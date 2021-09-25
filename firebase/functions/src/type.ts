@@ -32,3 +32,17 @@ export type VFTrigger = {
 export type ViewTrigger = {
   readonly [collectionName: string]: VFTrigger;
 };
+
+export type MasmottTrigger = {
+  readonly [key: string]: {
+    readonly [key: string]: {
+      readonly [key: string]: VFTrigger;
+    };
+  };
+};
+
+export type GetVFTriggerContext = {
+  readonly vfName: string;
+  readonly viewCollectionName: string;
+  readonly viewName: string;
+};

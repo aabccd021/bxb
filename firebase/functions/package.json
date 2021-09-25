@@ -27,9 +27,12 @@
     "@typescript-eslint/parser": "^3.8.0",
     "eslint": "^7.6.0",
     "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-functional": "^3.7.2",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-only-warn": "^1.0.3",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-unused-imports": "^1.1.5",
     "firebase-functions-test": "^0.2.0",
     "prettier": "^2.4.1",
     "typescript": "^3.8.0"
@@ -65,7 +68,8 @@
       "@typescript-eslint",
       "functional",
       "import",
-      "only-warn"
+      "only-warn",
+      "unused-imports"
     ],
     "rules": {
       "prettier/prettier": [
@@ -75,7 +79,18 @@
           "printWidth": 80
         }
       ],
-      "functional/no-throw-statement": "off"
+      "functional/no-throw-statement": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "unused-imports/no-unused-imports-ts": "warn",
+      "unused-imports/no-unused-vars": [
+        "warn",
+        {
+          "vars": "all",
+          "varsIgnorePattern": "^_",
+          "args": "after-used",
+          "argsIgnorePattern": "^_"
+        }
+      ]
     }
   }
 }

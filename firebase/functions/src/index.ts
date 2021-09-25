@@ -24,7 +24,7 @@ export const triggers = getTrigger<SFSpec, VFSpec>({
       },
     },
   },
-  getVfTrigger: ({ vfName, vfSpec, viewCollectionName, viewName }) => {
-    return getStringVFTrigger({ vfName, vfSpec, viewCollectionName, viewName });
+  getVfTrigger: (context, vfSpec) => {
+    return getStringVFTrigger(context, vfSpec);
   },
 });

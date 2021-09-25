@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { VFTrigger } from '../type';
+import { GetVFTriggerContext, VFTrigger } from '../type';
 
 export type StringSFSpec = {
   readonly type: 'string';
@@ -10,16 +10,10 @@ export type StringVFSpec = {
   readonly type: 'string';
 };
 
-export function getStringVFTrigger({
-  vfName,
-  viewCollectionName,
-  viewName,
-}: {
-  readonly vfName: string;
-  readonly vfSpec: StringVFSpec;
-  readonly viewCollectionName: string;
-  readonly viewName: string;
-}): VFTrigger {
+export function getStringVFTrigger(
+  { viewCollectionName, vfName, viewName }: GetVFTriggerContext,
+  _: StringVFSpec
+): VFTrigger {
   return {
     onSrcCreate: functions.firestore
       .document(`${viewCollectionName}/{documentId}`)
