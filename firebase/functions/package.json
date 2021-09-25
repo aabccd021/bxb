@@ -1,0 +1,74 @@
+{
+  "name": "functions",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "lint": "eslint --ext .js,.ts .",
+    "build": "tsc",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "14"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "^9.8.0",
+    "firebase-functions": "^3.14.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.9.1",
+    "@typescript-eslint/parser": "^3.8.0",
+    "eslint": "^7.6.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.22.0",
+    "firebase-functions-test": "^0.2.0",
+    "prettier": "^2.4.1",
+    "typescript": "^3.8.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "es6": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:import/errors",
+      "plugin:import/warnings",
+      "plugin:import/typescript",
+      "google",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended",
+      "prettier"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": [
+        "tsconfig.json",
+        "tsconfig.dev.json"
+      ],
+      "sourceType": "module"
+    },
+    "ignorePatterns": [
+      "/lib/**/*"
+    ],
+    "plugins": [
+      "@typescript-eslint",
+      "import"
+    ],
+    "rules": {
+      "import/no-unresolved": 0,
+      "prettier/prettier": [
+        "warn",
+        {
+          "singleQuote": true,
+          "printWidth": 80
+        }
+      ]
+    }
+  }
+}

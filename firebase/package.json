@@ -1,0 +1,10 @@
+{
+	"license": "MIT",
+	"scripts": {
+		"start": "firebase emulators:start --project demo-masmott",
+		"clean-start": "cd functions && yarn build && cd .. && yarn start"
+	},
+	"devDependencies": {
+		"firebase-tools": "^9.16.0"
+	}
+}
