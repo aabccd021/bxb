@@ -2,14 +2,18 @@
 	"name": "generator",
 	"license": "MIT",
 	"private": true,
+	"bin": {
+		"masmott": "lib/index.js"
+	},
 	"scripts": {
 		"lint": "eslint --ext .js,.ts .",
-		"build": "tsc"
+		"build": "tsc",
+		"start": "node lib/index.js",
+		"clean-start": "yarn build && yarn start"
 	},
 	"engines": {
 		"node": "14"
 	},
-	"main": "lib/index.js",
 	"dependencies": {
 		"assert-never": "^1.2.1",
 		"lodash": "^4.17.21"
