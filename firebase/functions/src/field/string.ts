@@ -21,32 +21,82 @@ export function getStringVFTrigger({
   readonly viewName: string;
 }): VFTrigger {
   return {
-    copyOnCreate: functions.firestore
+    onSourceCreate: functions.firestore
       .document(`${viewCollectionName}/{documentId}`)
       .onCreate((snapshot) => {
-        const stringSFData = snapshot.data()?.[vfName];
+        const sourceData = snapshot.data()?.[vfName];
 
-        // type validation
-        if (typeof stringSFData !== 'string') {
-          return functions.logger.error('Invalid Type', {
+        if (typeof sourceData !== 'string') {
+          functions.logger.error('Invalid Type', {
             viewCollectionName,
             viewName,
             vfName,
             snapshot,
           });
+          return 1;
         }
 
-        // copy the data
         return admin
           .firestore()
           .collection(`${viewCollectionName}_${viewName}`)
           .doc(snapshot.id)
           .set(
             {
-              [vfName]: stringSFData,
+              [vfName]: sourceData,
             },
             { merge: true }
           );
+      }),
+    onSourceUpdate: functions.firestore
+      .document(`${viewCollectionName}/{documentId}`)
+      .onUpdate((change) => {
+        const sourceDataBefore = change.before.data()?.[vfName];
+
+        if (typeof sourceDataBefore !== 'string') {
+          functions.logger.error('Invalid Type', {
+            viewCollectionName,
+            viewName,
+            vfName,
+            change,
+          });
+          return 1;
+        }
+
+        const sourceDataAfter = change.after.data()?.[vfName];
+
+        if (typeof sourceDataAfter !== 'string') {
+          functions.logger.error('Invalid Type', {
+            viewCollectionName,
+            viewName,
+            vfName,
+            change,
+          });
+          return 1;
+        }
+
+        if (sourceDataBefore === sourceDataAfter) {
+          return 0;
+        }
+
+        return admin
+          .firestore()
+          .collection(`${viewCollectionName}_${viewName}`)
+          .doc(change.after.id)
+          .set(
+            {
+              [vfName]: sourceDataAfter,
+            },
+            { merge: true }
+          );
+      }),
+    onSourceDelete: functions.firestore
+      .document(`${viewCollectionName}/{documentId}`)
+      .onDelete((snapshot) => {
+        return admin
+          .firestore()
+          .collection(`${viewCollectionName}_${viewName}`)
+          .doc(snapshot.id)
+          .delete();
       }),
   };
 }
