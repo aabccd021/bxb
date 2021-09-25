@@ -2,4 +2,6 @@ node_modules
 coverage
 *.log
 dist
-lib
+**/lib/**/*.js
+**/lib/**/*.map
+**/lib/**/*.d.ts
