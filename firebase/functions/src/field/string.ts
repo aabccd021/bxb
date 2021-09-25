@@ -21,18 +21,13 @@ export function getStringVFTrigger({
   readonly viewName: string;
 }): VFTrigger {
   return {
-    onSourceCreate: functions.firestore
+    onSrcCreate: functions.firestore
       .document(`${viewCollectionName}/{documentId}`)
       .onCreate((snapshot) => {
-        const sourceData = snapshot.data()?.[vfName];
+        const srcData = snapshot.data()?.[vfName];
 
-        if (typeof sourceData !== 'string') {
-          functions.logger.error('Invalid Type', {
-            viewCollectionName,
-            viewName,
-            vfName,
-            snapshot,
-          });
+        if (typeof srcData !== 'string') {
+          functions.logger.error('Invalid Type', { snapshot });
           return 1;
         }
 
@@ -42,39 +37,26 @@ export function getStringVFTrigger({
           .doc(snapshot.id)
           .set(
             {
-              [vfName]: sourceData,
+              [vfName]: srcData,
             },
             { merge: true }
           );
       }),
-    onSourceUpdate: functions.firestore
+    onSrcUpdate: functions.firestore
       .document(`${viewCollectionName}/{documentId}`)
       .onUpdate((change) => {
-        const sourceDataBefore = change.before.data()?.[vfName];
+        const srcDataBefore = change.before.data()?.[vfName];
+        const srcDataAfter = change.after.data()?.[vfName];
 
-        if (typeof sourceDataBefore !== 'string') {
-          functions.logger.error('Invalid Type', {
-            viewCollectionName,
-            viewName,
-            vfName,
-            change,
-          });
+        if (
+          typeof srcDataBefore !== 'string' ||
+          typeof srcDataAfter !== 'string'
+        ) {
+          functions.logger.error('Invalid Type', { change });
           return 1;
         }
 
-        const sourceDataAfter = change.after.data()?.[vfName];
-
-        if (typeof sourceDataAfter !== 'string') {
-          functions.logger.error('Invalid Type', {
-            viewCollectionName,
-            viewName,
-            vfName,
-            change,
-          });
-          return 1;
-        }
-
-        if (sourceDataBefore === sourceDataAfter) {
+        if (srcDataBefore === srcDataAfter) {
           return 0;
         }
 
@@ -84,12 +66,12 @@ export function getStringVFTrigger({
           .doc(change.after.id)
           .set(
             {
-              [vfName]: sourceDataAfter,
+              [vfName]: srcDataAfter,
             },
             { merge: true }
           );
       }),
-    onSourceDelete: functions.firestore
+    onSrcDelete: functions.firestore
       .document(`${viewCollectionName}/{documentId}`)
       .onDelete((snapshot) => {
         return admin
