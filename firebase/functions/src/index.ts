@@ -10,7 +10,7 @@ export type VFSpec = StringVFSpec;
 export const triggers = getTrigger<SFSpec, VFSpec>({
   config: {
     user: {
-      source: {
+      src: {
         id: {
           type: 'string',
         },
@@ -19,6 +19,7 @@ export const triggers = getTrigger<SFSpec, VFSpec>({
         card: {
           id: {
             type: 'string',
+            srcFieldName: 'id',
           },
         },
       },

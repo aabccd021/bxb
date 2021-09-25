@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 
-export type CollectionSource<SFSpec> = {
+export type CollectionSrc<SFSpec> = {
   readonly [fieldName: string]: SFSpec;
 };
 
@@ -13,7 +13,7 @@ export type CollectionView<VFSpec> = {
 };
 
 export type CollectionConfig<SFSpec, VFSpec> = {
-  readonly source: CollectionSource<SFSpec>;
+  readonly src: CollectionSrc<SFSpec>;
   readonly view: CollectionView<VFSpec>;
 };
 

@@ -8,17 +8,18 @@ export type StringSFSpec = {
 
 export type StringVFSpec = {
   readonly type: 'string';
+  readonly srcFieldName: string;
 };
 
 export function getStringVFTrigger(
   { viewCollectionName, vfName, viewName }: GetVFTriggerContext,
-  _: StringVFSpec
+  spec: StringVFSpec
 ): VFTrigger {
   return {
     onSrcCreate: functions.firestore
       .document(`${viewCollectionName}/{documentId}`)
       .onCreate((snapshot) => {
-        const srcData = snapshot.data()?.[vfName];
+        const srcData = snapshot.data()?.[spec.srcFieldName];
 
         if (typeof srcData !== 'string') {
           functions.logger.error('Invalid Type', { snapshot });
@@ -39,8 +40,8 @@ export function getStringVFTrigger(
     onSrcUpdate: functions.firestore
       .document(`${viewCollectionName}/{documentId}`)
       .onUpdate((change) => {
-        const srcDataBefore = change.before.data()?.[vfName];
-        const srcDataAfter = change.after.data()?.[vfName];
+        const srcDataBefore = change.before.data()?.[spec.srcFieldName];
+        const srcDataAfter = change.after.data()?.[spec.srcFieldName];
 
         if (
           typeof srcDataBefore !== 'string' ||
