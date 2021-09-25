@@ -2,18 +2,19 @@ import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { GetVFTriggerContext, VFTrigger } from '../type';
 
-export type StringSFSpec = {
-  readonly type: 'string';
+export type RefSFSpec = {
+  readonly type: 'ref';
+  readonly collection: string;
 };
 
-export type StringVFSpec = {
-  readonly type: 'string';
+export type RefVFSpec = {
+  readonly type: 'ref';
   readonly select: string;
 };
 
-export function getStringVFTrigger(
+export function getRefVFTrigger(
   { viewCollectionName, vfName, viewName }: GetVFTriggerContext,
-  { select: srcFieldName }: StringVFSpec
+  { select: srcFieldName }: RefVFSpec
 ): VFTrigger {
   return {
     onSrcCreate: functions.firestore

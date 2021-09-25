@@ -14,7 +14,7 @@ export type CollectionView<VFSpec> = {
 
 export type CollectionConfig<SFSpec, VFSpec> = {
   readonly src: CollectionSrc<SFSpec>;
-  readonly view: CollectionView<VFSpec>;
+  readonly view?: CollectionView<VFSpec>;
 };
 
 export type Collection<SFSpec, VFSpec> = {
