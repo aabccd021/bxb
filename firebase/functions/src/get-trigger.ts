@@ -14,14 +14,7 @@ export function getTrigger<SFSpec, VFSpec>({
   return mapValues(config, (collectionConfig, viewCollectionName) =>
     mapValues(collectionConfig.view, (view, viewName) =>
       mapValues(view, (vfSpec, vfName) =>
-        getVfTrigger(
-          {
-            vfName,
-            viewCollectionName,
-            viewName,
-          },
-          vfSpec
-        )
+        getVfTrigger({ vfName, viewCollectionName, viewName }, vfSpec)
       )
     )
   );
