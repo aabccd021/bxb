@@ -8,7 +8,7 @@ export type SFSpec = StringSFSpec;
 export type VFSpec = StringVFSpec;
 
 export const triggers = getTrigger<SFSpec, VFSpec>({
-  config: {
+  collection: {
     user: {
       src: {
         id: {
@@ -19,7 +19,7 @@ export const triggers = getTrigger<SFSpec, VFSpec>({
         card: {
           id: {
             type: 'string',
-            srcFieldName: 'id',
+            src: 'id',
           },
         },
       },

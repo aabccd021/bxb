@@ -1,0 +1,10 @@
+collection:
+  user:
+    src:
+      id: 
+        type: string
+    view:
+      card:
+        id:
+          type: string
+          src: id

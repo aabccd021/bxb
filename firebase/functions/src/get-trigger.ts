@@ -1,17 +1,22 @@
 import { mapValues } from 'lodash';
-import { Config, GetVFTriggerContext, MasmottTrigger, VFTrigger } from './type';
+import {
+  Collection,
+  GetVFTriggerContext,
+  MasmottTrigger,
+  VFTrigger,
+} from './type';
 
 export function getTrigger<SFSpec, VFSpec>({
-  config,
+  collection,
   getVfTrigger,
 }: {
-  readonly config: Config<SFSpec, VFSpec>;
+  readonly collection: Collection<SFSpec, VFSpec>;
   readonly getVfTrigger: (
     context: GetVFTriggerContext,
     vfSpec: VFSpec
   ) => VFTrigger;
 }): MasmottTrigger {
-  return mapValues(config, (collectionConfig, viewCollectionName) =>
+  return mapValues(collection, (collectionConfig, viewCollectionName) =>
     mapValues(collectionConfig.view, (view, viewName) =>
       mapValues(view, (vfSpec, vfName) =>
         getVfTrigger({ vfName, viewCollectionName, viewName }, vfSpec)
