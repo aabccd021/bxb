@@ -73,12 +73,12 @@ export function getStringVFTrigger({
       }),
     onSrcDelete: functions.firestore
       .document(`${viewCollectionName}/{documentId}`)
-      .onDelete((snapshot) => {
-        return admin
+      .onDelete((snapshot) =>
+        admin
           .firestore()
           .collection(`${viewCollectionName}_${viewName}`)
           .doc(snapshot.id)
-          .delete();
-      }),
+          .delete()
+      ),
   };
 }
