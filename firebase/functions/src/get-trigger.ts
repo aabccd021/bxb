@@ -1,10 +1,8 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import * as _ from 'lodash';
-import { mapValues } from 'lodash';
+import { Dictionary, mapKeys, mapValues, pick } from 'lodash';
 import {
   Collection,
-  Dict,
   FirestoreDataType,
   JoinSpec,
   RefSpec,
@@ -84,7 +82,7 @@ function addRefPrefixToFieldNames(
   const refFieldNames = [firstRef.fieldName, ...refChainFieldNames];
   const prefix = refFieldNames.join('_');
 
-  const prefixedData = _.mapKeys(
+  const prefixedData = mapKeys(
     data,
     (_, fieldName) => `${prefix}_${fieldName}`
   );
@@ -98,7 +96,7 @@ async function getDocDataFromJoinSpec(
 ): Promise<FirebaseFirestore.DocumentData> {
   const refDoc = await getRefDocFromRefSpecs(firstRef, refChain, data);
 
-  const docData = _.pick(refDoc.data(), selectedFieldNames);
+  const docData = pick(refDoc.data(), selectedFieldNames);
 
   const docDataWithId = {
     ...docData,
@@ -166,7 +164,7 @@ function getOnSrcCreatedFunction(
   viewCollectionRef: FirebaseFirestore.CollectionReference
 ): functions.CloudFunction<functions.firestore.QueryDocumentSnapshot> {
   return srcDocFunction.onCreate(async (srcDoc) => {
-    const selectedDocData = _.pick(srcDoc.data(), selectedFieldNames);
+    const selectedDocData = pick(srcDoc.data(), selectedFieldNames);
 
     const joinedDocData = await getJoinedDocData(srcDoc.data(), joinSpecs);
 
@@ -191,7 +189,7 @@ function getOnSrcUpdateFunction(
   return srcDocFunction.onUpdate(
     async ({ before: srcDocBefore, after: scrDocAfter }) => {
       const allDocDataUpdate = getDocDataDiff(srcDocBefore, scrDocAfter);
-      const docDataUpdate = _.pick(allDocDataUpdate, selectedFieldNames);
+      const docDataUpdate = pick(allDocDataUpdate, selectedFieldNames);
 
       const hasUpdate = Object.keys(docDataUpdate).length > 1;
       if (hasUpdate) {
@@ -215,7 +213,8 @@ function getOnSrcDeletedFunction(
 
 function getViewTrigger(
   collectionName: string,
-  { viewName, selectedFieldNames, joinSpecs }: View
+  viewName: string,
+  { selectedFieldNames, joinSpecs }: View
 ): ViewTrigger {
   const viewCollectionRef = admin
     .firestore()
@@ -250,9 +249,11 @@ function getViewTrigger(
 }
 
 export function getTrigger(
-  collections: Dict<Collection>
-): Dict<Dict<ViewTrigger>> {
-  return _.mapValues(collections, ({ views }, collectionName) =>
-    _.mapValues(views, (view) => getViewTrigger(collectionName, view))
+  collections: Dictionary<Collection>
+): Dictionary<Dictionary<ViewTrigger>> {
+  return mapValues(collections, ({ views }, collectionName) =>
+    mapValues(views, (view, viewName) =>
+      getViewTrigger(collectionName, viewName, view)
+    )
   );
 }

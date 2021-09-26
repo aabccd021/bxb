@@ -1,10 +1,7 @@
 import * as functions from 'firebase-functions';
+import { Dictionary } from 'lodash';
 import { RefSFSpec } from './field/ref';
 import { StringSFSpec } from './field/string';
-
-export type Dict<T> = {
-  readonly [key: string]: T;
-};
 
 export type SFSpec = StringSFSpec | RefSFSpec;
 
@@ -31,7 +28,7 @@ export type View = {
 
 export type Collection = {
   readonly src: readonly SF[];
-  readonly views: Dict<View>;
+  readonly views: Dictionary<View>;
 };
 
 export type FirestoreDataType = string;
