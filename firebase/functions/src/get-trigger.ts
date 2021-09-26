@@ -6,13 +6,7 @@ import * as functions from 'firebase-functions';
 function mergeObjectArray<T>(
   objectArray: readonly { readonly [key: string]: T }[]
 ): { readonly [key: string]: T } {
-  return objectArray.reduce(
-    (acc, object) => ({
-      ...acc,
-      ...object,
-    }),
-    {}
-  );
+  return objectArray.reduce((acc, object) => ({ ...acc, ...object }), {});
 }
 
 async function getRefDocFromRefSpecChainRec(
@@ -119,7 +113,7 @@ export function getTrigger(collections: readonly Collection[]): void {
         .firestore()
         .collection(`${collectionName}_${viewName}`);
 
-      const onCreateFunction = functions.firestore
+      const onSrcCreated = functions.firestore
         .document(`${collectionName}/{docId}`)
         .onCreate(async (srcDoc) => {
           const selectedDocData = _.pick(srcDoc.data(), selectedFieldNames);
@@ -139,7 +133,7 @@ export function getTrigger(collections: readonly Collection[]): void {
           await viewCollectionRef.doc(viewDocId).create(viewDocData);
         });
 
-      return onCreateFunction;
+      return onSrcCreated;
     })
   );
 }
