@@ -2,11 +2,26 @@ import * as _ from 'lodash';
 import * as admin from 'firebase-admin';
 import { Collection, JoinSpec, RefSpec } from './type';
 import * as functions from 'firebase-functions';
+import { mapValues } from 'lodash';
 
 function mergeObjectArray<T>(
   objectArray: readonly { readonly [key: string]: T }[]
 ): { readonly [key: string]: T } {
   return objectArray.reduce((acc, object) => ({ ...acc, ...object }), {});
+}
+
+function compactObject<T>(object: { readonly [key: string]: T | undefined }): {
+  readonly [key: string]: T;
+} {
+  return Object.entries(object).reduce((acc, [key, value]) => {
+    if (value !== undefined) {
+      return {
+        ...acc,
+        [key]: value,
+      };
+    }
+    return acc;
+  }, {});
 }
 
 async function getRefDocFromRefSpecChainRec(
@@ -104,6 +119,38 @@ async function getJoinedDocData(
   const docData = mergeObjectArray(docDataArray);
 
   return docData;
+}
+
+type FirestoreDataType = string;
+
+function getFieldDiff(
+  before: unknown,
+  after: unknown
+): FirestoreDataType | undefined {
+  if (typeof before === 'string' && typeof after === 'string') {
+    if (before !== after) {
+      return after;
+    }
+    return undefined;
+  }
+
+  functions.logger.error('unknown type', { before, after });
+  throw Error();
+}
+
+function getDocDataDiff(
+  beforeDocData: FirebaseFirestore.DocumentData,
+  afterDocData: FirebaseFirestore.DocumentData
+): FirebaseFirestore.DocumentData | undefined {
+  const docDataDiff = mapValues(beforeDocData, (beforeFieldData, fieldName) => {
+    const afterFieldData = afterDocData[fieldName];
+    const fieldDiff = getFieldDiff(beforeFieldData, afterFieldData);
+    return fieldDiff;
+  });
+
+  const compactDocDataDiff = compactObject(docDataDiff);
+
+  return compactDocDataDiff;
 }
 
 export function getTrigger(collections: readonly Collection[]): void {
