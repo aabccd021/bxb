@@ -6,11 +6,6 @@ export type StringSFSpec = {
   readonly type: 'string';
 };
 
-export type StringVFSpec = {
-  readonly type: 'string';
-  readonly select: string;
-};
-
 export function getStringVFTrigger(
   { viewCollectionName, vfName, viewName }: GetVFTriggerContext,
   { select: srcFieldName }: StringVFSpec

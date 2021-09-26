@@ -1,24 +1,39 @@
 import * as functions from 'firebase-functions';
+import { RefSFSpec } from './field/ref';
+import { StringSFSpec } from './field/string';
 
-export type CollectionSrc<SFSpec> = {
+export type SFSpec = StringSFSpec | RefSFSpec;
+
+export type CollectionSrc = {
   readonly [fieldName: string]: SFSpec;
 };
 
-export type View<VFSpec> = {
-  readonly [fieldName: string]: VFSpec;
+export type FirestoreDataType = string;
+
+export type SelectedFieldNames = readonly string[];
+
+export type JoinSpec = {
+  readonly refCollectionName: string;
+  readonly refFieldName: string;
+  readonly selectedFieldNames: SelectedFieldNames;
 };
 
-export type CollectionView<VFSpec> = {
-  readonly [viewName: string]: View<VFSpec>;
+export type View = {
+  readonly selectedFieldNames?: SelectedFieldNames;
+  readonly joinSpecs?: readonly JoinSpec[];
 };
 
-export type CollectionConfig<SFSpec, VFSpec> = {
-  readonly src: CollectionSrc<SFSpec>;
-  readonly view?: CollectionView<VFSpec>;
+export type CollectionView = {
+  readonly [viewname: string]: View;
 };
 
-export type Collection<SFSpec, VFSpec> = {
-  readonly [collectionName: string]: CollectionConfig<SFSpec, VFSpec>;
+export type Collection = {
+  readonly src: CollectionSrc;
+  readonly view?: CollectionView;
+};
+
+export type Collections = {
+  readonly [collectionName: string]: Collection;
 };
 
 export type VFTrigger = {

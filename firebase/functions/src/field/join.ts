@@ -25,11 +25,6 @@ export function getJoinVFTrigger(
       .onCreate(async (snapshot) => {
         const refId = snapshot.data()?.[refFieldName];
 
-        if (typeof refId !== 'string') {
-          functions.logger.error('Invalid Type', { snapshot });
-          return 0;
-        }
-
         const refDoc = await admin
           .firestore()
           .collection(refCollectionName)
