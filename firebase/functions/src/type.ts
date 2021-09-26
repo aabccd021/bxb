@@ -34,9 +34,14 @@ export type Collection = {
 export type FirestoreDataType = string;
 
 export type ViewTrigger = {
-  readonly onSrcCreated: functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
-  readonly onSrcUpdated: functions.CloudFunction<
-    functions.Change<functions.firestore.QueryDocumentSnapshot>
-  >;
-  readonly onSrcDeleted: functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
+  readonly onSrcCreated: OnCreateFunction;
+  readonly onSrcUpdated: OnUpdateFunction;
+  readonly onSrcDeleted: OnDeleteFunction;
 };
+
+export type OnCreateFunction =
+  functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
+export type OnDeleteFunction = OnCreateFunction;
+export type OnUpdateFunction = functions.CloudFunction<
+  functions.Change<functions.firestore.QueryDocumentSnapshot>
+>;
