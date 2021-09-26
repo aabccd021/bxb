@@ -71,19 +71,20 @@
       "unused-imports"
     ],
     "rules": {
-      "no-unsafe-optional-chaining": "warn",
-      "no-use-before-define": "warn",
-      "no-else-return": "warn",
-      "no-useless-return": "warn",
-      "no-undef-init": "warn",
-      "no-useless-rename": "warn",
-      "object-shorthand": "warn",
-      "prefer-arrow-callback": "warn",
-      "prefer-destructuring": "warn",
-      "prefer-template": "warn",
-      "eqeqeq": "warn",
+      "no-unsafe-optional-chaining": "error",
+      "no-use-before-define": "error",
+      "no-else-return": "error",
+      "no-useless-return": "error",
+      "no-undef-init": "error",
+      "no-useless-rename": "error",
+      "object-shorthand": "error",
+      "prefer-arrow-callback": "error",
+      "prefer-destructuring": "error",
+      "prefer-template": "error",
+      "eqeqeq": "error",
+      "@typescript-eslint/explicit-function-return-type": "error",
       "prettier/prettier": [
-        "warn",
+        "error",
         {
           "singleQuote": true,
           "printWidth": 80
@@ -91,9 +92,9 @@
       ],
       "functional/no-throw-statement": "off",
       "@typescript-eslint/no-unused-vars": "off",
-      "unused-imports/no-unused-imports-ts": "warn",
+      "unused-imports/no-unused-imports-ts": "error",
       "unused-imports/no-unused-vars": [
-        "warn",
+        "error",
         {
           "vars": "all",
           "varsIgnorePattern": "^_",

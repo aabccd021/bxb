@@ -3,13 +3,13 @@ import * as functions from 'firebase-functions';
 import { Dictionary, mapKeys, mapValues, pick } from 'lodash';
 import {
   Collection,
+  FieldSpec,
   FirestoreDataType,
   JoinSpec,
   OnCreateFunction,
   OnDeleteFunction,
   OnUpdateFunction,
   RefSpec,
-  FieldSpec,
   View,
   ViewTrigger as ViewTriggers,
 } from './type';
@@ -161,11 +161,16 @@ function getDocDataDiff(
   return compactDocDataDiff;
 }
 
-function getSrcDocFunction(collectionName: string) {
+function getSrcDocFunction(
+  collectionName: string
+): functions.firestore.DocumentBuilder {
   return functions.firestore.document(`${collectionName}/{docId}`);
 }
 
-function getViewCollectionRef(collectionName: string, viewName: string) {
+function getViewCollectionRef(
+  collectionName: string,
+  viewName: string
+): FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData> {
   return admin.firestore().collection(`${collectionName}_${viewName}`);
 }
 
