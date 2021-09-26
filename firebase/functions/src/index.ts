@@ -3,9 +3,8 @@ import { getTrigger } from './get-trigger';
 
 admin.initializeApp();
 
-export const triggers = getTrigger([
-  {
-    collectionName: 'user',
+export const triggers = getTrigger({
+  user: {
     src: [
       {
         name: 'id',
@@ -20,16 +19,14 @@ export const triggers = getTrigger([
         },
       },
     ],
-    view: [
-      {
-        viewName: 'card',
+    views: {
+      card: {
         selectedFieldNames: ['id'],
         joinSpecs: [],
       },
-    ],
+    },
   },
-  {
-    collectionName: 'tweet',
+  tweet: {
     src: [
       {
         name: 'text',
@@ -45,9 +42,8 @@ export const triggers = getTrigger([
         },
       },
     ],
-    view: [
-      {
-        viewName: 'card',
+    views: {
+      card: {
         selectedFieldNames: ['text'],
         joinSpecs: [
           {
@@ -60,10 +56,9 @@ export const triggers = getTrigger([
           },
         ],
       },
-    ],
+    },
   },
-  {
-    collectionName: 'reply',
+  reply: {
     src: [
       {
         name: 'text',
@@ -77,9 +72,8 @@ export const triggers = getTrigger([
         },
       },
     ],
-    view: [
-      {
-        viewName: 'card',
+    views: {
+      card: {
         selectedFieldNames: ['text'],
         joinSpecs: [
           {
@@ -97,6 +91,6 @@ export const triggers = getTrigger([
           },
         ],
       },
-    ],
+    },
   },
-]);
+});

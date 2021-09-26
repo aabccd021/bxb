@@ -1,9 +1,16 @@
-import * as _ from 'lodash';
 import * as admin from 'firebase-admin';
-import { Collection, JoinSpec, RefSpec, View } from './type';
 import * as functions from 'firebase-functions';
+import * as _ from 'lodash';
 import { mapValues } from 'lodash';
-import { QueryDocumentSnapshot } from 'firebase-functions/v1/firestore';
+import {
+  Collection,
+  Dict,
+  FirestoreDataType,
+  JoinSpec,
+  RefSpec,
+  View,
+  ViewTrigger,
+} from './type';
 
 function mergeObjectArray<T>(
   objectArray: readonly { readonly [key: string]: T }[]
@@ -122,8 +129,6 @@ async function getJoinedDocData(
   return docData;
 }
 
-type FirestoreDataType = string;
-
 function getFieldDiff(
   before: unknown,
   after: unknown
@@ -208,14 +213,6 @@ function getOnSrcDeletedFunction(
   });
 }
 
-type ViewTrigger = {
-  readonly onSrcCreated: functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
-  readonly onSrcUpdated: functions.CloudFunction<
-    functions.Change<functions.firestore.QueryDocumentSnapshot>
-  >;
-  readonly onSrcDeleted: functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
-};
-
 function getViewTrigger(
   collectionName: string,
   { viewName, selectedFieldNames, joinSpecs }: View
@@ -253,9 +250,9 @@ function getViewTrigger(
 }
 
 export function getTrigger(
-  collections: readonly Collection[]
-): readonly (readonly ViewTrigger[])[] {
-  return collections.map(({ collectionName, views }) =>
-    views?.map((view) => getViewTrigger(collectionName, view))
+  collections: Dict<Collection>
+): Dict<Dict<ViewTrigger>> {
+  return _.mapValues(collections, ({ views }, collectionName) =>
+    _.mapValues(views, (view) => getViewTrigger(collectionName, view))
   );
 }

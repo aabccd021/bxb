@@ -2,6 +2,10 @@ import * as functions from 'firebase-functions';
 import { RefSFSpec } from './field/ref';
 import { StringSFSpec } from './field/string';
 
+export type Dict<T> = {
+  readonly [key: string]: T;
+};
+
 export type SFSpec = StringSFSpec | RefSFSpec;
 
 export type SF = {
@@ -21,21 +25,21 @@ export type JoinSpec = {
 };
 
 export type View = {
-  readonly viewName: string;
   readonly selectedFieldNames: readonly string[];
   readonly joinSpecs: readonly JoinSpec[];
 };
 
 export type Collection = {
-  readonly collectionName: string;
   readonly src: readonly SF[];
-  readonly view: readonly View[];
+  readonly views: Dict<View>;
 };
 
-export type VFTrigger = {
-  readonly [triggerName: string]:
-    | functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>
-    | functions.CloudFunction<
-        functions.Change<functions.firestore.QueryDocumentSnapshot>
-      >;
+export type FirestoreDataType = string;
+
+export type ViewTrigger = {
+  readonly onSrcCreated: functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
+  readonly onSrcUpdated: functions.CloudFunction<
+    functions.Change<functions.firestore.QueryDocumentSnapshot>
+  >;
+  readonly onSrcDeleted: functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
 };
