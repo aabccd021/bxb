@@ -15,7 +15,7 @@ function mergeObjectArray<T>(
   );
 }
 
-function getSelectedDocumentData(
+function getSelectedDocData(
   data: FirebaseFirestore.DocumentData,
   selectedFieldNames: readonly string[] | undefined
 ): FirebaseFirestore.DocumentData {
@@ -23,11 +23,11 @@ function getSelectedDocumentData(
     return {};
   }
 
-  const selectedDocumentData = _.pick(data, selectedFieldNames);
-  return selectedDocumentData;
+  const selectedDocData = _.pick(data, selectedFieldNames);
+  return selectedDocData;
 }
 
-async function getDocumentDataFromJoinSpec(
+async function getDocDataFromJoinSpec(
   data: FirebaseFirestore.DocumentData,
   { refCollectionName, refFieldName, selectedFieldNames }: JoinSpec
 ): Promise<FirebaseFirestore.DocumentData> {
@@ -39,11 +39,11 @@ async function getDocumentDataFromJoinSpec(
     .doc(refId)
     .get();
 
-  const selectedDocumentData = _.pick(refDoc.data(), selectedFieldNames);
-  return selectedDocumentData;
+  const selectedDocData = _.pick(refDoc.data(), selectedFieldNames);
+  return selectedDocData;
 }
 
-async function getJoinedDocumentData(
+async function getJoinedDocData(
   data: FirebaseFirestore.DocumentData,
   specs: readonly JoinSpec[] | undefined
 ): Promise<FirebaseFirestore.DocumentData> {
@@ -51,15 +51,15 @@ async function getJoinedDocumentData(
     return {};
   }
 
-  const documentDataPromises = specs.map((spec) =>
-    getDocumentDataFromJoinSpec(data, spec)
+  const docDataPromises = specs.map((spec) =>
+    getDocDataFromJoinSpec(data, spec)
   );
 
-  const documentDataArray = await Promise.all(documentDataPromises);
+  const docDataArray = await Promise.all(docDataPromises);
 
-  const documentData = mergeObjectArray(documentDataArray);
+  const docData = mergeObjectArray(docDataArray);
 
-  return documentData;
+  return docData;
 }
 
 export function getTrigger(collections: readonly Collection[]): void {
@@ -70,24 +70,26 @@ export function getTrigger(collections: readonly Collection[]): void {
         .collection(`${collectionName}_${viewName}`);
 
       const onCreateFunction = functions.firestore
-        .document(`${collectionName}/{documentId}`)
-        .onCreate(async (snapshot) => {
-          const selectedDocumentData = getSelectedDocumentData(
-            snapshot.data(),
+        .document(`${collectionName}/{docId}`)
+        .onCreate(async (srcDoc) => {
+          const selectedDoctData = getSelectedDocData(
+            srcDoc.data(),
             selectedFieldNames
           );
 
-          const joinedDocumentData = await getJoinedDocumentData(
-            snapshot.data(),
+          const joinedDocData = await getJoinedDocData(
+            srcDoc.data(),
             joinSpecs
           );
 
-          const viewDocumentData = {
-            ...selectedDocumentData,
-            ...joinedDocumentData,
+          const viewDocData: FirebaseFirestore.DocumentData = {
+            ...selectedDoctData,
+            ...joinedDocData,
           };
 
-          await viewCollectionRef.doc(snapshot.id).create(viewDocumentData);
+          const viewDocId = srcDoc.id;
+
+          await viewCollectionRef.doc(viewDocId).create(viewDocData);
         });
 
       return onCreateFunction;
