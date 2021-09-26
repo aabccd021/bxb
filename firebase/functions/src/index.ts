@@ -51,8 +51,48 @@ export const triggers = getTrigger([
         selectedFieldNames: ['text'],
         joinSpecs: [
           {
-            refCollectionName: 'user',
-            refFieldName: 'owner',
+            firstRef: {
+              collectionName: 'user',
+              fieldName: 'owner',
+            },
+            refChain: [],
+            selectedFieldNames: ['username'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    collectionName: 'reply',
+    src: [
+      {
+        name: 'text',
+        spec: { type: 'string' },
+      },
+      {
+        name: 'repliedTweet',
+        spec: {
+          type: 'ref',
+          collection: 'tweet',
+        },
+      },
+    ],
+    view: [
+      {
+        viewName: 'card',
+        selectedFieldNames: ['text'],
+        joinSpecs: [
+          {
+            firstRef: {
+              collectionName: 'tweet',
+              fieldName: 'repliedTweet',
+            },
+            refChain: [
+              {
+                collectionName: 'user',
+                fieldName: 'owner',
+              },
+            ],
             selectedFieldNames: ['username'],
           },
         ],

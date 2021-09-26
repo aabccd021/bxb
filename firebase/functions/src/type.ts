@@ -9,9 +9,14 @@ export type SF = {
   readonly spec: SFSpec;
 };
 
+export type RefSpec = {
+  readonly collectionName: string;
+  readonly fieldName: string;
+};
+
 export type JoinSpec = {
-  readonly refCollectionName: string;
-  readonly refFieldName: string;
+  readonly firstRef: RefSpec;
+  readonly refChain: readonly RefSpec[];
   readonly selectedFieldNames: readonly string[];
 };
 

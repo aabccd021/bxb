@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as admin from 'firebase-admin';
-import { Collection, JoinSpec } from './type';
+import { Collection, JoinSpec, RefSpec } from './type';
 import * as functions from 'firebase-functions';
 
 function mergeObjectArray<T>(
@@ -15,28 +15,81 @@ function mergeObjectArray<T>(
   );
 }
 
-function getSelectedDocData(
-  data: FirebaseFirestore.DocumentData,
-  selectedFieldNames: readonly string[]
+async function getRefDocFromRefSpecChainRec(
+  refChain: readonly RefSpec[],
+  snapshot: FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>
+): Promise<FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>> {
+  const [currentRefSpec, ...nextRefChain] = refChain;
+
+  if (currentRefSpec === undefined) {
+    return snapshot;
+  }
+
+  const refId = snapshot.data()?.[currentRefSpec.fieldName];
+
+  const currentRefDoc = await admin
+    .firestore()
+    .collection(currentRefSpec.collectionName)
+    .doc(refId)
+    .get();
+
+  const refDoc = getRefDocFromRefSpecChainRec(nextRefChain, currentRefDoc);
+
+  return refDoc;
+}
+
+async function getRefDocFromRefSpecs(
+  firstRef: RefSpec,
+  refChain: readonly RefSpec[],
+  data: FirebaseFirestore.DocumentData
+): Promise<FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>> {
+  const refId = data[firstRef.fieldName];
+
+  const firstRefDoc = await admin
+    .firestore()
+    .collection(firstRef.collectionName)
+    .doc(refId)
+    .get();
+
+  const refDoc = getRefDocFromRefSpecChainRec(refChain, firstRefDoc);
+
+  return refDoc;
+}
+
+function addRefPrefixToFieldNames(
+  firstRef: RefSpec,
+  refChain: readonly RefSpec[],
+  data: FirebaseFirestore.DocumentData
 ): FirebaseFirestore.DocumentData {
-  const selectedDocData = _.pick(data, selectedFieldNames);
-  return selectedDocData;
+  const refChainFieldNames = refChain.map(({ fieldName }) => {
+    fieldName;
+  });
+  const refFieldNames = [firstRef.fieldName, ...refChainFieldNames];
+  const prefix = refFieldNames.join('_');
+
+  const prefixedData = _.mapKeys(
+    data,
+    (_, fieldName) => `${prefix}_${fieldName}`
+  );
+
+  return prefixedData;
 }
 
 async function getDocDataFromJoinSpec(
   data: FirebaseFirestore.DocumentData,
-  { refCollectionName, refFieldName, selectedFieldNames }: JoinSpec
+  { firstRef, refChain, selectedFieldNames }: JoinSpec
 ): Promise<FirebaseFirestore.DocumentData> {
-  const refId = data[refFieldName];
-
-  const refDoc = await admin
-    .firestore()
-    .collection(refCollectionName)
-    .doc(refId)
-    .get();
+  const refDoc = await getRefDocFromRefSpecs(firstRef, refChain, data);
 
   const selectedDocData = _.pick(refDoc.data(), selectedFieldNames);
-  return selectedDocData;
+
+  const prefixedData = addRefPrefixToFieldNames(
+    firstRef,
+    refChain,
+    selectedDocData
+  );
+
+  return prefixedData;
 }
 
 async function getJoinedDocData(
