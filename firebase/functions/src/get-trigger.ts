@@ -75,13 +75,27 @@ async function getRefDocFromRefSpecs(
   return refDoc;
 }
 
-function prefixJoinName(joinName: string, fieldName: string): string {
-  return `${joinName}_${fieldName}`;
+function addRefPrefixToFieldNames(
+  firstRef: RefSpec,
+  refChain: readonly RefSpec[],
+  data: FirebaseFirestore.DocumentData
+): FirebaseFirestore.DocumentData {
+  const refChainFieldNames = refChain.map(({ fieldName }) => {
+    fieldName;
+  });
+  const refFieldNames = [firstRef.fieldName, ...refChainFieldNames];
+  const prefix = refFieldNames.join('_');
+
+  const prefixedData = mapKeys(
+    data,
+    (_, fieldName) => `${prefix}_${fieldName}`
+  );
+
+  return prefixedData;
 }
 
 async function getDocDataFromJoinSpec(
   data: FirebaseFirestore.DocumentData,
-  joinName: string,
   { firstRef, refChain, selectedFieldNames }: JoinSpec
 ): Promise<FirebaseFirestore.DocumentData> {
   const refDoc = await getRefDocFromRefSpecs(firstRef, refChain, data);
@@ -93,8 +107,10 @@ async function getDocDataFromJoinSpec(
     id: refDoc.id,
   };
 
-  const prefixedData = mapKeys(docDataWithId, (_, fieldName) =>
-    prefixJoinName(joinName, fieldName)
+  const prefixedData = addRefPrefixToFieldNames(
+    firstRef,
+    refChain,
+    docDataWithId
   );
 
   return prefixedData;
@@ -102,10 +118,10 @@ async function getDocDataFromJoinSpec(
 
 async function getJoinedDocData(
   data: FirebaseFirestore.DocumentData,
-  specs: Dictionary<JoinSpec>
+  specs: readonly JoinSpec[]
 ): Promise<FirebaseFirestore.DocumentData> {
-  const docDataPromises = Object.entries(specs).map(([joinName, joinSpec]) =>
-    getDocDataFromJoinSpec(data, joinName, joinSpec)
+  const docDataPromises = specs.map((spec) =>
+    getDocDataFromJoinSpec(data, spec)
   );
 
   const docDataArray = await Promise.all(docDataPromises);
@@ -162,7 +178,7 @@ function getOnSrcCreatedFunction(
   collectionName: string,
   viewName: string,
   selectedFieldNames: readonly string[],
-  joinSpecs: Dictionary<JoinSpec>
+  joinSpecs: readonly JoinSpec[]
 ): OnCreateFunction {
   const srcDocFunction = getSrcDocFunction(collectionName);
   const onCreateFunction = srcDocFunction.onCreate(async (srcDoc) => {
@@ -207,12 +223,6 @@ function getOnSrcUpdateFunction(
   );
   return onUpdateFunction;
 }
-
-// function getOnJoinRefUpdateFunction(
-//   joinSpec: JoinSpec
-// ): Dictionary<OnUpdateFunction | undefined> {
-  
-// }
 
 function getOnSrcDeletedFunction(
   collectionName: string,

@@ -16,7 +16,7 @@ export const triggers = getTriggers({
     views: {
       card: {
         selectedFieldNames: ['id'],
-        joinSpecs: {},
+        joinSpecs: [],
       },
     },
   },
@@ -33,8 +33,8 @@ export const triggers = getTriggers({
     views: {
       card: {
         selectedFieldNames: ['text'],
-        joinSpecs: {
-          owener: {
+        joinSpecs: [
+          {
             firstRef: {
               collectionName: 'user',
               fieldName: 'owner',
@@ -42,7 +42,7 @@ export const triggers = getTriggers({
             refChain: [],
             selectedFieldNames: ['username'],
           },
-        },
+        ],
       },
     },
   },
@@ -60,8 +60,8 @@ export const triggers = getTriggers({
     views: {
       card: {
         selectedFieldNames: ['text'],
-        joinSpecs: {
-          repliedTweet_owner: {
+        joinSpecs: [
+          {
             firstRef: {
               collectionName: 'tweet',
               fieldName: 'repliedTweet',
@@ -74,7 +74,7 @@ export const triggers = getTriggers({
             ],
             selectedFieldNames: ['username'],
           },
-        },
+        ],
       },
     },
   },
