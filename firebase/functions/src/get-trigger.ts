@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as admin from 'firebase-admin';
-import { Collections, JoinSpec } from './type';
+import { Collection, JoinSpec } from './type';
 import * as functions from 'firebase-functions';
 
 function mergeObjectArray<T>(
@@ -62,39 +62,36 @@ async function getJoinedDocumentData(
   return documentData;
 }
 
-export function getTrigger(collections: Collections): void {
-  _.mapValues(collections, (collection, collectionName) =>
-    _.mapValues(
-      collection.view,
-      ({ selectedFieldNames, joinSpecs }, viewName) => {
-        const viewCollectionRef = admin
-          .firestore()
-          .collection(`${collectionName}_${viewName}`);
+export function getTrigger(collections: readonly Collection[]): void {
+  collections.map(({ collectionName, view }) =>
+    view?.map(({ viewName, selectedFieldNames, joinSpecs }) => {
+      const viewCollectionRef = admin
+        .firestore()
+        .collection(`${collectionName}_${viewName}`);
 
-        const onCreateFunction = functions.firestore
-          .document(`${collectionName}/{documentId}`)
-          .onCreate((snapshot) => {
-            const selectedDocumentData = getSelectedDocumentData(
-              snapshot.data(),
-              selectedFieldNames
-            );
+      const onCreateFunction = functions.firestore
+        .document(`${collectionName}/{documentId}`)
+        .onCreate((snapshot) => {
+          const selectedDocumentData = getSelectedDocumentData(
+            snapshot.data(),
+            selectedFieldNames
+          );
 
-            const joinedDocumentData = getJoinedDocumentData(
-              snapshot.data(),
-              joinSpecs
-            );
+          const joinedDocumentData = getJoinedDocumentData(
+            snapshot.data(),
+            joinSpecs
+          );
 
-            return viewCollectionRef.doc(snapshot.id).set(
-              {
-                ...selectedDocumentData,
-                ...joinedDocumentData,
-              },
-              { merge: true }
-            );
-          });
+          return viewCollectionRef.doc(snapshot.id).set(
+            {
+              ...selectedDocumentData,
+              ...joinedDocumentData,
+            },
+            { merge: true }
+          );
+        });
 
-        return onCreateFunction;
-      }
-    )
+      return onCreateFunction;
+    })
   );
 }

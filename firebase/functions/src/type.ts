@@ -4,36 +4,27 @@ import { StringSFSpec } from './field/string';
 
 export type SFSpec = StringSFSpec | RefSFSpec;
 
-export type CollectionSrc = {
-  readonly [fieldName: string]: SFSpec;
+export type SF = {
+  readonly name: string;
+  readonly spec: SFSpec;
 };
-
-export type FirestoreDataType = string;
-
-export type SelectedFieldNames = readonly string[];
 
 export type JoinSpec = {
   readonly refCollectionName: string;
   readonly refFieldName: string;
-  readonly selectedFieldNames: SelectedFieldNames;
+  readonly selectedFieldNames: readonly string[];
 };
 
 export type View = {
-  readonly selectedFieldNames?: SelectedFieldNames;
+  readonly viewName: string;
+  readonly selectedFieldNames?: readonly string[];
   readonly joinSpecs?: readonly JoinSpec[];
 };
 
-export type CollectionView = {
-  readonly [viewname: string]: View;
-};
-
 export type Collection = {
-  readonly src: CollectionSrc;
-  readonly view?: CollectionView;
-};
-
-export type Collections = {
-  readonly [collectionName: string]: Collection;
+  readonly collectionName: string;
+  readonly src: readonly SF[];
+  readonly view?: readonly View[];
 };
 
 export type VFTrigger = {
@@ -42,22 +33,4 @@ export type VFTrigger = {
     | functions.CloudFunction<
         functions.Change<functions.firestore.QueryDocumentSnapshot>
       >;
-};
-
-export type ViewTrigger = {
-  readonly [collectionName: string]: VFTrigger;
-};
-
-export type MasmottTrigger = {
-  readonly [key: string]: {
-    readonly [key: string]: {
-      readonly [key: string]: VFTrigger;
-    };
-  };
-};
-
-export type GetVFTriggerContext = {
-  readonly vfName: string;
-  readonly viewCollectionName: string;
-  readonly viewName: string;
 };

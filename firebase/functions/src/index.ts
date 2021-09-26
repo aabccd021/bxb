@@ -1,42 +1,52 @@
 import * as admin from 'firebase-admin';
-import { JoinVFSpec } from './field/join';
-import { RefSFSpec } from './field/ref';
-import { StringSFSpec, StringVFSpec } from './field/string';
 import { getTrigger } from './get-trigger';
 
 admin.initializeApp();
 
-export type SFSpec = StringSFSpec | RefSFSpec;
-export type VFSpec = StringVFSpec | JoinVFSpec;
-
-export const triggers = getTrigger({
-  user: {
-    src: {
-      id: {
-        type: 'string',
+export const triggers = getTrigger([
+  {
+    collectionName: 'user',
+    src: [
+      {
+        name: 'id',
+        spec: {
+          type: 'string',
+        },
       },
-      username: {
-        type: 'string',
+      {
+        name: 'username',
+        spec: {
+          type: 'string',
+        },
       },
-    },
-    view: {
-      card: {
+    ],
+    view: [
+      {
+        viewName: 'card',
         selectedFieldNames: ['id'],
       },
-    },
+    ],
   },
-  tweet: {
-    src: {
-      text: {
-        type: 'string',
+  {
+    collectionName: 'tweet',
+    src: [
+      {
+        name: 'text',
+        spec: {
+          type: 'string',
+        },
       },
-      owner: {
-        type: 'ref',
-        collection: 'user',
+      {
+        name: 'owner',
+        spec: {
+          type: 'ref',
+          collection: 'user',
+        },
       },
-    },
-    view: {
-      card: {
+    ],
+    view: [
+      {
+        viewName: 'card',
         selectedFieldNames: ['text'],
         joinSpecs: [
           {
@@ -46,6 +56,6 @@ export const triggers = getTrigger({
           },
         ],
       },
-    },
+    ],
   },
-});
+]);
