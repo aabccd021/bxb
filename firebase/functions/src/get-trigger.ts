@@ -255,15 +255,15 @@ function getOnJoinRefUpdateFunction(
           collectionName,
           viewName
         );
-        const referViewDocsSnapshot = await viewCollectionRef
+        const referrerViewDocsSnapshot = await viewCollectionRef
           .where(refIdFieldName, '==', refDocAfter.id)
           .get();
 
-        const referViewDocsUpdates = referViewDocsSnapshot.docs.map(({ ref }) =>
-          ref.update(prefixedDocDataUpdate)
+        const referrerViewDocsUpdates = referrerViewDocsSnapshot.docs.map(
+          ({ ref }) => ref.update(prefixedDocDataUpdate)
         );
 
-        await Promise.allSettled(referViewDocsUpdates);
+        await Promise.allSettled(referrerViewDocsUpdates);
       }
     });
 
@@ -318,17 +318,17 @@ function getOnSrcRefDeletedFunction(
     const onDeleteFunction = functions.firestore
       .document(`${sf.refCollection}/{documentId}`)
       .onDelete(async (refDoc) => {
-        const referSrcDocsSnapshot = await admin
+        const referrerSrcDocsSnapshot = await admin
           .firestore()
           .collection(collectionName)
           .where(sfName, '==', refDoc.id)
           .get();
 
-        const referDocsDeletes = referSrcDocsSnapshot.docs.map(({ ref }) =>
-          ref.delete()
+        const referrerDocsDeletes = referrerSrcDocsSnapshot.docs.map(
+          ({ ref }) => ref.delete()
         );
 
-        await Promise.allSettled(referDocsDeletes);
+        await Promise.allSettled(referrerDocsDeletes);
       });
     return onDeleteFunction;
   });
