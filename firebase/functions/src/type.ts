@@ -25,7 +25,7 @@ export type JoinSpec = {
 
 export type View = {
   readonly selectedFieldNames: readonly string[];
-  readonly joinSpecs: readonly JoinSpec[];
+  readonly joinSpecs: Dictionary<JoinSpec>
 };
 
 export type Collection = {
