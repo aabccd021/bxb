@@ -83,10 +83,15 @@ async function getDocDataFromJoinSpec(
 
   const selectedDocData = _.pick(refDoc.data(), selectedFieldNames);
 
+  const docDataWithId = {
+    ...selectedDocData,
+    id: refDoc.id,
+  };
+
   const prefixedData = addRefPrefixToFieldNames(
     firstRef,
     refChain,
-    selectedDocData
+    docDataWithId
   );
 
   return prefixedData;
