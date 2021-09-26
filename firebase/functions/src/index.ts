@@ -37,18 +37,14 @@ export const triggers = getTrigger({
     },
     view: {
       card: {
-        selectedFieldNames: ['text'],  joinSpecs?:
-        // text: {
-        //   type: 'string',
-        //   select: 'text',
-        // },
-        // owner_username: {
-        //   type: 'join',
-        //   from: 'user',
-        //   join_on: 'owner',
-        //   select: 'username',
-        //   data_type: 'string',
-        // },
+        selectedFieldNames: ['text'],
+        joinSpecs: [
+          {
+            refCollectionName: 'user',
+            refFieldName: 'owner',
+            selectedFieldNames: ['username'],
+          },
+        ],
       },
     },
   },
