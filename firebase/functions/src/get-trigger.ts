@@ -113,27 +113,35 @@ export function getTrigger(collections: readonly Collection[]): void {
         .firestore()
         .collection(`${collectionName}_${viewName}`);
 
-      const onSrcCreated = functions.firestore
-        .document(`${collectionName}/{docId}`)
-        .onCreate(async (srcDoc) => {
-          const selectedDocData = _.pick(srcDoc.data(), selectedFieldNames);
+      const srcDocFunction = functions.firestore.document(
+        `${collectionName}/{docId}`
+      );
 
-          const joinedDocData = await getJoinedDocData(
-            srcDoc.data(),
-            joinSpecs
-          );
+      const onSrcCreated = srcDocFunction.onCreate(async (srcDoc) => {
+        const selectedDocData = _.pick(srcDoc.data(), selectedFieldNames);
 
-          const viewDocData: FirebaseFirestore.DocumentData = {
-            ...selectedDocData,
-            ...joinedDocData,
-          };
+        const joinedDocData = await getJoinedDocData(srcDoc.data(), joinSpecs);
 
-          const viewDocId = srcDoc.id;
+        const viewDocData: FirebaseFirestore.DocumentData = {
+          ...selectedDocData,
+          ...joinedDocData,
+        };
 
-          await viewCollectionRef.doc(viewDocId).create(viewDocData);
-        });
+        const viewDocId = srcDoc.id;
 
-      return onSrcCreated;
+        await viewCollectionRef.doc(viewDocId).create(viewDocData);
+      });
+
+      const onSrcDeleted = srcDocFunction.onDelete(async (srcDoc) => {
+        const viewDocId = srcDoc.id;
+
+        await viewCollectionRef.doc(viewDocId).delete();
+      });
+
+      return {
+        onSrcCreated,
+        onSrcDeleted,
+      };
     })
   );
 }
