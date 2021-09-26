@@ -175,7 +175,6 @@ function getOnSrcCreatedFunction(
   joinSpecs: readonly JoinSpec[]
 ): OnCreateFunction {
   const srcDocFunction = getSrcDocFunction(collectionName);
-  const viewCollectionRef = getViewCollectionRef(collectionName, viewName);
   return srcDocFunction.onCreate(async (srcDoc) => {
     const selectedDocData = pick(srcDoc.data(), selectedFieldNames);
 
@@ -188,6 +187,7 @@ function getOnSrcCreatedFunction(
 
     const viewDocId = srcDoc.id;
 
+    const viewCollectionRef = getViewCollectionRef(collectionName, viewName);
     await viewCollectionRef.doc(viewDocId).create(viewDocData);
   });
 }
@@ -198,7 +198,6 @@ function getOnSrcUpdateFunction(
   selectedFieldNames: readonly string[]
 ): OnUpdateFunction {
   const srcDocFunction = getSrcDocFunction(collectionName);
-  const viewCollectionRef = getViewCollectionRef(collectionName, viewName);
   return srcDocFunction.onUpdate(
     async ({ before: srcDocBefore, after: scrDocAfter }) => {
       const allDocDataUpdate = getDocDataDiff(srcDocBefore, scrDocAfter);
@@ -207,6 +206,10 @@ function getOnSrcUpdateFunction(
       const hasUpdate = Object.keys(docDataUpdate).length > 1;
       if (hasUpdate) {
         const viewDocId = scrDocAfter.id;
+        const viewCollectionRef = getViewCollectionRef(
+          collectionName,
+          viewName
+        );
         await viewCollectionRef.doc(viewDocId).update(docDataUpdate);
       }
     }
@@ -218,10 +221,10 @@ function getOnSrcDeletedFunction(
   viewName: string
 ): OnDeleteFunction {
   const srcDocFunction = getSrcDocFunction(collectionName);
-  const viewCollectionRef = getViewCollectionRef(collectionName, viewName);
   return srcDocFunction.onDelete(async (srcDoc) => {
     const viewDocId = srcDoc.id;
 
+    const viewCollectionRef = getViewCollectionRef(collectionName, viewName);
     await viewCollectionRef.doc(viewDocId).delete();
   });
 }
