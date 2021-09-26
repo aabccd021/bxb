@@ -40,6 +40,7 @@ export type ViewTrigger = {
   readonly updateViewOnSrcUpdated: OnUpdateFunction;
   readonly deleteViewOnSrcDeleted: OnDeleteFunction;
   readonly deleteSrcOnRefDeleted: Dictionary<OnDeleteFunction | undefined>;
+  readonly updateViewOnJoinRefUpdated: Dictionary<OnUpdateFunction>;
 };
 
 export type OnCreateFunction =

@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { Dictionary, mapKeys, mapValues, pick } from 'lodash';
+import { Dictionary, isEmpty, mapKeys, mapValues, pick } from 'lodash';
 import {
   Collection,
   FieldSpec,
@@ -58,8 +58,7 @@ async function getRefDocFromRefSpecChainRec(
 }
 
 async function getRefDocFromRefSpecs(
-  firstRef: RefSpec,
-  refChain: readonly RefSpec[],
+  { firstRef, refChain }: JoinSpec,
   data: FirebaseFirestore.DocumentData
 ): Promise<FirebaseFirestore.DocumentSnapshot<FirebaseFirestore.DocumentData>> {
   const refId = data[firstRef.fieldName];
@@ -75,45 +74,51 @@ async function getRefDocFromRefSpecs(
   return refDoc;
 }
 
-function addRefPrefixToFieldNames(
-  firstRef: RefSpec,
-  refChain: readonly RefSpec[],
-  data: FirebaseFirestore.DocumentData
-): FirebaseFirestore.DocumentData {
+function getJoinName({ refChain, firstRef }: JoinSpec): string {
   const refChainFieldNames = refChain.map(({ fieldName }) => {
     fieldName;
   });
   const refFieldNames = [firstRef.fieldName, ...refChainFieldNames];
-  const prefix = refFieldNames.join('_');
+  const joinName = refFieldNames.join('_');
 
-  const prefixedData = mapKeys(
-    data,
-    (_, fieldName) => `${prefix}_${fieldName}`
-  );
+  return joinName;
+}
 
-  return prefixedData;
+function prefixJoinName(spec: JoinSpec, fieldName: string): string {
+  const joinName = getJoinName(spec);
+  const prefixedFieldName = `${joinName}_${fieldName}`;
+  return prefixedFieldName;
+}
+
+function getRefIdFieldName(spec: JoinSpec): string {
+  return prefixJoinName(spec, 'id');
+}
+
+function prefixJoinNameOnDocData(
+  docData: FirebaseFirestore.DocumentData,
+  spec: JoinSpec
+): FirebaseFirestore.DocumentData {
+  return mapKeys(docData, (_, fieldName) => prefixJoinName(spec, fieldName));
 }
 
 async function getDocDataFromJoinSpec(
   data: FirebaseFirestore.DocumentData,
-  { firstRef, refChain, selectedFieldNames }: JoinSpec
+  spec: JoinSpec
 ): Promise<FirebaseFirestore.DocumentData> {
-  const refDoc = await getRefDocFromRefSpecs(firstRef, refChain, data);
+  const refDoc = await getRefDocFromRefSpecs(spec, data);
 
-  const docData = pick(refDoc.data(), selectedFieldNames);
+  const docData = pick(refDoc.data(), spec.selectedFieldNames);
 
-  const docDataWithId = {
-    ...docData,
-    id: refDoc.id,
+  const prefixedData = prefixJoinNameOnDocData(docData, spec);
+
+  const refIdFieldName = getRefIdFieldName(spec);
+
+  const docDataWithRefId = {
+    ...prefixedData,
+    [refIdFieldName]: refDoc.id,
   };
 
-  const prefixedData = addRefPrefixToFieldNames(
-    firstRef,
-    refChain,
-    docDataWithId
-  );
-
-  return prefixedData;
+  return docDataWithRefId;
 }
 
 async function getJoinedDocData(
@@ -210,8 +215,7 @@ function getOnSrcUpdateFunction(
       const allDocDataUpdate = getDocDataDiff(srcDocBefore, scrDocAfter);
       const docDataUpdate = pick(allDocDataUpdate, selectedFieldNames);
 
-      const hasUpdate = Object.keys(docDataUpdate).length > 1;
-      if (hasUpdate) {
+      if (!isEmpty(docDataUpdate)) {
         const viewDocId = scrDocAfter.id;
         const viewCollectionRef = getViewCollectionRef(
           collectionName,
@@ -222,6 +226,71 @@ function getOnSrcUpdateFunction(
     }
   );
   return onUpdateFunction;
+}
+
+function getOnJoinRefUpdateFunction(
+  collectionName: string,
+  viewName: string,
+  spec: JoinSpec
+): OnUpdateFunction {
+  const { refChain, firstRef, selectedFieldNames } = spec;
+
+  // get latest collection in the chain
+  const refCollectionName =
+    refChain[refChain.length - 1]?.collectionName ?? firstRef.collectionName;
+
+  const updateFunction = functions.firestore
+    .document(`${refCollectionName}/{documentId}`)
+    .onUpdate(async ({ before: refDocBefore, after: refDocAfter }) => {
+      const allDocDataUpdate = getDocDataDiff(refDocBefore, refDocAfter);
+      const docDataUpdate = pick(allDocDataUpdate, selectedFieldNames);
+
+      if (!isEmpty(docDataUpdate)) {
+        const prefixedDocDataUpdate = prefixJoinNameOnDocData(
+          docDataUpdate,
+          spec
+        );
+        const refIdFieldName = getRefIdFieldName(spec);
+        const viewCollectionRef = getViewCollectionRef(
+          collectionName,
+          viewName
+        );
+        const referViewDocsSnapshot = await viewCollectionRef
+          .where(refIdFieldName, '==', refDocAfter.id)
+          .get();
+
+        const referViewDocsUpdates = referViewDocsSnapshot.docs.map(({ ref }) =>
+          ref.update(prefixedDocDataUpdate)
+        );
+
+        await Promise.allSettled(referViewDocsUpdates);
+      }
+    });
+
+  return updateFunction;
+}
+
+function getOnJoinRefUpdateFunctions(
+  collectionName: string,
+  viewName: string,
+  specs: readonly JoinSpec[]
+): Dictionary<OnUpdateFunction> {
+  const updateFunctionEntries = specs.map((spec) => {
+    const joinName = getJoinName(spec);
+    const updateFunction = getOnJoinRefUpdateFunction(
+      collectionName,
+      viewName,
+      spec
+    );
+    const entry: readonly [string, OnUpdateFunction] = [
+      joinName,
+      updateFunction,
+    ];
+    return entry;
+  });
+
+  const updateFunctions = Object.fromEntries(updateFunctionEntries);
+  return updateFunctions;
 }
 
 function getOnSrcDeletedFunction(
@@ -285,6 +354,11 @@ function getViewTriggers(
     ),
     deleteViewOnSrcDeleted: getOnSrcDeletedFunction(collectionName, viewName),
     deleteSrcOnRefDeleted: getOnSrcRefDeletedFunction(collectionName, src),
+    updateViewOnJoinRefUpdated: getOnJoinRefUpdateFunctions(
+      collectionName,
+      viewName,
+      joinSpecs
+    ),
   };
 }
 
