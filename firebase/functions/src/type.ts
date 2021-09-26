@@ -1,9 +1,16 @@
 import * as functions from 'firebase-functions';
 import { Dictionary } from 'lodash';
-import { RefSFSpec } from './field/ref';
-import { StringSFSpec } from './field/string';
 
-export type SFSpec = StringSFSpec | RefSFSpec;
+export type StringFieldSpec = {
+  readonly type: 'string';
+};
+
+export type RefFieldSpec = {
+  readonly type: 'ref';
+  readonly refCollection: string;
+};
+
+export type FieldSpec = StringFieldSpec | RefFieldSpec;
 
 export type RefSpec = {
   readonly collectionName: string;
@@ -22,7 +29,7 @@ export type View = {
 };
 
 export type Collection = {
-  readonly src: Dictionary<SFSpec>;
+  readonly src: Dictionary<FieldSpec>;
   readonly views: Dictionary<View>;
 };
 

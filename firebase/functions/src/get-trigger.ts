@@ -9,7 +9,7 @@ import {
   OnDeleteFunction,
   OnUpdateFunction,
   RefSpec,
-  SFSpec,
+  FieldSpec,
   View,
   ViewTrigger as ViewTriggers,
 } from './type';
@@ -232,7 +232,7 @@ function getOnSrcDeletedFunction(
 
 function getOnSrcRefDeletedFunction(
   collectionName: string,
-  src: Dictionary<SFSpec>
+  src: Dictionary<FieldSpec>
 ): Dictionary<OnDeleteFunction | undefined> {
   return mapValues(src, (sf, sfName) => {
     if (sf.type !== 'ref') {
@@ -260,7 +260,7 @@ function getOnSrcRefDeletedFunction(
 function getViewTriggers(
   collectionName: string,
   viewName: string,
-  src: Dictionary<SFSpec>,
+  src: Dictionary<FieldSpec>,
   { selectedFieldNames, joinSpecs }: View
 ): ViewTriggers {
   return {
