@@ -17,14 +17,14 @@ export type JoinSpec = {
 
 export type View = {
   readonly viewName: string;
-  readonly selectedFieldNames?: readonly string[];
-  readonly joinSpecs?: readonly JoinSpec[];
+  readonly selectedFieldNames: readonly string[];
+  readonly joinSpecs: readonly JoinSpec[];
 };
 
 export type Collection = {
   readonly collectionName: string;
   readonly src: readonly SF[];
-  readonly view?: readonly View[];
+  readonly view: readonly View[];
 };
 
 export type VFTrigger = {

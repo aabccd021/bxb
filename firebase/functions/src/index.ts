@@ -24,6 +24,7 @@ export const triggers = getTrigger([
       {
         viewName: 'card',
         selectedFieldNames: ['id'],
+        joinSpecs: [],
       },
     ],
   },

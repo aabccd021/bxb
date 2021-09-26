@@ -17,12 +17,8 @@ function mergeObjectArray<T>(
 
 function getSelectedDocData(
   data: FirebaseFirestore.DocumentData,
-  selectedFieldNames: readonly string[] | undefined
+  selectedFieldNames: readonly string[]
 ): FirebaseFirestore.DocumentData {
-  if (selectedFieldNames === undefined) {
-    return {};
-  }
-
   const selectedDocData = _.pick(data, selectedFieldNames);
   return selectedDocData;
 }
@@ -45,12 +41,8 @@ async function getDocDataFromJoinSpec(
 
 async function getJoinedDocData(
   data: FirebaseFirestore.DocumentData,
-  specs: readonly JoinSpec[] | undefined
+  specs: readonly JoinSpec[]
 ): Promise<FirebaseFirestore.DocumentData> {
-  if (specs === undefined) {
-    return {};
-  }
-
   const docDataPromises = specs.map((spec) =>
     getDocDataFromJoinSpec(data, spec)
   );
@@ -72,10 +64,7 @@ export function getTrigger(collections: readonly Collection[]): void {
       const onCreateFunction = functions.firestore
         .document(`${collectionName}/{docId}`)
         .onCreate(async (srcDoc) => {
-          const selectedDoctData = getSelectedDocData(
-            srcDoc.data(),
-            selectedFieldNames
-          );
+          const selectedDocData = _.pick(srcDoc.data(), selectedFieldNames);
 
           const joinedDocData = await getJoinedDocData(
             srcDoc.data(),
@@ -83,7 +72,7 @@ export function getTrigger(collections: readonly Collection[]): void {
           );
 
           const viewDocData: FirebaseFirestore.DocumentData = {
-            ...selectedDoctData,
+            ...selectedDocData,
             ...joinedDocData,
           };
 
