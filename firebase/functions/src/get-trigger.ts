@@ -71,24 +71,23 @@ export function getTrigger(collections: readonly Collection[]): void {
 
       const onCreateFunction = functions.firestore
         .document(`${collectionName}/{documentId}`)
-        .onCreate((snapshot) => {
+        .onCreate(async (snapshot) => {
           const selectedDocumentData = getSelectedDocumentData(
             snapshot.data(),
             selectedFieldNames
           );
 
-          const joinedDocumentData = getJoinedDocumentData(
+          const joinedDocumentData = await getJoinedDocumentData(
             snapshot.data(),
             joinSpecs
           );
 
-          return viewCollectionRef.doc(snapshot.id).set(
-            {
-              ...selectedDocumentData,
-              ...joinedDocumentData,
-            },
-            { merge: true }
-          );
+          const viewDocumentData = {
+            ...selectedDocumentData,
+            ...joinedDocumentData,
+          };
+
+          await viewCollectionRef.doc(snapshot.id).create(viewDocumentData);
         });
 
       return onCreateFunction;
