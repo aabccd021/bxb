@@ -1,24 +1,18 @@
 import * as admin from 'firebase-admin';
-import { getTrigger } from './get-trigger';
+import { getTriggers } from './get-trigger';
 
 admin.initializeApp();
 
-export const triggers = getTrigger({
+export const triggers = getTriggers({
   user: {
-    src: [
-      {
-        name: 'id',
-        spec: {
-          type: 'string',
-        },
+    src: {
+      id: {
+        type: 'string',
       },
-      {
-        name: 'username',
-        spec: {
-          type: 'string',
-        },
+      username: {
+        type: 'string',
       },
-    ],
+    },
     views: {
       card: {
         selectedFieldNames: ['id'],
@@ -27,21 +21,15 @@ export const triggers = getTrigger({
     },
   },
   tweet: {
-    src: [
-      {
-        name: 'text',
-        spec: {
-          type: 'string',
-        },
+    src: {
+      text: {
+        type: 'string',
       },
-      {
-        name: 'owner',
-        spec: {
-          type: 'ref',
-          collection: 'user',
-        },
+      owner: {
+        type: 'ref',
+        refCollection: 'user',
       },
-    ],
+    },
     views: {
       card: {
         selectedFieldNames: ['text'],
@@ -59,19 +47,16 @@ export const triggers = getTrigger({
     },
   },
   reply: {
-    src: [
-      {
-        name: 'text',
-        spec: { type: 'string' },
+    src: {
+      text: {
+        type: 'string',
       },
-      {
-        name: 'repliedTweet',
-        spec: {
-          type: 'ref',
-          collection: 'tweet',
-        },
+
+      repliedTweet: {
+        type: 'ref',
+        refCollection: 'tweet',
       },
-    ],
+    },
     views: {
       card: {
         selectedFieldNames: ['text'],

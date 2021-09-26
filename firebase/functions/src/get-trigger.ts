@@ -9,8 +9,9 @@ import {
   OnDeleteFunction,
   OnUpdateFunction,
   RefSpec,
+  SFSpec,
   View,
-  ViewTrigger,
+  ViewTrigger as ViewTriggers,
 } from './type';
 
 function mergeObjectArray<T>(
@@ -229,40 +230,62 @@ function getOnSrcDeletedFunction(
   });
 }
 
-function getOnJoinRefDeletedFunction(joinSpec: JoinSpec): OnDeleteFunction {}
+function getOnSrcRefDeletedFunction(
+  collectionName: string,
+  src: Dictionary<SFSpec>
+): Dictionary<OnDeleteFunction | undefined> {
+  return mapValues(src, (sf, sfName) => {
+    if (sf.type !== 'ref') {
+      return undefined;
+    }
+    const onDeleteFunction = functions.firestore
+      .document(`${sf.refCollection}/{documentId}`)
+      .onDelete(async (refDoc) => {
+        const referSrcDocsSnapshot = await admin
+          .firestore()
+          .collection(collectionName)
+          .where(sfName, '==', refDoc.id)
+          .get();
 
-function getViewTrigger(
+        const referDocsDeletes = referSrcDocsSnapshot.docs.map(({ ref }) =>
+          ref.delete()
+        );
+
+        await Promise.allSettled(referDocsDeletes);
+      });
+    return onDeleteFunction;
+  });
+}
+
+function getViewTriggers(
   collectionName: string,
   viewName: string,
+  src: Dictionary<SFSpec>,
   { selectedFieldNames, joinSpecs }: View
-): ViewTrigger {
-  const onSrcCreated = getOnSrcCreatedFunction(
-    collectionName,
-    viewName,
-    selectedFieldNames,
-    joinSpecs
-  );
-  const onSrcUpdated = getOnSrcUpdateFunction(
-    collectionName,
-    viewName,
-    selectedFieldNames
-  );
-
-  const onSrcDeleted = getOnSrcDeletedFunction(collectionName, viewName);
-
+): ViewTriggers {
   return {
-    onSrcCreated,
-    onSrcUpdated,
-    onSrcDeleted,
+    createViewOnSrcCreated: getOnSrcCreatedFunction(
+      collectionName,
+      viewName,
+      selectedFieldNames,
+      joinSpecs
+    ),
+    updateViewOnSrcUpdated: getOnSrcUpdateFunction(
+      collectionName,
+      viewName,
+      selectedFieldNames
+    ),
+    deleteViewOnSrcDeleted: getOnSrcDeletedFunction(collectionName, viewName),
+    deleteSrcOnRefDeleted: getOnSrcRefDeletedFunction(collectionName, src),
   };
 }
 
-export function getTrigger(
+export function getTriggers(
   collections: Dictionary<Collection>
-): Dictionary<Dictionary<ViewTrigger>> {
-  return mapValues(collections, ({ views }, collectionName) =>
+): Dictionary<Dictionary<ViewTriggers>> {
+  return mapValues(collections, ({ views, src }, collectionName) =>
     mapValues(views, (view, viewName) =>
-      getViewTrigger(collectionName, viewName, view)
+      getViewTriggers(collectionName, viewName, src, view)
     )
   );
 }

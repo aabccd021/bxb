@@ -5,11 +5,6 @@ import { StringSFSpec } from './field/string';
 
 export type SFSpec = StringSFSpec | RefSFSpec;
 
-export type SF = {
-  readonly name: string;
-  readonly spec: SFSpec;
-};
-
 export type RefSpec = {
   readonly collectionName: string;
   readonly fieldName: string;
@@ -27,16 +22,17 @@ export type View = {
 };
 
 export type Collection = {
-  readonly src: readonly SF[];
+  readonly src: Dictionary<SFSpec>;
   readonly views: Dictionary<View>;
 };
 
 export type FirestoreDataType = string;
 
 export type ViewTrigger = {
-  readonly onSrcCreated: OnCreateFunction;
-  readonly onSrcUpdated: OnUpdateFunction;
-  readonly onSrcDeleted: OnDeleteFunction;
+  readonly createViewOnSrcCreated: OnCreateFunction;
+  readonly updateViewOnSrcUpdated: OnUpdateFunction;
+  readonly deleteViewOnSrcDeleted: OnDeleteFunction;
+  readonly deleteSrcOnRefDeleted: Dictionary<OnDeleteFunction | undefined>;
 };
 
 export type OnCreateFunction =

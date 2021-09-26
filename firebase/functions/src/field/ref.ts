@@ -4,7 +4,7 @@ import { GetVFTriggerContext, VFTrigger } from '../type';
 
 export type RefSFSpec = {
   readonly type: 'ref';
-  readonly collection: string;
+  readonly refCollection: string;
 };
 
 export type RefVFSpec = {
