@@ -1,8 +1,9 @@
 import * as _ from 'lodash';
 import * as admin from 'firebase-admin';
-import { Collection, JoinSpec, RefSpec } from './type';
+import { Collection, JoinSpec, RefSpec, View } from './type';
 import * as functions from 'firebase-functions';
 import { mapValues } from 'lodash';
+import { QueryDocumentSnapshot } from 'firebase-functions/v1/firestore';
 
 function mergeObjectArray<T>(
   objectArray: readonly { readonly [key: string]: T }[]
@@ -90,10 +91,10 @@ async function getDocDataFromJoinSpec(
 ): Promise<FirebaseFirestore.DocumentData> {
   const refDoc = await getRefDocFromRefSpecs(firstRef, refChain, data);
 
-  const selectedDocData = _.pick(refDoc.data(), selectedFieldNames);
+  const docData = _.pick(refDoc.data(), selectedFieldNames);
 
   const docDataWithId = {
-    ...selectedDocData,
+    ...docData,
     id: refDoc.id,
   };
 
@@ -141,7 +142,7 @@ function getFieldDiff(
 function getDocDataDiff(
   beforeDocData: FirebaseFirestore.DocumentData,
   afterDocData: FirebaseFirestore.DocumentData
-): FirebaseFirestore.DocumentData | undefined {
+): FirebaseFirestore.DocumentData {
   const docDataDiff = mapValues(beforeDocData, (beforeFieldData, fieldName) => {
     const afterFieldData = afterDocData[fieldName];
     const fieldDiff = getFieldDiff(beforeFieldData, afterFieldData);
@@ -153,42 +154,108 @@ function getDocDataDiff(
   return compactDocDataDiff;
 }
 
-export function getTrigger(collections: readonly Collection[]): void {
-  collections.map(({ collectionName, view }) =>
-    view?.map(({ viewName, selectedFieldNames, joinSpecs }) => {
-      const viewCollectionRef = admin
-        .firestore()
-        .collection(`${collectionName}_${viewName}`);
+function getOnSrcCreatedFunction(
+  srcDocFunction: functions.firestore.DocumentBuilder,
+  selectedFieldNames: readonly string[],
+  joinSpecs: readonly JoinSpec[],
+  viewCollectionRef: FirebaseFirestore.CollectionReference
+): functions.CloudFunction<functions.firestore.QueryDocumentSnapshot> {
+  return srcDocFunction.onCreate(async (srcDoc) => {
+    const selectedDocData = _.pick(srcDoc.data(), selectedFieldNames);
 
-      const srcDocFunction = functions.firestore.document(
-        `${collectionName}/{docId}`
-      );
+    const joinedDocData = await getJoinedDocData(srcDoc.data(), joinSpecs);
 
-      const onSrcCreated = srcDocFunction.onCreate(async (srcDoc) => {
-        const selectedDocData = _.pick(srcDoc.data(), selectedFieldNames);
+    const viewDocData: FirebaseFirestore.DocumentData = {
+      ...selectedDocData,
+      ...joinedDocData,
+    };
 
-        const joinedDocData = await getJoinedDocData(srcDoc.data(), joinSpecs);
+    const viewDocId = srcDoc.id;
 
-        const viewDocData: FirebaseFirestore.DocumentData = {
-          ...selectedDocData,
-          ...joinedDocData,
-        };
+    await viewCollectionRef.doc(viewDocId).create(viewDocData);
+  });
+}
 
-        const viewDocId = srcDoc.id;
+function getOnSrcUpdateFunction(
+  srcDocFunction: functions.firestore.DocumentBuilder,
+  selectedFieldNames: readonly string[],
+  viewCollectionRef: FirebaseFirestore.CollectionReference
+): functions.CloudFunction<
+  functions.Change<functions.firestore.QueryDocumentSnapshot>
+> {
+  return srcDocFunction.onUpdate(
+    async ({ before: srcDocBefore, after: scrDocAfter }) => {
+      const allDocDataUpdate = getDocDataDiff(srcDocBefore, scrDocAfter);
+      const docDataUpdate = _.pick(allDocDataUpdate, selectedFieldNames);
 
-        await viewCollectionRef.doc(viewDocId).create(viewDocData);
-      });
+      const hasUpdate = Object.keys(docDataUpdate).length > 1;
+      if (hasUpdate) {
+        const viewDocId = scrDocAfter.id;
+        await viewCollectionRef.doc(viewDocId).update(docDataUpdate);
+      }
+    }
+  );
+}
 
-      const onSrcDeleted = srcDocFunction.onDelete(async (srcDoc) => {
-        const viewDocId = srcDoc.id;
+function getOnSrcDeletedFunction(
+  srcDocFunction: functions.firestore.DocumentBuilder,
+  viewCollectionRef: FirebaseFirestore.CollectionReference
+): functions.CloudFunction<functions.firestore.QueryDocumentSnapshot> {
+  return srcDocFunction.onDelete(async (srcDoc) => {
+    const viewDocId = srcDoc.id;
 
-        await viewCollectionRef.doc(viewDocId).delete();
-      });
+    await viewCollectionRef.doc(viewDocId).delete();
+  });
+}
 
-      return {
-        onSrcCreated,
-        onSrcDeleted,
-      };
-    })
+type ViewTrigger = {
+  readonly onSrcCreated: functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
+  readonly onSrcUpdated: functions.CloudFunction<
+    functions.Change<functions.firestore.QueryDocumentSnapshot>
+  >;
+  readonly onSrcDeleted: functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
+};
+
+function getViewTrigger(
+  collectionName: string,
+  { viewName, selectedFieldNames, joinSpecs }: View
+): ViewTrigger {
+  const viewCollectionRef = admin
+    .firestore()
+    .collection(`${collectionName}_${viewName}`);
+
+  const srcDocFunction = functions.firestore.document(
+    `${collectionName}/{docId}`
+  );
+
+  const onSrcCreated = getOnSrcCreatedFunction(
+    srcDocFunction,
+    selectedFieldNames,
+    joinSpecs,
+    viewCollectionRef
+  );
+  const onSrcUpdated = getOnSrcUpdateFunction(
+    srcDocFunction,
+    selectedFieldNames,
+    viewCollectionRef
+  );
+
+  const onSrcDeleted = getOnSrcDeletedFunction(
+    srcDocFunction,
+    viewCollectionRef
+  );
+
+  return {
+    onSrcCreated,
+    onSrcUpdated,
+    onSrcDeleted,
+  };
+}
+
+export function getTrigger(
+  collections: readonly Collection[]
+): readonly (readonly ViewTrigger[])[] {
+  return collections.map(({ collectionName, views }) =>
+    views?.map((view) => getViewTrigger(collectionName, view))
   );
 }
