@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { Dictionary, isEmpty, mapKeys, mapValues, pick } from 'lodash';
+import { chain, Dictionary, isEmpty, mapKeys, mapValues, pick } from 'lodash';
 import {
   Collection,
   CollectionTrigger,
@@ -14,6 +14,20 @@ import {
   View,
   ViewTrigger,
 } from './type';
+
+function logRejectedPromises(
+  results: readonly PromiseSettledResult<unknown>[]
+  // eslint-disable-next-line functional/no-return-void
+): void {
+  const errors = chain(results)
+    .map((result) => (result.status === 'rejected' ? result.reason : undefined))
+    .compact()
+    .value();
+
+  if (!isEmpty(errors)) {
+    throw Error(JSON.stringify(errors));
+  }
+}
 
 function mergeObjectArray<T>(
   objectArray: readonly { readonly [key: string]: T }[]
@@ -148,8 +162,7 @@ function getFieldDiff(
     return undefined;
   }
 
-  functions.logger.error('unknown type', { before, after });
-  throw Error();
+  throw Error(JSON.stringify({ before, after }));
 }
 
 function getDocDataDiff(
@@ -180,6 +193,42 @@ function getViewCollectionRef(
   return admin.firestore().collection(`${collectionName}_${viewName}`);
 }
 
+export async function materializeView(
+  srcDocData: FirebaseFirestore.DocumentData,
+  selectedFieldNames: readonly string[],
+  joinSpecs: readonly JoinSpec[]
+): Promise<FirebaseFirestore.DocumentData> {
+  const selectedDocData = pick(srcDocData, selectedFieldNames);
+
+  const joinedDocData = await getJoinedDocData(srcDocData, joinSpecs);
+
+  const viewDocData: FirebaseFirestore.DocumentData = {
+    ...selectedDocData,
+    ...joinedDocData,
+  };
+  return viewDocData;
+}
+
+export async function createViewDoc(
+  collectionName: string,
+  viewName: string,
+  srcDoc: FirebaseFirestore.QueryDocumentSnapshot,
+  selectedFieldNames: readonly string[],
+  joinSpecs: readonly JoinSpec[]
+): Promise<FirebaseFirestore.WriteResult> {
+  const viewDocData = materializeView(
+    srcDoc.data(),
+    selectedFieldNames,
+    joinSpecs
+  );
+  const viewDocId = srcDoc.id;
+  const viewCollectionRef = await getViewCollectionRef(
+    collectionName,
+    viewName
+  );
+  return viewCollectionRef.doc(viewDocId).create(viewDocData);
+}
+
 function getOnSrcCreatedFunction(
   collectionName: string,
   viewName: string,
@@ -187,21 +236,15 @@ function getOnSrcCreatedFunction(
   joinSpecs: readonly JoinSpec[]
 ): OnCreateFunction {
   const srcDocFunction = getSrcDocFunction(collectionName);
-  const onCreateFunction = srcDocFunction.onCreate(async (srcDoc) => {
-    const selectedDocData = pick(srcDoc.data(), selectedFieldNames);
-
-    const joinedDocData = await getJoinedDocData(srcDoc.data(), joinSpecs);
-
-    const viewDocData: FirebaseFirestore.DocumentData = {
-      ...selectedDocData,
-      ...joinedDocData,
-    };
-
-    const viewDocId = srcDoc.id;
-
-    const viewCollectionRef = getViewCollectionRef(collectionName, viewName);
-    await viewCollectionRef.doc(viewDocId).create(viewDocData);
-  });
+  const onCreateFunction = srcDocFunction.onCreate(async (srcDoc) =>
+    createViewDoc(
+      collectionName,
+      viewName,
+      srcDoc,
+      selectedFieldNames,
+      joinSpecs
+    )
+  );
   return onCreateFunction;
 }
 
@@ -264,7 +307,9 @@ function getOnJoinRefUpdateFunction(
           ({ ref }) => ref.update(prefixedDocDataUpdate)
         );
 
-        await Promise.allSettled(referrerViewDocsUpdates);
+        const result = await Promise.allSettled(referrerViewDocsUpdates);
+
+        logRejectedPromises(result);
       }
     });
 
