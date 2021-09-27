@@ -3,6 +3,7 @@ import * as functions from 'firebase-functions';
 import { Dictionary, isEmpty, mapKeys, mapValues, pick } from 'lodash';
 import {
   Collection,
+  CollectionTrigger,
   FieldSpec,
   FirestoreDataType,
   JoinSpec,
@@ -11,7 +12,7 @@ import {
   OnUpdateFunction,
   RefSpec,
   View,
-  ViewTrigger as ViewTriggers,
+  ViewTrigger,
 } from './type';
 
 function mergeObjectArray<T>(
@@ -337,24 +338,22 @@ function getOnSrcRefDeletedFunction(
 function getViewTriggers(
   collectionName: string,
   viewName: string,
-  src: Dictionary<FieldSpec>,
   { selectedFieldNames, joinSpecs }: View
-): ViewTriggers {
+): ViewTrigger {
   return {
-    createViewOnSrcCreated: getOnSrcCreatedFunction(
+    onSrcCreated: getOnSrcCreatedFunction(
       collectionName,
       viewName,
       selectedFieldNames,
       joinSpecs
     ),
-    updateViewOnSrcUpdated: getOnSrcUpdateFunction(
+    onSrcUpdated: getOnSrcUpdateFunction(
       collectionName,
       viewName,
       selectedFieldNames
     ),
-    deleteViewOnSrcDeleted: getOnSrcDeletedFunction(collectionName, viewName),
-    deleteSrcOnRefDeleted: getOnSrcRefDeletedFunction(collectionName, src),
-    updateViewOnJoinRefUpdated: getOnJoinRefUpdateFunctions(
+    onSrcDeleted: getOnSrcDeletedFunction(collectionName, viewName),
+    onJoinRefUpdated: getOnJoinRefUpdateFunctions(
       collectionName,
       viewName,
       joinSpecs
@@ -364,10 +363,11 @@ function getViewTriggers(
 
 export function getTriggers(
   collections: Dictionary<Collection>
-): Dictionary<Dictionary<ViewTriggers>> {
-  return mapValues(collections, ({ views, src }, collectionName) =>
-    mapValues(views, (view, viewName) =>
-      getViewTriggers(collectionName, viewName, src, view)
-    )
-  );
+): Dictionary<CollectionTrigger> {
+  return mapValues(collections, ({ views, src }, collectionName) => ({
+    onRefDeleted: getOnSrcRefDeletedFunction(collectionName, src),
+    view: mapValues(views, (view, viewName) =>
+      getViewTriggers(collectionName, viewName, view)
+    ),
+  }));
 }
