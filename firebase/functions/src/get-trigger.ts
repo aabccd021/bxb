@@ -216,16 +216,13 @@ export async function createViewDoc(
   selectedFieldNames: readonly string[],
   joinSpecs: readonly JoinSpec[]
 ): Promise<FirebaseFirestore.WriteResult> {
-  const viewDocData = materializeView(
+  const viewDocData = await materializeView(
     srcDoc.data(),
     selectedFieldNames,
     joinSpecs
   );
   const viewDocId = srcDoc.id;
-  const viewCollectionRef = await getViewCollectionRef(
-    collectionName,
-    viewName
-  );
+  const viewCollectionRef = getViewCollectionRef(collectionName, viewName);
   return viewCollectionRef.doc(viewDocId).create(viewDocData);
 }
 
