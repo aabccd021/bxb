@@ -403,13 +403,22 @@ function getViewTriggers(
   };
 }
 
-export function getTriggers(
-  collections: Dictionary<Collection>
-): Dictionary<CollectionTrigger> {
-  return mapValues(collections, ({ views, src }, collectionName) => ({
+export function getCollectionTrigger(
+  collectionName: string,
+  { src, views }: Collection
+): CollectionTrigger {
+  return {
     onRefDeleted: getOnSrcRefDeletedFunction(collectionName, src),
     view: mapValues(views, (view, viewName) =>
       getViewTriggers(collectionName, viewName, view)
     ),
-  }));
+  };
+}
+
+export function getTriggers(
+  collections: Dictionary<Collection>
+): Dictionary<CollectionTrigger> {
+  return mapValues(collections, (collection, collectionName) =>
+    getCollectionTrigger(collectionName, collection)
+  );
 }
