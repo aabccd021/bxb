@@ -1,14 +1,14 @@
 import { Dictionary, isEmpty, mapValues, pick } from 'lodash';
 import {
   DocumentSnapshot,
-  JoinSpec,
   DocumentData,
   SrcFieldSpec,
-  View,
+  ViewSpec,
   CollectionSpec,
 } from './type';
 import { getViewCollectionName, getDocDataChange } from './util';
 import { materializeJoinViewData, onJoinRefDocUpdated } from './view/join';
+import { materializeSelectViewData } from './view/select';
 import {
   createDoc,
   deleteDoc,
@@ -27,87 +27,75 @@ import {
 } from './wrapper/firebase-functions';
 
 /**
+ * Materialize view document data based on given specification.
  *
- *
- * @param srcDocData
- * @param selectedFieldNames
- * @param joinSpecs
- * @returns
+ * @param srcDocData Data of the view's source document.
+ * @param viewSpec Specification of the view.
+ * @returns Materialized view data.
  */
 async function materializeViewData(
   srcDocData: DocumentData,
-  selectedFieldNames: readonly string[],
-  joinSpecs: readonly JoinSpec[]
+  { selectedFieldNames, joinSpecs }: ViewSpec
 ): Promise<DocumentData> {
-  const selectedDocData = pick(srcDocData, selectedFieldNames);
+  const selectViewData = materializeSelectViewData(
+    srcDocData,
+    selectedFieldNames
+  );
 
-  const joinedDocData = await materializeJoinViewData(srcDocData, joinSpecs);
+  const joinViewData = await materializeJoinViewData(srcDocData, joinSpecs);
 
-  const materializedViewDocData: DocumentData = {
-    ...selectedDocData,
-    ...joinedDocData,
+  const materializedViewData: DocumentData = {
+    ...selectViewData,
+    ...joinViewData,
   };
-  return materializedViewDocData;
+  return materializedViewData;
 }
 
 /**
+ * Materialize and create a view document based on given specification.
  *
- * @param collectionName
- * @param viewName
- * @param srcDoc
- * @param selectedFieldNames
- * @param joinSpecs
- * @returns
+ * @param collectionName Name of the view's collection.
+ * @param viewName Name of the view.
+ * @param srcDoc Document snapshot of the view's source document
+ * @param viewSpec Specification of the view.
+ * @returns Creation result of the view document.
  */
 export async function createViewDoc(
   collectionName: string,
   viewName: string,
   srcDoc: DocumentSnapshot,
-  selectedFieldNames: readonly string[],
-  joinSpecs: readonly JoinSpec[]
+  viewSpec: ViewSpec
 ): Promise<FirebaseFirestore.WriteResult> {
-  const viewDocData = await materializeViewData(
-    srcDoc.data,
-    selectedFieldNames,
-    joinSpecs
-  );
+  const viewDocData = await materializeViewData(srcDoc.data, viewSpec);
   const viewDocId = srcDoc.id;
   const viewCollectionName = getViewCollectionName(collectionName, viewName);
   return createDoc(viewCollectionName, viewDocId, viewDocData);
 }
 
 /**
- * Make a trigger to run on source document creation.
- * The trigger will create view documents with the same id as updated source document, with
- * materialized view data.
+ * Make a trigger to run on source document creation. The trigger will
+ * materialize and create view documents with the same id as updated source
+ * document, with materialized view data.
  *
- * @param collectionName
- * @param viewName
- * @param selectedFieldNames
- * @param joinSpecs
- * @returns
+ * @param collectionName Name of the view's collection
+ * @param viewName Name of the view.
+ * @param viewSpec Specification of the
+ * @returns Trigger on view's source document created.
  */
 function onSrcDocCreated(
   collectionName: string,
   viewName: string,
-  selectedFieldNames: readonly string[],
-  joinSpecs: readonly JoinSpec[]
+  viewSpec: ViewSpec
 ): OnCreateTrigger {
   return onCreate(collectionName, async (srcDoc) =>
-    createViewDoc(
-      collectionName,
-      viewName,
-      srcDoc,
-      selectedFieldNames,
-      joinSpecs
-    )
+    createViewDoc(collectionName, viewName, srcDoc, viewSpec)
   );
 }
 
 /**
- * Make a trigger to run on source document update.
- * The trigger will update all view documents with the same id as updated source document, if there
- * is a change.
+ * Make a trigger to run on source document update. The trigger will update all
+ * view documents with the same id as updated source document, if there is a
+ * change.
  *
  * @param collectionName
  * @param viewName
@@ -135,8 +123,8 @@ function onSrcDocUpdated(
 }
 
 /**
- * Make a trigger to run on source document delete.
- * The trigger will delete all view documents with the same id as deleted source document.
+ * Make a trigger to run on source document delete. The trigger will delete all
+ * view documents with the same id as deleted source document.
  *
  * @param collectionName
  * @param viewName
@@ -154,8 +142,9 @@ function onSrcDocDeleted(
 }
 
 /**
- * Make a trigger to run on deletion of a document referenced by source document.
- * The trigger will delete all document that refers to that referenced document.
+ * Make a trigger to run on deletion of a document referenced by source
+ * document. The trigger will delete all document that refers to that referenced
+ * document.
  *
  * @param collectionName
  * @param src
@@ -166,7 +155,8 @@ function onSrcRefDocDeleted(
   src: Dictionary<SrcFieldSpec>
 ): Dictionary<OnDeleteTrigger | undefined> {
   return mapValues(src, (sourceField, sourceFieldName) => {
-    // only create trigger if the field is type of refId (the document has reference to another document)
+    // only create trigger if the field is type of refId (the document has
+    // reference to another document)
     if (sourceField.type !== 'refId') {
       return undefined;
     }
@@ -198,25 +188,20 @@ function onSrcRefDocDeleted(
 function makeViewTriggers(
   collectionName: string,
   viewName: string,
-  { selectedFieldNames, joinSpecs }: View
+  viewSpec: ViewSpec
 ): ViewTrigger {
   return {
-    onSrcDocCreated: onSrcDocCreated(
-      collectionName,
-      viewName,
-      selectedFieldNames,
-      joinSpecs
-    ),
+    onSrcDocCreated: onSrcDocCreated(collectionName, viewName, viewSpec),
     onSrcDocUpdated: onSrcDocUpdated(
       collectionName,
       viewName,
-      selectedFieldNames
+      viewSpec.selectedFieldNames
     ),
     onSrcDocDeleted: onSrcDocDeleted(collectionName, viewName),
     onJoinRefDocUpdated: onJoinRefDocUpdated(
       collectionName,
       viewName,
-      joinSpecs
+      viewSpec.joinSpecs
     ),
   };
 }

@@ -95,6 +95,12 @@
           "printWidth": 80
         }
       ],
+      "max-len": [
+        "error",
+        {
+          "code": 80
+        }
+      ],
       "functional/no-throw-statement": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "unused-imports/no-unused-imports-ts": "error",

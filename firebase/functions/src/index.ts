@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import * as admin from 'firebase-admin';
 import { makeMasmottTriggers } from './get-trigger';
 
@@ -26,7 +27,7 @@ export const triggers = makeMasmottTriggers({
         type: 'string',
       },
       owner: {
-        type: 'ref',
+        type: 'refId',
         refCollection: 'user',
       },
     },
@@ -53,7 +54,7 @@ export const triggers = makeMasmottTriggers({
       },
 
       repliedTweet: {
-        type: 'ref',
+        type: 'refId',
         refCollection: 'tweet',
       },
     },

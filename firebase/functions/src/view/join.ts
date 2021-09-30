@@ -12,8 +12,8 @@ import { getCollection, getDoc, updateDoc } from '../wrapper/firebase-admin';
 import { onUpdate, OnUpdateTrigger } from '../wrapper/firebase-functions';
 
 /**
- * Recursively returns a document referred by join view.
- * Returns latest document snapshot if it is the last document in the whole chain.
+ * Recursively returns a document referred by join view. Returns latest document
+ * snapshot if it is the last document in the whole chain.
  *
  * @param refChain Chain of reference to the document.
  * @param snapshot Latest document snapshot in the chain.

@@ -22,14 +22,14 @@ export type JoinSpec = {
   readonly selectedFieldNames: readonly string[];
 };
 
-export type View = {
+export type ViewSpec = {
   readonly selectedFieldNames: readonly string[];
   readonly joinSpecs: readonly JoinSpec[];
 };
 
 export type CollectionSpec = {
   readonly src: Dictionary<SrcFieldSpec>;
-  readonly views: Dictionary<View>;
+  readonly views: Dictionary<ViewSpec>;
 };
 
 export type FirestoreDataType = string;
