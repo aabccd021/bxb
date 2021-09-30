@@ -12,8 +12,6 @@ import { DocumentChangeSnapshot, DocumentSnapshot } from '../type';
  * Type safe and convenience firebase-functions wrapper
  */
 
-export type DocFunction = firestore.DocumentBuilder;
-
 export type OnCreateTrigger = CloudFunction<firestore.QueryDocumentSnapshot>;
 
 export type OnDeleteTrigger = OnCreateTrigger;
@@ -22,7 +20,7 @@ export type OnUpdateTrigger = CloudFunction<
   Change<firestore.QueryDocumentSnapshot>
 >;
 
-export type ViewTrigger = {
+export type ViewTriggers = {
   readonly onSrcDocCreated: OnCreateTrigger;
   readonly onSrcDocUpdated: OnUpdateTrigger;
   readonly onSrcDocDeleted: OnDeleteTrigger;
@@ -31,7 +29,7 @@ export type ViewTrigger = {
 
 export type CollectionTriggers = {
   readonly onRefDocDeleted: Dictionary<OnDeleteTrigger | undefined>;
-  readonly view: Dictionary<ViewTrigger>;
+  readonly view: Dictionary<ViewTriggers>;
 };
 
 function getDocTrigger(collectionName: string): firestore.DocumentBuilder {
@@ -47,7 +45,7 @@ export function wrapFirebaseSnapshot(
   };
 }
 
-export function onCreate(
+export function onCreateTrigger(
   collectionName: string,
   handler: (
     snapshot: DocumentSnapshot,
@@ -60,7 +58,7 @@ export function onCreate(
   });
 }
 
-export function onUpdate(
+export function onUpdateTrigger(
   collectionName: string,
   handler: (
     change: DocumentChangeSnapshot,
@@ -79,7 +77,7 @@ export function onUpdate(
   });
 }
 
-export function onDelete(
+export function onDeleteTrigger(
   collectionName: string,
   handler: (
     snapshot: DocumentSnapshot,

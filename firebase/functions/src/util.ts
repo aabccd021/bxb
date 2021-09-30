@@ -6,7 +6,7 @@ import { FirestoreDataType, DocumentDataChange, DocumentData } from './type';
  *
  * @param promiseResults The array of settled promises to process
  */
-export function logRejectedPromises(
+export function throwRejectedPromises(
   promiseResults: readonly PromiseSettledResult<unknown>[]
   // eslint-disable-next-line functional/no-return-void
 ): void {

@@ -1,4 +1,4 @@
-import { Dictionary, isEmpty, mapValues, pick } from 'lodash';
+import { Dictionary, isEmpty, mapValues } from 'lodash';
 import {
   DocumentSnapshot,
   DocumentData,
@@ -17,13 +17,13 @@ import {
 } from './wrapper/firebase-admin';
 import {
   OnCreateTrigger,
-  onCreate,
+  onCreateTrigger,
   OnUpdateTrigger,
   OnDeleteTrigger,
-  onDelete,
-  ViewTrigger,
+  onDeleteTrigger,
+  ViewTriggers,
   CollectionTriggers,
-  onUpdate,
+  onUpdateTrigger,
 } from './wrapper/firebase-functions';
 
 /**
@@ -87,7 +87,7 @@ function onSrcDocCreated(
   viewName: string,
   viewSpec: ViewSpec
 ): OnCreateTrigger {
-  return onCreate(collectionName, async (srcDoc) =>
+  return onCreateTrigger(collectionName, async (srcDoc) =>
     createViewDoc(collectionName, viewName, srcDoc, viewSpec)
   );
 }
@@ -107,17 +107,29 @@ function onSrcDocUpdated(
   viewName: string,
   selectedFieldNames: readonly string[]
 ): OnUpdateTrigger {
-  return onUpdate(collectionName, async (srcDoc) => {
+  return onUpdateTrigger(collectionName, async (srcDoc) => {
     const allDocDataUpdate = getDocDataChange(srcDoc.data);
-    const docDataUpdate = pick(allDocDataUpdate, selectedFieldNames);
 
-    if (!isEmpty(docDataUpdate)) {
+    const selectViewUpdateData = materializeSelectViewData(
+      allDocDataUpdate,
+      selectedFieldNames
+    );
+
+    // Changing referenceId is not supported at the moment.
+    const joinViewUpdateData = {};
+
+    const viewUpdateData = {
+      ...selectViewUpdateData,
+      ...joinViewUpdateData,
+    };
+
+    if (!isEmpty(viewUpdateData)) {
       const viewDocId = srcDoc.id;
       const viewCollectionName = getViewCollectionName(
         collectionName,
         viewName
       );
-      await updateDoc(viewCollectionName, viewDocId, docDataUpdate);
+      await updateDoc(viewCollectionName, viewDocId, viewUpdateData);
     }
   });
 }
@@ -134,7 +146,7 @@ function onSrcDocDeleted(
   collectionName: string,
   viewName: string
 ): OnDeleteTrigger {
-  return onDelete(collectionName, async (srcDoc) => {
+  return onDeleteTrigger(collectionName, async (srcDoc) => {
     const viewDocId = srcDoc.id;
     const viewCollectionName = getViewCollectionName(collectionName, viewName);
     await deleteDoc(viewCollectionName, viewDocId);
@@ -162,7 +174,7 @@ function onSrcRefDocDeleted(
     }
     const { refCollection } = sourceField;
     const refidFieldName = sourceFieldName;
-    return onDelete(refCollection, async (refDoc) => {
+    return onDeleteTrigger(refCollection, async (refDoc) => {
       const referrerSrcDocsSnapshot = await getCollection(
         collectionName,
         (collection) => collection.where(refidFieldName, '==', refDoc.id)
@@ -189,7 +201,7 @@ function makeViewTriggers(
   collectionName: string,
   viewName: string,
   viewSpec: ViewSpec
-): ViewTrigger {
+): ViewTriggers {
   return {
     onSrcDocCreated: onSrcDocCreated(collectionName, viewName, viewSpec),
     onSrcDocUpdated: onSrcDocUpdated(
