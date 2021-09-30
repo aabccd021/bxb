@@ -1,9 +1,4 @@
 import { Dictionary } from 'lodash';
-import {
-  OnCreateTrigger,
-  OnDeleteTrigger,
-  OnUpdateTrigger,
-} from './firebase-functions';
 
 export type StringFieldSpec = {
   readonly type: 'string';
@@ -41,17 +36,7 @@ export type FirestoreDataType = string;
 
 export type DocumentData = Dictionary<FirestoreDataType>;
 
-export type ViewTrigger = {
-  readonly onSrcCreated: OnCreateTrigger;
-  readonly onSrcUpdated: OnUpdateTrigger;
-  readonly onSrcDeleted: OnDeleteTrigger;
-  readonly onJoinRefUpdated: Dictionary<OnUpdateTrigger>;
-};
 
-export type CollectionTrigger = {
-  readonly onRefDeleted: Dictionary<OnDeleteTrigger | undefined>;
-  readonly view: Dictionary<ViewTrigger>;
-};
 
 export type DocumentDataChange = {
   readonly before: DocumentData;

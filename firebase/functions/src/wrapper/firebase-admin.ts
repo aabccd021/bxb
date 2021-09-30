@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
 import { firestore } from 'firebase-admin';
-import { DocumentData, DocumentSnapshot, QuerySnapshot } from './type';
+import { DocumentData, DocumentSnapshot, QuerySnapshot } from '../type';
 
 /**
  * Type safe and convenience firebase-admin wrapper

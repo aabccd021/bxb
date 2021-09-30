@@ -5,7 +5,8 @@ import {
   EventContext,
   firestore,
 } from 'firebase-functions';
-import { DocumentChangeSnapshot, DocumentSnapshot } from './type';
+import { Dictionary } from 'lodash';
+import { DocumentChangeSnapshot, DocumentSnapshot } from '../type';
 
 /**
  * Type safe and convenience firebase-functions wrapper
@@ -20,6 +21,18 @@ export type OnDeleteTrigger = OnCreateTrigger;
 export type OnUpdateTrigger = CloudFunction<
   Change<firestore.QueryDocumentSnapshot>
 >;
+
+export type ViewTrigger = {
+  readonly onSrcCreated: OnCreateTrigger;
+  readonly onSrcUpdated: OnUpdateTrigger;
+  readonly onSrcDeleted: OnDeleteTrigger;
+  readonly onJoinRefUpdated: Dictionary<OnUpdateTrigger>;
+};
+
+export type CollectionTrigger = {
+  readonly onRefDeleted: Dictionary<OnDeleteTrigger | undefined>;
+  readonly view: Dictionary<ViewTrigger>;
+};
 
 function getDocTrigger(collectionName: string): firestore.DocumentBuilder {
   return firestore.document(`${collectionName}/{documentId}`);
