@@ -52,3 +52,22 @@ export type CollectionTrigger = {
   readonly onRefDeleted: Dictionary<OnDeleteTrigger | undefined>;
   readonly view: Dictionary<ViewTrigger>;
 };
+
+export type DocumentDataChange = {
+  readonly before: DocumentData;
+  readonly after: DocumentData;
+};
+
+export type DocumentChangeSnapshot = {
+  readonly id: string;
+  readonly data: DocumentDataChange;
+};
+
+export type DocumentSnapshot = {
+  readonly id: string;
+  readonly data: DocumentData;
+};
+
+export type QuerySnapshot = {
+  readonly docs: readonly DocumentSnapshot[];
+};

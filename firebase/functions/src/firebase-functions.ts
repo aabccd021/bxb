@@ -5,21 +5,11 @@ import {
   EventContext,
   firestore,
 } from 'firebase-functions';
-import { DocumentData } from './type';
+import { DocumentChangeSnapshot, DocumentSnapshot } from './type';
 
 /**
- * Type safe firebase-functions wrapper
+ * Type safe and convenience firebase-functions wrapper
  */
-
-export type DocumentDataChange = {
-  readonly before: DocumentData;
-  readonly after: DocumentData;
-};
-
-export type ChangeSnapshot = {
-  readonly id: string;
-  readonly data: DocumentDataChange;
-};
 
 export type DocFunction = firestore.DocumentBuilder;
 
@@ -31,44 +21,60 @@ export type OnUpdateTrigger = CloudFunction<
   Change<firestore.QueryDocumentSnapshot>
 >;
 
-function getDocFunction(collectionName: string): firestore.DocumentBuilder {
-  return firestore.document(`${collectionName}/{docId}`);
+function getDocTrigger(collectionName: string): firestore.DocumentBuilder {
+  return firestore.document(`${collectionName}/{documentId}`);
+}
+
+export function wrapFirebaseSnapshot(
+  snapshot: firestore.QueryDocumentSnapshot
+): DocumentSnapshot {
+  return {
+    id: snapshot.id,
+    data: snapshot.data(),
+  };
 }
 
 export function onCreate(
   collectionName: string,
   handler: (
-    snapshot: FirebaseFirestore.QueryDocumentSnapshot<DocumentData>,
+    snapshot: DocumentSnapshot,
     context: EventContext
   ) => Promise<unknown>
-): CloudFunction<firestore.QueryDocumentSnapshot> {
-  return getDocFunction(collectionName).onCreate(handler);
+): OnCreateTrigger {
+  return getDocTrigger(collectionName).onCreate((snapshot, context) => {
+    const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
+    return handler(wrappedSnapshot, context);
+  });
 }
 
 export function onUpdate(
   collectionName: string,
-  handler: (change: ChangeSnapshot, context: EventContext) => Promise<unknown>
-): CloudFunction<Change<firestore.QueryDocumentSnapshot>> {
-  return getDocFunction(collectionName).onUpdate((change, context) =>
-    handler(
-      {
-        id: change.after.id,
-        data: {
-          before: change.before.data(),
-          after: change.after.data(),
-        },
+  handler: (
+    change: DocumentChangeSnapshot,
+    context: EventContext
+  ) => Promise<unknown>
+): OnUpdateTrigger {
+  return getDocTrigger(collectionName).onUpdate((change, context) => {
+    const changeSnapshot = {
+      id: change.after.id,
+      data: {
+        before: change.before.data(),
+        after: change.after.data(),
       },
-      context
-    )
-  );
+    };
+    return handler(changeSnapshot, context);
+  });
 }
 
 export function onDelete(
   collectionName: string,
   handler: (
-    snapshot: FirebaseFirestore.QueryDocumentSnapshot<DocumentData>,
+    snapshot: DocumentSnapshot,
     context: EventContext
   ) => Promise<unknown>
-): CloudFunction<firestore.QueryDocumentSnapshot> {
-  return getDocFunction(collectionName).onDelete(handler);
+): OnDeleteTrigger {
+  return getDocTrigger(collectionName).onDelete((snapshot, context) => {
+    const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
+    return handler(wrappedSnapshot, context);
+  });
 }

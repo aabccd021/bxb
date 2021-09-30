@@ -1,16 +1,34 @@
 // eslint-disable-next-line no-restricted-imports
 import { firestore } from 'firebase-admin';
-import { DocumentData } from './type';
+import { DocumentData, DocumentSnapshot, QuerySnapshot } from './type';
 
 /**
- * Firebase wrapper with type safe Document Data
+ * Type safe and convenience firebase-admin wrapper
  */
 
-export function getDoc(
+export function wrapFirebaseSnapshot(
+  snapshot: firestore.DocumentSnapshot
+): DocumentSnapshot {
+  const data = snapshot.data();
+  if (data === undefined) {
+    throw Error(`Invalid Type ${JSON.stringify(snapshot)}`);
+  }
+  return {
+    id: snapshot.id,
+    data,
+  };
+}
+
+export async function getDoc(
   collectionName: string,
   documentId: string
-): Promise<FirebaseFirestore.DocumentSnapshot<DocumentData>> {
-  return firestore().collection(collectionName).doc(documentId).get();
+): Promise<DocumentSnapshot> {
+  const snapshot = await firestore()
+    .collection(collectionName)
+    .doc(documentId)
+    .get();
+  const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
+  return wrappedSnapshot;
 }
 
 export function deleteDoc(
@@ -36,14 +54,19 @@ export function updateDoc(
   return firestore().collection(collectionName).doc(documentId).update(data);
 }
 
-export function getCollection(
+export async function getCollection(
   collectionName: string,
   query?: (
     collectionRef: FirebaseFirestore.CollectionReference<DocumentData>
   ) => FirebaseFirestore.Query<DocumentData>
-): Promise<FirebaseFirestore.QuerySnapshot<DocumentData>> {
+): Promise<QuerySnapshot> {
   const collectionRef = firestore().collection(collectionName);
   const collectionQuery =
     query === undefined ? collectionRef : query(collectionRef);
-  return collectionQuery.get();
+  const snapshot = await collectionQuery.get();
+  const wrappedDocs = snapshot.docs.map(wrapFirebaseSnapshot);
+  const wrappedQuerySnapshot = {
+    docs: wrappedDocs,
+  };
+  return wrappedQuerySnapshot;
 }

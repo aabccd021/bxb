@@ -7,7 +7,6 @@ import {
   updateDoc,
 } from './firebase-admin';
 import {
-  DocumentDataChange,
   onCreate,
   OnCreateTrigger,
   onDelete,
@@ -19,6 +18,8 @@ import {
   Collection,
   CollectionTrigger,
   DocumentData,
+  DocumentDataChange,
+  DocumentSnapshot,
   FieldSpec,
   FirestoreDataType,
   JoinSpec,
@@ -95,20 +96,20 @@ function compactObject<T>(object: Dictionary<T | undefined>): Dictionary<T> {
  */
 async function getRefDocFromRefSpecChainRec(
   refChain: readonly RefSpec[],
-  snapshot: FirebaseFirestore.DocumentSnapshot<DocumentData>
-): Promise<FirebaseFirestore.DocumentSnapshot<DocumentData>> {
+  snapshot: DocumentSnapshot
+): Promise<DocumentSnapshot> {
   const [currentRefSpec, ...nextRefChain] = refChain;
 
   if (currentRefSpec === undefined) {
     return snapshot;
   }
 
-  const refId = snapshot.data()?.[currentRefSpec.fieldName];
+  const refId = snapshot.data?.[currentRefSpec.fieldName];
 
   if (typeof refId !== 'string') {
     throw Error(
       `Invalid Type: ${JSON.stringify({
-        data: snapshot.data(),
+        data: snapshot.data,
         fieldName: currentRefSpec.fieldName,
       })}`
     );
@@ -131,7 +132,7 @@ async function getRefDocFromRefSpecChainRec(
 async function getRefDocFromRefSpecs(
   spec: JoinSpec,
   data: DocumentData
-): Promise<FirebaseFirestore.DocumentSnapshot<DocumentData>> {
+): Promise<DocumentSnapshot> {
   const { firstRef, refChain } = spec;
   const refId = data[firstRef.fieldName];
 
@@ -229,7 +230,7 @@ async function materializeJoinData(
 ): Promise<DocumentData> {
   const refDoc = await getRefDocFromRefSpecs(spec, srcDocData);
 
-  const selectedFieldDocData = pick(refDoc.data(), spec.selectedFieldNames);
+  const selectedFieldDocData = pick(refDoc.data, spec.selectedFieldNames);
   const compactDocData = compactObject(selectedFieldDocData);
 
   const prefixedData = prefixJoinNameOnDocData(compactDocData, spec);
@@ -297,8 +298,7 @@ function getValueChange(
 
 /**
  *
- * @param beforeDocData
- * @param afterDocData
+ * @param documentDataChange
  * @returns
  */
 function getDocDataChange({ before, after }: DocumentDataChange): DocumentData {
@@ -345,12 +345,12 @@ async function materializeView(
 export async function createViewDoc(
   collectionName: string,
   viewName: string,
-  srcDoc: FirebaseFirestore.QueryDocumentSnapshot,
+  srcDoc: DocumentSnapshot,
   selectedFieldNames: readonly string[],
   joinSpecs: readonly JoinSpec[]
 ): Promise<FirebaseFirestore.WriteResult> {
   const viewDocData = await materializeView(
-    srcDoc.data(),
+    srcDoc.data,
     selectedFieldNames,
     joinSpecs
   );
@@ -427,8 +427,8 @@ function getOnJoinRefUpdateFunction(
         (collection) => collection.where(refIdFieldName, '==', refDoc.id)
       );
 
-      const referrerViewDocsUpdates = referrerViewDocsSnapshot.docs.map(
-        ({ ref }) => ref.update(prefixedDocDataUpdate)
+      const referrerViewDocsUpdates = referrerViewDocsSnapshot.docs.map((doc) =>
+        updateDoc(viewCollectionName, doc.id, prefixedDocDataUpdate)
       );
 
       const result = await Promise.allSettled(referrerViewDocsUpdates);
@@ -489,8 +489,8 @@ function getOnSrcRefDeletedFunction(
         (collection) => collection.where(sfName, '==', refDoc.id)
       );
 
-      const referrerDocsDeletes = referrerSrcDocsSnapshot.docs.map(({ ref }) =>
-        ref.delete()
+      const referrerDocsDeletes = referrerSrcDocsSnapshot.docs.map((doc) =>
+        deleteDoc(collectionName, doc.id)
       );
 
       await Promise.allSettled(referrerDocsDeletes);
