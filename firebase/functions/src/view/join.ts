@@ -232,31 +232,27 @@ function makeOnJoinRefDocUpdatedTrigger(
     const allDocDataUpdate = getDocDataChange(refDoc.data);
     const docDataUpdate = pick(allDocDataUpdate, spec.selectedFieldNames);
 
-    if (!isEmpty(docDataUpdate)) {
-      const prefixedDocDataUpdate = prefixJoinNameOnDocData(
-        docDataUpdate,
-        spec
-      );
-      const refIdFieldName = makeRefIdFieldName(spec);
-
-      const viewCollectionName = getViewCollectionName(
-        collectionName,
-        viewName
-      );
-
-      const referrerViews = await getCollection(
-        viewCollectionName,
-        (collection) => collection.where(refIdFieldName, '==', refDoc.id)
-      );
-
-      const referrerViewsUpdates = referrerViews.docs.map((doc) =>
-        updateDoc(viewCollectionName, doc.id, prefixedDocDataUpdate)
-      );
-
-      const promisesResult = await Promise.allSettled(referrerViewsUpdates);
-
-      throwRejectedPromises(promisesResult);
+    if (isEmpty(docDataUpdate)) {
+      return;
     }
+
+    const prefixedDocDataUpdate = prefixJoinNameOnDocData(docDataUpdate, spec);
+    const refIdFieldName = makeRefIdFieldName(spec);
+
+    const viewCollectionName = getViewCollectionName(collectionName, viewName);
+
+    const referrerViews = await getCollection(
+      viewCollectionName,
+      (collection) => collection.where(refIdFieldName, '==', refDoc.id)
+    );
+
+    const referrerViewsUpdates = referrerViews.docs.map((doc) =>
+      updateDoc(viewCollectionName, doc.id, prefixedDocDataUpdate)
+    );
+
+    const promisesResult = await Promise.allSettled(referrerViewsUpdates);
+
+    throwRejectedPromises(promisesResult);
   });
 }
 
