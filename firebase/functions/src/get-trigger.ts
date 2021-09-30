@@ -326,7 +326,7 @@ function getViewCollectionName(
   return `${collectionName}_${viewName}`;
 }
 
-export async function materializeView(
+async function materializeView(
   srcDocData: DocumentData,
   selectedFieldNames: readonly string[],
   joinSpecs: readonly JoinSpec[]
@@ -355,11 +355,11 @@ export async function createViewDoc(
     joinSpecs
   );
   const viewDocId = srcDoc.id;
-  const viewCollectionRef = getViewCollectionName(collectionName, viewName);
-  return createDoc(viewCollectionRef, viewDocId, viewDocData);
+  const viewCollectionName = getViewCollectionName(collectionName, viewName);
+  return createDoc(viewCollectionName, viewDocId, viewDocData);
 }
 
-function getOnSrcCreatedTrigger(
+function getOnSrcCreatedFunction(
   collectionName: string,
   viewName: string,
   selectedFieldNames: readonly string[],
@@ -376,7 +376,7 @@ function getOnSrcCreatedTrigger(
   );
 }
 
-function getOnSrcUpdateTrigger(
+function getOnSrcUpdateFunction(
   collectionName: string,
   viewName: string,
   selectedFieldNames: readonly string[]
@@ -397,7 +397,7 @@ function getOnSrcUpdateTrigger(
   return onUpdateFunction;
 }
 
-function getOnJoinRefUpdateTrigger(
+function getOnJoinRefUpdateFunction(
   collectionName: string,
   viewName: string,
   spec: JoinSpec
@@ -441,14 +441,14 @@ function getOnJoinRefUpdateTrigger(
   return updateFunction;
 }
 
-function getOnJoinRefUpdateTriggers(
+function getOnJoinRefUpdateFunctions(
   collectionName: string,
   viewName: string,
   specs: readonly JoinSpec[]
 ): Dictionary<OnUpdateTrigger> {
   const updateFunctionEntries = specs.map((spec) => {
     const joinName = getJoinName(spec);
-    const updateFunction = getOnJoinRefUpdateTrigger(
+    const updateFunction = getOnJoinRefUpdateFunction(
       collectionName,
       viewName,
       spec
@@ -464,7 +464,7 @@ function getOnJoinRefUpdateTriggers(
   return updateFunctions;
 }
 
-function getOnSrcDeletedTrigger(
+function getOnSrcDeletedFunction(
   collectionName: string,
   viewName: string
 ): OnDeleteTrigger {
@@ -477,7 +477,7 @@ function getOnSrcDeletedTrigger(
   return onDeleteFunction;
 }
 
-function getOnSrcRefDeletedTrigger(
+function getOnSrcRefDeletedFunction(
   collectionName: string,
   src: Dictionary<FieldSpec>
 ): Dictionary<OnDeleteTrigger | undefined> {
@@ -507,19 +507,19 @@ function getViewTriggers(
   { selectedFieldNames, joinSpecs }: View
 ): ViewTrigger {
   return {
-    onSrcCreated: getOnSrcCreatedTrigger(
+    onSrcCreated: getOnSrcCreatedFunction(
       collectionName,
       viewName,
       selectedFieldNames,
       joinSpecs
     ),
-    onSrcUpdated: getOnSrcUpdateTrigger(
+    onSrcUpdated: getOnSrcUpdateFunction(
       collectionName,
       viewName,
       selectedFieldNames
     ),
-    onSrcDeleted: getOnSrcDeletedTrigger(collectionName, viewName),
-    onJoinRefUpdated: getOnJoinRefUpdateTriggers(
+    onSrcDeleted: getOnSrcDeletedFunction(collectionName, viewName),
+    onJoinRefUpdated: getOnJoinRefUpdateFunctions(
       collectionName,
       viewName,
       joinSpecs
@@ -527,12 +527,12 @@ function getViewTriggers(
   };
 }
 
-export function getCollectionTrigger(
-  collectionName: string,
-  { src, views }: Collection
+function getCollectionTrigger(
+  { src, views }: Collection,
+  collectionName: string
 ): CollectionTrigger {
   return {
-    onRefDeleted: getOnSrcRefDeletedTrigger(collectionName, src),
+    onRefDeleted: getOnSrcRefDeletedFunction(collectionName, src),
     view: mapValues(views, (view, viewName) =>
       getViewTriggers(collectionName, viewName, view)
     ),
@@ -542,7 +542,5 @@ export function getCollectionTrigger(
 export function getTriggers(
   collections: Dictionary<Collection>
 ): Dictionary<CollectionTrigger> {
-  return mapValues(collections, (collection, collectionName) =>
-    getCollectionTrigger(collectionName, collection)
-  );
+  return mapValues(collections, getCollectionTrigger);
 }
