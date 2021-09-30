@@ -5,11 +5,14 @@ import {
   compactObject,
   getDocDataChange,
   getViewCollectionName,
-  logRejectedPromises,
+  throwRejectedPromises,
   mergeObjectArray,
 } from '../util';
 import { getCollection, getDoc, updateDoc } from '../wrapper/firebase-admin';
-import { onUpdate, OnUpdateTrigger } from '../wrapper/firebase-functions';
+import {
+  onUpdateTrigger,
+  OnUpdateTrigger,
+} from '../wrapper/firebase-functions';
 
 /**
  * Recursively returns a document referred by join view. Returns latest document
@@ -53,15 +56,15 @@ async function getRefDocFromRefSpecChainRecursive(
 /**
  * Get a document referenced by a join view.
  *
- * @param spec Specification of the join view.
+ * @param joinSpec Specification of the join view.
  * @param data Data of source document of the join view.
  * @returns Document referenced.
  */
 async function getRefDocFromRefSpecs(
-  spec: JoinSpec,
+  joinSpec: JoinSpec,
   data: DocumentData
 ): Promise<DocumentSnapshot> {
-  const { firstRef, refChain } = spec;
+  const { firstRef, refChain } = joinSpec;
   const refId = data[firstRef.fieldName];
 
   if (typeof refId !== 'string') {
@@ -91,13 +94,13 @@ async function getRefDocFromRefSpecs(
  *     },
  *   ],
  * }
- * const joinName = getJoinName(joinSpec)
+ * const joinName = makeJoinName(joinSpec)
  * // joinName => 'repliedTweet_owner'
  *
  * @param joinSpec Join specification to process.
  * @returns Name of the join.
  */
-function getJoinName(joinSpec: JoinSpec): string {
+function makeJoinName(joinSpec: JoinSpec): string {
   const { refChain, firstRef } = joinSpec;
   const refChainFieldNames = refChain.map(({ fieldName }) => {
     fieldName;
@@ -111,23 +114,23 @@ function getJoinName(joinSpec: JoinSpec): string {
 /**
  * Prefix a join name to a field name.
  *
- * @param spec Join specification which the join name is created from.
+ * @param joinSpec Specification of the view.
  * @param fieldName Field name to prefix.
  * @returns Field name prefixed by join name.
  */
-function prefixJoinName(spec: JoinSpec, fieldName: string): string {
-  const joinName = getJoinName(spec);
+function prefixJoinName(joinSpec: JoinSpec, fieldName: string): string {
+  const joinName = makeJoinName(joinSpec);
   const prefixedFieldName = `${joinName}_${fieldName}`;
   return prefixedFieldName;
 }
 
 /**
- * Get id field name of a join view.
+ * Make refId field name of a join view.
  *
  * @param spec Specification of the view.
- * @returns Id field name.
+ * @returns Name of refId field of the view.
  */
-function getRefIdFieldName(spec: JoinSpec): string {
+function makeRefIdFieldName(spec: JoinSpec): string {
   return prefixJoinName(spec, 'id');
 }
 
@@ -146,7 +149,7 @@ function prefixJoinNameOnDocData(
 }
 
 /**
- * Create (materialize) join view data from a specification.
+ * Materialize join view data from a specification.
  *
  * @param srcDocData Source document data of the join view.
  * @param spec Materialization specification.
@@ -163,7 +166,7 @@ async function materializeJoinData(
 
   const prefixedData = prefixJoinNameOnDocData(compactDocData, spec);
 
-  const refIdFieldName = getRefIdFieldName(spec);
+  const refIdFieldName = makeRefIdFieldName(spec);
 
   const docDataWithRefId = {
     ...prefixedData,
@@ -195,69 +198,97 @@ export async function materializeJoinViewData(
   return docData;
 }
 
-function getOnJoinRefUpdateTrigger(
+/**
+ * Get collection name of the join view, which is the latest collection in the
+ * chain.
+ *
+ * @param spec Specification of the view.
+ * @returns Name of the view's reference collection.
+ */
+function makeJoinRefCollectionName({ refChain, firstRef }: JoinSpec): string {
+  return (
+    refChain[refChain.length - 1]?.collectionName ?? firstRef.collectionName
+  );
+}
+
+/**
+ * Make a trigger that runs on update of the source document referenced by the
+ * join view. The trigger will update all document with join view(s) referencing
+ * to the source document.
+ *
+ * @param collectionName Name of the view's collection.
+ * @param viewName Name of the view.
+ * @param spec Specification of the join view.
+ * @returns Trigger that runs on source document update.
+ */
+function makeOnJoinRefDocUpdatedTrigger(
   collectionName: string,
   viewName: string,
   spec: JoinSpec
 ): OnUpdateTrigger {
-  const { refChain, firstRef, selectedFieldNames } = spec;
+  const refCollectionName = makeJoinRefCollectionName(spec);
 
-  // get latest collection in the chain
-  const refCollectionName =
-    refChain[refChain.length - 1]?.collectionName ?? firstRef.collectionName;
-
-  const updateFunction = onUpdate(refCollectionName, async (refDoc) => {
+  return onUpdateTrigger(refCollectionName, async (refDoc) => {
     const allDocDataUpdate = getDocDataChange(refDoc.data);
-    const docDataUpdate = pick(allDocDataUpdate, selectedFieldNames);
+    const docDataUpdate = pick(allDocDataUpdate, spec.selectedFieldNames);
 
     if (!isEmpty(docDataUpdate)) {
       const prefixedDocDataUpdate = prefixJoinNameOnDocData(
         docDataUpdate,
         spec
       );
-      const refIdFieldName = getRefIdFieldName(spec);
+      const refIdFieldName = makeRefIdFieldName(spec);
 
       const viewCollectionName = getViewCollectionName(
         collectionName,
         viewName
       );
-      const referrerViewDocsSnapshot = await getCollection(
+
+      const referrerViews = await getCollection(
         viewCollectionName,
         (collection) => collection.where(refIdFieldName, '==', refDoc.id)
       );
 
-      const referrerViewDocsUpdates = referrerViewDocsSnapshot.docs.map((doc) =>
+      const referrerViewsUpdates = referrerViews.docs.map((doc) =>
         updateDoc(viewCollectionName, doc.id, prefixedDocDataUpdate)
       );
 
-      const result = await Promise.allSettled(referrerViewDocsUpdates);
+      const promisesResult = await Promise.allSettled(referrerViewsUpdates);
 
-      logRejectedPromises(result);
+      throwRejectedPromises(promisesResult);
     }
   });
-
-  return updateFunction;
 }
 
+/**
+ * Create triggers that run on update of documents that referenecd by a
+ * collection's join views.
+ *
+ * @param collectionName Name of the collection.
+ * @param viewName Name of the view.
+ * @param JoinSpecs Specifications of the collection's join views.
+ * @returns Dictionary of triggers that run on join view's referenced document
+ * updated.
+ */
 export function onJoinRefDocUpdated(
   collectionName: string,
   viewName: string,
-  specs: readonly JoinSpec[]
+  JoinSpecs: readonly JoinSpec[]
 ): Dictionary<OnUpdateTrigger> {
-  const updateFunctionEntries = specs.map((spec) => {
-    const joinName = getJoinName(spec);
-    const updateFunction = getOnJoinRefUpdateTrigger(
+  const triggerEntries = JoinSpecs.map((spec) => {
+    const joinName = makeJoinName(spec);
+    const trigger = makeOnJoinRefDocUpdatedTrigger(
       collectionName,
       viewName,
       spec
     );
-    const entry: readonly [string, OnUpdateTrigger] = [
+    const triggerEntry: readonly [string, OnUpdateTrigger] = [
       joinName,
-      updateFunction,
+      trigger,
     ];
-    return entry;
+    return triggerEntry;
   });
 
-  const updateFunctions = Object.fromEntries(updateFunctionEntries);
-  return updateFunctions;
+  const updateTriggers = Object.fromEntries(triggerEntries);
+  return updateTriggers;
 }
