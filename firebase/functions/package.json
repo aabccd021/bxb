@@ -71,6 +71,11 @@
       "unused-imports"
     ],
     "rules": {
+      "no-restricted-imports": [
+        "error",
+        "firebase-admin",
+        "firebase-functions"
+      ],
       "no-unsafe-optional-chaining": "error",
       "no-use-before-define": "error",
       "no-else-return": "error",

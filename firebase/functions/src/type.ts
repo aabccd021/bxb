@@ -1,5 +1,9 @@
-import * as functions from 'firebase-functions';
 import { Dictionary } from 'lodash';
+import {
+  OnCreateTrigger,
+  OnDeleteTrigger,
+  OnUpdateTrigger,
+} from './firebase-functions';
 
 export type StringFieldSpec = {
   readonly type: 'string';
@@ -35,21 +39,16 @@ export type Collection = {
 
 export type FirestoreDataType = string;
 
-export type OnCreateFunction =
-  functions.CloudFunction<functions.firestore.QueryDocumentSnapshot>;
-export type OnDeleteFunction = OnCreateFunction;
-export type OnUpdateFunction = functions.CloudFunction<
-  functions.Change<functions.firestore.QueryDocumentSnapshot>
->;
+export type DocumentData = Dictionary<FirestoreDataType>;
 
 export type ViewTrigger = {
-  readonly onSrcCreated: OnCreateFunction;
-  readonly onSrcUpdated: OnUpdateFunction;
-  readonly onSrcDeleted: OnDeleteFunction;
-  readonly onJoinRefUpdated: Dictionary<OnUpdateFunction>;
+  readonly onSrcCreated: OnCreateTrigger;
+  readonly onSrcUpdated: OnUpdateTrigger;
+  readonly onSrcDeleted: OnDeleteTrigger;
+  readonly onJoinRefUpdated: Dictionary<OnUpdateTrigger>;
 };
 
 export type CollectionTrigger = {
-  readonly onRefDeleted: Dictionary<OnDeleteFunction | undefined>;
+  readonly onRefDeleted: Dictionary<OnDeleteTrigger | undefined>;
   readonly view: Dictionary<ViewTrigger>;
 };
