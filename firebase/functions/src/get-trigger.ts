@@ -1,32 +1,32 @@
 import { chain, Dictionary, isEmpty, mapKeys, mapValues, pick } from 'lodash';
 import {
+  RefSpec,
+  DocumentSnapshot,
+  JoinSpec,
+  DocumentData,
+  FirestoreDataType,
+  DocumentDataChange,
+  FieldSpec,
+  View,
+  Collection,
+} from './type';
+import {
   createDoc,
   deleteDoc,
   getCollection,
   getDoc,
   updateDoc,
-} from './firebase-admin';
+} from './wrapper/firebase-admin';
 import {
-  onCreate,
   OnCreateTrigger,
-  onDelete,
-  OnDeleteTrigger,
-  onUpdate,
+  onCreate,
   OnUpdateTrigger,
-} from './firebase-functions';
-import {
-  Collection,
-  CollectionTrigger,
-  DocumentData,
-  DocumentDataChange,
-  DocumentSnapshot,
-  FieldSpec,
-  FirestoreDataType,
-  JoinSpec,
-  RefSpec,
-  View,
+  OnDeleteTrigger,
+  onDelete,
   ViewTrigger,
-} from './type';
+  CollectionTrigger,
+  onUpdate,
+} from './wrapper/firebase-functions';
 
 /**
  * Throw rejected promises from array of settled promises.
