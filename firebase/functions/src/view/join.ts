@@ -180,7 +180,7 @@ async function materializeJoinData(
  * @param specs Array of join view specification.
  * @returns Array of materialized datas.
  */
-export async function getMaterializedJoinDatas(
+export async function materializeJoinViewData(
   srcDocData: DocumentData,
   specs: readonly JoinSpec[]
 ): Promise<DocumentData> {

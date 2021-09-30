@@ -4,12 +4,12 @@ export type StringFieldSpec = {
   readonly type: 'string';
 };
 
-export type RefFieldSpec = {
-  readonly type: 'ref';
+export type RefIdFieldSpec = {
+  readonly type: 'refId';
   readonly refCollection: string;
 };
 
-export type FieldSpec = StringFieldSpec | RefFieldSpec;
+export type SrcFieldSpec = StringFieldSpec | RefIdFieldSpec;
 
 export type RefSpec = {
   readonly collectionName: string;
@@ -28,7 +28,7 @@ export type View = {
 };
 
 export type CollectionSpec = {
-  readonly src: Dictionary<FieldSpec>;
+  readonly src: Dictionary<SrcFieldSpec>;
   readonly views: Dictionary<View>;
 };
 

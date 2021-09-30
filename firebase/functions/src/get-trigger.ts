@@ -3,12 +3,12 @@ import {
   DocumentSnapshot,
   JoinSpec,
   DocumentData,
-  FieldSpec,
+  SrcFieldSpec,
   View,
   CollectionSpec,
 } from './type';
 import { getViewCollectionName, getDocDataChange } from './util';
-import { getMaterializedJoinDatas, onJoinRefDocUpdated } from './view/join';
+import { materializeJoinViewData, onJoinRefDocUpdated } from './view/join';
 import {
   createDoc,
   deleteDoc,
@@ -28,19 +28,20 @@ import {
 
 /**
  *
+ *
  * @param srcDocData
  * @param selectedFieldNames
  * @param joinSpecs
  * @returns
  */
-async function makeMaterializedViewDocData(
+async function materializeViewData(
   srcDocData: DocumentData,
   selectedFieldNames: readonly string[],
   joinSpecs: readonly JoinSpec[]
 ): Promise<DocumentData> {
   const selectedDocData = pick(srcDocData, selectedFieldNames);
 
-  const joinedDocData = await getMaterializedJoinDatas(srcDocData, joinSpecs);
+  const joinedDocData = await materializeJoinViewData(srcDocData, joinSpecs);
 
   const materializedViewDocData: DocumentData = {
     ...selectedDocData,
@@ -65,7 +66,7 @@ export async function createViewDoc(
   selectedFieldNames: readonly string[],
   joinSpecs: readonly JoinSpec[]
 ): Promise<FirebaseFirestore.WriteResult> {
-  const viewDocData = await makeMaterializedViewDocData(
+  const viewDocData = await materializeViewData(
     srcDoc.data,
     selectedFieldNames,
     joinSpecs
@@ -162,17 +163,19 @@ function onSrcDocDeleted(
  */
 function onSrcRefDocDeleted(
   collectionName: string,
-  src: Dictionary<FieldSpec>
+  src: Dictionary<SrcFieldSpec>
 ): Dictionary<OnDeleteTrigger | undefined> {
   return mapValues(src, (sourceField, sourceFieldName) => {
     // only create trigger if the field is type of refId (the document has reference to another document)
-    if (sourceField.type !== 'ref') {
+    if (sourceField.type !== 'refId') {
       return undefined;
     }
-    return onDelete(sourceField.refCollection, async (refDoc) => {
+    const { refCollection } = sourceField;
+    const refidFieldName = sourceFieldName;
+    return onDelete(refCollection, async (refDoc) => {
       const referrerSrcDocsSnapshot = await getCollection(
         collectionName,
-        (collection) => collection.where(sourceFieldName, '==', refDoc.id)
+        (collection) => collection.where(refidFieldName, '==', refDoc.id)
       );
 
       const referrerDocsDeletes = referrerSrcDocsSnapshot.docs.map((doc) =>
