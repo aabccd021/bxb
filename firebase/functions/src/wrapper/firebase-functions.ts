@@ -23,14 +23,14 @@ export type OnUpdateTrigger = CloudFunction<
 >;
 
 export type ViewTrigger = {
-  readonly onSrcCreated: OnCreateTrigger;
-  readonly onSrcUpdated: OnUpdateTrigger;
-  readonly onSrcDeleted: OnDeleteTrigger;
-  readonly onJoinRefUpdated: Dictionary<OnUpdateTrigger>;
+  readonly onSrcDocCreated: OnCreateTrigger;
+  readonly onSrcDocUpdated: OnUpdateTrigger;
+  readonly onSrcDocDeleted: OnDeleteTrigger;
+  readonly onJoinRefDocUpdated: Dictionary<OnUpdateTrigger>;
 };
 
-export type CollectionTrigger = {
-  readonly onRefDeleted: Dictionary<OnDeleteTrigger | undefined>;
+export type CollectionTriggers = {
+  readonly onRefDocDeleted: Dictionary<OnDeleteTrigger | undefined>;
   readonly view: Dictionary<ViewTrigger>;
 };
 

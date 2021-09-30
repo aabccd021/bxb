@@ -1,9 +1,9 @@
 import * as admin from 'firebase-admin';
-import { getTriggers } from './get-trigger';
+import { makeMasmottTriggers } from './get-trigger';
 
 admin.initializeApp();
 
-export const triggers = getTriggers({
+export const triggers = makeMasmottTriggers({
   user: {
     src: {
       id: {

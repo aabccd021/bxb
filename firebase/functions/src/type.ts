@@ -27,7 +27,7 @@ export type View = {
   readonly joinSpecs: readonly JoinSpec[];
 };
 
-export type Collection = {
+export type CollectionSpec = {
   readonly src: Dictionary<FieldSpec>;
   readonly views: Dictionary<View>;
 };
@@ -35,8 +35,6 @@ export type Collection = {
 export type FirestoreDataType = string;
 
 export type DocumentData = Dictionary<FirestoreDataType>;
-
-
 
 export type DocumentDataChange = {
   readonly before: DocumentData;
