@@ -49,9 +49,8 @@ export function onUpdate(
   collectionName: string,
   handler: (change: ChangeSnapshot, context: EventContext) => Promise<unknown>
 ): CloudFunction<Change<firestore.QueryDocumentSnapshot>> {
-  return getDocFunction(collectionName).onUpdate((change, context) => {
-    change.after;
-    return handler(
+  return getDocFunction(collectionName).onUpdate((change, context) =>
+    handler(
       {
         id: change.after.id,
         data: {
@@ -60,8 +59,8 @@ export function onUpdate(
         },
       },
       context
-    );
-  });
+    )
+  );
 }
 
 export function onDelete(

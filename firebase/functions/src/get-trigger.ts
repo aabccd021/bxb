@@ -381,7 +381,7 @@ function getOnSrcUpdateFunction(
   viewName: string,
   selectedFieldNames: readonly string[]
 ): OnUpdateTrigger {
-  const onUpdateFunction = onUpdate(collectionName, async (srcDoc) => {
+  return onUpdate(collectionName, async (srcDoc) => {
     const allDocDataUpdate = getDocDataChange(srcDoc.data);
     const docDataUpdate = pick(allDocDataUpdate, selectedFieldNames);
 
@@ -394,7 +394,6 @@ function getOnSrcUpdateFunction(
       await updateDoc(viewCollectionName, viewDocId, docDataUpdate);
     }
   });
-  return onUpdateFunction;
 }
 
 function getOnJoinRefUpdateFunction(
@@ -468,13 +467,12 @@ function getOnSrcDeletedFunction(
   collectionName: string,
   viewName: string
 ): OnDeleteTrigger {
-  const onDeleteFunction = onDelete(collectionName, async (srcDoc) => {
+  return onDelete(collectionName, async (srcDoc) => {
     const viewDocId = srcDoc.id;
 
     const viewCollectionName = getViewCollectionName(collectionName, viewName);
     await deleteDoc(viewCollectionName, viewDocId);
   });
-  return onDeleteFunction;
 }
 
 function getOnSrcRefDeletedFunction(
