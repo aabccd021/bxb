@@ -6,6 +6,23 @@ import { DocumentData, DocumentSnapshot, QuerySnapshot } from '../type';
  * Type safe and convenience firebase-admin wrapper
  */
 
+export type Firestore = firestore.Firestore;
+
+// eslint-disable-next-line functional/no-let
+let firestoreInstance: Firestore | undefined;
+
+// eslint-disable-next-line functional/no-return-void
+export function setFirestore(firestore: Firestore): void {
+  firestoreInstance = firestore;
+}
+
+function getFirestore(): Firestore {
+  if (firestoreInstance === undefined) {
+    throw Error('Firestore is uninitialized.');
+  }
+  return firestoreInstance;
+}
+
 export function wrapFirebaseSnapshot(
   snapshot: firestore.DocumentSnapshot
 ): DocumentSnapshot {
@@ -23,7 +40,7 @@ export async function getDoc(
   collectionName: string,
   documentId: string
 ): Promise<DocumentSnapshot> {
-  const snapshot = await firestore()
+  const snapshot = await getFirestore()
     .collection(collectionName)
     .doc(documentId)
     .get();
@@ -35,7 +52,7 @@ export function deleteDoc(
   collectionName: string,
   documentId: string
 ): Promise<FirebaseFirestore.WriteResult> {
-  return firestore().collection(collectionName).doc(documentId).delete();
+  return getFirestore().collection(collectionName).doc(documentId).delete();
 }
 
 export function createDoc(
@@ -43,7 +60,7 @@ export function createDoc(
   documentId: string,
   data: DocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return firestore().collection(collectionName).doc(documentId).create(data);
+  return getFirestore().collection(collectionName).doc(documentId).create(data);
 }
 
 export function updateDoc(
@@ -51,7 +68,7 @@ export function updateDoc(
   documentId: string,
   data: DocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return firestore().collection(collectionName).doc(documentId).update(data);
+  return getFirestore().collection(collectionName).doc(documentId).update(data);
 }
 
 export async function getCollection(
@@ -60,7 +77,7 @@ export async function getCollection(
     collectionRef: FirebaseFirestore.CollectionReference<DocumentData>
   ) => FirebaseFirestore.Query<DocumentData>
 ): Promise<QuerySnapshot> {
-  const collectionRef = firestore().collection(collectionName);
+  const collectionRef = getFirestore().collection(collectionName);
   const collectionQuery =
     query === undefined ? collectionRef : query(collectionRef);
   const snapshot = await collectionQuery.get();

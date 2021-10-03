@@ -4,7 +4,7 @@ import { makeMasmottTriggers } from './get-trigger';
 
 admin.initializeApp();
 
-export const triggers = makeMasmottTriggers({
+export const triggers = makeMasmottTriggers(admin.firestore(), {
   user: {
     src: {
       id: {

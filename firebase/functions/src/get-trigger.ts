@@ -1,4 +1,4 @@
-import { Dictionary, isEmpty, mapValues } from 'lodash';
+import { Dictionary, isEmpty, mapValues, pick } from 'lodash';
 import {
   DocumentSnapshot,
   DocumentData,
@@ -8,11 +8,12 @@ import {
 } from './type';
 import { getViewCollectionName, getDocDataChange } from './util';
 import { materializeJoinViewData, onJoinRefDocUpdated } from './view/join';
-import { materializeSelectViewData } from './view/select';
 import {
   createDoc,
   deleteDoc,
+  Firestore,
   getCollection,
+  setFirestore,
   updateDoc,
 } from './wrapper/firebase-admin';
 import {
@@ -37,10 +38,7 @@ async function materializeViewData(
   srcDocData: DocumentData,
   { selectedFieldNames, join: joinSpecs }: ViewSpec
 ): Promise<DocumentData> {
-  const selectViewData = materializeSelectViewData(
-    srcDocData,
-    selectedFieldNames
-  );
+  const selectViewData = pick(srcDocData, selectedFieldNames);
 
   const joinViewData = await materializeJoinViewData(srcDocData, joinSpecs);
 
@@ -110,10 +108,7 @@ function onSrcDocUpdated(
   return onUpdateTrigger(collectionName, async (srcDoc) => {
     const allDocDataUpdate = getDocDataChange(srcDoc.data);
 
-    const selectViewUpdateData = materializeSelectViewData(
-      allDocDataUpdate,
-      selectedFieldNames
-    );
+    const selectViewUpdateData = pick(allDocDataUpdate, selectedFieldNames);
 
     // Changing referenceId is not supported at the moment.
     const joinViewUpdateData = {};
@@ -239,10 +234,13 @@ function makeCollectionTriggers(
  * Make triggers for masmott.
  *
  * @param collectionSpecs Collections specs of the app.
+ *
  * @returns Triggers made by masmott.
  */
 export function makeMasmottTriggers(
+  firestore: Firestore,
   collectionSpecs: Dictionary<CollectionSpec>
 ): Dictionary<CollectionTriggers> {
+  setFirestore(firestore);
   return mapValues(collectionSpecs, makeCollectionTriggers);
 }

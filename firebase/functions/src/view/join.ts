@@ -8,7 +8,7 @@ import {
   throwRejectedPromises,
   mergeObjectArray,
 } from '../util';
-import { getCollection, getDoc, updateDoc } from '../wrapper/firebase-admin';
+import { getDoc, getCollection, updateDoc } from '../wrapper/firebase-admin';
 import {
   onUpdateTrigger,
   OnUpdateTrigger,
