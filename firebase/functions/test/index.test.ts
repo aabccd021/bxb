@@ -42,8 +42,8 @@ describe('masmott', () => {
     });
   });
 
-  describe('on double chain', () => {
-    it('materialize join on ref doc created', async () => {
+  describe('on double chained ref', () => {
+    it('materialize clap_view on clap created', async () => {
       await admin.firestore().doc('user/marino').create({
         id: 'marino',
         bio: 'marinos desu',
@@ -67,6 +67,31 @@ describe('masmott', () => {
         clappedArticle_ownerUser_bio: 'marinos desu',
         clappedArticle_ownerUser_id: 'marino',
       });
+    });
+
+    it('update clap_view on user updated', async () => {
+      await admin
+        .firestore()
+        .doc('user/marino')
+        .update({ bio: 'kousaka desu' });
+      await sleep(4000);
+
+      const clapView = await admin
+        .firestore()
+        .doc('clap_detail/hikaru_46')
+        .get();
+      expect(clapView.data()).toStrictEqual({
+        clappedArticle_ownerUser_bio: 'kousaka desu',
+        clappedArticle_ownerUser_id: 'marino',
+      });
+    });
+
+    it('delete clap on user deleted', async () => {
+      await admin.firestore().doc('user/marino').delete();
+      await sleep(4000);
+
+      const clap = await admin.firestore().doc('clap/hikaru_46').get();
+      expect(clap.exists).toStrictEqual(false);
     });
   });
 });

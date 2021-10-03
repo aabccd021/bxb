@@ -234,7 +234,6 @@ function makeCollectionTriggers(
  * Make triggers for masmott.
  *
  * @param collectionSpecs Collections specs of the app.
- *
  * @returns Triggers made by masmott.
  */
 export function makeMasmottTriggers(
