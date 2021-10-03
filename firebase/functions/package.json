@@ -5,9 +5,8 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
-    "serve": "npm run build && firebase emulators:start --only functions",
-    "shell": "npm run build && firebase functions:shell",
-    "start": "npm run shell",
+    "start": "firebase emulators:start --project demo-masmott",
+    "clean-start": "yarn build && rm -rf functions/lib && cp -r lib functions/lib && yarn start",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
@@ -34,6 +33,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-unused-imports": "^1.1.5",
     "firebase-functions-test": "^0.3.2",
+    "firebase-tools": "^9.19.0",
     "prettier": "^2.4.1",
     "typescript": "^4.4.3"
   },
