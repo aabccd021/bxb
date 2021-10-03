@@ -26,22 +26,41 @@ export const triggers = makeMasmottTriggers(admin.firestore(), {
       text: {
         type: 'string',
       },
-      owner: {
+      ownerUser: {
         type: 'refId',
         refCollection: 'user',
       },
     },
     views: {
       card: {
-        selectedFieldNames: ['text'],
+        selectedFieldNames: [],
+        join: [],
+      },
+    },
+  },
+  clap: {
+    src: {
+      clappedArticle: {
+        type: 'refId',
+        refCollection: 'article',
+      },
+    },
+    views: {
+      detail: {
+        selectedFieldNames: [],
         join: [
           {
             firstRef: {
-              collectionName: 'user',
-              fieldName: 'owner',
+              collectionName: 'article',
+              fieldName: 'clappedArticle',
             },
-            refChain: [],
-            selectedFieldNames: ['username'],
+            refChain: [
+              {
+                collectionName: 'user',
+                fieldName: 'ownerUser',
+              },
+            ],
+            selectedFieldNames: ['bio'],
           },
         ],
       },

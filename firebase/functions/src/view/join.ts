@@ -102,9 +102,7 @@ async function getRefDocFromRefSpecs(
  */
 function makeJoinName(joinSpec: JoinSpec): string {
   const { refChain, firstRef } = joinSpec;
-  const refChainFieldNames = refChain.map(({ fieldName }) => {
-    fieldName;
-  });
+  const refChainFieldNames = refChain.map(({ fieldName }) => fieldName);
   const refFieldNames = [firstRef.fieldName, ...refChainFieldNames];
   const joinName = refFieldNames.join('_');
 
