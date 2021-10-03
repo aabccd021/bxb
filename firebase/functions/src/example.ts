@@ -10,13 +10,13 @@ export const triggers = makeMasmottTriggers(admin.firestore(), {
       id: {
         type: 'string',
       },
-      username: {
+      bio: {
         type: 'string',
       },
     },
     views: {
       card: {
-        selectedFieldNames: ['username'],
+        selectedFieldNames: ['bio'],
         join: [],
       },
     },
