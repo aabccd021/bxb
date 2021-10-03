@@ -17,7 +17,7 @@ export const triggers = makeMasmottTriggers({
     views: {
       card: {
         selectedFieldNames: ['id'],
-        joinSpecs: [],
+        join: [],
       },
     },
   },
@@ -34,7 +34,7 @@ export const triggers = makeMasmottTriggers({
     views: {
       card: {
         selectedFieldNames: ['text'],
-        joinSpecs: [
+        join: [
           {
             firstRef: {
               collectionName: 'user',
@@ -61,7 +61,7 @@ export const triggers = makeMasmottTriggers({
     views: {
       card: {
         selectedFieldNames: ['text'],
-        joinSpecs: [
+        join: [
           {
             firstRef: {
               collectionName: 'tweet',

@@ -35,7 +35,7 @@ import {
  */
 async function materializeViewData(
   srcDocData: DocumentData,
-  { selectedFieldNames, joinSpecs }: ViewSpec
+  { selectedFieldNames, join: joinSpecs }: ViewSpec
 ): Promise<DocumentData> {
   const selectViewData = materializeSelectViewData(
     srcDocData,
@@ -123,14 +123,12 @@ function onSrcDocUpdated(
       ...joinViewUpdateData,
     };
 
-    if (!isEmpty(viewUpdateData)) {
-      const viewDocId = srcDoc.id;
-      const viewCollectionName = getViewCollectionName(
-        collectionName,
-        viewName
-      );
-      await updateDoc(viewCollectionName, viewDocId, viewUpdateData);
+    if (isEmpty(viewUpdateData)) {
+      return;
     }
+    const viewDocId = srcDoc.id;
+    const viewCollectionName = getViewCollectionName(collectionName, viewName);
+    await updateDoc(viewCollectionName, viewDocId, viewUpdateData);
   });
 }
 
@@ -213,7 +211,7 @@ function makeViewTriggers(
     onJoinRefDocUpdated: onJoinRefDocUpdated(
       collectionName,
       viewName,
-      viewSpec.joinSpecs
+      viewSpec.join
     ),
   };
 }
