@@ -7,7 +7,7 @@ admin.initializeApp();
 export const triggers = makeMasmottTriggers(admin.firestore(), {
   user: {
     src: {
-      id: {
+      uid: {
         type: 'string',
       },
       bio: {
@@ -18,6 +18,13 @@ export const triggers = makeMasmottTriggers(admin.firestore(), {
       card: {
         selectedFieldNames: ['bio'],
         join: [],
+        count: [
+          {
+            fieldName: 'articleCount',
+            countedCollectionName: 'article',
+            groupBy: 'ownerUser',
+          },
+        ],
       },
     },
   },
@@ -35,6 +42,13 @@ export const triggers = makeMasmottTriggers(admin.firestore(), {
       card: {
         selectedFieldNames: [],
         join: [],
+        count: [
+          {
+            fieldName: 'commentCount',
+            countedCollectionName: 'comment',
+            groupBy: 'commentedArticle',
+          },
+        ],
       },
     },
   },
@@ -63,7 +77,20 @@ export const triggers = makeMasmottTriggers(admin.firestore(), {
             selectedFieldNames: ['bio'],
           },
         ],
+        count: [],
       },
     },
+  },
+  comment: {
+    src: {
+      text: {
+        type: 'string',
+      },
+      commentedArticle: {
+        type: 'refId',
+        refCollection: 'article',
+      },
+    },
+    views: {},
   },
 });

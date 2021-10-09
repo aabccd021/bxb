@@ -22,9 +22,16 @@ export type JoinSpec = {
   readonly selectedFieldNames: readonly string[];
 };
 
+export type CountSpec = {
+  readonly fieldName: string;
+  readonly groupBy: string;
+  readonly countedCollectionName: string;
+};
+
 export type ViewSpec = {
   readonly selectedFieldNames: readonly string[];
   readonly join: readonly JoinSpec[];
+  readonly count: readonly CountSpec[];
 };
 
 export type CollectionSpec = {
