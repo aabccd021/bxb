@@ -18,6 +18,11 @@ export const triggers = makeMasmottTriggers(admin.firestore(), {
       card: {
         selectedFieldNames: ['bio'],
         join: [],
+        count: [],
+      },
+      detail: {
+        selectedFieldNames: [],
+        join: [],
         count: [
           {
             fieldName: 'articleCount',

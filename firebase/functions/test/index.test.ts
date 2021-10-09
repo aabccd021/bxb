@@ -60,6 +60,7 @@ describe('on double chained ref', () => {
       .doc('clap_detail/hikaru_46')
       .get();
     expect(clapDetail.data()).toStrictEqual({
+      // TODO: don't generate name
       clappedArticle_ownerUser_bio: 'marinos desu',
       clappedArticle_ownerUser_id: 'marino',
     });
@@ -82,5 +83,117 @@ describe('on double chained ref', () => {
 
     const clap = await admin.firestore().doc('clap/hikaru_46').get();
     expect(clap.exists).toStrictEqual(false);
+  });
+});
+
+describe('count article', () => {
+  it('initialize user article count with 0', async () => {
+    await admin.firestore().doc('user/berisa').create({
+      id: 'berisa',
+      bio: 'berisa desu',
+    });
+
+    const userDetail = await admin.firestore().doc('user_detail/berisa').get();
+    expect(userDetail.data()).toStrictEqual({
+      articleCount: 0,
+    });
+  });
+
+  it('increase count when new article created', async () => {
+    await admin.firestore().doc('article/21').create({
+      text: 'mugon no uchuu',
+      ownerUser: 'berisa',
+    });
+
+    const userDetail = await admin.firestore().doc('user_detail/berisa').get();
+    expect(userDetail.data()).toStrictEqual({
+      articleCount: 1,
+    });
+  });
+
+  it('increase count when another new article created', async () => {
+    await admin.firestore().doc('article/42').create({
+      text: 'nageredama',
+      ownerUser: 'berisa',
+    });
+
+    const userDetail = await admin.firestore().doc('user_detail/berisa').get();
+    expect(userDetail.data()).toStrictEqual({
+      articleCount: 2,
+    });
+  });
+
+  it('decrease count when an article deleted', async () => {
+    await admin.firestore().doc('article/21').delete();
+
+    const userDetail = await admin.firestore().doc('user_detail/berisa').get();
+    expect(userDetail.data()).toStrictEqual({
+      articleCount: 1,
+    });
+  });
+
+  it('decrease count again when an article deleted', async () => {
+    await admin.firestore().doc('article/42').delete();
+
+    const userDetail = await admin.firestore().doc('user_detail/berisa').get();
+    expect(userDetail.data()).toStrictEqual({
+      articleCount: 0,
+    });
+  });
+});
+
+describe('count comment', () => {
+  it('initialize article comment count with 0', async () => {
+    await admin.firestore().doc('article/17').create({
+      text: 'MV released mugon no uchuu',
+      ownerUser: 'berisa',
+    });
+
+    const articleCard = await admin.firestore().doc('article_card/17').get();
+    expect(articleCard.data()).toStrictEqual({
+      commentCount: 0,
+    });
+  });
+
+  it('increase count when new article created', async () => {
+    await admin.firestore().doc('comment/123').create({
+      text: 'cool',
+      commentedArticle: '17',
+    });
+
+    const articleCard = await admin.firestore().doc('article_card/17').get();
+    expect(articleCard.data()).toStrictEqual({
+      commentCount: 1,
+    });
+  });
+
+  it('increase count when another new article created', async () => {
+    await admin.firestore().doc('comment/456').create({
+      text: 'hype as fujii kaze kirari',
+      commentedArticle: '17',
+    });
+
+    const articleCard = await admin.firestore().doc('article_card/17').get();
+    expect(articleCard.data()).toStrictEqual({
+      commentCount: 2,
+    });
+  });
+
+  it('decrease count when an article deleted', async () => {
+    await admin.firestore().doc('comment/123').delete();
+
+    const articleCard = await admin.firestore().doc('article_card/17').get();
+    expect(articleCard.data()).toStrictEqual({
+      commentCount: 1,
+    });
+  });
+
+  it('decrease count again when an article deleted', async () => {
+    await admin.firestore().doc('comment/456').delete();
+
+    const articleCard = await admin.firestore().doc('article_card/17').get();
+    expect(articleCard.data()).toStrictEqual({
+      commentCount: 0,
+    });
   });
 });
