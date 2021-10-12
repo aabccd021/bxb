@@ -1,59 +1,88 @@
-import { _useDoc, _useDocCreation } from './_useDoc';
+import { _useDocCreation, _useViewable } from './_useDoc';
 import { CollectionSpec, Dictionary } from './type';
 import { Doc, DocCreation } from './types';
 
-type Collection = 'article' | 'user' | 'clap' | 'comment';
-type DocKey<C extends Collection> = [C, string];
+export type Collection = 'article' | 'user' | 'clap' | 'comment';
 
-type User = {
+export type View = 'user_card' | 'user_detail' | 'article_card' | 'clap_detail';
+
+export type Viewable = Collection | View;
+
+export type DocKey<C extends Collection> = [C, string];
+
+export type User = {
   uid: string;
   bio: string;
 };
 
-type Article = {
+export type User_Card = {
+  bio: string;
+};
+
+export type User_Detail = {
+  articleCount: number;
+};
+
+export type Article = {
   text: string;
   ownerUser: string;
 };
 
-type Clap = {
+export type Article_Card = {
+  commentCount: number;
+};
+
+export type Clap = {
   clappedArticle: string;
 };
 
-type Comment = {
+export type Clap_Detail = {
+  clappedArticle_ownerUser_bio: string;
+};
+
+export type Comment = {
   text: string;
   commentedArticle: string;
 };
 
-type CreateUser = {
+export type CreateUser = {
   uid: string;
   bio: string;
 };
 
-type CreateArticle = {
+export type CreateArticle = {
   text: string;
   ownerUser: string;
 };
 
-type CreateClap = {
+export type CreateClap = {
   clappedArticle: string;
 };
 
-type CreateComment = {
+export type CreateComment = {
   text: string;
   commentedArticle: string;
 };
 
-type DataOfCollection<C extends Collection> = C extends 'user'
+export type DataOfViewable<V extends Viewable> = V extends 'user'
   ? User
-  : C extends 'article'
+  : V extends 'user_card'
+  ? User_Card
+  : V extends 'user_detail'
+  ? User_Detail
+  : V extends 'article'
   ? Article
-  : C extends 'clap'
+  : V extends 'article_card'
+  ? Article_Card
+  : V extends 'clap'
   ? Clap
-  : C extends 'comment'
+  : V extends 'clap_detail'
+  ? Clap_Detail
+  : V extends 'comment'
   ? Comment
   : never;
 
-type CreateDataOfCollection<C extends Collection> = C extends 'user'
+export type CreateDataOfCollection<C extends Collection> = C extends 'user'
   ? CreateUser
   : C extends 'article'
   ? CreateArticle
@@ -63,13 +92,7 @@ type CreateDataOfCollection<C extends Collection> = C extends 'user'
   ? CreateComment
   : never;
 
-export function useDoc<C extends Collection>(
-  key: DocKey<C>
-): Doc<DataOfCollection<C>> {
-  return _useDoc(key) as Doc<DataOfCollection<C>>;
-}
-
-const schema = {
+export const schema = {
   user: {
     src: {
       uid: {
@@ -167,9 +190,16 @@ const schema = {
 
 export function useDocCreation<C extends Collection>(
   collectionName: C
-): DocCreation<DataOfCollection<C>, CreateDataOfCollection<C>> {
+): DocCreation<DataOfViewable<C>, CreateDataOfCollection<C>> {
   return _useDocCreation(
     collectionName,
     schema as Dictionary<CollectionSpec>
-  ) as DocCreation<DataOfCollection<C>, CreateDataOfCollection<C>>;
+  ) as DocCreation<DataOfViewable<C>, CreateDataOfCollection<C>>;
+}
+
+export function useViewable<V extends Viewable>(
+  viewableName: V,
+  id: string
+): Doc<DataOfViewable<V>> {
+  return _useViewable(viewableName, id) as Doc<DataOfViewable<V>>;
 }

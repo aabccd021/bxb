@@ -157,9 +157,12 @@ export function _useDocCreation(
   return state;
 }
 
-export function _useDoc(key: DocKey): Doc {
+export function _useViewable(viewableName: string, id: string): Doc {
   const [doc, setDoc] = useState<Doc>({ state: 'fetching' });
-  const { data, error, mutate } = useSWR(key, firestoreFetcher);
+  const { data, error, mutate } = useSWR(
+    `${viewableName}/${id}`,
+    firestoreFetcher
+  );
 
   useEffect(() => {
     if (data === undefined) {
