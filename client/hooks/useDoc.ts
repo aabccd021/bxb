@@ -223,8 +223,10 @@ export function useViewable<C extends Collection, V extends ViewOf<C>>(
   >;
 }
 
-const userCard = useViewable(['user', 'xxx'], { view: 'card' });
-const userDetail = useViewable(['user', 'xxx'], { view: 'detail' });
-const user = useViewable(['user', 'xxx']);
+const userCard: Doc<User_Card> = useViewable(['user', 'xxx'], { view: 'card' });
+const userDetail: Doc<User_Detail> = useViewable(['user', 'xxx'], {
+  view: 'detail',
+});
+const user: Doc<User> = useViewable(['user', 'xxx']);
 
 const userCreation = useDocCreation('article');
