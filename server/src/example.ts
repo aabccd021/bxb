@@ -17,13 +17,13 @@ export const triggers = makeMasmottTriggers(admin.firestore(), {
     views: {
       card: {
         selectedFieldNames: ['bio'],
-        join: [],
-        count: [],
+        joinSpecs: [],
+        countSpecs: [],
       },
       detail: {
         selectedFieldNames: [],
-        join: [],
-        count: [
+        joinSpecs: [],
+        countSpecs: [
           {
             fieldName: 'articleCount',
             countedCollectionName: 'article',
@@ -46,8 +46,8 @@ export const triggers = makeMasmottTriggers(admin.firestore(), {
     views: {
       card: {
         selectedFieldNames: [],
-        join: [],
-        count: [
+        joinSpecs: [],
+        countSpecs: [
           {
             fieldName: 'commentCount',
             countedCollectionName: 'comment',
@@ -67,7 +67,7 @@ export const triggers = makeMasmottTriggers(admin.firestore(), {
     views: {
       detail: {
         selectedFieldNames: [],
-        join: [
+        joinSpecs: [
           {
             firstRef: {
               collectionName: 'article',
@@ -82,7 +82,7 @@ export const triggers = makeMasmottTriggers(admin.firestore(), {
             selectedFieldNames: ['bio'],
           },
         ],
-        count: [],
+        countSpecs: [],
       },
     },
   },

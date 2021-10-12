@@ -36,7 +36,7 @@ import {
  */
 async function materializeViewData(
   srcDocData: DocumentData,
-  { selectedFieldNames, join: joinSpecs }: ViewSpec
+  { selectedFieldNames, joinSpecs: joinSpecs }: ViewSpec
 ): Promise<DocumentData> {
   const selectViewData = pick(srcDocData, selectedFieldNames);
 
@@ -206,7 +206,7 @@ function makeViewTriggers(
     onJoinRefDocUpdated: onJoinRefDocUpdated(
       collectionName,
       viewName,
-      viewSpec.join
+      viewSpec.joinSpecs
     ),
   };
 }

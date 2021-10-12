@@ -1,4 +1,6 @@
-import { Dictionary } from 'lodash';
+export interface Dictionary<T> {
+  readonly [key: string]: T;
+}
 
 export type StringFieldSpec = {
   readonly type: 'string';
@@ -37,27 +39,4 @@ export type ViewSpec = {
 export type CollectionSpec = {
   readonly src: Dictionary<SrcFieldSpec>;
   readonly views: Dictionary<ViewSpec>;
-};
-
-export type FirestoreDataType = string;
-
-export type DocumentData = Dictionary<FirestoreDataType>;
-
-export type DocumentDataChange = {
-  readonly before: DocumentData;
-  readonly after: DocumentData;
-};
-
-export type DocumentChangeSnapshot = {
-  readonly id: string;
-  readonly data: DocumentDataChange;
-};
-
-export type DocumentSnapshot = {
-  readonly id: string;
-  readonly data: DocumentData;
-};
-
-export type QuerySnapshot = {
-  readonly docs: readonly DocumentSnapshot[];
 };

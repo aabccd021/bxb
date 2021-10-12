@@ -10,11 +10,42 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 
-type MutateDoc = (key: DocKey, data?: Doc) => Promise<void>;
+import { CollectionSpec, Dictionary } from './type';
 
-export function useMutateDoc(): MutateDoc {
+type MutateSetDoc = (
+  key: DocKey,
+  data?: Doc,
+  shouldRevalidate?: boolean
+) => Promise<void>;
+
+type MutateUpdateView = (
+  key: ViewKey,
+  data?: Doc | ((doc: Doc) => Doc),
+  shouldRevalidate?: boolean
+) => Promise<void>;
+
+export function useMutateDoc(): MutateSetDoc {
   const { mutate } = useSWRConfig();
-  return mutate;
+  const mutateDoc = useCallback<MutateSetDoc>(
+    ([collectionName, id], data, shouldRevalidate) => {
+      const path = `${collectionName}/${id}`;
+      return mutate(path, data, shouldRevalidate);
+    },
+    [mutate]
+  );
+  return mutateDoc;
+}
+
+export function useMutateView(): MutateUpdateView {
+  const { mutate } = useSWRConfig();
+  const mutateView = useCallback<MutateUpdateView>(
+    ([collectionName, viewName, id], data, shouldRevalidate) => {
+      const path = `${collectionName}_${viewName}/${id}`;
+      return mutate(path, data, shouldRevalidate);
+    },
+    [mutate]
+  );
+  return mutateView;
 }
 
 export type DocCreationData = {
@@ -57,69 +88,186 @@ export type DocCreation<
       state: 'error';
       reason: unknown;
       retry: () => void;
+      reset: () => void;
     }
   | {
-      state: 'created' | 'creating';
+      state: 'creating';
       id: string;
       data: DD;
+    }
+  | {
+      state: 'created';
+      id: string;
+      data: DD;
+      reset: () => void;
     };
 
-type Field = string;
+type Field = string | number;
 
 type DocKey = [string, string];
 
-function fetcher(
-  collectionName: string,
-  id: string
-): Promise<DocumentSnapshot<DocData>> {
+function firestoreFetcher(path: string): Promise<DocumentSnapshot<DocData>> {
   const firestore = getFirestore();
-  const collectionRef = collection(firestore, collectionName);
-  const docRef = doc(collectionRef, id);
+  const docRef = doc(firestore, path);
   return getDoc(docRef);
 }
 
-export type CreateDoc = (data: DocCreationData) => void;
+export type ViewKey = [string, string, string];
+
+type UpdateView = (
+  key: ViewKey,
+  mutate: (data: DocData) => DocData,
+  shouldRevalidate?: boolean
+) => void;
+
+function useUpdateView(): UpdateView {
+  const mutateView = useMutateView();
+  const updateView = useCallback<UpdateView>(
+    (key, mutate) => {
+      mutateView(key, (doc) => {
+        if (doc?.state === 'loaded' && doc.exists) {
+          const mutatedData = mutate(doc.data);
+          return { ...doc, data: mutatedData };
+        }
+        return doc;
+      });
+    },
+
+    [mutateView]
+  );
+  return updateView;
+}
 
 export function getId(): string {
   return 'a';
 }
 
-export function _useDocCreation(collectionName: string): DocCreation {
-  const [docCreation, setDocCreation] = useState<DocCreation>({
+type UpdateCountViews = (data: DocData) => void;
+
+function useUpdateCountViews(
+  collectionName: string,
+  spec: Dictionary<CollectionSpec>,
+  incrementValue: 1 | -1
+): UpdateCountViews {
+  const updateView = useUpdateView();
+
+  const updateCountViews = useCallback<UpdateCountViews>(
+    (data) => {
+      Object.entries(spec).forEach(([viewCollectionName, { views }]) =>
+        Object.entries(views).forEach(([viewName, { countSpecs }]) =>
+          countSpecs.forEach(
+            ({
+              countedCollectionName,
+              fieldName: counterFieldName,
+              groupBy: refIdFieldName,
+            }) => {
+              if (countedCollectionName !== collectionName) {
+                return;
+              }
+
+              const viewId = data[refIdFieldName];
+              if (typeof viewId !== 'string') {
+                throw Error(JSON.stringify({ data, refIdFieldName }));
+              }
+
+              const viewKey: ViewKey = [viewCollectionName, viewName, viewId];
+
+              // update count view if exists in cache
+              updateView(viewKey, (viewData) => {
+                const counterFieldValue = viewData[counterFieldName];
+                if (typeof counterFieldValue !== 'number') {
+                  throw Error(JSON.stringify({ counterFieldName, viewData }));
+                }
+
+                const updatedCounterFieldValue =
+                  counterFieldValue + incrementValue;
+
+                const updatedViewData = {
+                  ...viewData,
+                  [counterFieldName]: updatedCounterFieldValue,
+                };
+                return updatedViewData;
+              });
+            }
+          )
+        )
+      );
+    },
+    [collectionName, spec, updateView, incrementValue]
+  );
+
+  return updateCountViews;
+}
+
+export function _useDocCreation(
+  collectionName: string,
+  spec: Dictionary<CollectionSpec>
+): DocCreation {
+  const [state, setState] = useState<DocCreation>({
     state: 'initial',
   });
 
-  const setDoc = useSetDoc();
+  const reset = useCallback(() => setState({ state: 'initial' }), []);
 
-  const createDoc: CreateDoc = useCallback(
-    (data) => {
+  const mutateDoc = useMutateDoc();
+
+  const updateDocCacheStateToLoaded = useCallback(
+    (key: DocKey, data: DocData) => {
+      mutateDoc(key, {
+        state: 'loaded',
+        exists: true,
+        data,
+        revalidate: () => mutateDoc(key),
+      });
+    },
+    [mutateDoc]
+  );
+
+  const updateCountViews = useUpdateCountViews(collectionName, spec, 1);
+
+  const createDoc = useCallback(
+    (data: DocCreationData) => {
       const id = getId();
-      setDocCreation({ state: 'creating', id, data });
-      setDoc([collectionName, id], data)
-        .then(() => setDocCreation({ state: 'created', id, data }))
+
+      setState({ state: 'creating', id, data });
+
+      const docKey: DocKey = [collectionName, id];
+      const docRef = getDocRef(docKey);
+      firestoreSetDoc(docRef, data)
+        .then(() => {
+          setState({ state: 'created', id, data, reset });
+          updateDocCacheStateToLoaded(docKey, data);
+          updateCountViews(data);
+          // There is no logic to materialize view, because:
+          // (1) A view should not be read before the source document is
+          // created
+          // (2) Aggregating or joining from limited document on cache does not
+          // make sense
+        })
         .catch((reason) =>
-          setDocCreation({
+          setState({
             state: 'error',
             reason,
+            reset,
             retry: () => createDoc(data),
           })
         );
     },
-    [collectionName, setDoc]
+    [collectionName, updateCountViews, reset, updateDocCacheStateToLoaded]
   );
 
   useEffect(() => {
-    if (docCreation.state === 'initial') {
-      setDocCreation({ state: 'notCreated', createDoc });
+    if (state.state === 'initial') {
+      setState({ state: 'notCreated', createDoc });
     }
-  }, [collectionName, docCreation, setDoc, createDoc]);
+  }, [createDoc, state]);
 
-  return docCreation;
+  return state;
 }
 
 export function _useDoc(key: DocKey): Doc {
   const [doc, setDoc] = useState<Doc>({ state: 'fetching' });
-  const { data, error, mutate } = useSWR(key, fetcher);
+  const { data, error, mutate } = useSWR(key, firestoreFetcher);
 
   useEffect(() => {
     if (data === undefined) {
@@ -157,33 +305,3 @@ export function getDocRef([collectionName, id]: DocKey): DocumentReference {
   const docRef = doc(collectionRef, id);
   return docRef;
 }
-
-type SetDoc = (key: DocKey, data: DocCreationData) => Promise<void>;
-
-export function useSetDoc(): SetDoc {
-  const mutateDoc = useMutateDoc();
-  const setDoc: SetDoc = useCallback(
-    async (key, data) => {
-      mutateDoc(key, {
-        state: 'loaded',
-        exists: true,
-        data,
-        revalidate: () => mutateDoc(key),
-      });
-      const docRef = getDocRef(key);
-      await firestoreSetDoc(docRef, data);
-    },
-    [mutateDoc]
-  );
-  return setDoc;
-}
-
-// export async function _createDoc(
-//   collectionName: string,
-//   data: CreateDocData
-// ): Promise<string> {
-//   const firestore = getFirestore();
-//   const collectionRef = collection(firestore, collectionName);
-//   const doc = await addDoc(collectionRef, data);
-//   return doc.id;
-// }
