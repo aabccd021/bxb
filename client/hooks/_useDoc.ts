@@ -157,10 +157,14 @@ export function _useDocCreation(
   return state;
 }
 
-export function _useViewable(viewableName: string, id: string): Doc {
+export function _useViewable(
+  [collectionName, id]: DocKey,
+  viewName: string | undefined
+): Doc {
   const [doc, setDoc] = useState<Doc>({ state: 'fetching' });
+  const viewSuffix = viewName !== undefined ? `_${viewName}` : '';
   const { data, error, mutate } = useSWR(
-    `${viewableName}/${id}`,
+    `${collectionName}${viewSuffix}/${id}`,
     firestoreFetcher
   );
 
