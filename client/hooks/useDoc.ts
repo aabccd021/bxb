@@ -4,9 +4,13 @@ import { Doc, DocCreation } from './types';
 
 export type Collection = 'article' | 'user' | 'clap' | 'comment';
 
-export type View = 'user_card' | 'user_detail' | 'article_card' | 'clap_detail';
+export type View =
+  | ['user', 'card']
+  | ['user', 'detail']
+  | ['article', 'card']
+  | ['clap', 'detail'];
 
-export type Viewable = Collection | View;
+export type Viewable = [Collection] | View;
 
 export type DocKey<C extends Collection> = [C, string];
 
@@ -64,21 +68,24 @@ export type CreateComment = {
   commentedArticle: string;
 };
 
-export type DataOfViewable<V extends Viewable> = V extends 'user'
-  ? User
-  : V extends 'user_card'
-  ? User_Card
-  : V extends 'user_detail'
-  ? User_Detail
-  : V extends 'article'
-  ? Article
-  : V extends 'article_card'
-  ? Article_Card
-  : V extends 'clap'
-  ? Clap
-  : V extends 'clap_detail'
-  ? Clap_Detail
-  : V extends 'comment'
+export type DataOfViewable<
+  C extends Collection,
+  V extends ViewOf<C> | undefined
+> = C extends 'user'
+  ? V extends { view: 'card' }
+    ? User_Card
+    : V extends { view: 'detail' }
+    ? User_Detail
+    : User
+  : C extends 'article'
+  ? V extends { view: 'card' }
+    ? Article_Card
+    : Article
+  : C extends 'clap'
+  ? V extends { view: 'clap_detail' }
+    ? Clap_Detail
+    : Clap
+  : C extends 'comment'
   ? Comment
   : never;
 
@@ -190,16 +197,34 @@ export const schema = {
 
 export function useDocCreation<C extends Collection>(
   collectionName: C
-): DocCreation<DataOfViewable<C>, CreateDataOfCollection<C>> {
+): DocCreation<DataOfViewable<C, undefined>, CreateDataOfCollection<C>> {
   return _useDocCreation(
     collectionName,
     schema as Dictionary<CollectionSpec>
-  ) as DocCreation<DataOfViewable<C>, CreateDataOfCollection<C>>;
+  ) as DocCreation<DataOfViewable<C, undefined>, CreateDataOfCollection<C>>;
 }
 
-export function useViewable<V extends Viewable>(
-  viewableName: V,
-  id: string
-): Doc<DataOfViewable<V>> {
-  return _useViewable(viewableName, id) as Doc<DataOfViewable<V>>;
+export type ViewOf<C extends Collection> = C extends 'user'
+  ? { view: 'card' | 'detail' }
+  : C extends 'article'
+  ? { view: 'card' }
+  : C extends 'clap'
+  ? { view: 'detail' }
+  : C extends 'comment'
+  ? never
+  : never;
+
+export function useViewable<C extends Collection, V extends ViewOf<C>>(
+  docKey: DocKey<C>,
+  option?: V
+): Doc<DataOfViewable<C, V extends ViewOf<C> ? V : undefined>> {
+  return _useViewable(docKey, option?.view) as Doc<
+    DataOfViewable<C, V extends ViewOf<C> ? V : undefined>
+  >;
 }
+
+const userCard = useViewable(['user', 'xxx'], { view: 'card' });
+const userDetail = useViewable(['user', 'xxx'], { view: 'detail' });
+const user = useViewable(['user', 'xxx']);
+
+const userCreation = useDocCreation('article');
