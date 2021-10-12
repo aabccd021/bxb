@@ -7,104 +7,20 @@ import {
   getFirestore,
   setDoc as firestoreSetDoc,
 } from 'firebase/firestore/lite';
+import { Dictionary } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import useSWR from 'swr';
 
-import { CollectionSpec, Dictionary } from './type';
-
-type MutateSetDoc = (
-  key: DocKey,
-  data?: Doc,
-  shouldRevalidate?: boolean
-) => Promise<void>;
-
-type MutateUpdateView = (
-  key: ViewKey,
-  data?: Doc | ((doc: Doc) => Doc),
-  shouldRevalidate?: boolean
-) => Promise<void>;
-
-export function useMutateDoc(): MutateSetDoc {
-  const { mutate } = useSWRConfig();
-  const mutateDoc = useCallback<MutateSetDoc>(
-    ([collectionName, id], data, shouldRevalidate) => {
-      const path = `${collectionName}/${id}`;
-      return mutate(path, data, shouldRevalidate);
-    },
-    [mutate]
-  );
-  return mutateDoc;
-}
-
-export function useMutateView(): MutateUpdateView {
-  const { mutate } = useSWRConfig();
-  const mutateView = useCallback<MutateUpdateView>(
-    ([collectionName, viewName, id], data, shouldRevalidate) => {
-      const path = `${collectionName}_${viewName}/${id}`;
-      return mutate(path, data, shouldRevalidate);
-    },
-    [mutate]
-  );
-  return mutateView;
-}
-
-export type DocCreationData = {
-  [key: string]: Field;
-};
-
-export type DocData = {
-  [key: string]: Field;
-};
-
-export type Doc<DD extends DocData = DocData> =
-  | { state: 'fetching' }
-  | {
-      state: 'error';
-      reason: unknown;
-      revalidate: () => void;
-    }
-  | {
-      state: 'loaded';
-      exists: true;
-      data: DD;
-      revalidate: () => void;
-    }
-  | {
-      state: 'loaded';
-      exists: false;
-      revalidate: () => void;
-    };
-
-export type DocCreation<
-  DD extends DocData = DocData,
-  CDD extends DocCreationData = DocCreationData
-> =
-  | { state: 'initial' }
-  | {
-      state: 'notCreated';
-      createDoc: (data: CDD) => void;
-    }
-  | {
-      state: 'error';
-      reason: unknown;
-      retry: () => void;
-      reset: () => void;
-    }
-  | {
-      state: 'creating';
-      id: string;
-      data: DD;
-    }
-  | {
-      state: 'created';
-      id: string;
-      data: DD;
-      reset: () => void;
-    };
-
-type Field = string | number;
-
-type DocKey = [string, string];
+import { useMutateDoc, useUpdateView } from './mutate';
+import { CollectionSpec } from './type';
+import {
+  Doc,
+  DocCreation,
+  DocCreationData,
+  DocData,
+  DocKey,
+  ViewKey,
+} from './types';
 
 function firestoreFetcher(path: string): Promise<DocumentSnapshot<DocData>> {
   const firestore = getFirestore();
@@ -112,47 +28,22 @@ function firestoreFetcher(path: string): Promise<DocumentSnapshot<DocData>> {
   return getDoc(docRef);
 }
 
-export type ViewKey = [string, string, string];
-
-type UpdateView = (
-  key: ViewKey,
-  mutate: (data: DocData) => DocData,
-  shouldRevalidate?: boolean
-) => void;
-
-function useUpdateView(): UpdateView {
-  const mutateView = useMutateView();
-  const updateView = useCallback<UpdateView>(
-    (key, mutate) => {
-      mutateView(key, (doc) => {
-        if (doc?.state === 'loaded' && doc.exists) {
-          const mutatedData = mutate(doc.data);
-          return { ...doc, data: mutatedData };
-        }
-        return doc;
-      });
-    },
-
-    [mutateView]
-  );
-  return updateView;
-}
-
 export function getId(): string {
   return 'a';
 }
 
-type UpdateCountViews = (data: DocData) => void;
+type UpdateCountViews = (p: {
+  updatedCollectionName: string;
+  spec: Dictionary<CollectionSpec>;
+  incrementValue: 1 | -1;
+  data: DocData;
+}) => void;
 
-function useUpdateCountViews(
-  collectionName: string,
-  spec: Dictionary<CollectionSpec>,
-  incrementValue: 1 | -1
-): UpdateCountViews {
+function useUpdateCountViews(): UpdateCountViews {
   const updateView = useUpdateView();
 
   const updateCountViews = useCallback<UpdateCountViews>(
-    (data) => {
+    ({ updatedCollectionName, spec, incrementValue, data }) => {
       Object.entries(spec).forEach(([viewCollectionName, { views }]) =>
         Object.entries(views).forEach(([viewName, { countSpecs }]) =>
           countSpecs.forEach(
@@ -161,7 +52,7 @@ function useUpdateCountViews(
               fieldName: counterFieldName,
               groupBy: refIdFieldName,
             }) => {
-              if (countedCollectionName !== collectionName) {
+              if (countedCollectionName !== updatedCollectionName) {
                 return;
               }
 
@@ -193,7 +84,7 @@ function useUpdateCountViews(
         )
       );
     },
-    [collectionName, spec, updateView, incrementValue]
+    [updateView]
   );
 
   return updateCountViews;
@@ -203,27 +94,15 @@ export function _useDocCreation(
   collectionName: string,
   spec: Dictionary<CollectionSpec>
 ): DocCreation {
+  const mutateDoc = useMutateDoc();
+
+  const updateCountViews = useUpdateCountViews();
+
   const [state, setState] = useState<DocCreation>({
     state: 'initial',
   });
 
   const reset = useCallback(() => setState({ state: 'initial' }), []);
-
-  const mutateDoc = useMutateDoc();
-
-  const updateDocCacheStateToLoaded = useCallback(
-    (key: DocKey, data: DocData) => {
-      mutateDoc(key, {
-        state: 'loaded',
-        exists: true,
-        data,
-        revalidate: () => mutateDoc(key),
-      });
-    },
-    [mutateDoc]
-  );
-
-  const updateCountViews = useUpdateCountViews(collectionName, spec, 1);
 
   const createDoc = useCallback(
     (data: DocCreationData) => {
@@ -236,8 +115,21 @@ export function _useDocCreation(
       firestoreSetDoc(docRef, data)
         .then(() => {
           setState({ state: 'created', id, data, reset });
-          updateDocCacheStateToLoaded(docKey, data);
-          updateCountViews(data);
+
+          // update document cache
+          mutateDoc(docKey, {
+            state: 'loaded',
+            exists: true,
+            data,
+            revalidate: () => mutateDoc(docKey),
+          });
+
+          updateCountViews({
+            updatedCollectionName: collectionName,
+            spec,
+            data,
+            incrementValue: 1,
+          });
           // There is no logic to materialize view, because:
           // (1) A view should not be read before the source document is
           // created
@@ -253,7 +145,7 @@ export function _useDocCreation(
           })
         );
     },
-    [collectionName, updateCountViews, reset, updateDocCacheStateToLoaded]
+    [collectionName, updateCountViews, reset, mutateDoc, spec]
   );
 
   useEffect(() => {

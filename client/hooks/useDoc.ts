@@ -1,5 +1,6 @@
-import { _useDoc, _useDocCreation, Doc, DocCreation } from './_useDoc';
+import { _useDoc, _useDocCreation } from './_useDoc';
 import { CollectionSpec, Dictionary } from './type';
+import { Doc, DocCreation } from './types';
 
 type Collection = 'article' | 'user' | 'clap' | 'comment';
 type DocKey<C extends Collection> = [C, string];
