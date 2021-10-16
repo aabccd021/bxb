@@ -23,7 +23,7 @@ import {
  * Recursively returns a document referred by join view. Returns latest document
  * snapshot if it is the last document in the whole chain.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param refChain Chain of reference to the document.
  * @param snapshot Latest document snapshot in the chain.
  * @returns Document snapshot of first reference in current chain.
@@ -64,7 +64,7 @@ async function getRefDocFromRefSpecChainRecursive(
 /**
  * Get a document referenced by a join view.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param joinSpec Specification of the join view.
  * @param data Data of source document of the join view.
  * @returns Document referenced.
@@ -159,7 +159,7 @@ function prefixJoinNameOnDocData(
 /**
  * Materialize join view data from a specification.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param srcDocData Source document data of the join view.
  * @param spec Materialization specification.
  * @returns Materialized join view data.
@@ -189,7 +189,7 @@ async function materializeJoinData(
 /**
  * Maps array of join view specification into array of materialized data.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param srcDocData Source document data of the join view.
  * @param specs Array of join view specification.
  * @returns Array of materialized datas.
@@ -228,7 +228,7 @@ function makeJoinRefCollectionName({ refChain, firstRef }: JoinSpec): string {
  * join view. The trigger will update all document with join view(s) referencing
  * to the source document.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param collectionName Name of the view's collection.
  * @param viewName Name of the view.
  * @param spec Specification of the join view.
@@ -275,7 +275,7 @@ function makeOnJoinRefDocUpdatedTrigger(
  * Create triggers that run on update of documents that referenecd by a
  * collection's join views.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param collectionName Name of the collection.
  * @param viewName Name of the view.
  * @param JoinSpecs Specifications of the collection's join views.

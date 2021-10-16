@@ -29,7 +29,7 @@ import {
 /**
  * Materialize view document data based on given specification.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param srcDocData Data of the view's source document.
  * @param viewSpec Specification of the view.
  * @returns Materialized view data.
@@ -57,7 +57,7 @@ async function materializeViewData(
 /**
  * Materialize and create a view document based on given specification.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param collectionName Name of the view's collection.
  * @param viewName Name of the view.
  * @param srcDoc Document snapshot of the view's source document
@@ -82,7 +82,7 @@ export async function createViewDoc(
  * materialize and create view documents with the same id as updated source
  * document, with materialized view data.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param collectionName Name of the view's collection
  * @param viewName Name of the view.
  * @param viewSpec Specification of the
@@ -104,7 +104,7 @@ function onSrcDocCreated(
  * view documents with the same id as updated source document, if there is a
  * change.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param collectionName
  * @param viewName
  * @param selectedFieldNames
@@ -142,7 +142,7 @@ function onSrcDocUpdated(
  * Make a trigger to run on source document delete. The trigger will delete all
  * view documents with the same id as deleted source document.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param collectionName
  * @param viewName
  * @returns
@@ -164,7 +164,7 @@ function onSrcDocDeleted(
  * document. The trigger will delete all document that refers to that referenced
  * document.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param collectionName
  * @param src
  * @returns
@@ -201,7 +201,7 @@ function onSrcRefDocDeleted(
 /**
  * Make triggers for a view.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param collectionName Name of the view's collection.
  * @param viewName Name of the view.
  * @param viewSpec Specification of the view.
@@ -234,7 +234,7 @@ function makeViewTriggers(
 /**
  * Make triggers for a collection.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param collectionSpec Specification of the collection.
  * @param collectionName Name of the collection.
  * @returns Triggers made for the collection.
@@ -255,7 +255,7 @@ function makeCollectionTriggers(
 /**
  * Make triggers for masmott.
  *
- * @param app Firebase app
+ * @param app Firebase app.
  * @param collectionSpecs Collections specs of the app.
  * @returns Triggers made by masmott.
  */
