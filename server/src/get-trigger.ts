@@ -6,8 +6,15 @@ import {
   ViewSpec,
   CollectionSpec,
   Dict,
+  CollectionTriggers,
+  ViewTriggers,
 } from './type';
 import { getViewCollectionName, getDocDataChange } from './util';
+import {
+  materializeCountViewData,
+  onCountedDocCreated,
+  onCountedDocDeleted,
+} from './view/count';
 import { materializeJoinViewData, onJoinRefDocUpdated } from './view/join';
 import {
   App,
@@ -22,8 +29,6 @@ import {
   OnUpdateTrigger,
   OnDeleteTrigger,
   onDeleteTrigger,
-  ViewTriggers,
-  CollectionTriggers,
   onUpdateTrigger,
 } from './wrapper/firebase-functions';
 
@@ -38,7 +43,7 @@ import {
 async function materializeViewData(
   app: App,
   srcDocData: DocumentData,
-  { selectedFieldNames, joinSpecs }: ViewSpec
+  { selectedFieldNames, joinSpecs, countSpecs }: ViewSpec
 ): Promise<DocumentData> {
   const selectViewData = pick(srcDocData, selectedFieldNames);
 
@@ -48,9 +53,14 @@ async function materializeViewData(
     joinSpecs
   );
 
+  const countViewData = materializeCountViewData(countSpecs);
+
+  console.log(countViewData);
+
   const materializedViewData: DocumentData = {
     ...selectViewData,
     ...joinViewData,
+    ...countViewData,
   };
   return materializedViewData;
 }
@@ -228,6 +238,18 @@ function makeViewTriggers(
       collectionName,
       viewName,
       viewSpec.joinSpecs
+    ),
+    onCountedDocCreated: onCountedDocCreated(
+      app,
+      collectionName,
+      viewName,
+      viewSpec.countSpecs
+    ),
+    onCountedDocDeleted: onCountedDocDeleted(
+      app,
+      collectionName,
+      viewName,
+      viewSpec.countSpecs
     ),
   };
 }

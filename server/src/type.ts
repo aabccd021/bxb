@@ -1,3 +1,10 @@
+import { FieldValue } from './wrapper/firebase-admin';
+import {
+  OnCreateTrigger,
+  OnUpdateTrigger,
+  OnDeleteTrigger,
+} from './wrapper/firebase-functions';
+
 export type Dict<T> = {
   readonly [key: string]: T;
 };
@@ -40,9 +47,13 @@ export type CollectionSpec = {
   readonly views: Dict<ViewSpec>;
 };
 
-export type FirestoreDataType = string;
+export type FirestoreDataType = string | number;
+
+export type FirestoreWriteDataType = FirestoreDataType | FieldValue;
 
 export type DocumentData = Dict<FirestoreDataType>;
+
+export type WriteDocumentData = Dict<FirestoreWriteDataType>;
 
 export type DocumentDataChange = {
   readonly before: DocumentData;
@@ -61,4 +72,18 @@ export type DocumentSnapshot = {
 
 export type QuerySnapshot = {
   readonly docs: readonly DocumentSnapshot[];
+};
+
+export type ViewTriggers = {
+  readonly onSrcDocCreated: OnCreateTrigger;
+  readonly onSrcDocUpdated: OnUpdateTrigger;
+  readonly onSrcDocDeleted: OnDeleteTrigger;
+  readonly onJoinRefDocUpdated: Dict<OnUpdateTrigger>;
+  readonly onCountedDocCreated: Dict<OnCreateTrigger>;
+  readonly onCountedDocDeleted: Dict<OnDeleteTrigger>;
+};
+
+export type CollectionTriggers = {
+  readonly onRefDocDeleted: Dict<OnDeleteTrigger | undefined>;
+  readonly view: Dict<ViewTriggers>;
 };

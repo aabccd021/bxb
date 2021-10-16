@@ -92,6 +92,7 @@ describe('count article', () => {
       id: 'berisa',
       bio: 'berisa desu',
     });
+    await sleep(4000);
 
     const userDetail = await admin.firestore().doc('user_detail/berisa').get();
     expect(userDetail.data()).toStrictEqual({
@@ -104,6 +105,7 @@ describe('count article', () => {
       text: 'mugon no uchuu',
       ownerUser: 'berisa',
     });
+    await sleep(4000);
 
     const userDetail = await admin.firestore().doc('user_detail/berisa').get();
     expect(userDetail.data()).toStrictEqual({
@@ -116,6 +118,7 @@ describe('count article', () => {
       text: 'nageredama',
       ownerUser: 'berisa',
     });
+    await sleep(4000);
 
     const userDetail = await admin.firestore().doc('user_detail/berisa').get();
     expect(userDetail.data()).toStrictEqual({
@@ -125,6 +128,7 @@ describe('count article', () => {
 
   it('decrease count when an article deleted', async () => {
     await admin.firestore().doc('article/21').delete();
+    await sleep(4000);
 
     const userDetail = await admin.firestore().doc('user_detail/berisa').get();
     expect(userDetail.data()).toStrictEqual({
@@ -134,6 +138,7 @@ describe('count article', () => {
 
   it('decrease count again when an article deleted', async () => {
     await admin.firestore().doc('article/42').delete();
+    await sleep(4000);
 
     const userDetail = await admin.firestore().doc('user_detail/berisa').get();
     expect(userDetail.data()).toStrictEqual({
@@ -148,6 +153,7 @@ describe('count comment', () => {
       text: 'MV released mugon no uchuu',
       ownerUser: 'berisa',
     });
+    await sleep(4000);
 
     const articleCard = await admin.firestore().doc('article_card/17').get();
     expect(articleCard.data()).toStrictEqual({
@@ -160,6 +166,7 @@ describe('count comment', () => {
       text: 'cool',
       commentedArticle: '17',
     });
+    await sleep(4000);
 
     const articleCard = await admin.firestore().doc('article_card/17').get();
     expect(articleCard.data()).toStrictEqual({
@@ -172,6 +179,7 @@ describe('count comment', () => {
       text: 'hype as fujii kaze kirari',
       commentedArticle: '17',
     });
+    await sleep(4000);
 
     const articleCard = await admin.firestore().doc('article_card/17').get();
     expect(articleCard.data()).toStrictEqual({
@@ -181,6 +189,7 @@ describe('count comment', () => {
 
   it('decrease count when an article deleted', async () => {
     await admin.firestore().doc('comment/123').delete();
+    await sleep(4000);
 
     const articleCard = await admin.firestore().doc('article_card/17').get();
     expect(articleCard.data()).toStrictEqual({
@@ -190,6 +199,7 @@ describe('count comment', () => {
 
   it('decrease count again when an article deleted', async () => {
     await admin.firestore().doc('comment/456').delete();
+    await sleep(4000);
 
     const articleCard = await admin.firestore().doc('article_card/17').get();
     expect(articleCard.data()).toStrictEqual({

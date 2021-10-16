@@ -7,7 +7,7 @@ import {
   region,
   SUPPORTED_REGIONS,
 } from 'firebase-functions';
-import { Dict, DocumentChangeSnapshot, DocumentSnapshot } from '../type';
+import { DocumentChangeSnapshot, DocumentSnapshot } from '../type';
 
 /**
  * Type safe and convenience firebase-functions wrapper
@@ -20,18 +20,6 @@ export type OnDeleteTrigger = OnCreateTrigger;
 export type OnUpdateTrigger = CloudFunction<
   Change<firestore.QueryDocumentSnapshot>
 >;
-
-export type ViewTriggers = {
-  readonly onSrcDocCreated: OnCreateTrigger;
-  readonly onSrcDocUpdated: OnUpdateTrigger;
-  readonly onSrcDocDeleted: OnDeleteTrigger;
-  readonly onJoinRefDocUpdated: Dict<OnUpdateTrigger>;
-};
-
-export type CollectionTriggers = {
-  readonly onRefDocDeleted: Dict<OnDeleteTrigger | undefined>;
-  readonly view: Dict<ViewTriggers>;
-};
 
 function getDocTrigger(
   collectionName: string,

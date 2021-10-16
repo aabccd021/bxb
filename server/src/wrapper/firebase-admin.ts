@@ -2,16 +2,24 @@
 import {
   getFirestore,
   DocumentSnapshot as FirestoreDocumentSnapshot,
+  FieldValue,
 } from 'firebase-admin/firestore';
 // eslint-disable-next-line no-restricted-imports
 import { App } from 'firebase-admin/app';
-import { DocumentData, DocumentSnapshot, QuerySnapshot } from '../type';
+import {
+  DocumentData,
+  DocumentSnapshot,
+  QuerySnapshot,
+  WriteDocumentData,
+} from '../type';
 
 /**
  * Type safe and convenience firebase-admin wrapper
  */
 
 export type { App };
+
+export { FieldValue };
 
 export function wrapFirebaseSnapshot(
   snapshot: FirestoreDocumentSnapshot
@@ -20,10 +28,7 @@ export function wrapFirebaseSnapshot(
   if (data === undefined) {
     throw Error(`Invalid Type ${JSON.stringify(snapshot)}`);
   }
-  return {
-    id: snapshot.id,
-    data,
-  };
+  return { id: snapshot.id, data };
 }
 
 export async function getDoc(
@@ -63,7 +68,7 @@ export function updateDoc(
   app: App,
   collectionName: string,
   documentId: string,
-  data: DocumentData
+  data: WriteDocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
   return getFirestore(app)
     .collection(collectionName)
