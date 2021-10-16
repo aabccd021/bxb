@@ -7,8 +7,7 @@ import {
   region,
   SUPPORTED_REGIONS,
 } from 'firebase-functions';
-import { Dictionary } from 'lodash';
-import { DocumentChangeSnapshot, DocumentSnapshot } from '../type';
+import { Dict, DocumentChangeSnapshot, DocumentSnapshot } from '../type';
 
 /**
  * Type safe and convenience firebase-functions wrapper
@@ -26,12 +25,12 @@ export type ViewTriggers = {
   readonly onSrcDocCreated: OnCreateTrigger;
   readonly onSrcDocUpdated: OnUpdateTrigger;
   readonly onSrcDocDeleted: OnDeleteTrigger;
-  readonly onJoinRefDocUpdated: Dictionary<OnUpdateTrigger>;
+  readonly onJoinRefDocUpdated: Dict<OnUpdateTrigger>;
 };
 
 export type CollectionTriggers = {
-  readonly onRefDocDeleted: Dictionary<OnDeleteTrigger | undefined>;
-  readonly view: Dictionary<ViewTriggers>;
+  readonly onRefDocDeleted: Dict<OnDeleteTrigger | undefined>;
+  readonly view: Dict<ViewTriggers>;
 };
 
 function getDocTrigger(

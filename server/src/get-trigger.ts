@@ -1,10 +1,11 @@
-import { Dictionary, isEmpty, mapValues, pick } from 'lodash';
+import { isEmpty, mapValues, pick } from 'lodash';
 import {
   DocumentSnapshot,
   DocumentData,
   SrcFieldSpec,
   ViewSpec,
   CollectionSpec,
+  Dict,
 } from './type';
 import { getViewCollectionName, getDocDataChange } from './util';
 import { materializeJoinViewData, onJoinRefDocUpdated } from './view/join';
@@ -172,8 +173,8 @@ function onSrcDocDeleted(
 function onSrcRefDocDeleted(
   app: App,
   collectionName: string,
-  src: Dictionary<SrcFieldSpec>
-): Dictionary<OnDeleteTrigger | undefined> {
+  src: Dict<SrcFieldSpec>
+): Dict<OnDeleteTrigger | undefined> {
   return mapValues(src, (sourceField, sourceFieldName) => {
     // only create trigger if the field is type of refId (the document has
     // reference to another document)
@@ -261,8 +262,8 @@ function makeCollectionTriggers(
  */
 export function makeMasmottTriggers(
   app: App,
-  collectionSpecs: Dictionary<CollectionSpec>
-): Dictionary<CollectionTriggers> {
+  collectionSpecs: Dict<CollectionSpec>
+): Dict<CollectionTriggers> {
   return mapValues(collectionSpecs, (collectionSpec, collectionName) =>
     makeCollectionTriggers(app, collectionSpec, collectionName)
   );

@@ -61,8 +61,8 @@ describe('on double chained ref', () => {
       .get();
     expect(clapDetail.data()).toStrictEqual({
       // TODO: don't generate name
-      clappedArticle_ownerUser_bio: 'marinos desu',
-      clappedArticle_ownerUser_id: 'marino',
+      clappedArticleOwner_bio: 'marinos desu',
+      clappedArticleOwner_id: 'marino',
     });
   });
 
@@ -72,8 +72,8 @@ describe('on double chained ref', () => {
 
     const clapView = await admin.firestore().doc('clap_detail/hikaru_46').get();
     expect(clapView.data()).toStrictEqual({
-      clappedArticle_ownerUser_bio: 'kousaka desu',
-      clappedArticle_ownerUser_id: 'marino',
+      clappedArticleOwner_bio: 'kousaka desu',
+      clappedArticleOwner_id: 'marino',
     });
   });
 

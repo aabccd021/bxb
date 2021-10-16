@@ -1,5 +1,6 @@
-import { chain, isEmpty, Dictionary, mapValues } from 'lodash';
-import { FirestoreDataType, DocumentDataChange, DocumentData } from './type';
+import { compact, isEmpty, mapValues } from 'lodash';
+import { FirestoreDataType } from '.';
+import { DocumentDataChange, DocumentData, Dict } from './type';
 
 /**
  * Throw rejected promises from array of settled promises.
@@ -10,10 +11,11 @@ export function throwRejectedPromises(
   promiseResults: readonly PromiseSettledResult<unknown>[]
   // eslint-disable-next-line functional/no-return-void
 ): void {
-  const errors = chain(promiseResults)
-    .map((result) => (result.status === 'rejected' ? result.reason : undefined))
-    .compact()
-    .value();
+  const rejectedPromiseReasons = promiseResults.map((result) =>
+    result.status === 'rejected' ? result.reason : undefined
+  );
+
+  const errors = compact(rejectedPromiseReasons);
 
   if (!isEmpty(errors)) {
     throw Error(JSON.stringify(errors));
@@ -47,9 +49,7 @@ export function mergeObjectArray<T>(
  * @param object The object to compact.
  * @returns Returns the new object without undefined values.
  */
-export function compactObject<T>(
-  object: Dictionary<T | undefined>
-): Dictionary<T> {
+export function compactObject<T>(object: Dict<T | undefined>): Dict<T> {
   return Object.entries(object).reduce((acc, [key, value]) => {
     if (value !== undefined) {
       return {

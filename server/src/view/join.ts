@@ -1,6 +1,12 @@
-import { Dictionary, isEmpty, mapKeys, pick } from 'lodash';
+import { isEmpty, mapKeys, mapValues, pick } from 'lodash';
 
-import { DocumentData, DocumentSnapshot, JoinSpec, RefSpec } from '../type';
+import {
+  Dict,
+  DocumentData,
+  DocumentSnapshot,
+  JoinSpec,
+  RefSpec,
+} from '../type';
 import {
   compactObject,
   getDocDataChange,
@@ -89,45 +95,13 @@ async function getRefDocFromRefSpecs(
 }
 
 /**
- * Creates join name of a join spec.
- *
- * @example
- * const joinSpec = {
- *   firstRef: {
- *     collectionName: 'tweet',
- *     fieldName: 'repliedTweet',
- *   },
- *   refChain: [
- *     {
- *       collectionName: 'user',
- *       fieldName: 'owner',
- *     },
- *   ],
- * }
- * const joinName = makeJoinName(joinSpec)
- * // joinName => 'repliedTweet_owner'
- *
- * @param joinSpec Join specification to process.
- * @returns Name of the join.
- */
-function makeJoinName(joinSpec: JoinSpec): string {
-  const { refChain, firstRef } = joinSpec;
-  const refChainFieldNames = refChain.map(({ fieldName }) => fieldName);
-  const refFieldNames = [firstRef.fieldName, ...refChainFieldNames];
-  const joinName = refFieldNames.join('_');
-
-  return joinName;
-}
-
-/**
  * Prefix a join name to a field name.
  *
- * @param joinSpec Specification of the view.
+ * @param joinName Name of the join view.
  * @param fieldName Field name to prefix.
  * @returns Field name prefixed by join name.
  */
-function prefixJoinName(joinSpec: JoinSpec, fieldName: string): string {
-  const joinName = makeJoinName(joinSpec);
+function prefixJoinName(joinName: string, fieldName: string): string {
   const prefixedFieldName = `${joinName}_${fieldName}`;
   return prefixedFieldName;
 }
@@ -135,25 +109,27 @@ function prefixJoinName(joinSpec: JoinSpec, fieldName: string): string {
 /**
  * Make refId field name of a join view.
  *
- * @param spec Specification of the view.
+ * @param joinName Name of the join view.
  * @returns Name of refId field of the view.
  */
-function makeRefIdFieldName(spec: JoinSpec): string {
-  return prefixJoinName(spec, 'id');
+function makeRefIdFieldName(joinName: string): string {
+  return prefixJoinName(joinName, 'id');
 }
 
 /**
  * Creates document data with fields name prefixed by join name.
  *
  * @param docData Document data to be process.
- * @param spec Specification of the join view.
+ * @param joinName Name of the join view
  * @returns Document data with prefixed fields name.
  */
 function prefixJoinNameOnDocData(
   docData: DocumentData,
-  spec: JoinSpec
+  joinName: string
 ): DocumentData {
-  return mapKeys(docData, (_, fieldName) => prefixJoinName(spec, fieldName));
+  return mapKeys(docData, (_, fieldName) =>
+    prefixJoinName(joinName, fieldName)
+  );
 }
 
 /**
@@ -167,6 +143,7 @@ function prefixJoinNameOnDocData(
 async function materializeJoinData(
   app: App,
   srcDocData: DocumentData,
+  joinName: string,
   spec: JoinSpec
 ): Promise<DocumentData> {
   const refDoc = await getRefDocFromRefSpecs(app, spec, srcDocData);
@@ -174,9 +151,9 @@ async function materializeJoinData(
   const selectedFieldDocData = pick(refDoc.data, spec.selectedFieldNames);
   const compactDocData = compactObject(selectedFieldDocData);
 
-  const prefixedData = prefixJoinNameOnDocData(compactDocData, spec);
+  const prefixedData = prefixJoinNameOnDocData(compactDocData, joinName);
 
-  const refIdFieldName = makeRefIdFieldName(spec);
+  const refIdFieldName = makeRefIdFieldName(joinName);
 
   const docDataWithRefId = {
     ...prefixedData,
@@ -197,10 +174,10 @@ async function materializeJoinData(
 export async function materializeJoinViewData(
   app: App,
   srcDocData: DocumentData,
-  specs: readonly JoinSpec[]
+  specs: Dict<JoinSpec>
 ): Promise<DocumentData> {
-  const docDataPromises = specs.map((spec) =>
-    materializeJoinData(app, srcDocData, spec)
+  const docDataPromises = Object.entries(specs).map(([joinName, spec]) =>
+    materializeJoinData(app, srcDocData, joinName, spec)
   );
 
   const docDataArray = await Promise.all(docDataPromises);
@@ -238,6 +215,7 @@ function makeOnJoinRefDocUpdatedTrigger(
   app: App,
   collectionName: string,
   viewName: string,
+  joinName: string,
   spec: JoinSpec
 ): OnUpdateTrigger {
   const refCollectionName = makeJoinRefCollectionName(spec);
@@ -250,8 +228,11 @@ function makeOnJoinRefDocUpdatedTrigger(
       return;
     }
 
-    const prefixedDocDataUpdate = prefixJoinNameOnDocData(docDataUpdate, spec);
-    const refIdFieldName = makeRefIdFieldName(spec);
+    const prefixedDocDataUpdate = prefixJoinNameOnDocData(
+      docDataUpdate,
+      joinName
+    );
+    const refIdFieldName = makeRefIdFieldName(joinName);
 
     const viewCollectionName = getViewCollectionName(collectionName, viewName);
 
@@ -278,7 +259,7 @@ function makeOnJoinRefDocUpdatedTrigger(
  * @param app Firebase app.
  * @param collectionName Name of the collection.
  * @param viewName Name of the view.
- * @param JoinSpecs Specifications of the collection's join views.
+ * @param joinSpecs Specifications of the collection's join views.
  * @returns Dictionary of triggers that run on join view's referenced document
  * updated.
  */
@@ -286,23 +267,15 @@ export function onJoinRefDocUpdated(
   app: App,
   collectionName: string,
   viewName: string,
-  JoinSpecs: readonly JoinSpec[]
-): Dictionary<OnUpdateTrigger> {
-  const triggerEntries = JoinSpecs.map((spec) => {
-    const joinName = makeJoinName(spec);
-    const trigger = makeOnJoinRefDocUpdatedTrigger(
+  joinSpecs: Dict<JoinSpec>
+): Dict<OnUpdateTrigger> {
+  return mapValues(joinSpecs, (joinSpec, joinName) =>
+    makeOnJoinRefDocUpdatedTrigger(
       app,
       collectionName,
       viewName,
-      spec
-    );
-    const triggerEntry: readonly [string, OnUpdateTrigger] = [
       joinName,
-      trigger,
-    ];
-    return triggerEntry;
-  });
-
-  const updateTriggers = Object.fromEntries(triggerEntries);
-  return updateTriggers;
+      joinSpec
+    )
+  );
 }

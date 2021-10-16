@@ -17,19 +17,18 @@ export const triggers = makeMasmottTriggers(app, {
     views: {
       card: {
         selectedFieldNames: ['bio'],
-        joinSpecs: [],
-        countSpecs: [],
+        joinSpecs: {},
+        countSpecs: {},
       },
       detail: {
         selectedFieldNames: [],
-        joinSpecs: [],
-        countSpecs: [
-          {
-            fieldName: 'articleCount',
+        joinSpecs: {},
+        countSpecs: {
+          articleCount: {
             countedCollectionName: 'article',
             groupBy: 'ownerUser',
           },
-        ],
+        },
       },
     },
   },
@@ -46,14 +45,13 @@ export const triggers = makeMasmottTriggers(app, {
     views: {
       card: {
         selectedFieldNames: [],
-        joinSpecs: [],
-        countSpecs: [
-          {
-            fieldName: 'commentCount',
+        joinSpecs: {},
+        countSpecs: {
+          commentCount: {
             countedCollectionName: 'comment',
             groupBy: 'commentedArticle',
           },
-        ],
+        },
       },
     },
   },
@@ -67,8 +65,8 @@ export const triggers = makeMasmottTriggers(app, {
     views: {
       detail: {
         selectedFieldNames: [],
-        joinSpecs: [
-          {
+        joinSpecs: {
+          clappedArticleOwner: {
             firstRef: {
               collectionName: 'article',
               fieldName: 'clappedArticle',
@@ -81,8 +79,8 @@ export const triggers = makeMasmottTriggers(app, {
             ],
             selectedFieldNames: ['bio'],
           },
-        ],
-        countSpecs: [],
+        },
+        countSpecs: {},
       },
     },
   },
