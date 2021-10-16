@@ -13,10 +13,11 @@
   "engines": {
     "node": "14"
   },
+  "type": "module",
   "main": "lib/index.js",
   "dependencies": {
     "assert-never": "^1.2.1",
-    "firebase-admin": "^9.8.0",
+    "firebase-admin": "^10.0.0",
     "firebase-functions": "^3.14.1",
     "lodash": "^4.17.21"
   },
@@ -60,7 +61,6 @@
     "plugins": [
       "@typescript-eslint",
       "functional",
-      "import",
       "only-warn",
       "unused-imports",
       "jest"
@@ -69,9 +69,6 @@
       "eslint:recommended",
       "plugin:@typescript-eslint/recommended",
       "plugin:functional/lite",
-      "plugin:import/errors",
-      "plugin:import/typescript",
-      "plugin:import/warnings",
       "plugin:jest/recommended",
       "plugin:jest/style",
       "plugin:prettier/recommended",
@@ -80,8 +77,12 @@
     "rules": {
       "no-restricted-imports": [
         "error",
-        "firebase-admin",
-        "firebase-functions"
+        {
+          "patterns": [
+            "firebase-admin/*",
+            "firebase-functions/*"
+          ]
+        }
       ],
       "no-unsafe-optional-chaining": "error",
       "no-use-before-define": "error",
@@ -110,7 +111,6 @@
       ],
       "functional/no-throw-statement": "off",
       "@typescript-eslint/no-unused-vars": "off",
-      "unused-imports/no-unused-imports-ts": "error",
       "unused-imports/no-unused-vars": [
         "error",
         {

@@ -9,11 +9,10 @@ import {
 import { getViewCollectionName, getDocDataChange } from './util';
 import { materializeJoinViewData, onJoinRefDocUpdated } from './view/join';
 import {
+  App,
   createDoc,
   deleteDoc,
-  Firestore,
   getCollection,
-  setFirestore,
   updateDoc,
 } from './wrapper/firebase-admin';
 import {
@@ -30,17 +29,23 @@ import {
 /**
  * Materialize view document data based on given specification.
  *
+ * @param app Firebase app
  * @param srcDocData Data of the view's source document.
  * @param viewSpec Specification of the view.
  * @returns Materialized view data.
  */
 async function materializeViewData(
+  app: App,
   srcDocData: DocumentData,
-  { selectedFieldNames, joinSpecs: joinSpecs }: ViewSpec
+  { selectedFieldNames, joinSpecs }: ViewSpec
 ): Promise<DocumentData> {
   const selectViewData = pick(srcDocData, selectedFieldNames);
 
-  const joinViewData = await materializeJoinViewData(srcDocData, joinSpecs);
+  const joinViewData = await materializeJoinViewData(
+    app,
+    srcDocData,
+    joinSpecs
+  );
 
   const materializedViewData: DocumentData = {
     ...selectViewData,
@@ -52,6 +57,7 @@ async function materializeViewData(
 /**
  * Materialize and create a view document based on given specification.
  *
+ * @param app Firebase app
  * @param collectionName Name of the view's collection.
  * @param viewName Name of the view.
  * @param srcDoc Document snapshot of the view's source document
@@ -59,15 +65,16 @@ async function materializeViewData(
  * @returns Creation result of the view document.
  */
 export async function createViewDoc(
+  app: App,
   collectionName: string,
   viewName: string,
   srcDoc: DocumentSnapshot,
   viewSpec: ViewSpec
 ): Promise<FirebaseFirestore.WriteResult> {
-  const viewDocData = await materializeViewData(srcDoc.data, viewSpec);
+  const viewDocData = await materializeViewData(app, srcDoc.data, viewSpec);
   const viewDocId = srcDoc.id;
   const viewCollectionName = getViewCollectionName(collectionName, viewName);
-  return createDoc(viewCollectionName, viewDocId, viewDocData);
+  return createDoc(app, viewCollectionName, viewDocId, viewDocData);
 }
 
 /**
@@ -75,18 +82,20 @@ export async function createViewDoc(
  * materialize and create view documents with the same id as updated source
  * document, with materialized view data.
  *
+ * @param app Firebase app
  * @param collectionName Name of the view's collection
  * @param viewName Name of the view.
  * @param viewSpec Specification of the
  * @returns Trigger on view's source document created.
  */
 function onSrcDocCreated(
+  app: App,
   collectionName: string,
   viewName: string,
   viewSpec: ViewSpec
 ): OnCreateTrigger {
   return onCreateTrigger(collectionName, async (srcDoc) =>
-    createViewDoc(collectionName, viewName, srcDoc, viewSpec)
+    createViewDoc(app, collectionName, viewName, srcDoc, viewSpec)
   );
 }
 
@@ -95,12 +104,14 @@ function onSrcDocCreated(
  * view documents with the same id as updated source document, if there is a
  * change.
  *
+ * @param app Firebase app
  * @param collectionName
  * @param viewName
  * @param selectedFieldNames
  * @returns
  */
 function onSrcDocUpdated(
+  app: App,
   collectionName: string,
   viewName: string,
   selectedFieldNames: readonly string[]
@@ -123,7 +134,7 @@ function onSrcDocUpdated(
     }
     const viewDocId = srcDoc.id;
     const viewCollectionName = getViewCollectionName(collectionName, viewName);
-    await updateDoc(viewCollectionName, viewDocId, viewUpdateData);
+    await updateDoc(app, viewCollectionName, viewDocId, viewUpdateData);
   });
 }
 
@@ -131,18 +142,20 @@ function onSrcDocUpdated(
  * Make a trigger to run on source document delete. The trigger will delete all
  * view documents with the same id as deleted source document.
  *
+ * @param app Firebase app
  * @param collectionName
  * @param viewName
  * @returns
  */
 function onSrcDocDeleted(
+  app: App,
   collectionName: string,
   viewName: string
 ): OnDeleteTrigger {
   return onDeleteTrigger(collectionName, async (srcDoc) => {
     const viewDocId = srcDoc.id;
     const viewCollectionName = getViewCollectionName(collectionName, viewName);
-    await deleteDoc(viewCollectionName, viewDocId);
+    await deleteDoc(app, viewCollectionName, viewDocId);
   });
 }
 
@@ -151,11 +164,13 @@ function onSrcDocDeleted(
  * document. The trigger will delete all document that refers to that referenced
  * document.
  *
+ * @param app Firebase app
  * @param collectionName
  * @param src
  * @returns
  */
 function onSrcRefDocDeleted(
+  app: App,
   collectionName: string,
   src: Dictionary<SrcFieldSpec>
 ): Dictionary<OnDeleteTrigger | undefined> {
@@ -169,12 +184,13 @@ function onSrcRefDocDeleted(
     const refidFieldName = sourceFieldName;
     return onDeleteTrigger(refCollection, async (refDoc) => {
       const referrerSrcDocsSnapshot = await getCollection(
+        app,
         collectionName,
         (collection) => collection.where(refidFieldName, '==', refDoc.id)
       );
 
       const referrerDocsDeletes = referrerSrcDocsSnapshot.docs.map((doc) =>
-        deleteDoc(collectionName, doc.id)
+        deleteDoc(app, collectionName, doc.id)
       );
 
       await Promise.allSettled(referrerDocsDeletes);
@@ -185,25 +201,29 @@ function onSrcRefDocDeleted(
 /**
  * Make triggers for a view.
  *
+ * @param app Firebase app
  * @param collectionName Name of the view's collection.
  * @param viewName Name of the view.
  * @param viewSpec Specification of the view.
  * @returns
  */
 function makeViewTriggers(
+  app: App,
   collectionName: string,
   viewName: string,
   viewSpec: ViewSpec
 ): ViewTriggers {
   return {
-    onSrcDocCreated: onSrcDocCreated(collectionName, viewName, viewSpec),
+    onSrcDocCreated: onSrcDocCreated(app, collectionName, viewName, viewSpec),
     onSrcDocUpdated: onSrcDocUpdated(
+      app,
       collectionName,
       viewName,
       viewSpec.selectedFieldNames
     ),
-    onSrcDocDeleted: onSrcDocDeleted(collectionName, viewName),
+    onSrcDocDeleted: onSrcDocDeleted(app, collectionName, viewName),
     onJoinRefDocUpdated: onJoinRefDocUpdated(
+      app,
       collectionName,
       viewName,
       viewSpec.joinSpecs
@@ -214,18 +234,20 @@ function makeViewTriggers(
 /**
  * Make triggers for a collection.
  *
+ * @param app Firebase app
  * @param collectionSpec Specification of the collection.
  * @param collectionName Name of the collection.
  * @returns Triggers made for the collection.
  */
 function makeCollectionTriggers(
+  app: App,
   { src, views }: CollectionSpec,
   collectionName: string
 ): CollectionTriggers {
   return {
-    onRefDocDeleted: onSrcRefDocDeleted(collectionName, src),
+    onRefDocDeleted: onSrcRefDocDeleted(app, collectionName, src),
     view: mapValues(views, (view, viewName) =>
-      makeViewTriggers(collectionName, viewName, view)
+      makeViewTriggers(app, collectionName, viewName, view)
     ),
   };
 }
@@ -233,13 +255,15 @@ function makeCollectionTriggers(
 /**
  * Make triggers for masmott.
  *
+ * @param app Firebase app
  * @param collectionSpecs Collections specs of the app.
  * @returns Triggers made by masmott.
  */
 export function makeMasmottTriggers(
-  firestore: Firestore,
+  app: App,
   collectionSpecs: Dictionary<CollectionSpec>
 ): Dictionary<CollectionTriggers> {
-  setFirestore(firestore);
-  return mapValues(collectionSpecs, makeCollectionTriggers);
+  return mapValues(collectionSpecs, (collectionSpec, collectionName) =>
+    makeCollectionTriggers(app, collectionSpec, collectionName)
+  );
 }

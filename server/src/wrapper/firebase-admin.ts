@@ -1,30 +1,20 @@
 // eslint-disable-next-line no-restricted-imports
-import { firestore } from 'firebase-admin';
+import {
+  getFirestore,
+  DocumentSnapshot as FirestoreDocumentSnapshot,
+} from 'firebase-admin/firestore';
+// eslint-disable-next-line no-restricted-imports
+import { App } from 'firebase-admin/app';
 import { DocumentData, DocumentSnapshot, QuerySnapshot } from '../type';
 
 /**
  * Type safe and convenience firebase-admin wrapper
  */
 
-export type Firestore = firestore.Firestore;
-
-// eslint-disable-next-line functional/no-let
-let firestoreInstance: Firestore | undefined;
-
-// eslint-disable-next-line functional/no-return-void
-export function setFirestore(firestore: Firestore): void {
-  firestoreInstance = firestore;
-}
-
-function getFirestore(): Firestore {
-  if (firestoreInstance === undefined) {
-    throw Error('Firestore is uninitialized.');
-  }
-  return firestoreInstance;
-}
+export type { App };
 
 export function wrapFirebaseSnapshot(
-  snapshot: firestore.DocumentSnapshot
+  snapshot: FirestoreDocumentSnapshot
 ): DocumentSnapshot {
   const data = snapshot.data();
   if (data === undefined) {
@@ -37,10 +27,11 @@ export function wrapFirebaseSnapshot(
 }
 
 export async function getDoc(
+  app: App,
   collectionName: string,
   documentId: string
 ): Promise<DocumentSnapshot> {
-  const snapshot = await getFirestore()
+  const snapshot = await getFirestore(app)
     .collection(collectionName)
     .doc(documentId)
     .get();
@@ -49,35 +40,45 @@ export async function getDoc(
 }
 
 export function deleteDoc(
+  app: App,
   collectionName: string,
   documentId: string
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getFirestore().collection(collectionName).doc(documentId).delete();
+  return getFirestore(app).collection(collectionName).doc(documentId).delete();
 }
 
 export function createDoc(
+  app: App,
   collectionName: string,
   documentId: string,
   data: DocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getFirestore().collection(collectionName).doc(documentId).create(data);
+  return getFirestore(app)
+    .collection(collectionName)
+    .doc(documentId)
+    .create(data);
 }
 
 export function updateDoc(
+  app: App,
   collectionName: string,
   documentId: string,
   data: DocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getFirestore().collection(collectionName).doc(documentId).update(data);
+  return getFirestore(app)
+    .collection(collectionName)
+    .doc(documentId)
+    .update(data);
 }
 
 export async function getCollection(
+  app: App,
   collectionName: string,
   query?: (
     collectionRef: FirebaseFirestore.CollectionReference<DocumentData>
   ) => FirebaseFirestore.Query<DocumentData>
 ): Promise<QuerySnapshot> {
-  const collectionRef = getFirestore().collection(collectionName);
+  const collectionRef = getFirestore(app).collection(collectionName);
   const collectionQuery =
     query === undefined ? collectionRef : query(collectionRef);
   const snapshot = await collectionQuery.get();

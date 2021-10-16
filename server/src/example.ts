@@ -1,10 +1,10 @@
 // eslint-disable-next-line no-restricted-imports
-import * as admin from 'firebase-admin';
+import { initializeApp } from 'firebase-admin/app';
 import { makeMasmottTriggers } from './get-trigger';
 
-admin.initializeApp();
+const app = initializeApp();
 
-export const triggers = makeMasmottTriggers(admin.firestore(), {
+export const triggers = makeMasmottTriggers(app, {
   user: {
     src: {
       uid: {

@@ -4,6 +4,8 @@ import {
   CloudFunction,
   EventContext,
   firestore,
+  region,
+  SUPPORTED_REGIONS,
 } from 'firebase-functions';
 import { Dictionary } from 'lodash';
 import { DocumentChangeSnapshot, DocumentSnapshot } from '../type';
@@ -32,8 +34,17 @@ export type CollectionTriggers = {
   readonly view: Dictionary<ViewTriggers>;
 };
 
-function getDocTrigger(collectionName: string): firestore.DocumentBuilder {
-  return firestore.document(`${collectionName}/{documentId}`);
+function getDocTrigger(
+  collectionName: string,
+  options?: {
+    readonly regions?: ReadonlyArray<typeof SUPPORTED_REGIONS[number] | string>;
+  }
+): firestore.DocumentBuilder {
+  const functionWithRegion =
+    options?.regions !== undefined
+      ? region(...options.regions).firestore
+      : firestore;
+  return functionWithRegion.document(`${collectionName}/{documentId}`);
 }
 
 export function wrapFirebaseSnapshot(
