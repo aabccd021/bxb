@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "next lint",
     "masmott:build": "cd ../../packages/server && yarn build",
-    "masmott:copy": "cp -r ../../packages/server/lib node_modules/masmott-server",
+    "masmott:copy": "rm -rf node_modules/masmott-server && mkdir node_modules/masmott-server && cp -r ../../packages/server/lib node_modules/masmott-server/lib &&  cp -r ../../packages/server/package.json node_modules/masmott-server/package.json",
     "server:build": "yarn masmott:build  && yarn masmott:copy && tsc --project tsconfig.functions.json",
     "server:start:cached": "firebase emulators:start --project demo-sakurazaka-blog",
     "server:start": "yarn server:build && yarn server:start:cached ",
