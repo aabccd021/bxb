@@ -3,6 +3,7 @@ import {
   getFirestore,
   DocumentSnapshot as FirestoreDocumentSnapshot,
   FieldValue,
+  GrpcStatus,
 } from 'firebase-admin/firestore';
 // eslint-disable-next-line no-restricted-imports
 import { App } from 'firebase-admin/app';
@@ -19,7 +20,7 @@ import {
 
 export type { App };
 
-export { FieldValue };
+export { FieldValue, GrpcStatus };
 
 export function wrapFirebaseSnapshot(
   snapshot: FirestoreDocumentSnapshot

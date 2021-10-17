@@ -1,7 +1,12 @@
 import { mapValues } from 'lodash';
 import { CountSpec, Dict, DocumentData } from '..';
 import { getViewCollectionName } from '../util';
-import { App, FieldValue, updateDoc } from '../wrapper/firebase-admin';
+import {
+  App,
+  FieldValue,
+  GrpcStatus,
+  updateDoc,
+} from '../wrapper/firebase-admin';
 import {
   OnCreateTrigger,
   onCreateTrigger,
@@ -76,6 +81,12 @@ function makeOnCountedDocDeletedTrigger(
     );
     updateDoc(app, viewCollectionName, counterDocId, {
       [countName]: FieldValue.increment(-1),
+    }).catch((reason) => {
+      // Ignore if counter document not exists.
+      if (reason.code === GrpcStatus.NOT_FOUND) {
+        return;
+      }
+      throw reason;
     });
   });
 }
