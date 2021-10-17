@@ -55,8 +55,6 @@ async function materializeViewData(
 
   const countViewData = materializeCountViewData(countSpecs);
 
-  console.log(countViewData);
-
   const materializedViewData: DocumentData = {
     ...selectViewData,
     ...joinViewData,
