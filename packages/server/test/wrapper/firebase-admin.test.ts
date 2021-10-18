@@ -1,11 +1,12 @@
-import { expect } from 'chai';
+import { assert } from 'chai';
 import { App } from 'firebase-admin/app';
 import * as firestore from 'firebase-admin/firestore';
 import sinon, { stubInterface } from 'ts-sinon';
 import { getDoc } from '../../src/wrapper/firebase-admin';
 
-describe('count view', () => {
-  it('on counted document created', async () => {
+describe('getDoc', () => {
+  it('gets the document', async () => {
+    // arrange
     const snapshot: firestore.DocumentSnapshot = {
       ...stubInterface<firestore.DocumentSnapshot>(),
       id: 'hogeId',
@@ -24,19 +25,22 @@ describe('count view', () => {
       .stub(firestore, 'getFirestore')
       .returns(firestoreInstance);
 
-    const app1: App = { name: '', options: {} };
+    const app1 = stubInterface<App>();
 
+    // act
     const wrappedSnapshot = await getDoc(app1, 'fooCollection', 'barId');
 
-    expect(getFirestore.calledOnceWith(app1)).to.be.true;
-    expect(firestoreInstance.doc.calledOnceWith('fooCollection/barId')).to.be
-      .true;
-    expect(doc.get.calledOnceWith()).to.be.true;
-    expect(wrappedSnapshot).to.deep.equal({
+    // assert
+    assert.isTrue(getFirestore.calledOnceWith(app1));
+    assert.isTrue(firestoreInstance.doc.calledOnceWith('fooCollection/barId'));
+    assert.isTrue(doc.get.calledOnceWith());
+
+    const expectedSnapshot = {
       data: {
         lorem: 'ipsum',
       },
       id: 'hogeId',
-    });
+    };
+    assert.deepStrictEqual(wrappedSnapshot, expectedSnapshot);
   });
 });
