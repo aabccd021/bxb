@@ -1,12 +1,14 @@
 import { expect } from 'chai';
 import { App } from 'firebase-admin/app';
 import * as firestore from 'firebase-admin/firestore';
-import sinon from 'ts-sinon';
+import sinon, { stubInterface } from 'ts-sinon';
 import { getDoc } from '../../src/wrapper/firebase-admin';
 
-const getFirestore = sinon.stub(firestore, 'getFirestore').returns({
+const firestoreInstance = stubInterface<firestore.Firestore>();
 
-});
+const getFirestore = sinon
+  .stub(firestore, 'getFirestore')
+  .returns(firestoreInstance);
 
 describe('count view', () => {
   it('on counted document created', () => {
