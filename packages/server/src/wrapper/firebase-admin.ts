@@ -38,8 +38,7 @@ export async function getDoc(
   documentId: string
 ): Promise<DocumentSnapshot> {
   const snapshot = await getFirestore(app)
-    .collection(collectionName)
-    .doc(documentId)
+    .doc(`${collectionName}/${documentId}`)
     .get();
   const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
   return wrappedSnapshot;
