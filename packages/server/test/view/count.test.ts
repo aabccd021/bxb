@@ -4,7 +4,9 @@ import * as firestore from 'firebase-admin/firestore';
 import sinon from 'ts-sinon';
 import { getDoc } from '../../src/wrapper/firebase-admin';
 
-const getFirestore = sinon.stub(firestore, 'getFirestore');
+const getFirestore = sinon.stub(firestore, 'getFirestore').returns({
+
+});
 
 describe('count view', () => {
   it('on counted document created', () => {
