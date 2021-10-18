@@ -16,7 +16,7 @@ describe('masmott', () => {
         id: 'kirako',
         bio: 'dorokatsu desu',
       });
-      await sleep(2000);
+      await sleep(1000);
 
       const userCard = await admin.firestore().doc('user_card/kirako').get();
       expect(userCard.data()).toStrictEqual({ bio: 'dorokatsu desu' });
@@ -54,7 +54,7 @@ describe('masmott', () => {
       await admin.firestore().doc('clap/hikaru_46').create({
         clappedArticle: '46',
       });
-      await sleep(3000);
+      await sleep(4000);
 
       const clapDetail = await admin
         .firestore()
@@ -69,7 +69,7 @@ describe('masmott', () => {
 
     it('update clap_view on user updated', async () => {
       await admin.firestore().doc('user/marino').update({ bio: 'kousaka desu' });
-      await sleep(2000);
+      await sleep(1000);
 
       const clapView = await admin.firestore().doc('clap_detail/hikaru_46').get();
       expect(clapView.data()).toStrictEqual({
@@ -93,7 +93,7 @@ describe('masmott', () => {
         id: 'berisa',
         bio: 'berisa desu',
       });
-      await sleep(2000);
+      await sleep(1000);
 
       const userDetail = await admin.firestore().doc('user_detail/berisa').get();
       expect(userDetail.data()).toStrictEqual({
@@ -106,7 +106,7 @@ describe('masmott', () => {
         text: 'mugon no uchuu',
         ownerUser: 'berisa',
       });
-      await sleep(2000);
+      await sleep(1000);
 
       const userDetail = await admin.firestore().doc('user_detail/berisa').get();
       expect(userDetail.data()).toStrictEqual({
@@ -119,7 +119,7 @@ describe('masmott', () => {
         text: 'nageredama',
         ownerUser: 'berisa',
       });
-      await sleep(2000);
+      await sleep(1000);
 
       const userDetail = await admin.firestore().doc('user_detail/berisa').get();
       expect(userDetail.data()).toStrictEqual({
@@ -129,7 +129,7 @@ describe('masmott', () => {
 
     it('decrease count when an article deleted', async () => {
       await admin.firestore().doc('article/21').delete();
-      await sleep(2000);
+      await sleep(1000);
 
       const userDetail = await admin.firestore().doc('user_detail/berisa').get();
       expect(userDetail.data()).toStrictEqual({
@@ -139,7 +139,7 @@ describe('masmott', () => {
 
     it('decrease count again when an article deleted', async () => {
       await admin.firestore().doc('article/42').delete();
-      await sleep(2000);
+      await sleep(1000);
 
       const userDetail = await admin.firestore().doc('user_detail/berisa').get();
       expect(userDetail.data()).toStrictEqual({
@@ -154,7 +154,7 @@ describe('masmott', () => {
         text: 'MV released mugon no uchuu',
         ownerUser: 'berisa',
       });
-      await sleep(2000);
+      await sleep(1000);
 
       const articleCard = await admin.firestore().doc('article_card/17').get();
       expect(articleCard.data()).toStrictEqual({
@@ -167,7 +167,7 @@ describe('masmott', () => {
         text: 'cool',
         commentedArticle: '17',
       });
-      await sleep(2000);
+      await sleep(1000);
 
       const articleCard = await admin.firestore().doc('article_card/17').get();
       expect(articleCard.data()).toStrictEqual({
@@ -180,7 +180,7 @@ describe('masmott', () => {
         text: 'hype as fujii kaze kirari',
         commentedArticle: '17',
       });
-      await sleep(2000);
+      await sleep(1000);
 
       const articleCard = await admin.firestore().doc('article_card/17').get();
       expect(articleCard.data()).toStrictEqual({
@@ -190,7 +190,7 @@ describe('masmott', () => {
 
     it('decrease count when an article deleted', async () => {
       await admin.firestore().doc('comment/123').delete();
-      await sleep(2000);
+      await sleep(1000);
 
       const articleCard = await admin.firestore().doc('article_card/17').get();
       expect(articleCard.data()).toStrictEqual({
@@ -200,7 +200,7 @@ describe('masmott', () => {
 
     it('decrease count again when an article deleted', async () => {
       await admin.firestore().doc('comment/456').delete();
-      await sleep(2000);
+      await sleep(1000);
 
       const articleCard = await admin.firestore().doc('article_card/17').get();
       expect(articleCard.data()).toStrictEqual({
