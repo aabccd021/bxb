@@ -1,4 +1,4 @@
-import { compact, isEmpty, mapValues } from 'lodash';
+import { compact, isEmpty, mapValues as lodashMapValues } from 'lodash';
 import { FirestoreDataType } from '.';
 import { DocumentDataChange, DocumentData, Dict } from './type';
 
@@ -114,6 +114,17 @@ export function getDocDataChange({
   const compactDocDataDiff = compactObject(docDataDiff);
 
   return compactDocDataDiff;
+}
+
+export type Mapped<T extends string | number, VResult> = {
+  readonly [P in T]: VResult;
+};
+
+export function mapValues<T extends string | number, V, VResult>(
+  obj: Mapped<T, V>,
+  mapper: (value: V, key: string) => VResult
+): Mapped<T, VResult> {
+  return lodashMapValues(obj, mapper);
 }
 
 export function getViewCollectionName(

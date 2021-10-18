@@ -1,6 +1,5 @@
-import { mapValues } from 'lodash';
 import { CountSpec, Dict, DocumentData } from '..';
-import { getViewCollectionName } from '../util';
+import { getViewCollectionName, Mapped, mapValues } from '../util';
 import {
   App,
   FieldValue,
@@ -35,18 +34,19 @@ function makeOnCountedDocCreatedTrigger(
       counterCollectionName,
       viewName
     );
-    updateDoc(app, viewCollectionName, counterDocId, {
+    const incrementedData = {
       [countName]: FieldValue.increment(1),
-    });
+    };
+    await updateDoc(app, viewCollectionName, counterDocId, incrementedData);
   });
 }
 
-export function onCountedDocCreated(
+export function onCountedDocCreated<T extends string>(
   app: App,
   counterCollectionName: string,
   viewName: string,
-  countSpecs: Dict<CountSpec>
-): Dict<OnCreateTrigger> {
+  countSpecs: Mapped<T, CountSpec>
+): Mapped<T, OnCreateTrigger> {
   return mapValues(countSpecs, (countSpec, countName) =>
     makeOnCountedDocCreatedTrigger(
       app,
@@ -79,11 +79,17 @@ function makeOnCountedDocDeletedTrigger(
       counterCollectionName,
       viewName
     );
-    updateDoc(app, viewCollectionName, counterDocId, {
+    const decrementedData = {
       [countName]: FieldValue.increment(-1),
-    }).catch((reason) => {
-      // Ignore if counter document not exists.
+    };
+    await updateDoc(
+      app,
+      viewCollectionName,
+      counterDocId,
+      decrementedData
+    ).catch((reason) => {
       if (reason.code === GrpcStatus.NOT_FOUND) {
+        // Ignore if counter document not exists.
         return;
       }
       throw reason;
