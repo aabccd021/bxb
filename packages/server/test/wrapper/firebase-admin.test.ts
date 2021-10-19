@@ -25,10 +25,11 @@ describe('getDoc', () => {
     const firestoreInstance = stubInterface<firestore.Firestore>();
     firestoreInstance.doc.returns(doc);
 
-    const app = stubInterface<App>();
     const getFirestore = sinon
       .stub(firestore, 'getFirestore')
       .returns(firestoreInstance);
+
+    const app = stubInterface<App>();
 
     // act
     const wrappedSnapshot = await getDoc(app, 'fooCollection', 'barId');
@@ -59,10 +60,11 @@ describe('deleteDoc', () => {
     const firestoreInstance = stubInterface<firestore.Firestore>();
     firestoreInstance.doc.returns(doc);
 
-    const app = stubInterface<App>();
     const getFirestore = sinon
       .stub(firestore, 'getFirestore')
       .returns(firestoreInstance);
+
+    const app = stubInterface<App>();
 
     // act
     const deleteResult = await deleteDoc(app, 'fooCollection', 'barId');

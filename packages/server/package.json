@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "lint": "eslint --ext .js,.ts .",
-    "test": "nyc --reporter=html mocha -r ts-node/register 'test/**/*.ts'"
+    "test": "nyc --reporter=text --reporter=html mocha -r ts-node/register 'test/**/*.ts'"
   },
   "engines": {
     "node": "14"
