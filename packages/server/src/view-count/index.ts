@@ -6,7 +6,7 @@ import {
   OnCreateTrigger,
   OnDeleteTrigger,
 } from '../type';
-import { FieldValue, GrpcStatus, updateDoc } from '../firebase-admin';
+import { firestore, updateDoc } from '../firebase-admin';
 import { onCreateTrigger, onDeleteTrigger } from '../firebase-functions';
 import { getViewCollectionName, Mapped, mapValues } from '../util';
 
@@ -32,7 +32,7 @@ function makeOnCountedDocCreatedTrigger(
       viewName
     );
     const incrementedData = {
-      [countName]: FieldValue.increment(1),
+      [countName]: firestore.FieldValue.increment(1),
     };
     await updateDoc(app, viewCollectionName, counterDocId, incrementedData);
   });
@@ -77,7 +77,7 @@ function makeOnCountedDocDeletedTrigger(
       viewName
     );
     const decrementedData = {
-      [countName]: FieldValue.increment(-1),
+      [countName]: firestore.FieldValue.increment(-1),
     };
     await updateDoc(
       app,
@@ -85,7 +85,7 @@ function makeOnCountedDocDeletedTrigger(
       counterDocId,
       decrementedData
     ).catch((reason) => {
-      if (reason.code === GrpcStatus.NOT_FOUND) {
+      if (reason.code === firestore.GrpcStatus.NOT_FOUND) {
         // Ignore if counter document not exists.
         return;
       }

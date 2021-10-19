@@ -1,6 +1,5 @@
-// eslint-disable-next-line no-restricted-imports
+/* eslint-disable no-restricted-imports */
 import { App } from 'firebase-admin/app';
-// eslint-disable-next-line no-restricted-imports
 import { FieldValue, getFirestore, GrpcStatus } from 'firebase-admin/firestore';
 import {
   DocumentData,
@@ -10,11 +9,11 @@ import {
 } from '../type';
 import { wrapFirebaseSnapshot } from '../util';
 
+export const firestore = { FieldValue, GrpcStatus };
+
 /**
  * Type safe and convenience firebase-admin wrapper
  */
-
-export { FieldValue, GrpcStatus };
 
 export async function getDoc(
   app: App,
