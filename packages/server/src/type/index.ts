@@ -4,7 +4,12 @@ import {
   FieldValue,
   DocumentSnapshot as FirestoreDocumentSnapshot,
 } from 'firebase-admin/firestore';
-import { Change, CloudFunction, firestore } from 'firebase-functions';
+import {
+  Change,
+  CloudFunction,
+  EventContext,
+  firestore,
+} from 'firebase-functions';
 
 export type { FirestoreDocumentSnapshot };
 
@@ -98,5 +103,10 @@ export type CollectionTriggers = {
   readonly onRefDocDeleted: Dict<OnDeleteTrigger | undefined>;
   readonly view: Dict<ViewTriggers>;
 };
+
+export type OnCreateTriggerHandler = (
+  snapshot: DocumentSnapshot,
+  context: EventContext
+) => Promise<unknown>;
 
 export type { App };

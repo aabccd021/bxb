@@ -6,6 +6,7 @@ import {
   DocumentChangeSnapshot,
   OnUpdateTrigger,
   OnDeleteTrigger,
+  OnCreateTriggerHandler,
 } from '../type';
 import { wrapFirebaseSnapshot } from '../util';
 import { getDocTrigger } from './util';
@@ -16,14 +17,12 @@ import { getDocTrigger } from './util';
 
 export function onCreateTrigger(
   collectionName: string,
-  handler: (
-    snapshot: DocumentSnapshot,
-    context: EventContext
-  ) => Promise<unknown>
+  handler: OnCreateTriggerHandler
 ): OnCreateTrigger {
   return getDocTrigger(collectionName).onCreate((snapshot, context) => {
     const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
-    return handler(wrappedSnapshot, context);
+    const result = handler(wrappedSnapshot, context);
+    return result;
   });
 }
 
@@ -42,7 +41,8 @@ export function onUpdateTrigger(
         after: change.after.data(),
       },
     };
-    return handler(changeSnapshot, context);
+    const result = handler(changeSnapshot, context);
+    return result;
   });
 }
 
@@ -55,6 +55,7 @@ export function onDeleteTrigger(
 ): OnDeleteTrigger {
   return getDocTrigger(collectionName).onDelete((snapshot, context) => {
     const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
-    return handler(wrappedSnapshot, context);
+    const result = handler(wrappedSnapshot, context);
+    return result;
   });
 }
