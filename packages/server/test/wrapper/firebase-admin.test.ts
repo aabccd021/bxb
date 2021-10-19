@@ -9,6 +9,7 @@ import {
   getCollection,
   getDoc,
   updateDoc,
+  wrapFirebaseSnapshot,
 } from '../../src/wrapper/firebase-admin';
 
 afterEach(() => {
@@ -196,7 +197,6 @@ describe('getCollection', () => {
 
   it('returns collection with query', async () => {
     // arrange
-    // const mockedQueryResult = stubInterface<firestore.QuerySnapshot>();
     const snapshot: firestore.QueryDocumentSnapshot = {
       ...stubInterface<firestore.QueryDocumentSnapshot>(),
       id: 'hogeId',
@@ -249,5 +249,26 @@ describe('getCollection', () => {
       ],
     };
     assert.deepStrictEqual(queryResult, expectedQueryResult);
+  });
+});
+
+describe('wrapFirebaseSnapshot', () => {
+  it('returns empty object if data is undefined', () => {
+    // arrange
+    const snapshot: firestore.DocumentSnapshot = {
+      ...stubInterface<firestore.DocumentSnapshot>(),
+      id: 'hogeId',
+      data: () => undefined,
+    };
+
+    // act
+    const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
+
+    // assert
+    const expectedSnapshot = {
+      id: 'hogeId',
+      data: {},
+    };
+    assert.deepStrictEqual(wrappedSnapshot, expectedSnapshot);
   });
 });

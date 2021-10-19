@@ -25,11 +25,7 @@ export { FieldValue, GrpcStatus };
 export function wrapFirebaseSnapshot(
   snapshot: FirestoreDocumentSnapshot
 ): DocumentSnapshot {
-  const data = snapshot.data();
-  if (data === undefined) {
-    throw Error(`Invalid Type ${JSON.stringify(snapshot)}`);
-  }
-  return { id: snapshot.id, data };
+  return { id: snapshot.id, data: snapshot.data() ?? {} };
 }
 
 export async function getDoc(
