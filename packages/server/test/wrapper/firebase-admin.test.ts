@@ -2,7 +2,8 @@ import { assert } from 'chai';
 import { App } from 'firebase-admin/app';
 import * as firestore from 'firebase-admin/firestore';
 import sinon, { stubInterface } from 'ts-sinon';
-import { deleteDoc, getDoc } from '../../src/wrapper/firebase-admin';
+import { DocumentData } from '../../src';
+import { createDoc, deleteDoc, getDoc } from '../../src/wrapper/firebase-admin';
 
 afterEach(() => {
   sinon.restore();
@@ -74,5 +75,35 @@ describe('deleteDoc', () => {
     assert.isTrue(firestoreInstance.doc.calledOnceWith('fooCollection/barId'));
     assert.isTrue(doc.delete.calledOnceWith());
     assert.deepStrictEqual(deleteResult, mockedDeleteResult);
+  });
+});
+
+describe('createDoc', () => {
+  it('creates  document', async () => {
+    // arrange
+    const mockedCreateResult = stubInterface<firestore.WriteResult>();
+
+    const doc = stubInterface<firestore.DocumentReference>();
+    doc.create.resolves(mockedCreateResult);
+
+    const firestoreInstance = stubInterface<firestore.Firestore>();
+    firestoreInstance.doc.returns(doc);
+
+    const getFirestore = sinon
+      .stub(firestore, 'getFirestore')
+      .returns(firestoreInstance);
+
+    const app = stubInterface<App>();
+
+    const data = stubInterface<DocumentData>();
+
+    // act
+    const createResult = await createDoc(app, 'fooCollection', 'barId', data);
+
+    // assert
+    assert.isTrue(getFirestore.calledOnceWith(app));
+    assert.isTrue(firestoreInstance.doc.calledOnceWith('fooCollection/barId'));
+    assert.isTrue(doc.create.calledOnceWith(data));
+    assert.deepStrictEqual(createResult, mockedCreateResult);
   });
 });

@@ -58,10 +58,7 @@ export function createDoc(
   documentId: string,
   data: DocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getFirestore(app)
-    .collection(collectionName)
-    .doc(documentId)
-    .create(data);
+  return getFirestore(app).doc(`${collectionName}/${documentId}`).create(data);
 }
 
 export function updateDoc(
