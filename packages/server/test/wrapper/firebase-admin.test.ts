@@ -3,7 +3,13 @@ import { App } from 'firebase-admin/app';
 import * as firestore from 'firebase-admin/firestore';
 import sinon, { stubInterface } from 'ts-sinon';
 import { DocumentData } from '../../src';
-import { createDoc, deleteDoc, getDoc, updateDoc } from '../../src/wrapper/firebase-admin';
+import {
+  createDoc,
+  deleteDoc,
+  getCollection,
+  getDoc,
+  updateDoc,
+} from '../../src/wrapper/firebase-admin';
 
 afterEach(() => {
   sinon.restore();
@@ -135,5 +141,56 @@ describe('updateDoc', () => {
     assert.isTrue(firestoreInstance.doc.calledOnceWith('fooCollection/barId'));
     // assert.isTrue(doc.update.calledOnceWith(data));
     assert.deepStrictEqual(updateResult, mockedUpdateResult);
+  });
+});
+
+describe('getCollection', () => {
+  it('returns collection', async () => {
+    // arrange
+    // const mockedQueryResult = stubInterface<firestore.QuerySnapshot>();
+    const snapshot: firestore.QueryDocumentSnapshot = {
+      ...stubInterface<firestore.QueryDocumentSnapshot>(),
+      id: 'hogeId',
+      data: () => ({
+        lorem: 'ipsum',
+      }),
+    };
+    const mockedDocs = [snapshot];
+
+    const mockedQueryResult: firestore.QuerySnapshot = {
+      ...stubInterface<firestore.QuerySnapshot>(),
+      docs: mockedDocs,
+    };
+
+    const collection = stubInterface<firestore.CollectionReference>();
+    collection.get.resolves(mockedQueryResult);
+
+    const firestoreInstance = stubInterface<firestore.Firestore>();
+    firestoreInstance.collection.returns(collection);
+
+    const getFirestore = sinon
+      .stub(firestore, 'getFirestore')
+      .returns(firestoreInstance);
+
+    const app = stubInterface<App>();
+
+    // act
+    const queryResult = await getCollection(app, 'fooCollection');
+
+    // assert
+    assert.isTrue(getFirestore.calledOnceWith(app));
+    assert.isTrue(firestoreInstance.collection.calledOnceWith('fooCollection'));
+    assert.isTrue(collection.get.calledOnceWith());
+    const expectedQueryResult = {
+      docs: [
+        {
+          id: 'hogeId',
+          data: {
+            lorem: 'ipsum',
+          },
+        },
+      ],
+    };
+    assert.deepStrictEqual(queryResult, expectedQueryResult);
   });
 });

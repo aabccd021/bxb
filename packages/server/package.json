@@ -64,7 +64,8 @@
         ],
         "rules": {
           "no-restricted-imports": "off",
-          "import/no-internal-modules": "off"
+          "import/no-internal-modules": "off",
+          "functional/prefer-readonly-type": "off"
         }
       }
     ],
