@@ -10,6 +10,7 @@ import {
   CloudFunction,
   EventContext,
   firestore,
+  SUPPORTED_REGIONS,
 } from 'firebase-functions';
 
 export type { FirestoreDocumentSnapshot, Change, QueryDocumentSnapshot };
@@ -118,3 +119,15 @@ export type OnUpdateTriggerHandler = (
 ) => Promise<unknown>;
 
 export type { App };
+
+export type GetDocTriggerOptions = {
+  readonly regions?: ReadonlyArray<typeof SUPPORTED_REGIONS[number]>;
+};
+
+export type FunctionsFirestore = {
+  readonly document: (path: string) => firestore.DocumentBuilder;
+  /** @hidden */
+  readonly namespace: (namespace: string) => firestore.NamespaceBuilder;
+  /** @hidden */
+  readonly database: (database: string) => firestore.DatabaseBuilder;
+};

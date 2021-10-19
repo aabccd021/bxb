@@ -1,8 +1,9 @@
 import { assert } from 'chai';
-import * as functions from 'firebase-functions';
+import * as nonTestable from '../../src/firebase-functions/non-testable';
 import { DocumentBuilder } from 'firebase-functions/v1/firestore';
 import sinon, { stubInterface } from 'ts-sinon';
 import { getDocTrigger } from '../../src/firebase-functions/util';
+import { FunctionsFirestore } from '../../src/type';
 
 describe('firebase-functions', () => {
   afterEach(() => {
@@ -12,34 +13,48 @@ describe('firebase-functions', () => {
   describe('getDocTrigger', () => {
     it('get doc trigger with given collectionName', () => {
       // arrange
+      const mockedDocTrigger = stubInterface<DocumentBuilder>();
 
-      const mockedDocumentBuilder = stubInterface<DocumentBuilder>();
+      const functionsFirestore = stubInterface<FunctionsFirestore>();
+      functionsFirestore.document.returns(mockedDocTrigger);
 
-      const document = sinon
-        .stub(functions.firestore, 'document')
-        .returns(mockedDocumentBuilder);
+      const getFunctionsFirestore = sinon
+        .stub(nonTestable, 'getFunctionsFirestore')
+        .returns(functionsFirestore);
 
       // act
-      const trigger = getDocTrigger('fooCollection');
+      const docTrigger = getDocTrigger('fooCollection');
 
       //assert
-      assert.isTrue(document.calledOnceWith('fooCollection/{documentId}'));
-      assert.equal(trigger, mockedDocumentBuilder);
+      assert.isTrue(getFunctionsFirestore.calledOnceWith());
+      assert.isTrue(
+        functionsFirestore.document.calledOnceWith('fooCollection/{documentId}')
+      );
+      assert.equal(docTrigger, mockedDocTrigger);
     });
 
     it('get doc trigger with given collectionName and region', () => {
       // arrange
+      const mockedDocTrigger = stubInterface<DocumentBuilder>();
 
-      // const region = sinon.stub(functions, 'region');
-      const document = sinon.stub(functions.firestore, 'document');
+      const functionsFirestore = stubInterface<FunctionsFirestore>();
+      functionsFirestore.document.returns(mockedDocTrigger);
+
+      const getFunctionsFirestore = sinon
+        .stub(nonTestable, 'getFunctionsFirestore')
+        .returns(functionsFirestore);
 
       // act
-      getDocTrigger('fooCollection', { regions: ['asia-southeast2'] });
+      const docTrigger = getDocTrigger('fooCollection', {
+        regions: ['asia-southeast2'],
+      });
 
       //assert
-      // TODO:
-      // assert.isTrue(region.called);
-      assert.isTrue(document.notCalled);
+      assert.isTrue(getFunctionsFirestore.calledOnceWith(['asia-southeast2']));
+      assert.isTrue(
+        functionsFirestore.document.calledOnceWith('fooCollection/{documentId}')
+      );
+      assert.equal(docTrigger, mockedDocTrigger);
     });
   });
 });

@@ -1,17 +1,15 @@
 // eslint-disable-next-line no-restricted-imports
-import * as functions from 'firebase-functions';
+import { firestore } from 'firebase-functions';
+import { GetDocTriggerOptions } from '../type';
+import { getFunctionsFirestore } from './non-testable';
 
 export function getDocTrigger(
   collectionName: string,
-  options?: {
-    readonly regions?: ReadonlyArray<
-      typeof functions.SUPPORTED_REGIONS[number]
-    >;
-  }
-): functions.firestore.DocumentBuilder {
-  const functionWithRegion =
-    options?.regions !== undefined
-      ? functions.region(...options.regions).firestore
-      : functions.firestore;
-  return functionWithRegion.document(`${collectionName}/{documentId}`);
+  options?: GetDocTriggerOptions
+): firestore.DocumentBuilder {
+  const functionsFirestore = getFunctionsFirestore(options?.regions);
+  const docTrigger = functionsFirestore.document(
+    `${collectionName}/{documentId}`
+  );
+  return docTrigger;
 }
