@@ -142,8 +142,7 @@ describe('firebase-admin', () => {
       assert.isTrue(
         firestoreInstance.doc.calledOnceWith('fooCollection/barId')
       );
-      // TODO:
-      // assert.isTrue(doc.update.calledOnceWith(data));
+      assert.isTrue((doc.update as sinon.SinonStub).calledOnceWith(data));
       assert.deepStrictEqual(updateResult, mockedUpdateResult);
     });
   });
