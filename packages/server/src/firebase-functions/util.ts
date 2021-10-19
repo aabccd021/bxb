@@ -1,15 +1,17 @@
 // eslint-disable-next-line no-restricted-imports
-import { firestore, region, SUPPORTED_REGIONS } from 'firebase-functions';
+import * as functions from 'firebase-functions';
 
 export function getDocTrigger(
   collectionName: string,
   options?: {
-    readonly regions?: ReadonlyArray<typeof SUPPORTED_REGIONS[number] | string>;
+    readonly regions?: ReadonlyArray<
+      typeof functions.SUPPORTED_REGIONS[number]
+    >;
   }
-): firestore.DocumentBuilder {
+): functions.firestore.DocumentBuilder {
   const functionWithRegion =
     options?.regions !== undefined
-      ? region(...options.regions).firestore
-      : firestore;
+      ? functions.region(...options.regions).firestore
+      : functions.firestore;
   return functionWithRegion.document(`${collectionName}/{documentId}`);
 }
