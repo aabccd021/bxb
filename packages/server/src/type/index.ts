@@ -3,6 +3,7 @@ import { App } from 'firebase-admin/app';
 import {
   FieldValue,
   DocumentSnapshot as FirestoreDocumentSnapshot,
+  QueryDocumentSnapshot,
 } from 'firebase-admin/firestore';
 import {
   Change,
@@ -11,7 +12,7 @@ import {
   firestore,
 } from 'firebase-functions';
 
-export type { FirestoreDocumentSnapshot };
+export type { FirestoreDocumentSnapshot, Change, QueryDocumentSnapshot };
 
 export type Dict<T> = {
   readonly [key: string]: T;
@@ -106,6 +107,13 @@ export type CollectionTriggers = {
 
 export type OnCreateTriggerHandler = (
   snapshot: DocumentSnapshot,
+  context: EventContext
+) => Promise<unknown>;
+
+export type OnDeleteTriggerHandler = OnCreateTriggerHandler;
+
+export type OnUpdateTriggerHandler = (
+  change: DocumentChangeSnapshot,
   context: EventContext
 ) => Promise<unknown>;
 

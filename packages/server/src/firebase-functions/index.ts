@@ -1,14 +1,13 @@
 // eslint-disable-next-line no-restricted-imports
-import { EventContext } from 'firebase-functions';
 import {
-  DocumentSnapshot,
   OnCreateTrigger,
-  DocumentChangeSnapshot,
-  OnUpdateTrigger,
-  OnDeleteTrigger,
   OnCreateTriggerHandler,
+  OnDeleteTrigger,
+  OnDeleteTriggerHandler,
+  OnUpdateTrigger,
+  OnUpdateTriggerHandler,
 } from '../type';
-import { wrapFirebaseSnapshot } from '../util';
+import { wrapFirebaseChangeSnapshot, wrapFirebaseSnapshot } from '../util';
 import { getDocTrigger } from './util';
 
 /**
@@ -28,30 +27,18 @@ export function onCreateTrigger(
 
 export function onUpdateTrigger(
   collectionName: string,
-  handler: (
-    change: DocumentChangeSnapshot,
-    context: EventContext
-  ) => Promise<unknown>
+  handler: OnUpdateTriggerHandler
 ): OnUpdateTrigger {
   return getDocTrigger(collectionName).onUpdate((change, context) => {
-    const changeSnapshot = {
-      id: change.after.id,
-      data: {
-        before: change.before.data(),
-        after: change.after.data(),
-      },
-    };
-    const result = handler(changeSnapshot, context);
+    const wrappedChange = wrapFirebaseChangeSnapshot(change);
+    const result = handler(wrappedChange, context);
     return result;
   });
 }
 
 export function onDeleteTrigger(
   collectionName: string,
-  handler: (
-    snapshot: DocumentSnapshot,
-    context: EventContext
-  ) => Promise<unknown>
+  handler: OnDeleteTriggerHandler
 ): OnDeleteTrigger {
   return getDocTrigger(collectionName).onDelete((snapshot, context) => {
     const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);

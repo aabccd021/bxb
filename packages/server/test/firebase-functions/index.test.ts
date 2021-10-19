@@ -1,12 +1,22 @@
 import { assert } from 'chai';
-import { EventContext } from 'firebase-functions/v1';
+import { Change, EventContext } from 'firebase-functions/v1';
 import {
   DocumentBuilder,
   QueryDocumentSnapshot,
 } from 'firebase-functions/v1/firestore';
 import sinon, { stubInterface } from 'ts-sinon';
-import { DocumentSnapshot, OnCreateTrigger, OnDeleteTrigger } from '../../src';
-import { onCreateTrigger, onDeleteTrigger } from '../../src/firebase-functions';
+import {
+  DocumentChangeSnapshot,
+  DocumentSnapshot,
+  OnCreateTrigger,
+  OnDeleteTrigger,
+  OnUpdateTrigger,
+} from '../../src';
+import {
+  onCreateTrigger,
+  onDeleteTrigger,
+  onUpdateTrigger,
+} from '../../src/firebase-functions';
 import * as functionUtil from '../../src/firebase-functions/util';
 import * as util from '../../src/util';
 
@@ -54,6 +64,49 @@ describe('firebase-functions', () => {
       assert.equal(trigger, mockedTrigger);
       assert.isTrue(wrapFirebaseSnapshot.calledOnceWith(triggerSnapshot));
       assert.isTrue(handler.calledOnceWith(wrappedSnapshot, context));
+      assert.equal(handlerResult, mockedHandlerResult);
+    });
+  });
+
+  describe('onUpdateTrigger', () => {
+    it('make on create trigger', async () => {
+      // arrange
+      const mockedTrigger = stubInterface<OnUpdateTrigger>();
+
+      const documentBuilder = stubInterface<DocumentBuilder>();
+      documentBuilder.onUpdate.returns(mockedTrigger);
+
+      const getDocTrigger = sinon
+        .stub(functionUtil, 'getDocTrigger')
+        .returns(documentBuilder);
+
+      const mockedHandlerResult = stubInterface<Promise<unknown>>();
+
+      const handler = sinon.stub<
+        Parameters<OnUpdateTrigger>,
+        ReturnType<OnUpdateTrigger>
+      >();
+      handler.returns(mockedHandlerResult);
+
+      const triggerSnapshot = stubInterface<Change<QueryDocumentSnapshot>>();
+
+      const wrappedChange = stubInterface<DocumentChangeSnapshot>();
+      const context = stubInterface<EventContext>();
+
+      const wrapFirebaseChangeSnapshot = sinon
+        .stub(util, 'wrapFirebaseChangeSnapshot')
+        .returns(wrappedChange);
+
+      // act
+      const trigger = onUpdateTrigger('fooCol', handler);
+      const [triggerHandler] = documentBuilder.onUpdate.getCall(0).args;
+      const handlerResult = triggerHandler(triggerSnapshot, context);
+
+      // assert
+      assert.isTrue(getDocTrigger.calledOnceWith('fooCol'));
+      assert.equal(trigger, mockedTrigger);
+      assert.isTrue(wrapFirebaseChangeSnapshot.calledOnceWith(triggerSnapshot));
+      assert.isTrue(handler.calledOnceWith(wrappedChange, context));
       assert.equal(handlerResult, mockedHandlerResult);
     });
   });

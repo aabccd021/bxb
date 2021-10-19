@@ -6,6 +6,9 @@ import {
   DocumentData,
   DocumentSnapshot,
   FirestoreDocumentSnapshot,
+  Change,
+  DocumentChangeSnapshot,
+  QueryDocumentSnapshot,
 } from '../type';
 
 export type Mapped<T extends string | number, VResult> = {
@@ -143,5 +146,20 @@ export function getViewCollectionName(
 export function wrapFirebaseSnapshot(
   snapshot: FirestoreDocumentSnapshot
 ): DocumentSnapshot {
-  return { id: snapshot.id, data: snapshot.data() ?? {} };
+  return {
+    id: snapshot.id,
+    data: snapshot.data() ?? {},
+  };
+}
+
+export function wrapFirebaseChangeSnapshot(
+  change: Change<QueryDocumentSnapshot>
+): DocumentChangeSnapshot {
+  return {
+    id: change.after.id,
+    data: {
+      before: change.before.data(),
+      after: change.after.data(),
+    },
+  };
 }
