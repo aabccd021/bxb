@@ -249,4 +249,3 @@ describe('getCollection', () => {
     assert.deepStrictEqual(queryResult, expectedQueryResult);
   });
 });
-
