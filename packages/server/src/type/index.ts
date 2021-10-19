@@ -1,7 +1,12 @@
 /* eslint-disable no-restricted-imports */
 import { App } from 'firebase-admin/app';
-import { FieldValue } from 'firebase-admin/firestore';
+import {
+  FieldValue,
+  DocumentSnapshot as FirestoreDocumentSnapshot,
+} from 'firebase-admin/firestore';
 import { Change, CloudFunction, firestore } from 'firebase-functions';
+
+export type { FirestoreDocumentSnapshot };
 
 export type Dict<T> = {
   readonly [key: string]: T;

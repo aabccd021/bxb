@@ -4,6 +4,8 @@ import {
   FirestoreDataType,
   DocumentDataChange,
   DocumentData,
+  DocumentSnapshot,
+  FirestoreDocumentSnapshot,
 } from '../type';
 
 export type Mapped<T extends string | number, VResult> = {
@@ -136,4 +138,10 @@ export function getViewCollectionName(
   viewName: string
 ): string {
   return `${collectionName}_${viewName}`;
+}
+
+export function wrapFirebaseSnapshot(
+  snapshot: FirestoreDocumentSnapshot
+): DocumentSnapshot {
+  return { id: snapshot.id, data: snapshot.data() ?? {} };
 }

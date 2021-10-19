@@ -8,7 +8,7 @@ import {
   QuerySnapshot,
   WriteDocumentData,
 } from '../type';
-import { wrapFirebaseSnapshot } from './util';
+import { wrapFirebaseSnapshot } from '../util';
 
 /**
  * Type safe and convenience firebase-admin wrapper

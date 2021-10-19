@@ -7,7 +7,8 @@ import {
   OnUpdateTrigger,
   OnDeleteTrigger,
 } from '../type';
-import { getDocTrigger, wrapFirebaseSnapshot } from './util';
+import { wrapFirebaseSnapshot } from '../util';
+import { getDocTrigger } from './util';
 
 /**
  * Type safe and convenience firebase-functions wrapper

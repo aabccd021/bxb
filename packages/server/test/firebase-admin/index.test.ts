@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import * as firestore from 'firebase-admin/firestore';
-import * as util from '../../src/firebase-admin/util';
+import * as util from '../../src/util';
 import sinon, { stubInterface } from 'ts-sinon';
 import {
   getDoc,
