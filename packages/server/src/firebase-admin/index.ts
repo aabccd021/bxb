@@ -14,7 +14,6 @@ import { wrapFirebaseSnapshot } from './util';
  * Type safe and convenience firebase-admin wrapper
  */
 
-export type { App };
 export { FieldValue, GrpcStatus };
 
 export async function getDoc(

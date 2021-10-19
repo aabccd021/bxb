@@ -1,6 +1,6 @@
 import { assert } from 'chai';
-import { App } from 'firebase-admin/app';
 import * as firestore from 'firebase-admin/firestore';
+import * as util from '../../src/firebase-admin/util';
 import sinon, { stubInterface } from 'ts-sinon';
 import {
   getDoc,
@@ -9,6 +9,7 @@ import {
   updateDoc,
   getCollection,
 } from '../../src/firebase-admin';
+import { App, DocumentSnapshot } from '../../src/type';
 
 afterEach(() => {
   sinon.restore();
@@ -17,16 +18,10 @@ afterEach(() => {
 describe('getDoc', () => {
   it('gets the document', async () => {
     // arrange
-    const snapshot: firestore.DocumentSnapshot = {
-      ...stubInterface<firestore.DocumentSnapshot>(),
-      id: 'hogeId',
-      data: () => ({
-        lorem: 'ipsum',
-      }),
-    };
+    const firestoreSnapshot = stubInterface<firestore.DocumentSnapshot>();
 
     const doc = stubInterface<firestore.DocumentReference>();
-    doc.get.resolves(snapshot);
+    doc.get.resolves(firestoreSnapshot);
 
     const firestoreInstance = stubInterface<firestore.Firestore>();
     firestoreInstance.doc.returns(doc);
@@ -34,6 +29,12 @@ describe('getDoc', () => {
     const getFirestore = sinon
       .stub(firestore, 'getFirestore')
       .returns(firestoreInstance);
+
+    const snapshot = stubInterface<DocumentSnapshot>();
+
+    const wrapFirebaseSnapshot = sinon
+      .stub(util, 'wrapFirebaseSnapshot')
+      .returns(snapshot);
 
     const app = stubInterface<App>();
 
@@ -44,14 +45,8 @@ describe('getDoc', () => {
     assert.isTrue(getFirestore.calledOnceWith(app));
     assert.isTrue(firestoreInstance.doc.calledOnceWith('fooCollection/barId'));
     assert.isTrue(doc.get.calledOnceWith());
-
-    const expectedSnapshot = {
-      data: {
-        lorem: 'ipsum',
-      },
-      id: 'hogeId',
-    };
-    assert.deepStrictEqual(wrappedSnapshot, expectedSnapshot);
+    assert.isTrue(wrapFirebaseSnapshot.calledOnceWith(firestoreSnapshot));
+    assert.equal(wrappedSnapshot, snapshot);
   });
 });
 
@@ -146,15 +141,8 @@ describe('updateDoc', () => {
 describe('getCollection', () => {
   it('returns collection', async () => {
     // arrange
-    // const mockedQueryResult = stubInterface<firestore.QuerySnapshot>();
-    const snapshot: firestore.QueryDocumentSnapshot = {
-      ...stubInterface<firestore.QueryDocumentSnapshot>(),
-      id: 'hogeId',
-      data: () => ({
-        lorem: 'ipsum',
-      }),
-    };
-    const mockedDocs = [snapshot];
+    const querySnapshot = stubInterface<firestore.QueryDocumentSnapshot>();
+    const mockedDocs = [querySnapshot];
 
     const mockedQueryResult: firestore.QuerySnapshot = {
       ...stubInterface<firestore.QuerySnapshot>(),
@@ -171,6 +159,12 @@ describe('getCollection', () => {
       .stub(firestore, 'getFirestore')
       .returns(firestoreInstance);
 
+    const snapshot = stubInterface<DocumentSnapshot>();
+
+    const wrapFirebaseSnapshot = sinon
+      .stub(util, 'wrapFirebaseSnapshot')
+      .returns(snapshot);
+
     const app = stubInterface<App>();
 
     // act
@@ -180,29 +174,17 @@ describe('getCollection', () => {
     assert.isTrue(getFirestore.calledOnceWith(app));
     assert.isTrue(firestoreInstance.collection.calledOnceWith('fooCollection'));
     assert.isTrue(collection.get.calledOnceWith());
+    assert.isTrue(wrapFirebaseSnapshot.calledOnceWith(querySnapshot));
     const expectedQueryResult = {
-      docs: [
-        {
-          id: 'hogeId',
-          data: {
-            lorem: 'ipsum',
-          },
-        },
-      ],
+      docs: [snapshot],
     };
     assert.deepStrictEqual(queryResult, expectedQueryResult);
   });
 
   it('returns collection with query', async () => {
     // arrange
-    const snapshot: firestore.QueryDocumentSnapshot = {
-      ...stubInterface<firestore.QueryDocumentSnapshot>(),
-      id: 'hogeId',
-      data: () => ({
-        lorem: 'ipsum',
-      }),
-    };
-    const mockedDocs = [snapshot];
+    const querySnapshot = stubInterface<firestore.QueryDocumentSnapshot>();
+    const mockedDocs = [querySnapshot];
 
     const mockedQueryResult: firestore.QuerySnapshot = {
       ...stubInterface<firestore.QuerySnapshot>(),
@@ -222,6 +204,12 @@ describe('getCollection', () => {
       .stub(firestore, 'getFirestore')
       .returns(firestoreInstance);
 
+    const snapshot = stubInterface<DocumentSnapshot>();
+
+    const wrapFirebaseSnapshot = sinon
+      .stub(util, 'wrapFirebaseSnapshot')
+      .returns(snapshot);
+
     const app = stubInterface<App>();
 
     // act
@@ -236,15 +224,9 @@ describe('getCollection', () => {
     assert.isTrue(firestoreInstance.collection.calledOnceWith('fooCollection'));
     assert.isTrue(collection.where.calledOnceWith('foo', '!=', 'bar'));
     assert.isTrue(queryObj.get.calledOnceWith());
+    assert.isTrue(wrapFirebaseSnapshot.calledOnceWith(querySnapshot));
     const expectedQueryResult = {
-      docs: [
-        {
-          id: 'hogeId',
-          data: {
-            lorem: 'ipsum',
-          },
-        },
-      ],
+      docs: [snapshot],
     };
     assert.deepStrictEqual(queryResult, expectedQueryResult);
   });
