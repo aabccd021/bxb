@@ -1,10 +1,5 @@
 // eslint-disable-next-line no-restricted-imports
-import {
-  EventContext,
-  firestore,
-  region,
-  SUPPORTED_REGIONS,
-} from 'firebase-functions';
+import { EventContext } from 'firebase-functions';
 import {
   DocumentSnapshot,
   OnCreateTrigger,
