@@ -2,7 +2,11 @@ import { assert } from 'chai';
 import { App } from 'firebase-admin/app';
 import * as firestore from 'firebase-admin/firestore';
 import sinon, { stubInterface } from 'ts-sinon';
-import { getDoc } from '../../src/wrapper/firebase-admin';
+import { deleteDoc, getDoc } from '../../src/wrapper/firebase-admin';
+
+afterEach(() => {
+  sinon.restore();
+});
 
 describe('getDoc', () => {
   it('gets the document', async () => {
@@ -21,17 +25,16 @@ describe('getDoc', () => {
     const firestoreInstance = stubInterface<firestore.Firestore>();
     firestoreInstance.doc.returns(doc);
 
+    const app = stubInterface<App>();
     const getFirestore = sinon
       .stub(firestore, 'getFirestore')
       .returns(firestoreInstance);
 
-    const app1 = stubInterface<App>();
-
     // act
-    const wrappedSnapshot = await getDoc(app1, 'fooCollection', 'barId');
+    const wrappedSnapshot = await getDoc(app, 'fooCollection', 'barId');
 
     // assert
-    assert.isTrue(getFirestore.calledOnceWith(app1));
+    assert.isTrue(getFirestore.calledOnceWith(app));
     assert.isTrue(firestoreInstance.doc.calledOnceWith('fooCollection/barId'));
     assert.isTrue(doc.get.calledOnceWith());
 
@@ -42,5 +45,32 @@ describe('getDoc', () => {
       id: 'hogeId',
     };
     assert.deepStrictEqual(wrappedSnapshot, expectedSnapshot);
+  });
+});
+
+describe('deleteDoc', () => {
+  it('deletes the document', async () => {
+    // arrange
+    const mockedDeleteResult = stubInterface<firestore.WriteResult>();
+
+    const doc = stubInterface<firestore.DocumentReference>();
+    doc.delete.resolves(mockedDeleteResult);
+
+    const firestoreInstance = stubInterface<firestore.Firestore>();
+    firestoreInstance.doc.returns(doc);
+
+    const app = stubInterface<App>();
+    const getFirestore = sinon
+      .stub(firestore, 'getFirestore')
+      .returns(firestoreInstance);
+
+    // act
+    const deleteResult = await deleteDoc(app, 'fooCollection', 'barId');
+
+    // assert
+    assert.isTrue(getFirestore.calledOnceWith(app));
+    assert.isTrue(firestoreInstance.doc.calledOnceWith('fooCollection/barId'));
+    assert.isTrue(doc.delete.calledOnceWith());
+    assert.deepStrictEqual(deleteResult, mockedDeleteResult);
   });
 });

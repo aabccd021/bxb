@@ -49,7 +49,7 @@ export function deleteDoc(
   collectionName: string,
   documentId: string
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getFirestore(app).collection(collectionName).doc(documentId).delete();
+  return getFirestore(app).doc(`${collectionName}/${documentId}`).delete();
 }
 
 export function createDoc(
