@@ -1,17 +1,14 @@
-import { CountSpec, Dict, DocumentData } from '..';
-import { getViewCollectionName, Mapped, mapValues } from '../util';
 import {
   App,
-  FieldValue,
-  GrpcStatus,
-  updateDoc,
-} from '../wrapper/firebase-admin';
-import {
+  CountSpec,
+  Dict,
+  DocumentData,
   OnCreateTrigger,
-  onCreateTrigger,
-  onDeleteTrigger,
   OnDeleteTrigger,
-} from '../wrapper/firebase-functions';
+} from '../type';
+import { FieldValue, GrpcStatus, updateDoc } from '../firebase-admin';
+import { onCreateTrigger, onDeleteTrigger } from '../firebase-functions';
+import { getViewCollectionName, Mapped, mapValues } from '../util';
 
 function makeOnCountedDocCreatedTrigger(
   app: App,

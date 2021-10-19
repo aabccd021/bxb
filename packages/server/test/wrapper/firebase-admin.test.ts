@@ -2,15 +2,14 @@ import { assert } from 'chai';
 import { App } from 'firebase-admin/app';
 import * as firestore from 'firebase-admin/firestore';
 import sinon, { stubInterface } from 'ts-sinon';
-import { DocumentData } from '../../src';
 import {
-  createDoc,
-  deleteDoc,
-  getCollection,
   getDoc,
+  deleteDoc,
+  createDoc,
   updateDoc,
+  getCollection,
   wrapFirebaseSnapshot,
-} from '../../src/wrapper/firebase-admin';
+} from '../../src/firebase-admin';
 
 afterEach(() => {
   sinon.restore();
@@ -102,7 +101,7 @@ describe('createDoc', () => {
 
     const app = stubInterface<App>();
 
-    const data = stubInterface<DocumentData>();
+    const data = stubInterface<firestore.DocumentData>();
 
     // act
     const createResult = await createDoc(app, 'fooCollection', 'barId', data);
@@ -132,7 +131,7 @@ describe('updateDoc', () => {
 
     const app = stubInterface<App>();
 
-    const data = stubInterface<DocumentData>();
+    const data = stubInterface<firestore.DocumentData>();
 
     // act
     const updateResult = await updateDoc(app, 'fooCollection', 'barId', data);

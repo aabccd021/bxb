@@ -4,7 +4,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
+    "build": "rm -rf lib && tsc --build tsconfig.build.json",
     "lint": "eslint --ext .js,.ts .",
     "test": "nyc --reporter=text --reporter=html mocha -r ts-node/register 'test/**/*.ts'"
   },
@@ -55,7 +55,8 @@
       "sourceType": "module"
     },
     "ignorePatterns": [
-      "**/lib/**/*"
+      "lib/**/*",
+      "coverage/**/*"
     ],
     "overrides": [
       {
@@ -65,6 +66,7 @@
         "rules": {
           "no-restricted-imports": "off",
           "import/no-internal-modules": "off",
+          "import/no-relative-parent-imports": "off",
           "functional/prefer-readonly-type": "off"
         }
       }
@@ -81,6 +83,8 @@
       "plugin:@typescript-eslint/recommended",
       "plugin:functional/lite",
       "plugin:prettier/recommended",
+      "plugin:import/recommended",
+      "plugin:import/typescript",
       "prettier"
     ],
     "rules": {
@@ -129,10 +133,9 @@
           "argsIgnorePattern": "^_"
         }
       ],
-      "import/no-relative-parent-imports": "error",
       "import/no-cycle": "error",
       "import/no-internal-modules": "error",
-      "import/no-useless-path-segments": "error"
+      "import/no-unresolved": "off"
     }
   }
 }

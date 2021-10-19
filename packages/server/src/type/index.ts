@@ -1,9 +1,7 @@
-import { FieldValue } from './wrapper/firebase-admin';
-import {
-  OnCreateTrigger,
-  OnUpdateTrigger,
-  OnDeleteTrigger,
-} from './wrapper/firebase-functions';
+/* eslint-disable no-restricted-imports */
+import { App } from 'firebase-admin/app';
+import { FieldValue } from 'firebase-admin/firestore';
+import { Change, CloudFunction, firestore } from 'firebase-functions';
 
 export type Dict<T> = {
   readonly [key: string]: T;
@@ -74,6 +72,14 @@ export type QuerySnapshot = {
   readonly docs: readonly DocumentSnapshot[];
 };
 
+export type OnCreateTrigger = CloudFunction<firestore.QueryDocumentSnapshot>;
+
+export type OnDeleteTrigger = OnCreateTrigger;
+
+export type OnUpdateTrigger = CloudFunction<
+  Change<firestore.QueryDocumentSnapshot>
+>;
+
 export type ViewTriggers = {
   readonly onSrcDocCreated: OnCreateTrigger;
   readonly onSrcDocUpdated: OnUpdateTrigger;
@@ -87,3 +93,5 @@ export type CollectionTriggers = {
   readonly onRefDocDeleted: Dict<OnDeleteTrigger | undefined>;
   readonly view: Dict<ViewTriggers>;
 };
+
+export type { App };

@@ -1,36 +1,36 @@
-import { isEmpty, mapValues, pick } from 'lodash';
+import { pick, isEmpty, mapValues } from 'lodash';
 import {
-  DocumentSnapshot,
+  App,
   DocumentData,
-  SrcFieldSpec,
   ViewSpec,
-  CollectionSpec,
+  DocumentSnapshot,
+  OnCreateTrigger,
+  OnUpdateTrigger,
+  OnDeleteTrigger,
   Dict,
-  CollectionTriggers,
+  SrcFieldSpec,
   ViewTriggers,
-} from './type';
-import { getViewCollectionName, getDocDataChange } from './util';
+  CollectionSpec,
+  CollectionTriggers,
+} from '../type';
+import {
+  createDoc,
+  updateDoc,
+  deleteDoc,
+  getCollection,
+} from '../firebase-admin';
+import {
+  onCreateTrigger,
+  onUpdateTrigger,
+  onDeleteTrigger,
+} from '../firebase-functions';
+import { getViewCollectionName, getDocDataChange } from '../util';
 import {
   materializeCountViewData,
   onCountedDocCreated,
   onCountedDocDeleted,
-} from './view/count';
-import { materializeJoinViewData, onJoinRefDocUpdated } from './view/join';
-import {
-  App,
-  createDoc,
-  deleteDoc,
-  getCollection,
-  updateDoc,
-} from './wrapper/firebase-admin';
-import {
-  OnCreateTrigger,
-  onCreateTrigger,
-  OnUpdateTrigger,
-  OnDeleteTrigger,
-  onDeleteTrigger,
-  onUpdateTrigger,
-} from './wrapper/firebase-functions';
+} from '../view-count';
+import { materializeJoinViewData, onJoinRefDocUpdated } from '../view-join';
 
 /**
  * Materialize view document data based on given specification.

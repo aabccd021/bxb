@@ -1,6 +1,10 @@
 import { compact, isEmpty, mapValues as lodashMapValues } from 'lodash';
-import { FirestoreDataType } from '.';
-import { DocumentDataChange, DocumentData, Dict } from './type';
+import {
+  Dict,
+  FirestoreDataType,
+  DocumentDataChange,
+  DocumentData,
+} from '../type';
 
 export type Mapped<T extends string | number, VResult> = {
   readonly [P in T]: VResult;

@@ -1,25 +1,21 @@
 // eslint-disable-next-line no-restricted-imports
 import {
-  Change,
-  CloudFunction,
   EventContext,
   firestore,
   region,
   SUPPORTED_REGIONS,
 } from 'firebase-functions';
-import { DocumentChangeSnapshot, DocumentSnapshot } from '../type';
+import {
+  DocumentSnapshot,
+  OnCreateTrigger,
+  DocumentChangeSnapshot,
+  OnUpdateTrigger,
+  OnDeleteTrigger,
+} from '../type';
 
 /**
  * Type safe and convenience firebase-functions wrapper
  */
-
-export type OnCreateTrigger = CloudFunction<firestore.QueryDocumentSnapshot>;
-
-export type OnDeleteTrigger = OnCreateTrigger;
-
-export type OnUpdateTrigger = CloudFunction<
-  Change<firestore.QueryDocumentSnapshot>
->;
 
 function getDocTrigger(
   collectionName: string,

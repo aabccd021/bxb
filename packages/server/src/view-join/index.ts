@@ -1,29 +1,23 @@
 import { isEmpty, mapKeys, mapValues, pick } from 'lodash';
+import { getDoc, getCollection, updateDoc } from '../firebase-admin';
+import { onUpdateTrigger } from '../firebase-functions';
 
 import {
+  App,
   Dict,
   DocumentData,
   DocumentSnapshot,
   JoinSpec,
+  OnUpdateTrigger,
   RefSpec,
 } from '../type';
 import {
   compactObject,
+  mergeObjectArray,
   getDocDataChange,
   getViewCollectionName,
   throwRejectedPromises,
-  mergeObjectArray,
 } from '../util';
-import {
-  getDoc,
-  getCollection,
-  updateDoc,
-  App,
-} from '../wrapper/firebase-admin';
-import {
-  onUpdateTrigger,
-  OnUpdateTrigger,
-} from '../wrapper/firebase-functions';
 
 /**
  * Recursively returns a document referred by join view. Returns latest document
