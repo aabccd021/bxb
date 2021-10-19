@@ -8,7 +8,6 @@ import {
   createDoc,
   updateDoc,
   getCollection,
-  wrapFirebaseSnapshot,
 } from '../../src/firebase-admin';
 
 afterEach(() => {
@@ -251,23 +250,3 @@ describe('getCollection', () => {
   });
 });
 
-describe('wrapFirebaseSnapshot', () => {
-  it('returns empty object if data is undefined', () => {
-    // arrange
-    const snapshot: firestore.DocumentSnapshot = {
-      ...stubInterface<firestore.DocumentSnapshot>(),
-      id: 'hogeId',
-      data: () => undefined,
-    };
-
-    // act
-    const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
-
-    // assert
-    const expectedSnapshot = {
-      id: 'hogeId',
-      data: {},
-    };
-    assert.deepStrictEqual(wrappedSnapshot, expectedSnapshot);
-  });
-});

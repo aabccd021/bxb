@@ -1,18 +1,14 @@
 // eslint-disable-next-line no-restricted-imports
 import { App } from 'firebase-admin/app';
 // eslint-disable-next-line no-restricted-imports
-import {
-  DocumentSnapshot as FirestoreDocumentSnapshot,
-  FieldValue,
-  getFirestore,
-  GrpcStatus,
-} from 'firebase-admin/firestore';
+import { FieldValue, getFirestore, GrpcStatus } from 'firebase-admin/firestore';
 import {
   DocumentData,
   DocumentSnapshot,
   QuerySnapshot,
   WriteDocumentData,
 } from '../type';
+import { wrapFirebaseSnapshot } from './util';
 
 /**
  * Type safe and convenience firebase-admin wrapper
@@ -20,12 +16,6 @@ import {
 
 export type { App };
 export { FieldValue, GrpcStatus };
-
-export function wrapFirebaseSnapshot(
-  snapshot: FirestoreDocumentSnapshot
-): DocumentSnapshot {
-  return { id: snapshot.id, data: snapshot.data() ?? {} };
-}
 
 export async function getDoc(
   app: App,

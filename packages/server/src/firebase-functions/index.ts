@@ -12,32 +12,11 @@ import {
   OnUpdateTrigger,
   OnDeleteTrigger,
 } from '../type';
+import { getDocTrigger, wrapFirebaseSnapshot } from './util';
 
 /**
  * Type safe and convenience firebase-functions wrapper
  */
-
-function getDocTrigger(
-  collectionName: string,
-  options?: {
-    readonly regions?: ReadonlyArray<typeof SUPPORTED_REGIONS[number] | string>;
-  }
-): firestore.DocumentBuilder {
-  const functionWithRegion =
-    options?.regions !== undefined
-      ? region(...options.regions).firestore
-      : firestore;
-  return functionWithRegion.document(`${collectionName}/{documentId}`);
-}
-
-export function wrapFirebaseSnapshot(
-  snapshot: firestore.QueryDocumentSnapshot
-): DocumentSnapshot {
-  return {
-    id: snapshot.id,
-    data: snapshot.data(),
-  };
-}
 
 export function onCreateTrigger(
   collectionName: string,
