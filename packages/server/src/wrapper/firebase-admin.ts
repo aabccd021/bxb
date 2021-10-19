@@ -67,10 +67,7 @@ export function updateDoc(
   documentId: string,
   data: WriteDocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getFirestore(app)
-    .collection(collectionName)
-    .doc(documentId)
-    .update(data);
+  return getFirestore(app).doc(`${collectionName}/${documentId}`).update(data);
 }
 
 export async function getCollection(
