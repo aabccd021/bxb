@@ -13,9 +13,9 @@ import {
   OnUpdateTrigger,
 } from '../../src';
 import {
-  onCreateTrigger,
-  onDeleteTrigger,
-  onUpdateTrigger,
+  makeOnCreateTrigger,
+  makeOnDeleteTrigger,
+  makeOnUpdateTrigger,
 } from '../../src/firebase-functions';
 import * as functionUtil from '../../src/firebase-functions/util';
 import * as util from '../../src/util';
@@ -25,8 +25,8 @@ describe('firebase-functions', () => {
     sinon.restore();
   });
 
-  describe('onCreateTrigger', () => {
-    it('make on create trigger', async () => {
+  describe('makeOnCreateTrigger', () => {
+    it('make onCreateTrigger', async () => {
       // arrange
       const mockedTrigger = stubInterface<OnCreateTrigger>();
 
@@ -55,7 +55,7 @@ describe('firebase-functions', () => {
         .returns(wrappedSnapshot);
 
       // act
-      const trigger = onCreateTrigger('fooCol', handler);
+      const trigger = makeOnCreateTrigger('fooCol', handler);
       const [triggerHandler] = documentBuilder.onCreate.getCall(0).args;
       const handlerResult = triggerHandler(triggerSnapshot, context);
 
@@ -68,8 +68,8 @@ describe('firebase-functions', () => {
     });
   });
 
-  describe('onUpdateTrigger', () => {
-    it('make on create trigger', async () => {
+  describe('makeOnUpdateTrigger', () => {
+    it('make onUpdateTrigger', async () => {
       // arrange
       const mockedTrigger = stubInterface<OnUpdateTrigger>();
 
@@ -98,7 +98,7 @@ describe('firebase-functions', () => {
         .returns(wrappedChange);
 
       // act
-      const trigger = onUpdateTrigger('fooCol', handler);
+      const trigger = makeOnUpdateTrigger('fooCol', handler);
       const [triggerHandler] = documentBuilder.onUpdate.getCall(0).args;
       const handlerResult = triggerHandler(triggerSnapshot, context);
 
@@ -111,8 +111,8 @@ describe('firebase-functions', () => {
     });
   });
 
-  describe('onDeleteTrigger', () => {
-    it('make on delete trigger', async () => {
+  describe('makeOnDeleteTrigger', () => {
+    it('make onDeleteTrigger', async () => {
       // arrange
       const mockedTrigger = stubInterface<OnDeleteTrigger>();
 
@@ -141,7 +141,7 @@ describe('firebase-functions', () => {
         .returns(wrappedSnapshot);
 
       // act
-      const trigger = onDeleteTrigger('fooCol', handler);
+      const trigger = makeOnDeleteTrigger('fooCol', handler);
       const [triggerHandler] = documentBuilder.onDelete.getCall(0).args;
       const handlerResult = triggerHandler(triggerSnapshot, context);
 

@@ -14,7 +14,7 @@ import { getDocTrigger } from './util';
  * Type safe and convenience firebase-functions wrapper
  */
 
-export function onCreateTrigger(
+export function makeOnCreateTrigger(
   collectionName: string,
   handler: OnCreateTriggerHandler
 ): OnCreateTrigger {
@@ -25,7 +25,7 @@ export function onCreateTrigger(
   });
 }
 
-export function onUpdateTrigger(
+export function makeOnUpdateTrigger(
   collectionName: string,
   handler: OnUpdateTriggerHandler
 ): OnUpdateTrigger {
@@ -36,7 +36,7 @@ export function onUpdateTrigger(
   });
 }
 
-export function onDeleteTrigger(
+export function makeOnDeleteTrigger(
   collectionName: string,
   handler: OnDeleteTriggerHandler
 ): OnDeleteTrigger {

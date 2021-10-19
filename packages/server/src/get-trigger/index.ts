@@ -20,9 +20,9 @@ import {
   getCollection,
 } from '../firebase-admin';
 import {
-  onCreateTrigger,
-  onUpdateTrigger,
-  onDeleteTrigger,
+  makeOnCreateTrigger,
+  makeOnUpdateTrigger,
+  makeOnDeleteTrigger,
 } from '../firebase-functions';
 import { getViewCollectionName, getDocDataChange } from '../util';
 import {
@@ -103,7 +103,7 @@ function onSrcDocCreated(
   viewName: string,
   viewSpec: ViewSpec
 ): OnCreateTrigger {
-  return onCreateTrigger(collectionName, async (srcDoc) =>
+  return makeOnCreateTrigger(collectionName, async (srcDoc) =>
     createViewDoc(app, collectionName, viewName, srcDoc, viewSpec)
   );
 }
@@ -125,7 +125,7 @@ function onSrcDocUpdated(
   viewName: string,
   selectedFieldNames: readonly string[]
 ): OnUpdateTrigger {
-  return onUpdateTrigger(collectionName, async (srcDoc) => {
+  return makeOnUpdateTrigger(collectionName, async (srcDoc) => {
     const allDocDataUpdate = getDocDataChange(srcDoc.data);
 
     const selectViewUpdateData = pick(allDocDataUpdate, selectedFieldNames);
@@ -161,7 +161,7 @@ function onSrcDocDeleted(
   collectionName: string,
   viewName: string
 ): OnDeleteTrigger {
-  return onDeleteTrigger(collectionName, async (srcDoc) => {
+  return makeOnDeleteTrigger(collectionName, async (srcDoc) => {
     const viewDocId = srcDoc.id;
     const viewCollectionName = getViewCollectionName(collectionName, viewName);
     await deleteDoc(app, viewCollectionName, viewDocId);
@@ -191,7 +191,7 @@ function onSrcRefDocDeleted(
     }
     const { refCollection } = sourceField;
     const refidFieldName = sourceFieldName;
-    return onDeleteTrigger(refCollection, async (refDoc) => {
+    return makeOnDeleteTrigger(refCollection, async (refDoc) => {
       const referrerSrcDocsSnapshot = await getCollection(
         app,
         collectionName,

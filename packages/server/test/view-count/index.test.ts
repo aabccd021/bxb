@@ -32,7 +32,7 @@ describe('view-count', () => {
     const mockedTrigger = stubInterface<OnDeleteTrigger>();
     const mockedTrigger2 = stubInterface<OnDeleteTrigger>();
     const onDeleteTrigger = sinon
-      .stub(functions, 'onDeleteTrigger')
+      .stub(functions, 'makeOnDeleteTrigger')
       .returns(mockedTrigger)
       .onSecondCall()
       .returns(mockedTrigger2);

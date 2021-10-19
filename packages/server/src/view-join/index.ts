@@ -1,6 +1,6 @@
 import { isEmpty, mapKeys, mapValues, pick } from 'lodash';
 import { getDoc, getCollection, updateDoc } from '../firebase-admin';
-import { onUpdateTrigger } from '../firebase-functions';
+import { makeOnUpdateTrigger } from '../firebase-functions';
 
 import {
   App,
@@ -214,7 +214,7 @@ function makeOnJoinRefDocUpdatedTrigger(
 ): OnUpdateTrigger {
   const refCollectionName = makeJoinRefCollectionName(spec);
 
-  return onUpdateTrigger(refCollectionName, async (refDoc) => {
+  return makeOnUpdateTrigger(refCollectionName, async (refDoc) => {
     const allDocDataUpdate = getDocDataChange(refDoc.data);
     const docDataUpdate = pick(allDocDataUpdate, spec.selectedFieldNames);
 
