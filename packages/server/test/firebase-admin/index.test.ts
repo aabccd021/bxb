@@ -20,6 +20,7 @@ describe('firebase-admin', () => {
     it('gets the document', async () => {
       // arrange
       const firestoreSnapshot = stubInterface<firestore.DocumentSnapshot>();
+      const firestoreSnapshot2 = stubInterface<firestore.DocumentSnapshot>();
 
       const doc = stubInterface<firestore.DocumentReference>();
       doc.get.resolves(firestoreSnapshot);
@@ -48,7 +49,10 @@ describe('firebase-admin', () => {
         firestoreInstance.doc.calledOnceWith('fooCollection/barId')
       );
       assert.isTrue(doc.get.calledOnceWith());
+
       assert.isTrue(wrapFirebaseSnapshot.calledOnceWith(firestoreSnapshot));
+      assert.isFalse(wrapFirebaseSnapshot.calledOnceWith(firestoreSnapshot2));
+
       assert.equal(wrappedSnapshot, snapshot);
     });
   });
@@ -87,6 +91,7 @@ describe('firebase-admin', () => {
     it('creates  document', async () => {
       // arrange
       const mockedCreateResult = stubInterface<firestore.WriteResult>();
+      const mockedCreateResult2 = stubInterface<firestore.WriteResult>();
 
       const doc = stubInterface<firestore.DocumentReference>();
       doc.create.resolves(mockedCreateResult);
@@ -99,19 +104,27 @@ describe('firebase-admin', () => {
         .returns(firestoreInstance);
 
       const app = stubInterface<App>();
+      const app2 = stubInterface<App>();
 
       const data = stubInterface<firestore.DocumentData>();
+      const data2 = stubInterface<firestore.DocumentData>();
 
       // act
       const createResult = await createDoc(app, 'fooCollection', 'barId', data);
 
       // assert
       assert.isTrue(getFirestore.calledOnceWith(app));
+      assert.isFalse(getFirestore.calledOnceWith(app2));
+
       assert.isTrue(
         firestoreInstance.doc.calledOnceWith('fooCollection/barId')
       );
+
       assert.isTrue(doc.create.calledOnceWith(data));
-      assert.deepStrictEqual(createResult, mockedCreateResult);
+      assert.isFalse(doc.create.calledOnceWith(data2));
+
+      assert.equal(createResult, mockedCreateResult);
+      assert.notEqual(createResult, mockedCreateResult2);
     });
   });
 
@@ -119,6 +132,7 @@ describe('firebase-admin', () => {
     it('updates the  document', async () => {
       // arrange
       const mockedUpdateResult = stubInterface<firestore.WriteResult>();
+      const mockedUpdateResult2 = stubInterface<firestore.WriteResult>();
 
       const doc = stubInterface<firestore.DocumentReference>();
       doc.update.resolves(mockedUpdateResult);
@@ -131,19 +145,27 @@ describe('firebase-admin', () => {
         .returns(firestoreInstance);
 
       const app = stubInterface<App>();
+      const app2 = stubInterface<App>();
 
       const data = stubInterface<firestore.DocumentData>();
+      const data2 = stubInterface<firestore.DocumentData>();
 
       // act
       const updateResult = await updateDoc(app, 'fooCollection', 'barId', data);
 
       // assert
       assert.isTrue(getFirestore.calledOnceWith(app));
+      assert.isFalse(getFirestore.calledOnceWith(app2));
+
       assert.isTrue(
         firestoreInstance.doc.calledOnceWith('fooCollection/barId')
       );
+
       assert.isTrue((doc.update as sinon.SinonStub).calledOnceWith(data));
-      assert.deepStrictEqual(updateResult, mockedUpdateResult);
+      assert.isFalse((doc.update as sinon.SinonStub).calledOnceWith(data2));
+
+      assert.equal(updateResult, mockedUpdateResult);
+      assert.notEqual(updateResult, mockedUpdateResult2);
     });
   });
 
