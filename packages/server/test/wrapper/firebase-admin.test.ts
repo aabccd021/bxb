@@ -193,4 +193,61 @@ describe('getCollection', () => {
     };
     assert.deepStrictEqual(queryResult, expectedQueryResult);
   });
+
+  it('returns collection with query', async () => {
+    // arrange
+    // const mockedQueryResult = stubInterface<firestore.QuerySnapshot>();
+    const snapshot: firestore.QueryDocumentSnapshot = {
+      ...stubInterface<firestore.QueryDocumentSnapshot>(),
+      id: 'hogeId',
+      data: () => ({
+        lorem: 'ipsum',
+      }),
+    };
+    const mockedDocs = [snapshot];
+
+    const mockedQueryResult: firestore.QuerySnapshot = {
+      ...stubInterface<firestore.QuerySnapshot>(),
+      docs: mockedDocs,
+    };
+
+    const queryObj = stubInterface<firestore.Query>();
+    queryObj.get.resolves(mockedQueryResult);
+
+    const collection = stubInterface<firestore.CollectionReference>();
+    collection.where.returns(queryObj);
+
+    const firestoreInstance = stubInterface<firestore.Firestore>();
+    firestoreInstance.collection.returns(collection);
+
+    const getFirestore = sinon
+      .stub(firestore, 'getFirestore')
+      .returns(firestoreInstance);
+
+    const app = stubInterface<App>();
+
+    // act
+    const queryResult = await getCollection(
+      app,
+      'fooCollection',
+      (collection) => collection.where('foo', '!=', 'bar')
+    );
+
+    // assert
+    assert.isTrue(getFirestore.calledOnceWith(app));
+    assert.isTrue(firestoreInstance.collection.calledOnceWith('fooCollection'));
+    assert.isTrue(collection.where.calledOnceWith('foo', '!=', 'bar'));
+    assert.isTrue(queryObj.get.calledOnceWith());
+    const expectedQueryResult = {
+      docs: [
+        {
+          id: 'hogeId',
+          data: {
+            lorem: 'ipsum',
+          },
+        },
+      ],
+    };
+    assert.deepStrictEqual(queryResult, expectedQueryResult);
+  });
 });
