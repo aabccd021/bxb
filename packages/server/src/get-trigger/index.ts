@@ -1,30 +1,30 @@
-import { pick, isEmpty, mapValues } from 'lodash';
-import {
-  App,
-  DocumentData,
-  ViewSpec,
-  DocumentSnapshot,
-  OnCreateTrigger,
-  OnUpdateTrigger,
-  OnDeleteTrigger,
-  Dict,
-  SrcFieldSpec,
-  ViewTriggers,
-  CollectionSpec,
-  CollectionTriggers,
-} from '../type';
+import { isEmpty, mapValues, pick } from 'lodash';
 import {
   createDoc,
-  updateDoc,
   deleteDoc,
   getCollection,
+  updateDoc,
 } from '../firebase-admin';
 import {
   makeOnCreateTrigger,
-  makeOnUpdateTrigger,
   makeOnDeleteTrigger,
+  makeOnUpdateTrigger,
 } from '../firebase-functions';
-import { getViewCollectionName, getDocDataChange } from '../util';
+import {
+  App,
+  CollectionSpec,
+  CollectionTriggers,
+  Dict,
+  DocumentData,
+  DocumentSnapshot,
+  OnCreateTrigger,
+  OnDeleteTrigger,
+  OnUpdateTrigger,
+  SrcFieldSpec,
+  ViewSpec,
+  ViewTriggers,
+} from '../type';
+import { getDocDataChange, getViewCollectionName } from '../util';
 import {
   materializeCountViewData,
   onCountedDocCreated,

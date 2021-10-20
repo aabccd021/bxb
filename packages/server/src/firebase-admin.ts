@@ -1,14 +1,14 @@
 /* eslint-disable no-restricted-imports */
-import { App } from 'firebase-admin/app';
 import { FieldValue, getFirestore, GrpcStatus } from 'firebase-admin/firestore';
 import {
+  App,
   DocumentData,
+  DocumentReference,
   DocumentSnapshot,
   QuerySnapshot,
   WriteDocumentData,
-} from '../type';
-import { wrapFirebaseSnapshot } from '../util';
-import { getDocRef } from './util';
+} from './type';
+import { wrapFirebaseSnapshot } from './util';
 
 export const firestore = { FieldValue, GrpcStatus };
 
@@ -16,12 +16,20 @@ export const firestore = { FieldValue, GrpcStatus };
  * Type safe and convenience firebase-admin wrapper
  */
 
+function getDocRef(
+  app: App,
+  collectionName: string,
+  documentId: string
+): DocumentReference {
+  return getFirestore(app).collection(collectionName).doc(documentId);
+}
+
 export async function getDoc(
   app: App,
   collectionName: string,
   documentId: string
 ): Promise<DocumentSnapshot> {
-  const snapshot = await getDocRef(app, collectionName, documentId).get();
+  const snapshot = await _.getDocRef(app, collectionName, documentId).get();
   const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
   return wrappedSnapshot;
 }
@@ -31,7 +39,7 @@ export function deleteDoc(
   collectionName: string,
   documentId: string
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getDocRef(app, collectionName, documentId).delete();
+  return _.getDocRef(app, collectionName, documentId).delete();
 }
 
 export function createDoc(
@@ -40,7 +48,7 @@ export function createDoc(
   documentId: string,
   data: DocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getDocRef(app, collectionName, documentId).create(data);
+  return _.getDocRef(app, collectionName, documentId).create(data);
 }
 
 export function updateDoc(
@@ -49,7 +57,7 @@ export function updateDoc(
   documentId: string,
   data: WriteDocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getDocRef(app, collectionName, documentId).update(data);
+  return _.getDocRef(app, collectionName, documentId).update(data);
 }
 
 export async function getCollection(
@@ -69,3 +77,5 @@ export async function getCollection(
   };
   return wrappedQuerySnapshot;
 }
+
+export const _ = { getDocRef };

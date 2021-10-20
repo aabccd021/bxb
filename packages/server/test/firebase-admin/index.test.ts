@@ -8,14 +8,50 @@ import {
   getCollection,
   getDoc,
   updateDoc,
+  _,
 } from '../../src/firebase-admin';
-import * as adminUtil from '../../src/firebase-admin/util';
 import { App, DocumentSnapshot, WHERE_FILTER_OP } from '../../src/type';
 import * as util from '../../src/util';
 
 describe('firebase-admin', () => {
-  afterEach(() => {
-    sinon.restore();
+  describe('getDocRef', () => {
+    it('gets the DocumentReference', async () => {
+      fc.assert(
+        fc
+          .property(fc.string(), fc.string(), (collectionName, documentId) => {
+            // arrange
+            const mockedDocRef = stubInterface<firestore.DocumentReference>();
+
+            const mockedCollectionRef =
+              stubInterface<firestore.CollectionReference>();
+            mockedCollectionRef.doc.returns(mockedDocRef);
+
+            const mockedFirestore = stubInterface<firestore.Firestore>();
+            mockedFirestore.collection.returns(mockedCollectionRef);
+
+            const mockedGetFirestore = sinon
+              .stub(firestore, 'getFirestore')
+              .returns(mockedFirestore);
+
+            const app = stubInterface<App>();
+            const app2 = stubInterface<App>();
+
+            // act
+            const docRef = _.getDocRef(app, collectionName, documentId);
+
+            // assert
+            assert.isTrue(mockedGetFirestore.calledOnceWith(app));
+            assert.isFalse(mockedGetFirestore.calledOnceWith(app2));
+
+            assert.isTrue(
+              mockedFirestore.collection.calledOnceWith(collectionName)
+            );
+            assert.isTrue(mockedCollectionRef.doc.calledOnceWith(documentId));
+            assert.equal(docRef, mockedDocRef);
+          })
+          .afterEach(() => sinon.restore())
+      );
+    });
   });
 
   describe('getDoc', () => {
@@ -36,7 +72,7 @@ describe('firebase-admin', () => {
               mockedDocRef.get.resolves(mockedSnapshot);
 
               const mockedGetDocRef = sinon
-                .stub(adminUtil, 'getDocRef')
+                .stub(_, 'getDocRef')
                 .returns(mockedDocRef);
 
               const mockedWrappedSnapshot = stubInterface<DocumentSnapshot>();
@@ -106,7 +142,7 @@ describe('firebase-admin', () => {
               mockedDocRef.delete.resolves(mockedResult);
 
               const mockedGetDocRef = sinon
-                .stub(adminUtil, 'getDocRef')
+                .stub(_, 'getDocRef')
                 .returns(mockedDocRef);
 
               const mockedApp = stubInterface<App>();
@@ -164,7 +200,7 @@ describe('firebase-admin', () => {
               mockedDocRef.create.resolves(mockedCreateResult);
 
               const mockedGetDocRef = sinon
-                .stub(adminUtil, 'getDocRef')
+                .stub(_, 'getDocRef')
                 .returns(mockedDocRef);
 
               const mockedApp = stubInterface<App>();
@@ -229,7 +265,7 @@ describe('firebase-admin', () => {
               mockedDocRef.update.resolves(mockedUpdateResult);
 
               const mockedGetDocRef = sinon
-                .stub(adminUtil, 'getDocRef')
+                .stub(_, 'getDocRef')
                 .returns(mockedDocRef);
 
               const mockedApp = stubInterface<App>();
