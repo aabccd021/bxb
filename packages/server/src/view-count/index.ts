@@ -11,9 +11,27 @@ import {
   OnCreateTrigger,
   OnCreateTriggerHandler,
   OnDeleteTrigger,
+  OnDeleteTriggerHandler,
+  WriteDocumentData,
 } from '../type';
 import { getViewCollectionName, Mapped, mapValues } from '../util';
-import { makeOnCountedDocDeletedHandler } from './makeOnCountedDocDeletedHandler';
+
+function getStringField(data: DocumentData, fieldName: string): string {
+  const fieldValue = data[fieldName];
+  if (typeof fieldValue !== 'string') {
+    throw Error(`Invalid Type: ${JSON.stringify({ data, fieldName })}`);
+  }
+  return fieldValue;
+}
+
+function makeIncrementDocData(
+  countName: string,
+  value: 1 | -1
+): WriteDocumentData {
+  return {
+    [countName]: firestore.FieldValue.increment(value),
+  };
+}
 
 function makeOnCountedDocCreatedTrigger(
   app: App,
@@ -23,22 +41,12 @@ function makeOnCountedDocCreatedTrigger(
   { groupBy: counterRefIdFieldName }: CountSpec
 ): OnCreateTriggerHandler {
   return async (snapshot): Promise<void> => {
-    const counterDocId = snapshot.data[counterRefIdFieldName];
-    if (typeof counterDocId !== 'string') {
-      throw Error(
-        `Invalid Type: ${JSON.stringify({
-          data: snapshot.data,
-          fieldName: counterRefIdFieldName,
-        })}`
-      );
-    }
+    const counterDocId = _.getStringField(snapshot.data, counterRefIdFieldName);
     const viewCollectionName = getViewCollectionName(
       counterCollectionName,
       viewName
     );
-    const incrementedData = {
-      [countName]: firestore.FieldValue.increment(1),
-    };
+    const incrementedData = _.makeIncrementDocData(countName, 1);
     await updateDoc(app, viewCollectionName, counterDocId, incrementedData);
   };
 }
@@ -65,6 +73,35 @@ export function onCountedDocCreated<T extends string>(
   });
 }
 
+function makeOnCountedDocDeletedHandler(
+  app: App,
+  counterCollectionName: string,
+  viewName: string,
+  countName: string,
+  counterRefIdFieldName: string
+): OnDeleteTriggerHandler {
+  return async (snapshot): Promise<void> => {
+    const counterDocId = _.getStringField(snapshot.data, counterRefIdFieldName);
+    const viewCollectionName = getViewCollectionName(
+      counterCollectionName,
+      viewName
+    );
+    const decrementedData = _.makeIncrementDocData(countName, -1);
+    await updateDoc(
+      app,
+      viewCollectionName,
+      counterDocId,
+      decrementedData
+    ).catch((reason) => {
+      if (reason.code === firestore.GrpcStatus.NOT_FOUND) {
+        // Ignore if counter document not exists.
+        return;
+      }
+      throw reason;
+    });
+  };
+}
+
 export function onCountedDocDeleted(
   app: App,
   counterCollectionName: string,
@@ -72,7 +109,7 @@ export function onCountedDocDeleted(
   countSpecs: Dict<CountSpec>
 ): Dict<OnDeleteTrigger> {
   return mapValues(countSpecs, (countSpec, countName) => {
-    const handler = makeOnCountedDocDeletedHandler(
+    const handler = _.makeOnCountedDocDeletedHandler(
       app,
       counterCollectionName,
       viewName,
@@ -92,3 +129,10 @@ export function materializeCountViewData(
 ): DocumentData {
   return mapValues(countSpecs, () => 0);
 }
+
+export const _ = {
+  makeOnCountedDocDeletedHandler,
+  makeOnCountedDocCreatedTrigger,
+  makeIncrementDocData,
+  getStringField,
+};
