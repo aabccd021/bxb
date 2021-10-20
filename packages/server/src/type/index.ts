@@ -129,3 +129,18 @@ export type FunctionsFirestore = {
   readonly namespace: (namespace: string) => firestore.NamespaceBuilder;
   readonly database: (database: string) => firestore.DatabaseBuilder;
 };
+
+export const WHERE_FILTER_OP = [
+  '<',
+  '<=',
+  '==',
+  '!=',
+  '>=',
+  '>',
+  'array-contains',
+  'in',
+  'not-in',
+  'array-contains-any',
+] as const;
+
+export type WhereFilterOp = typeof WHERE_FILTER_OP[number];

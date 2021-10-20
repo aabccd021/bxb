@@ -10,7 +10,7 @@ import {
   updateDoc,
 } from '../../src/firebase-admin';
 import * as adminUtil from '../../src/firebase-admin/util';
-import { App, DocumentSnapshot } from '../../src/type';
+import { App, DocumentSnapshot, WHERE_FILTER_OP } from '../../src/type';
 import * as util from '../../src/util';
 
 describe('firebase-admin', () => {
@@ -299,58 +299,66 @@ describe('firebase-admin', () => {
     it('returns collection with query', async () => {
       fc.assert(
         fc
-          .asyncProperty(fc.string(), async (collectionName) => {
-            // arrange
-            const querySnapshot =
-              stubInterface<firestore.QueryDocumentSnapshot>();
-            const mockedDocs = [querySnapshot];
+          .asyncProperty(
+            fc.string(),
+            fc.constantFrom(...WHERE_FILTER_OP),
+            fc.string(),
+            fc.string(),
+            async (collectionName, op, fieldKey, fieldValue) => {
+              // arrange
+              const querySnapshot =
+                stubInterface<firestore.QueryDocumentSnapshot>();
+              const mockedDocs = [querySnapshot];
 
-            const mockedQueryResult: firestore.QuerySnapshot = {
-              ...stubInterface<firestore.QuerySnapshot>(),
-              docs: mockedDocs,
-            };
+              const mockedQueryResult: firestore.QuerySnapshot = {
+                ...stubInterface<firestore.QuerySnapshot>(),
+                docs: mockedDocs,
+              };
 
-            const queryObj = stubInterface<firestore.Query>();
-            queryObj.get.resolves(mockedQueryResult);
+              const queryObj = stubInterface<firestore.Query>();
+              queryObj.get.resolves(mockedQueryResult);
 
-            const collection = stubInterface<firestore.CollectionReference>();
-            collection.where.returns(queryObj);
+              const collection = stubInterface<firestore.CollectionReference>();
+              collection.where.returns(queryObj);
 
-            const firestoreInstance = stubInterface<firestore.Firestore>();
-            firestoreInstance.collection.returns(collection);
+              const firestoreInstance = stubInterface<firestore.Firestore>();
+              firestoreInstance.collection.returns(collection);
 
-            const getFirestore = sinon
-              .stub(firestore, 'getFirestore')
-              .returns(firestoreInstance);
+              const getFirestore = sinon
+                .stub(firestore, 'getFirestore')
+                .returns(firestoreInstance);
 
-            const snapshot = stubInterface<DocumentSnapshot>();
+              const snapshot = stubInterface<DocumentSnapshot>();
 
-            const wrapFirebaseSnapshot = sinon
-              .stub(util, 'wrapFirebaseSnapshot')
-              .returns(snapshot);
+              const wrapFirebaseSnapshot = sinon
+                .stub(util, 'wrapFirebaseSnapshot')
+                .returns(snapshot);
 
-            const app = stubInterface<App>();
+              const app = stubInterface<App>();
 
-            // act
-            const queryResult = await getCollection(
-              app,
-              collectionName,
-              (collection) => collection.where('foo', '!=', 'bar')
-            );
+              // act
+              const queryResult = await getCollection(
+                app,
+                collectionName,
+                (collection) => collection.where(fieldKey, op, fieldValue)
+              );
 
-            // assert
-            assert.isTrue(getFirestore.calledOnceWith(app));
-            assert.isTrue(
-              firestoreInstance.collection.calledOnceWith(collectionName)
-            );
-            assert.isTrue(collection.where.calledOnceWith('foo', '!=', 'bar'));
-            assert.isTrue(queryObj.get.calledOnceWith());
-            assert.isTrue(wrapFirebaseSnapshot.calledOnceWith(querySnapshot));
-            const expectedQueryResult = {
-              docs: [snapshot],
-            };
-            assert.deepStrictEqual(queryResult, expectedQueryResult);
-          })
+              // assert
+              assert.isTrue(getFirestore.calledOnceWith(app));
+              assert.isTrue(
+                firestoreInstance.collection.calledOnceWith(collectionName)
+              );
+              assert.isTrue(
+                collection.where.calledOnceWith(fieldKey, '!=', fieldValue)
+              );
+              assert.isTrue(queryObj.get.calledOnceWith());
+              assert.isTrue(wrapFirebaseSnapshot.calledOnceWith(querySnapshot));
+              const expectedQueryResult = {
+                docs: [snapshot],
+              };
+              assert.deepStrictEqual(queryResult, expectedQueryResult);
+            }
+          )
           .afterEach(() => sinon.restore())
       );
     });
