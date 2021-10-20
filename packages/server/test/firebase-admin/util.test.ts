@@ -4,13 +4,13 @@ import { App } from 'firebase-admin/app';
 import * as firestore from 'firebase-admin/firestore';
 import sinon, { stubInterface } from 'ts-sinon';
 import { getDocRef } from '../../src/firebase-admin/util';
-describe('firebase-admin', () => {
+describe('firebase-admin/util', () => {
   afterEach(() => {
     sinon.restore();
   });
 
   describe('getDocRef', () => {
-    it('gets the document', async () => {
+    it('gets the DocumentReference', async () => {
       fc.assert(
         fc
           .property(fc.string(), fc.string(), (collectionName, documentId) => {
@@ -24,7 +24,7 @@ describe('firebase-admin', () => {
             const mockedFirestore = stubInterface<firestore.Firestore>();
             mockedFirestore.collection.returns(mockedCollectionRef);
 
-            const getFirestore = sinon
+            const mockedGetFirestore = sinon
               .stub(firestore, 'getFirestore')
               .returns(mockedFirestore);
 
@@ -35,8 +35,8 @@ describe('firebase-admin', () => {
             const docRef = getDocRef(app, collectionName, documentId);
 
             // assert
-            assert.isTrue(getFirestore.calledOnceWith(app));
-            assert.isFalse(getFirestore.calledOnceWith(app2));
+            assert.isTrue(mockedGetFirestore.calledOnceWith(app));
+            assert.isFalse(mockedGetFirestore.calledOnceWith(app2));
 
             assert.isTrue(
               mockedFirestore.collection.calledOnceWith(collectionName)
