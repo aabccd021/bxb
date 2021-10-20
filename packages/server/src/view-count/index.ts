@@ -1,5 +1,8 @@
 import { firestore, updateDoc } from '../firebase-admin';
-import { makeOnCreateTrigger, makeOnDeleteTrigger } from '../firebase-functions';
+import {
+  makeOnCreateTrigger,
+  makeOnDeleteTrigger,
+} from '../firebase-functions';
 import {
   App,
   CountSpec,
@@ -54,7 +57,10 @@ export function onCountedDocCreated<T extends string>(
       countName,
       countSpec
     );
-    const trigger = makeOnCreateTrigger(countSpec.countedCollectionName, handler);
+    const trigger = makeOnCreateTrigger(
+      countSpec.countedCollectionName,
+      handler
+    );
     return trigger;
   });
 }
@@ -73,7 +79,10 @@ export function onCountedDocDeleted(
       countName,
       countSpec.groupBy
     );
-    const trigger = makeOnDeleteTrigger(countSpec.countedCollectionName, handler);
+    const trigger = makeOnDeleteTrigger(
+      countSpec.countedCollectionName,
+      handler
+    );
     return trigger;
   });
 }

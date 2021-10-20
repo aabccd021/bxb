@@ -356,57 +356,73 @@ describe('firebase-admin', () => {
             fc.string(),
             async (collectionName, op, fieldKey, fieldValue) => {
               // arrange
-              const querySnapshot =
+              const mockedQuerySnapshot =
                 stubInterface<firestore.QueryDocumentSnapshot>();
-              const mockedDocs = [querySnapshot];
+              const mockedQuerySnapshot2 =
+                stubInterface<firestore.QueryDocumentSnapshot>();
 
               const mockedQueryResult: firestore.QuerySnapshot = {
                 ...stubInterface<firestore.QuerySnapshot>(),
-                docs: mockedDocs,
+                docs: [mockedQuerySnapshot],
               };
 
               const queryObj = stubInterface<firestore.Query>();
               queryObj.get.resolves(mockedQueryResult);
 
-              const collection = stubInterface<firestore.CollectionReference>();
-              collection.where.returns(queryObj);
+              const mockedCollectionRef =
+                stubInterface<firestore.CollectionReference>();
+              mockedCollectionRef.where.returns(queryObj);
 
-              const firestoreInstance = stubInterface<firestore.Firestore>();
-              firestoreInstance.collection.returns(collection);
+              const mockedFirestore = stubInterface<firestore.Firestore>();
+              mockedFirestore.collection.returns(mockedCollectionRef);
 
-              const getFirestore = sinon
+              const mockedGetFirestore = sinon
                 .stub(firestore, 'getFirestore')
-                .returns(firestoreInstance);
+                .returns(mockedFirestore);
 
-              const snapshot = stubInterface<DocumentSnapshot>();
+              const mockedSnapshot = stubInterface<DocumentSnapshot>();
+              const mockedSnapshot2 = stubInterface<DocumentSnapshot>();
 
-              const wrapFirebaseSnapshot = sinon
+              const mockedWrapFirebaseSnapshot = sinon
                 .stub(util, 'wrapFirebaseSnapshot')
-                .returns(snapshot);
+                .returns(mockedSnapshot);
 
-              const app = stubInterface<App>();
+              const mockedApp = stubInterface<App>();
+              const mockedApp2 = stubInterface<App>();
 
               // act
               const queryResult = await getCollection(
-                app,
+                mockedApp,
                 collectionName,
                 (collection) => collection.where(fieldKey, op, fieldValue)
               );
 
               // assert
-              assert.isTrue(getFirestore.calledOnceWith(app));
+              assert.isTrue(mockedGetFirestore.calledOnceWith(mockedApp));
+              assert.isFalse(mockedGetFirestore.calledOnceWith(mockedApp2));
+
               assert.isTrue(
-                firestoreInstance.collection.calledOnceWith(collectionName)
+                mockedFirestore.collection.calledOnceWith(collectionName)
               );
+
+              assert.isTrue(mockedCollectionRef.get.calledOnceWith());
+
               assert.isTrue(
-                collection.where.calledOnceWith(fieldKey, '!=', fieldValue)
+                mockedWrapFirebaseSnapshot.calledOnceWith(mockedQuerySnapshot)
               );
-              assert.isTrue(queryObj.get.calledOnceWith());
-              assert.isTrue(wrapFirebaseSnapshot.calledOnceWith(querySnapshot));
-              const expectedQueryResult = {
-                docs: [snapshot],
-              };
-              assert.deepStrictEqual(queryResult, expectedQueryResult);
+              assert.isFalse(
+                mockedWrapFirebaseSnapshot.calledOnceWith(mockedQuerySnapshot2)
+              );
+
+              assert.equal(queryResult.docs[0], mockedSnapshot);
+              assert.notEqual(queryResult.docs[0], mockedSnapshot2);
+              assert.isTrue(
+                mockedCollectionRef.where.calledOnceWith(
+                  fieldKey,
+                  '!=',
+                  fieldValue
+                )
+              );
             }
           )
           .afterEach(() => sinon.restore())
