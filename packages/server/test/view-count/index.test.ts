@@ -9,7 +9,6 @@ describe('view-count', () => {
   describe('onCountedDocDeleted', () => {
     // arrange
     const mockedApp = stubInterface<App>();
-    const mockedApp2 = stubInterface<App>();
     const countSpecs = {
       articleCount: {
         groupBy: 'articleAuthorUserId',
@@ -57,17 +56,6 @@ describe('view-count', () => {
           'articleAuthorUserId'
         )
     );
-    assert.isFalse(
-      wrappedMakeHandler
-        .getCall(0)
-        .calledWith(
-          mockedApp2,
-          'user',
-          'detail',
-          'articleCount',
-          'articleAuthorUserId'
-        )
-    );
     assert.isTrue(
       wrappedMakeHandler
         .getCall(1)
@@ -79,18 +67,6 @@ describe('view-count', () => {
           'likerUserId'
         )
     );
-    assert.isFalse(
-      wrappedMakeHandler
-        .getCall(1)
-        .calledWith(
-          mockedApp2,
-          'user',
-          'detail',
-          'likedArticleCount',
-          'likerUserId'
-        )
-    );
-
     assert.equal(onDeleteTrigger.callCount, 2);
 
     assert.equal(onDeleteTrigger.getCall(0).args[0], 'article');

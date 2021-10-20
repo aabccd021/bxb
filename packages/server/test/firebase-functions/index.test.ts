@@ -25,7 +25,7 @@ import * as util from '../../src/util';
 
 describe('firebase-functions', () => {
   describe('getDocTrigger', () => {
-    it('get doc trigger with given collectionName', () => {
+    it('get doc trigger with given collectionName', () =>
       fc.assert(
         fc
           .asyncProperty(
@@ -59,10 +59,9 @@ describe('firebase-functions', () => {
             }
           )
           .afterEach(() => sinon.restore())
-      );
-    });
+      ));
 
-    it('get doc trigger with given collectionName and region', () => {
+    it('get doc trigger with given collectionName and region', () =>
       fc.assert(
         fc
           .asyncProperty(
@@ -79,12 +78,12 @@ describe('firebase-functions', () => {
                 .stub(nonTestable, 'getFunctionsFirestore')
                 .returns(functionsFirestore);
 
-              const mockedGetDocPath = sinon
+              const mockedMakeDocTriggerPath = sinon
                 .stub(_, 'makeDocTriggerPath')
                 .returns(docPath);
 
               // act
-              const docTrigger = _.makeDocTrigger('fooCollection', {
+              const docTrigger = _.makeDocTrigger(collectionName, {
                 regions: ['asia-southeast2'],
               });
 
@@ -96,13 +95,14 @@ describe('firebase-functions', () => {
               assert.isTrue(
                 functionsFirestore.document.calledOnceWith(docPath)
               );
-              assert.isTrue(mockedGetDocPath.calledOnceWith(collectionName));
+              assert.isTrue(
+                mockedMakeDocTriggerPath.calledOnceWith(collectionName)
+              );
               assert.equal(docTrigger, mockedDocTrigger);
             }
           )
           .afterEach(() => sinon.restore())
-      );
-    });
+      ));
   });
 
   describe('makeDocTriggerPath', () => {
@@ -118,7 +118,7 @@ describe('firebase-functions', () => {
   });
 
   describe('makeOnCreateTrigger', () => {
-    it('make onCreateTrigger', async () => {
+    it('make onCreateTrigger', () =>
       fc.assert(
         fc
           .asyncProperty(fc.string(), async (collectionName) => {
@@ -162,12 +162,11 @@ describe('firebase-functions', () => {
             assert.equal(handlerResult, mockedHandlerResult);
           })
           .afterEach(() => sinon.restore())
-      );
-    });
+      ));
   });
 
   describe('makeOnUpdateTrigger', () => {
-    it('make onUpdateTrigger', async () => {
+    it('make onUpdateTrigger', () =>
       fc.assert(
         fc
           .asyncProperty(fc.string(), async (collectionName) => {
@@ -214,12 +213,11 @@ describe('firebase-functions', () => {
             assert.equal(handlerResult, mockedHandlerResult);
           })
           .afterEach(() => sinon.restore())
-      );
-    });
+      ));
   });
 
   describe('makeOnDeleteTrigger', () => {
-    it('make onDeleteTrigger', async () => {
+    it('make onDeleteTrigger', () =>
       fc.assert(
         fc
           .asyncProperty(fc.string(), async (collectionName) => {
@@ -263,7 +261,6 @@ describe('firebase-functions', () => {
             assert.equal(handlerResult, mockedHandlerResult);
           })
           .afterEach(() => sinon.restore())
-      );
-    });
+      ));
   });
 });
