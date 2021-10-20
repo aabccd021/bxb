@@ -19,7 +19,7 @@ describe('firebase-admin', () => {
   });
 
   describe('getDoc', () => {
-    it('gets the document', async () => {
+    it('gets the document', () => {
       fc.assert(
         fc
           .asyncProperty(

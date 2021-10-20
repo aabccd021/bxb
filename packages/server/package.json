@@ -99,7 +99,12 @@
         }
       ],
       "no-unsafe-optional-chaining": "error",
-      "no-use-before-define": "error",
+      "no-use-before-define": [
+        "error",
+        {
+          "variables": false
+        }
+      ],
       "no-else-return": "error",
       "no-useless-return": "error",
       "no-undef-init": "error",
