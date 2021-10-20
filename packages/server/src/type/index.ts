@@ -13,9 +13,16 @@ import {
   firestore,
   SUPPORTED_REGIONS,
 } from 'firebase-functions';
+import { DocumentBuilder } from 'firebase-functions/v1/firestore';
 
-export type { FirestoreDocumentSnapshot, Change, QueryDocumentSnapshot };
-export type { App, DocumentReference };
+export type {
+  FirestoreDocumentSnapshot,
+  Change,
+  QueryDocumentSnapshot,
+  App,
+  DocumentReference,
+  DocumentBuilder,
+};
 
 export type Dict<T> = {
   readonly [key: string]: T;
