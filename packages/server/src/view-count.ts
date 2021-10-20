@@ -1,8 +1,5 @@
 import { firestore, updateDoc } from './firebase-admin';
-import {
-  makeOnCreateTrigger,
-  makeOnDeleteTrigger,
-} from './firebase-functions';
+import { makeOnCreateTrigger, makeOnDeleteTrigger } from './firebase-functions';
 import {
   App,
   CountSpec,

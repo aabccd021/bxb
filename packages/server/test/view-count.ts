@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import sinon, { stubInterface } from 'ts-sinon';
-import * as functions from '../../src/firebase-functions';
-import { App, OnDeleteTrigger, OnDeleteTriggerHandler } from '../../src/type';
-import { onCountedDocDeleted, _ } from '../../src/view-count';
+import * as functions from '../src/firebase-functions';
+import { App, OnDeleteTrigger, OnDeleteTriggerHandler } from '../src/type';
+import { onCountedDocDeleted, _ } from '../src/view-count';
 // eslint-disable-next-line max-len
 
 describe('view-count', () => {
@@ -36,36 +36,19 @@ describe('view-count', () => {
       .returns(mockedTrigger2);
 
     // act
-    const triggers = onCountedDocDeleted(
-      mockedApp,
-      'user',
-      'detail',
-      countSpecs
-    );
+    const triggers = onCountedDocDeleted(mockedApp, 'user', 'detail', countSpecs);
 
     // assert
     assert.isTrue(wrappedMakeHandler.calledTwice);
     assert.isTrue(
       wrappedMakeHandler
         .getCall(0)
-        .calledWith(
-          mockedApp,
-          'user',
-          'detail',
-          'articleCount',
-          'articleAuthorUserId'
-        )
+        .calledWith(mockedApp, 'user', 'detail', 'articleCount', 'articleAuthorUserId')
     );
     assert.isTrue(
       wrappedMakeHandler
         .getCall(1)
-        .calledWith(
-          mockedApp,
-          'user',
-          'detail',
-          'likedArticleCount',
-          'likerUserId'
-        )
+        .calledWith(mockedApp, 'user', 'detail', 'likedArticleCount', 'likerUserId')
     );
     assert.equal(onDeleteTrigger.callCount, 2);
 

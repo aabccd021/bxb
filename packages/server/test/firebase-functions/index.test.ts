@@ -1,10 +1,7 @@
 import { assert } from 'chai';
 import * as fc from 'fast-check';
 import { Change, EventContext } from 'firebase-functions/v1';
-import {
-  DocumentBuilder,
-  QueryDocumentSnapshot,
-} from 'firebase-functions/v1/firestore';
+import { DocumentBuilder, QueryDocumentSnapshot } from 'firebase-functions/v1/firestore';
 import sinon, { stubInterface } from 'ts-sinon';
 import {
   DocumentChangeSnapshot,
@@ -28,79 +25,59 @@ describe('firebase-functions', () => {
     it('get doc trigger with given collectionName', () =>
       fc.assert(
         fc
-          .asyncProperty(
-            fc.string(),
-            fc.string(),
-            async (collectionName, docPath) => {
-              // arrange
-              const mockedDocTrigger = stubInterface<DocumentBuilder>();
+          .property(fc.string(), fc.string(), (collectionName, docPath) => {
+            // arrange
+            const mockedDocTrigger = stubInterface<DocumentBuilder>();
 
-              const functionsFirestore = stubInterface<FunctionsFirestore>();
-              functionsFirestore.document.returns(mockedDocTrigger);
+            const functionsFirestore = stubInterface<FunctionsFirestore>();
+            functionsFirestore.document.returns(mockedDocTrigger);
 
-              const mockedGetFunctionsFirestore = sinon
-                .stub(nonTestable, 'getFunctionsFirestore')
-                .returns(functionsFirestore);
+            const mockedGetFunctionsFirestore = sinon
+              .stub(nonTestable, 'getFunctionsFirestore')
+              .returns(functionsFirestore);
 
-              const mockedGetDocPath = sinon
-                .stub(_, 'makeDocTriggerPath')
-                .returns(docPath);
+            const mockedGetDocPath = sinon.stub(_, 'makeDocTriggerPath').returns(docPath);
 
-              // act
-              const docTrigger = _.makeDocTrigger(collectionName);
+            // act
+            const docTrigger = _.makeDocTrigger(collectionName);
 
-              //assert
-              assert.isTrue(mockedGetFunctionsFirestore.calledOnceWith());
-              assert.isTrue(
-                functionsFirestore.document.calledOnceWith(docPath)
-              );
-              assert.isTrue(mockedGetDocPath.calledOnceWith(collectionName));
-              assert.equal(docTrigger, mockedDocTrigger);
-            }
-          )
+            //assert
+            assert.isTrue(mockedGetFunctionsFirestore.calledOnceWith());
+            assert.isTrue(functionsFirestore.document.calledOnceWith(docPath));
+            assert.isTrue(mockedGetDocPath.calledOnceWith(collectionName));
+            assert.equal(docTrigger, mockedDocTrigger);
+          })
           .afterEach(() => sinon.restore())
       ));
 
     it('get doc trigger with given collectionName and region', () =>
       fc.assert(
         fc
-          .asyncProperty(
-            fc.string(),
-            fc.string(),
-            async (collectionName, docPath) => {
-              // arrange
-              const mockedDocTrigger = stubInterface<DocumentBuilder>();
+          .property(fc.string(), fc.string(), (collectionName, docPath) => {
+            // arrange
+            const mockedDocTrigger = stubInterface<DocumentBuilder>();
 
-              const functionsFirestore = stubInterface<FunctionsFirestore>();
-              functionsFirestore.document.returns(mockedDocTrigger);
+            const functionsFirestore = stubInterface<FunctionsFirestore>();
+            functionsFirestore.document.returns(mockedDocTrigger);
 
-              const mockedGetFunctionsFirestore = sinon
-                .stub(nonTestable, 'getFunctionsFirestore')
-                .returns(functionsFirestore);
+            const mockedGetFunctionsFirestore = sinon
+              .stub(nonTestable, 'getFunctionsFirestore')
+              .returns(functionsFirestore);
 
-              const mockedMakeDocTriggerPath = sinon
-                .stub(_, 'makeDocTriggerPath')
-                .returns(docPath);
+            const mockedMakeDocTriggerPath = sinon.stub(_, 'makeDocTriggerPath').returns(docPath);
 
-              // act
-              const docTrigger = _.makeDocTrigger(collectionName, {
-                regions: ['asia-southeast2'],
-              });
+            // act
+            const docTrigger = _.makeDocTrigger(collectionName, {
+              regions: ['asia-southeast2'],
+            });
 
-              //assert
-              assert.isTrue(
-                mockedGetFunctionsFirestore.calledOnceWith(['asia-southeast2'])
-              );
+            //assert
+            assert.isTrue(mockedGetFunctionsFirestore.calledOnceWith(['asia-southeast2']));
 
-              assert.isTrue(
-                functionsFirestore.document.calledOnceWith(docPath)
-              );
-              assert.isTrue(
-                mockedMakeDocTriggerPath.calledOnceWith(collectionName)
-              );
-              assert.equal(docTrigger, mockedDocTrigger);
-            }
-          )
+            assert.isTrue(functionsFirestore.document.calledOnceWith(docPath));
+            assert.isTrue(mockedMakeDocTriggerPath.calledOnceWith(collectionName));
+            assert.equal(docTrigger, mockedDocTrigger);
+          })
           .afterEach(() => sinon.restore())
       ));
   });
@@ -121,23 +98,18 @@ describe('firebase-functions', () => {
     it('make onCreateTrigger', () =>
       fc.assert(
         fc
-          .asyncProperty(fc.string(), async (collectionName) => {
+          .property(fc.string(), (collectionName) => {
             // arrange
             const mockedTrigger = stubInterface<OnCreateTrigger>();
 
             const documentBuilder = stubInterface<DocumentBuilder>();
             documentBuilder.onCreate.returns(mockedTrigger);
 
-            const mockedMakeDocTrigger = sinon
-              .stub(_, 'makeDocTrigger')
-              .returns(documentBuilder);
+            const mockedMakeDocTrigger = sinon.stub(_, 'makeDocTrigger').returns(documentBuilder);
 
             const mockedHandlerResult = stubInterface<Promise<unknown>>();
 
-            const handler = sinon.stub<
-              Parameters<OnCreateTrigger>,
-              ReturnType<OnCreateTrigger>
-            >();
+            const handler = sinon.stub<Parameters<OnCreateTrigger>, ReturnType<OnCreateTrigger>>();
             handler.returns(mockedHandlerResult);
 
             const triggerSnapshot = stubInterface<QueryDocumentSnapshot>();
@@ -169,27 +141,21 @@ describe('firebase-functions', () => {
     it('make onUpdateTrigger', () =>
       fc.assert(
         fc
-          .asyncProperty(fc.string(), async (collectionName) => {
+          .property(fc.string(), (collectionName) => {
             // arrange
             const mockedTrigger = stubInterface<OnUpdateTrigger>();
 
             const documentBuilder = stubInterface<DocumentBuilder>();
             documentBuilder.onUpdate.returns(mockedTrigger);
 
-            const mockedMakeDocTrigger = sinon
-              .stub(_, 'makeDocTrigger')
-              .returns(documentBuilder);
+            const mockedMakeDocTrigger = sinon.stub(_, 'makeDocTrigger').returns(documentBuilder);
 
             const mockedHandlerResult = stubInterface<Promise<unknown>>();
 
-            const handler = sinon.stub<
-              Parameters<OnUpdateTrigger>,
-              ReturnType<OnUpdateTrigger>
-            >();
+            const handler = sinon.stub<Parameters<OnUpdateTrigger>, ReturnType<OnUpdateTrigger>>();
             handler.returns(mockedHandlerResult);
 
-            const triggerSnapshot =
-              stubInterface<Change<QueryDocumentSnapshot>>();
+            const triggerSnapshot = stubInterface<Change<QueryDocumentSnapshot>>();
 
             const wrappedChange = stubInterface<DocumentChangeSnapshot>();
             const context = stubInterface<EventContext>();
@@ -206,9 +172,7 @@ describe('firebase-functions', () => {
             // assert
             assert.isTrue(mockedMakeDocTrigger.calledOnceWith(collectionName));
             assert.equal(trigger, mockedTrigger);
-            assert.isTrue(
-              wrapFirebaseChangeSnapshot.calledOnceWith(triggerSnapshot)
-            );
+            assert.isTrue(wrapFirebaseChangeSnapshot.calledOnceWith(triggerSnapshot));
             assert.isTrue(handler.calledOnceWith(wrappedChange, context));
             assert.equal(handlerResult, mockedHandlerResult);
           })
@@ -220,23 +184,18 @@ describe('firebase-functions', () => {
     it('make onDeleteTrigger', () =>
       fc.assert(
         fc
-          .asyncProperty(fc.string(), async (collectionName) => {
+          .property(fc.string(), (collectionName) => {
             // arrange
             const mockedTrigger = stubInterface<OnDeleteTrigger>();
 
             const documentBuilder = stubInterface<DocumentBuilder>();
             documentBuilder.onDelete.returns(mockedTrigger);
 
-            const mockedMakeDocTrigger = sinon
-              .stub(_, 'makeDocTrigger')
-              .returns(documentBuilder);
+            const mockedMakeDocTrigger = sinon.stub(_, 'makeDocTrigger').returns(documentBuilder);
 
             const mockedHandlerResult = stubInterface<Promise<unknown>>();
 
-            const handler = sinon.stub<
-              Parameters<OnDeleteTrigger>,
-              ReturnType<OnDeleteTrigger>
-            >();
+            const handler = sinon.stub<Parameters<OnDeleteTrigger>, ReturnType<OnDeleteTrigger>>();
             handler.returns(mockedHandlerResult);
 
             const triggerSnapshot = stubInterface<QueryDocumentSnapshot>();

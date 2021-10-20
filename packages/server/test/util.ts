@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import * as firestore from 'firebase-admin/firestore';
 import sinon, { stubInterface } from 'ts-sinon';
-import { wrapFirebaseSnapshot } from '../../src/util';
+import { wrapFirebaseSnapshot } from '../src/util';
 
 describe('util', () => {
   afterEach(() => {

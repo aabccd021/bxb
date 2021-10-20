@@ -68,7 +68,20 @@
           "no-restricted-imports": "off",
           "import/no-internal-modules": "off",
           "import/no-relative-parent-imports": "off",
-          "functional/prefer-readonly-type": "off"
+          "functional/prefer-readonly-type": "off",
+          "prettier/prettier": [
+            "error",
+            {
+              "singleQuote": true,
+              "printWidth": 100
+            }
+          ],
+          "max-len": [
+            "error",
+            {
+              "code": 100
+            }
+          ]
         }
       }
     ],
@@ -125,8 +138,7 @@
       "max-len": [
         "error",
         {
-          "code": 80,
-          "ignorePattern": "^import .*"
+          "code": 80
         }
       ],
       "functional/no-throw-statement": "off",
