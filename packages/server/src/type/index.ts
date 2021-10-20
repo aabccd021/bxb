@@ -1,8 +1,9 @@
 /* eslint-disable no-restricted-imports */
 import { App } from 'firebase-admin/app';
 import {
-  FieldValue,
+  DocumentReference,
   DocumentSnapshot as FirestoreDocumentSnapshot,
+  FieldValue,
   QueryDocumentSnapshot,
 } from 'firebase-admin/firestore';
 import {
@@ -14,6 +15,7 @@ import {
 } from 'firebase-functions';
 
 export type { FirestoreDocumentSnapshot, Change, QueryDocumentSnapshot };
+export type { App, DocumentReference };
 
 export type Dict<T> = {
   readonly [key: string]: T;
@@ -118,16 +120,12 @@ export type OnUpdateTriggerHandler = (
   context: EventContext
 ) => Promise<unknown>;
 
-export type { App };
-
 export type GetDocTriggerOptions = {
   readonly regions?: ReadonlyArray<typeof SUPPORTED_REGIONS[number]>;
 };
 
 export type FunctionsFirestore = {
   readonly document: (path: string) => firestore.DocumentBuilder;
-  /** @hidden */
   readonly namespace: (namespace: string) => firestore.NamespaceBuilder;
-  /** @hidden */
   readonly database: (database: string) => firestore.DatabaseBuilder;
 };

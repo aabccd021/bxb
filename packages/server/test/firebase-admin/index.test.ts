@@ -1,15 +1,16 @@
 import { assert } from 'chai';
 import * as firestore from 'firebase-admin/firestore';
-import * as util from '../../src/util';
 import sinon, { stubInterface } from 'ts-sinon';
 import {
-  getDoc,
-  deleteDoc,
   createDoc,
-  updateDoc,
+  deleteDoc,
   getCollection,
+  getDoc,
+  updateDoc,
 } from '../../src/firebase-admin';
+import * as adminUtil from '../../src/firebase-admin/util';
 import { App, DocumentSnapshot } from '../../src/type';
+import * as util from '../../src/util';
 
 describe('firebase-admin', () => {
   afterEach(() => {
@@ -22,15 +23,12 @@ describe('firebase-admin', () => {
       const firestoreSnapshot = stubInterface<firestore.DocumentSnapshot>();
       const firestoreSnapshot2 = stubInterface<firestore.DocumentSnapshot>();
 
-      const doc = stubInterface<firestore.DocumentReference>();
-      doc.get.resolves(firestoreSnapshot);
+      const mockedDocRef = stubInterface<firestore.DocumentReference>();
+      mockedDocRef.get.resolves(firestoreSnapshot);
 
-      const firestoreInstance = stubInterface<firestore.Firestore>();
-      firestoreInstance.doc.returns(doc);
-
-      const getFirestore = sinon
-        .stub(firestore, 'getFirestore')
-        .returns(firestoreInstance);
+      const getDocRef = sinon
+        .stub(adminUtil, 'getDocRef')
+        .returns(mockedDocRef);
 
       const snapshot = stubInterface<DocumentSnapshot>();
 
@@ -44,11 +42,8 @@ describe('firebase-admin', () => {
       const wrappedSnapshot = await getDoc(app, 'fooCollection', 'barId');
 
       // assert
-      assert.isTrue(getFirestore.calledOnceWith(app));
-      assert.isTrue(
-        firestoreInstance.doc.calledOnceWith('fooCollection/barId')
-      );
-      assert.isTrue(doc.get.calledOnceWith());
+      assert.isTrue(getDocRef.calledOnceWith(app, 'fooCollection', 'barId'));
+      assert.isTrue(mockedDocRef.get.calledOnceWith());
 
       assert.isTrue(wrapFirebaseSnapshot.calledOnceWith(firestoreSnapshot));
       assert.isFalse(wrapFirebaseSnapshot.calledOnceWith(firestoreSnapshot2));
@@ -62,15 +57,12 @@ describe('firebase-admin', () => {
       // arrange
       const mockedDeleteResult = stubInterface<firestore.WriteResult>();
 
-      const doc = stubInterface<firestore.DocumentReference>();
-      doc.delete.resolves(mockedDeleteResult);
+      const mockedDocRef = stubInterface<firestore.DocumentReference>();
+      mockedDocRef.delete.resolves(mockedDeleteResult);
 
-      const firestoreInstance = stubInterface<firestore.Firestore>();
-      firestoreInstance.doc.returns(doc);
-
-      const getFirestore = sinon
-        .stub(firestore, 'getFirestore')
-        .returns(firestoreInstance);
+      const getDocRef = sinon
+        .stub(adminUtil, 'getDocRef')
+        .returns(mockedDocRef);
 
       const app = stubInterface<App>();
 
@@ -78,11 +70,8 @@ describe('firebase-admin', () => {
       const deleteResult = await deleteDoc(app, 'fooCollection', 'barId');
 
       // assert
-      assert.isTrue(getFirestore.calledOnceWith(app));
-      assert.isTrue(
-        firestoreInstance.doc.calledOnceWith('fooCollection/barId')
-      );
-      assert.isTrue(doc.delete.calledOnceWith());
+      assert.isTrue(getDocRef.calledOnceWith(app, 'fooCollection', 'barId'));
+      assert.isTrue(mockedDocRef.delete.calledOnceWith());
       assert.deepStrictEqual(deleteResult, mockedDeleteResult);
     });
   });
@@ -93,15 +82,12 @@ describe('firebase-admin', () => {
       const mockedCreateResult = stubInterface<firestore.WriteResult>();
       const mockedCreateResult2 = stubInterface<firestore.WriteResult>();
 
-      const doc = stubInterface<firestore.DocumentReference>();
-      doc.create.resolves(mockedCreateResult);
+      const mockedDocRef = stubInterface<firestore.DocumentReference>();
+      mockedDocRef.create.resolves(mockedCreateResult);
 
-      const firestoreInstance = stubInterface<firestore.Firestore>();
-      firestoreInstance.doc.returns(doc);
-
-      const getFirestore = sinon
-        .stub(firestore, 'getFirestore')
-        .returns(firestoreInstance);
+      const getDocRef = sinon
+        .stub(adminUtil, 'getDocRef')
+        .returns(mockedDocRef);
 
       const app = stubInterface<App>();
       const app2 = stubInterface<App>();
@@ -113,15 +99,11 @@ describe('firebase-admin', () => {
       const createResult = await createDoc(app, 'fooCollection', 'barId', data);
 
       // assert
-      assert.isTrue(getFirestore.calledOnceWith(app));
-      assert.isFalse(getFirestore.calledOnceWith(app2));
+      assert.isTrue(getDocRef.calledOnceWith(app, 'fooCollection', 'barId'));
+      assert.isFalse(getDocRef.calledOnceWith(app2, 'fooCollection', 'barId'));
 
-      assert.isTrue(
-        firestoreInstance.doc.calledOnceWith('fooCollection/barId')
-      );
-
-      assert.isTrue(doc.create.calledOnceWith(data));
-      assert.isFalse(doc.create.calledOnceWith(data2));
+      assert.isTrue(mockedDocRef.create.calledOnceWith(data));
+      assert.isFalse(mockedDocRef.create.calledOnceWith(data2));
 
       assert.equal(createResult, mockedCreateResult);
       assert.notEqual(createResult, mockedCreateResult2);
@@ -134,15 +116,12 @@ describe('firebase-admin', () => {
       const mockedUpdateResult = stubInterface<firestore.WriteResult>();
       const mockedUpdateResult2 = stubInterface<firestore.WriteResult>();
 
-      const doc = stubInterface<firestore.DocumentReference>();
-      doc.update.resolves(mockedUpdateResult);
+      const mockedDocRef = stubInterface<firestore.DocumentReference>();
+      mockedDocRef.update.resolves(mockedUpdateResult);
 
-      const firestoreInstance = stubInterface<firestore.Firestore>();
-      firestoreInstance.doc.returns(doc);
-
-      const getFirestore = sinon
-        .stub(firestore, 'getFirestore')
-        .returns(firestoreInstance);
+      const getDocRef = sinon
+        .stub(adminUtil, 'getDocRef')
+        .returns(mockedDocRef);
 
       const app = stubInterface<App>();
       const app2 = stubInterface<App>();
@@ -154,15 +133,15 @@ describe('firebase-admin', () => {
       const updateResult = await updateDoc(app, 'fooCollection', 'barId', data);
 
       // assert
-      assert.isTrue(getFirestore.calledOnceWith(app));
-      assert.isFalse(getFirestore.calledOnceWith(app2));
+      assert.isTrue(getDocRef.calledOnceWith(app, 'fooCollection', 'barId'));
+      assert.isFalse(getDocRef.calledOnceWith(app2, 'fooCollection', 'barId'));
 
       assert.isTrue(
-        firestoreInstance.doc.calledOnceWith('fooCollection/barId')
+        (mockedDocRef.update as sinon.SinonStub).calledOnceWith(data)
       );
-
-      assert.isTrue((doc.update as sinon.SinonStub).calledOnceWith(data));
-      assert.isFalse((doc.update as sinon.SinonStub).calledOnceWith(data2));
+      assert.isFalse(
+        (mockedDocRef.update as sinon.SinonStub).calledOnceWith(data2)
+      );
 
       assert.equal(updateResult, mockedUpdateResult);
       assert.notEqual(updateResult, mockedUpdateResult2);

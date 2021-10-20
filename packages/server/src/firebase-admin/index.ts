@@ -8,6 +8,7 @@ import {
   WriteDocumentData,
 } from '../type';
 import { wrapFirebaseSnapshot } from '../util';
+import { getDocRef } from './util';
 
 export const firestore = { FieldValue, GrpcStatus };
 
@@ -20,9 +21,7 @@ export async function getDoc(
   collectionName: string,
   documentId: string
 ): Promise<DocumentSnapshot> {
-  const snapshot = await getFirestore(app)
-    .doc(`${collectionName}/${documentId}`)
-    .get();
+  const snapshot = await getDocRef(app, collectionName, documentId).get();
   const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
   return wrappedSnapshot;
 }
@@ -32,7 +31,7 @@ export function deleteDoc(
   collectionName: string,
   documentId: string
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getFirestore(app).doc(`${collectionName}/${documentId}`).delete();
+  return getDocRef(app, collectionName, documentId).delete();
 }
 
 export function createDoc(
@@ -41,7 +40,7 @@ export function createDoc(
   documentId: string,
   data: DocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getFirestore(app).doc(`${collectionName}/${documentId}`).create(data);
+  return getDocRef(app, collectionName, documentId).create(data);
 }
 
 export function updateDoc(
@@ -50,7 +49,7 @@ export function updateDoc(
   documentId: string,
   data: WriteDocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return getFirestore(app).doc(`${collectionName}/${documentId}`).update(data);
+  return getDocRef(app, collectionName, documentId).update(data);
 }
 
 export async function getCollection(
