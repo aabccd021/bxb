@@ -4,12 +4,12 @@ import {
   deleteDoc,
   getCollection,
   updateDoc,
-} from '../firebase-admin';
+} from './firebase-admin';
 import {
   makeOnCreateTrigger,
   makeOnDeleteTrigger,
   makeOnUpdateTrigger,
-} from '../firebase-functions';
+} from './firebase-functions';
 import {
   App,
   CollectionSpec,
@@ -23,14 +23,14 @@ import {
   SrcFieldSpec,
   ViewSpec,
   ViewTriggers,
-} from '../type';
-import { getDocDataChange, getViewCollectionName } from '../util';
+} from './type';
+import { getDocDataChange, getViewCollectionName } from './util';
 import {
   materializeCountViewData,
   onCountedDocCreated,
   onCountedDocDeleted,
-} from '../view-count';
-import { materializeJoinViewData, onJoinRefDocUpdated } from '../view-join';
+} from './view-count';
+import { materializeJoinViewData, onJoinRefDocUpdated } from './view-join';
 
 /**
  * Materialize view document data based on given specification.

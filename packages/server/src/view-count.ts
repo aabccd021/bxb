@@ -1,8 +1,8 @@
-import { firestore, updateDoc } from '../firebase-admin';
+import { firestore, updateDoc } from './firebase-admin';
 import {
   makeOnCreateTrigger,
   makeOnDeleteTrigger,
-} from '../firebase-functions';
+} from './firebase-functions';
 import {
   App,
   CountSpec,
@@ -13,8 +13,8 @@ import {
   OnDeleteTrigger,
   OnDeleteTriggerHandler,
   WriteDocumentData,
-} from '../type';
-import { getViewCollectionName, Mapped, mapValues } from '../util';
+} from './type';
+import { getViewCollectionName, Mapped, mapValues } from './util';
 
 function getStringField(data: DocumentData, fieldName: string): string {
   const fieldValue = data[fieldName];

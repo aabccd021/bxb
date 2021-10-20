@@ -9,7 +9,7 @@ import {
   Change,
   DocumentChangeSnapshot,
   QueryDocumentSnapshot,
-} from '../type';
+} from './type';
 
 export type Mapped<T extends string | number, VResult> = {
   readonly [P in T]: VResult;
