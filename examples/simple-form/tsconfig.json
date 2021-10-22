@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    // next
     "target": "es5",
     "lib": [
       "dom",
@@ -17,6 +18,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    // masmott
     "noUncheckedIndexedAccess": true,
     "noPropertyAccessFromIndexSignature": true,
     "exactOptionalPropertyTypes": true,
