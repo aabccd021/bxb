@@ -31,15 +31,17 @@ export function useDocCreation<
       const docRef = getDocRef(docKey);
       setDoc(docRef, data)
         .then(() => {
-          setState({ state: "created", id, data, reset });
+          setState({
+            state: "created",
+            reset,
+            createdDoc: {
+              id,
+              data,
+            },
+          });
 
           // update document cache
-          mutateDoc(docKey, {
-            state: "loaded",
-            exists: true,
-            data,
-            revalidate: () => mutateDoc(docKey),
-          });
+          mutateDoc(docKey, { exists: true, data });
 
           updateCountViews({
             updatedCollectionName: collection,

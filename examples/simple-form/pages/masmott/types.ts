@@ -18,6 +18,15 @@ export type DocData = {
   readonly [key: string]: Field;
 };
 
+export type DocSnapshot =
+  | {
+      readonly exists: true;
+      readonly data: DocData;
+    }
+  | {
+      readonly exists: false;
+    };
+
 export type Doc<DD extends DocData = DocData> =
   | { readonly state: "fetching" }
   | {
@@ -37,15 +46,19 @@ export type Doc<DD extends DocData = DocData> =
       readonly revalidate: () => void;
     };
 
+export type DocCreation_NotCreated<
+  CDD extends DocCreationData = DocCreationData
+> = {
+  readonly state: "notCreated";
+  readonly createDoc: (data: CDD) => void;
+};
+
 export type DocCreation<
   DD extends DocData = DocData,
   CDD extends DocCreationData = DocCreationData
 > =
   | { readonly state: "initial" }
-  | {
-      readonly state: "notCreated";
-      readonly createDoc: (data: CDD) => void;
-    }
+  | DocCreation_NotCreated<CDD>
   | {
       readonly state: "error";
       readonly reason: unknown;
@@ -59,14 +72,16 @@ export type DocCreation<
     }
   | {
       readonly state: "created";
-      readonly id: string;
-      readonly data: DD;
+      readonly createdDoc: {
+        readonly id: string;
+        readonly data: DD;
+      };
       readonly reset: () => void;
     };
 
 export type MutateSetDoc = (
   key: DocKey,
-  data?: Doc,
+  data?: DocSnapshot,
   shouldRevalidate?: boolean
 ) => Promise<void>;
 
