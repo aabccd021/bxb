@@ -9,7 +9,6 @@ function sleep(milli: number): Promise<unknown> {
 jest.setTimeout(5000);
 
 describe('masmott', () => {
-
   describe('on single collection', () => {
     it('craete user_card when user created', async () => {
       await admin.firestore().doc('user/kirako').create({
@@ -56,10 +55,7 @@ describe('masmott', () => {
       });
       await sleep(4000);
 
-      const clapDetail = await admin
-        .firestore()
-        .doc('clap_detail/hikaru_46')
-        .get();
+      const clapDetail = await admin.firestore().doc('clap_detail/hikaru_46').get();
       expect(clapDetail.data()).toStrictEqual({
         // TODO: don't generate name
         clappedArticleOwner_bio: 'marinos desu',
@@ -208,5 +204,4 @@ describe('masmott', () => {
       });
     });
   });
-
-})
+});

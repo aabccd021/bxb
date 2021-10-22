@@ -11,6 +11,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "eslint": "eslint ./ --ext ts,tsx",
     "masmott:build": "cd ../../packages/server && yarn build",
     "masmott:copy": "rm -rf node_modules/masmott-server && mkdir node_modules/masmott-server && cp -r ../../packages/server/lib node_modules/masmott-server/lib &&  cp -r ../../packages/server/package.json node_modules/masmott-server/package.json",
     "server:build": "yarn masmott:build  && yarn masmott:copy && tsc --project tsconfig.functions.json",
@@ -21,19 +22,33 @@
     "test": "yarn server:build && yarn server:test:cached"
   },
   "dependencies": {
+    "firebase": "^9.1.3",
     "firebase-admin": "^10.0.0",
     "firebase-functions": "^3.15.7",
     "masmott-server": "file:./../../packages/server",
     "next": "11.1.2",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "swr": "^1.0.1"
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^11.1.2",
     "@types/jest": "^27.0.2",
     "@types/react": "17.0.30",
-    "eslint": "8.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
+    "eslint": "^7.22.0",
     "eslint-config-next": "11.1.2",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-no-null": "^1.0.2",
+    "eslint-plugin-only-warn": "^1.0.2",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-tailwindcss": "^1.14.1",
+    "eslint-plugin-ts-immutable": "^0.3.0",
+    "eslint-plugin-unused-imports": "^1.0.1",
     "jest": "^27.2.5",
+    "prettier": "^2.2.1",
     "ts-jest": "^27.0.7",
     "typescript": "4.4.4"
   },
@@ -43,5 +58,85 @@
     "testMatch": [
       "**/test/**/*.test.ts"
     ]
+  },
+  "eslintConfig": {
+    "ignorePatterns": [
+      "**/*.js"
+    ],
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    },
+    "env": {
+      "browser": true,
+      "es2021": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      },
+      "ecmaVersion": 12,
+      "sourceType": "module"
+    },
+    "plugins": [
+      "@typescript-eslint",
+      "no-null",
+      "only-warn",
+      "simple-import-sort",
+      "ts-immutable",
+      "unused-imports",
+      "tailwindcss"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended",
+      "plugin:tailwindcss/recommended",
+      "plugin:ts-immutable/recommended",
+      "plugin:@next/next/recommended",
+      "next/core-web-vitals",
+      "next",
+      "prettier"
+    ],
+    "rules": {
+      "@typescript-eslint/no-empty-function": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "no-null/no-null": "warn",
+      "no-unused-expressions": "off",
+      "react/prop-types": "off",
+      "react/react-in-jsx-scope": "off",
+      "simple-import-sort/exports": "warn",
+      "simple-import-sort/imports": "warn",
+      "ts-immutable/immutable-data": "off",
+      "ts-immutable/prefer-readonly-types": "off",
+      "unused-imports/no-unused-imports-ts": "warn",
+      "prettier/prettier": [
+        "warn",
+        {
+          "singleQuote": true,
+          "printWidth": 100
+        }
+      ],
+      "curly": [
+        "warn",
+        "multi-line"
+      ],
+      "eqeqeq": "warn",
+      "max-len": [
+        "warn",
+        {
+          "code": 100,
+          "comments": 100,
+          "ignoreStrings": true,
+          "ignoreTemplateLiterals": true
+        }
+      ],
+      "max-params": [
+        "warn",
+        3
+      ]
+    }
   }
 }
