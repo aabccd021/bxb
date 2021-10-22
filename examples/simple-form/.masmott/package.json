@@ -1,0 +1,11 @@
+{
+	"main": "functions/index.js",
+	"engines": {
+		"node": "14"
+	},
+	"dependencies": {
+		"masmott-server": "file:./../../../packages/server",
+		"firebase-admin": "^10.0.0",
+		"firebase-functions": "^3.15.7"
+	}
+}
