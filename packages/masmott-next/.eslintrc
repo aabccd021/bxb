@@ -8,17 +8,22 @@
       "experimentalObjectRestSpread": true
     },
     "allowImportExportEverywhere": true,
-    "project": ["**/tsconfig.json"]
+    "project": [
+      "**/tsconfig.json"
+    ]
   },
-  "plugins": ["@typescript-eslint", "react-hooks"],
+  "plugins": [
+    "@typescript-eslint",
+    "react-hooks"
+  ],
   "extends": [
     "eslint:recommended",
-    "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "prettier/@typescript-eslint",
     "plugin:jest-dom/recommended",
-    "plugin:testing-library/react"
+    "plugin:react/recommended",
+    "plugin:testing-library/react",
+    "prettier",
+    "prettier/@typescript-eslint"
   ],
   "settings": {
     "react": {
@@ -32,7 +37,10 @@
     "jest": true
   },
   "rules": {
-    "func-names": [2, "as-needed"],
+    "func-names": [
+      2,
+      "as-needed"
+    ],
     "no-shadow": 0,
     "@typescript-eslint/no-shadow": 2,
     "@typescript-eslint/explicit-function-return-type": 0,
