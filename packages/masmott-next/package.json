@@ -1,0 +1,85 @@
+{
+  "name": "masmott-next",
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "license": "MIT",
+  "dependencies": {
+    "firebase": "^9.1.3",
+    "swr": "^1.0.1"
+  },
+  "devDependencies": {
+    "@swc-node/jest": "1.3.3",
+    "@testing-library/jest-dom": "5.14.1",
+    "@testing-library/react": "12.0.0",
+    "@types/react": "17.0.20",
+    "@typescript-eslint/eslint-plugin": "4.31.0",
+    "@typescript-eslint/parser": "4.31.0",
+    "bunchee": "1.7.1",
+    "eslint": "7.32.0",
+    "eslint-config-prettier": "6.5.0",
+    "eslint-plugin-jest-dom": "3.6.5",
+    "eslint-plugin-react": "7.20.6",
+    "eslint-plugin-react-hooks": "4.1.2",
+    "eslint-plugin-testing-library": "3.10.1",
+    "husky": "2.4.1",
+    "jest": "27.0.6",
+    "lint-staged": "8.2.1",
+    "npm-run-all": "4.1.5",
+    "prettier": "1.18.2",
+    "react": "17.0.1",
+    "react-dom": "17.0.1",
+    "react-dom-experimental": "npm:react-dom@alpha",
+    "react-experimental": "npm:react@alpha",
+    "rimraf": "3.0.2",
+    "typescript": "4.4.3",
+    "yalc": "1.0.0-pre.53"
+  },
+  "peerDependencies": {
+    "react": "^16.11.0 || ^17.0.0 || ^18.0.0"
+  },
+  "module": "./dist/index.esm.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "react-native": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "yarn build:core",
+    "watch": "yalc publish && node scripts/watch.js",
+    "watch:core": "node scripts/watch.js core",
+    "build:core": "bunchee src/index.ts -m --no-sourcemap",
+    "prepublishOnly": "yarn clean && yarn build",
+    "publish-beta": "yarn publish --tag beta",
+    "types:check": "tsc --noEmit --project tsconfig.check.json && tsc --noEmit -p test",
+    "format": "prettier --write ./**/*.{ts,tsx}",
+    "lint": "eslint . --ext .ts,.tsx --cache",
+    "lint:fix": "yarn lint --fix",
+    "test": "jest --coverage",
+    "register": "yarn link && cd node_modules/react && yarn link",
+    "dev-next": "node scripts/dev-next.js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "yarn types:check"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix --cache",
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "resolutions": {
+    "tslib": "2.3.0"
+  }
+}
