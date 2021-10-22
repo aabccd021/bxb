@@ -8,8 +8,14 @@ function init(): void {
   connectFirestoreEmulator(firestore, 'localhost', 8080);
 }
 
+function z(): string {
+  return 'xx';
+}
+
 export function useMasmott(): void {
+  const a  = z();
   useEffect(() => {
     init();
+    console.log(a);
   }, []);
 }

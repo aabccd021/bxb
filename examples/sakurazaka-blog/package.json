@@ -10,8 +10,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "eslint": "eslint ./ --ext ts,tsx",
+    "lint": "eslint ./ --ext ts,tsx",
     "masmott:build": "cd ../../packages/server && yarn build",
     "masmott:copy": "rm -rf node_modules/masmott-server && mkdir node_modules/masmott-server && cp -r ../../packages/server/lib node_modules/masmott-server/lib &&  cp -r ../../packages/server/package.json node_modules/masmott-server/package.json",
     "server:build": "yarn masmott:build  && yarn masmott:copy && tsc --project tsconfig.functions.json",
@@ -96,7 +95,6 @@
       "plugin:tailwindcss/recommended",
       "plugin:ts-immutable/recommended",
       "plugin:@next/next/recommended",
-      "next/core-web-vitals",
       "next",
       "prettier"
     ],
