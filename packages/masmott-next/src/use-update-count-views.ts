@@ -12,7 +12,7 @@ export function useUpdateCountViews(): UpdateCountViews {
           Object.entries(countSpecs).forEach(
             ([
               counterFieldName,
-              { countedCollectionName, groupBy: refIdFieldName }
+              { countedCollectionName, groupBy: refIdFieldName },
             ]) => {
               if (countedCollectionName !== updatedCollectionName) {
                 return
@@ -26,7 +26,7 @@ export function useUpdateCountViews(): UpdateCountViews {
               const viewKey: ViewKey = [viewCollectionName, viewName, viewId]
 
               // update count view if exists in cache
-              updateView(viewKey, viewData => {
+              updateView(viewKey, (viewData) => {
                 const counterFieldValue = viewData[counterFieldName]
                 if (typeof counterFieldValue !== 'number') {
                   throw Error(JSON.stringify({ counterFieldName, viewData }))
@@ -37,7 +37,7 @@ export function useUpdateCountViews(): UpdateCountViews {
 
                 const updatedViewData = {
                   ...viewData,
-                  [counterFieldName]: updatedCounterFieldValue
+                  [counterFieldName]: updatedCounterFieldValue,
                 }
                 return updatedViewData
               })

@@ -1,7 +1,7 @@
 import {
   doc as makeDocRef,
   getDoc,
-  getFirestore
+  getFirestore,
 } from 'firebase/firestore/lite'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
@@ -14,11 +14,11 @@ async function firestoreFetcher(path: string): Promise<DocSnapshot> {
   if (snapshot.exists()) {
     return {
       exists: true,
-      data: snapshot.data()
+      data: snapshot.data(),
     }
   }
   return {
-    exists: false
+    exists: false,
   }
 }
 
@@ -28,10 +28,11 @@ export function useDoc<T extends Doc>(
 ): T {
   const [doc, setDoc] = useState<Doc>({ state: 'fetching' })
   const viewSuffix = viewName !== undefined ? `_${viewName}` : ''
-  const { data: snapshot, error, mutate } = useSWR(
-    `${collectionName}${viewSuffix}/${id}`,
-    firestoreFetcher
-  )
+  const {
+    data: snapshot,
+    error,
+    mutate,
+  } = useSWR(`${collectionName}${viewSuffix}/${id}`, firestoreFetcher)
 
   useEffect(() => {
     if (snapshot === undefined) {
@@ -48,7 +49,7 @@ export function useDoc<T extends Doc>(
         state: 'loaded',
         exists: true,
         data: snapshot.data,
-        revalidate: mutate
+        revalidate: mutate,
       })
       return
     }
@@ -56,7 +57,7 @@ export function useDoc<T extends Doc>(
     setDoc({
       state: 'loaded',
       exists: false,
-      revalidate: mutate
+      revalidate: mutate,
     })
   }, [snapshot, error, mutate])
 

@@ -16,7 +16,7 @@ export function useDocCreation<
   const updateCountViews = useUpdateCountViews()
 
   const [state, setState] = useState<DocCreation>({
-    state: 'initial'
+    state: 'initial',
   })
 
   const reset = useCallback(() => setState({ state: 'initial' }), [])
@@ -36,8 +36,8 @@ export function useDocCreation<
             reset,
             createdDoc: {
               id,
-              data
-            }
+              data,
+            },
           })
 
           // update document cache
@@ -47,7 +47,7 @@ export function useDocCreation<
             updatedCollectionName: collection,
             spec,
             data,
-            incrementValue: 1
+            incrementValue: 1,
           })
           // There is no logic to materialize view, because:
           // (1) A view should not be read before the source document is
@@ -55,12 +55,12 @@ export function useDocCreation<
           // (2) Aggregating or joining from limited document on cache does not
           // make sense
         })
-        .catch(reason =>
+        .catch((reason) =>
           setState({
             state: 'error',
             reason,
             reset,
-            retry: () => createDoc(data)
+            retry: () => createDoc(data),
           })
         )
     },

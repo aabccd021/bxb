@@ -2,7 +2,7 @@ import {
   collection,
   doc,
   DocumentReference,
-  getFirestore
+  getFirestore,
 } from 'firebase/firestore/lite'
 import { DocKey } from './types'
 

@@ -5,11 +5,11 @@ import { useMutateView } from './use-mutate-view'
 export function useDeleteView(): DeleteView {
   const mutateView = useMutateView()
   const deleteView = useCallback<DeleteView>(
-    key => {
+    (key) => {
       mutateView(key, {
         state: 'loaded',
         exists: false,
-        revalidate: () => mutateView(key)
+        revalidate: () => mutateView(key),
       })
     },
     [mutateView]
