@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
-import { useSWRConfig } from 'swr';
+import { useCallback } from "react";
+import { useSWRConfig } from "swr";
 
-import { Doc, DocData, DocKey, ViewKey } from './types';
+import { Doc, DocData, DocKey, ViewKey } from "./types";
 
 type MutateUpdateView = (
   key: ViewKey,
@@ -21,14 +21,17 @@ function useMutateView(): MutateUpdateView {
   return mutateView;
 }
 
-export type UpdateView = (key: ViewKey, mutate: (data: DocData) => DocData) => void;
+export type UpdateView = (
+  key: ViewKey,
+  mutate: (data: DocData) => DocData
+) => void;
 
 export function useUpdateView(): UpdateView {
   const mutateView = useMutateView();
   const updateView = useCallback<UpdateView>(
     (key, mutate) => {
       mutateView(key, (doc) => {
-        if (doc?.state === 'loaded' && doc.exists) {
+        if (doc?.state === "loaded" && doc.exists) {
           const mutatedData = mutate(doc.data);
           return { ...doc, data: mutatedData };
         }
@@ -47,7 +50,7 @@ export function useDeleteView(): DeleteView {
   const deleteView = useCallback<DeleteView>(
     (key) => {
       mutateView(key, {
-        state: 'loaded',
+        state: "loaded",
         exists: false,
         revalidate: () => mutateView(key),
       });
@@ -57,7 +60,11 @@ export function useDeleteView(): DeleteView {
   return deleteView;
 }
 
-export type MutateSetDoc = (key: DocKey, data?: Doc, shouldRevalidate?: boolean) => Promise<void>;
+export type MutateSetDoc = (
+  key: DocKey,
+  data?: Doc,
+  shouldRevalidate?: boolean
+) => Promise<void>;
 
 export function useMutateDoc(): MutateSetDoc {
   const { mutate } = useSWRConfig();

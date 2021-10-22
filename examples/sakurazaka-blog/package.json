@@ -31,23 +31,11 @@
     "swr": "^1.0.1"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^11.1.2",
     "@types/jest": "^27.0.2",
     "@types/react": "17.0.30",
-    "@typescript-eslint/eslint-plugin": "^4.18.0",
-    "@typescript-eslint/parser": "^4.18.0",
-    "eslint": "^7.22.0",
-    "eslint-config-next": "11.1.2",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-no-null": "^1.0.2",
-    "eslint-plugin-only-warn": "^1.0.2",
-    "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-simple-import-sort": "^7.0.0",
-    "eslint-plugin-tailwindcss": "^1.14.1",
-    "eslint-plugin-ts-immutable": "^0.3.0",
-    "eslint-plugin-unused-imports": "^1.0.1",
+    "eslint": "^7.32.0",
+    "eslint-config-masmott": "file:./../../packages/eslint-config-masmott",
     "jest": "^27.2.5",
-    "prettier": "^2.2.1",
     "ts-jest": "^27.0.7",
     "typescript": "4.4.4"
   },
@@ -59,82 +47,6 @@
     ]
   },
   "eslintConfig": {
-    "ignorePatterns": [
-      "**/*.js"
-    ],
-    "settings": {
-      "react": {
-        "version": "detect"
-      }
-    },
-    "env": {
-      "browser": true,
-      "es2021": true
-    },
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "ecmaFeatures": {
-        "jsx": true
-      },
-      "ecmaVersion": 12,
-      "sourceType": "module"
-    },
-    "plugins": [
-      "@typescript-eslint",
-      "no-null",
-      "only-warn",
-      "simple-import-sort",
-      "ts-immutable",
-      "unused-imports",
-      "tailwindcss"
-    ],
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:prettier/recommended",
-      "plugin:tailwindcss/recommended",
-      "plugin:ts-immutable/recommended",
-      "plugin:@next/next/recommended",
-      "next",
-      "prettier"
-    ],
-    "rules": {
-      "@typescript-eslint/no-empty-function": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "no-null/no-null": "warn",
-      "no-unused-expressions": "off",
-      "react/prop-types": "off",
-      "react/react-in-jsx-scope": "off",
-      "simple-import-sort/exports": "warn",
-      "simple-import-sort/imports": "warn",
-      "ts-immutable/immutable-data": "off",
-      "ts-immutable/prefer-readonly-types": "off",
-      "unused-imports/no-unused-imports-ts": "warn",
-      "prettier/prettier": [
-        "warn",
-        {
-          "singleQuote": true,
-          "printWidth": 100
-        }
-      ],
-      "curly": [
-        "warn",
-        "multi-line"
-      ],
-      "eqeqeq": "warn",
-      "max-len": [
-        "warn",
-        {
-          "code": 100,
-          "comments": 100,
-          "ignoreStrings": true,
-          "ignoreTemplateLiterals": true
-        }
-      ],
-      "max-params": [
-        "warn",
-        3
-      ]
-    }
+    "extends": "masmott"
   }
 }

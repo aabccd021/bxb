@@ -1,59 +1,59 @@
 export type Field = string | number;
 
-export type DocKey = [string, string];
+export type DocKey = readonly [string, string];
 
-export type ViewKey = [string, string, string];
+export type ViewKey = readonly [string, string, string];
 
 export type DocCreationData = {
-  [key: string]: Field;
+  readonly [key: string]: Field;
 };
 
 export type DocData = {
-  [key: string]: Field;
+  readonly [key: string]: Field;
 };
 
 export type Doc<DD extends DocData = DocData> =
-  | { state: 'fetching' }
+  | { readonly state: "fetching" }
   | {
-      state: 'error';
-      reason: unknown;
-      revalidate: () => void;
+      readonly state: "error";
+      readonly reason: unknown;
+      readonly revalidate: () => void;
     }
   | {
-      state: 'loaded';
-      exists: true;
-      data: DD;
-      revalidate: () => void;
+      readonly state: "loaded";
+      readonly exists: true;
+      readonly data: DD;
+      readonly revalidate: () => void;
     }
   | {
-      state: 'loaded';
-      exists: false;
-      revalidate: () => void;
+      readonly state: "loaded";
+      readonly exists: false;
+      readonly revalidate: () => void;
     };
 
 export type DocCreation<
   DD extends DocData = DocData,
   CDD extends DocCreationData = DocCreationData
 > =
-  | { state: 'initial' }
+  | { readonly state: "initial" }
   | {
-      state: 'notCreated';
-      createDoc: (data: CDD) => void;
+      readonly state: "notCreated";
+      readonly createDoc: (data: CDD) => void;
     }
   | {
-      state: 'error';
-      reason: unknown;
-      retry: () => void;
-      reset: () => void;
+      readonly state: "error";
+      readonly reason: unknown;
+      readonly retry: () => void;
+      readonly reset: () => void;
     }
   | {
-      state: 'creating';
-      id: string;
-      data: DD;
+      readonly state: "creating";
+      readonly id: string;
+      readonly data: DD;
     }
   | {
-      state: 'created';
-      id: string;
-      data: DD;
-      reset: () => void;
+      readonly state: "created";
+      readonly id: string;
+      readonly data: DD;
+      readonly reset: () => void;
     };

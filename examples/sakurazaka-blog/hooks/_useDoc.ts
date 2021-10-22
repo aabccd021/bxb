@@ -6,14 +6,23 @@ import {
   getDoc,
   getFirestore,
   setDoc as firestoreSetDoc,
-} from 'firebase/firestore/lite';
-import { Dictionary } from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
-import useSWR from 'swr';
+} from "firebase/firestore/lite";
+import { useCallback, useEffect, useState } from "react";
+import useSWR from "swr";
+import { useMutateDoc, useUpdateView } from "./mutate";
+import { CollectionSpec } from "./type";
+import {
+  Doc,
+  DocCreation,
+  DocCreationData,
+  DocData,
+  DocKey,
+  ViewKey,
+} from "./types";
 
-import { useMutateDoc, useUpdateView } from './mutate';
-import { CollectionSpec } from './type';
-import { Doc, DocCreation, DocCreationData, DocData, DocKey, ViewKey } from './types';
+type Dictionary<T> = {
+  readonly [key: string]: T;
+};
 
 function firestoreFetcher(path: string): Promise<DocumentSnapshot<DocData>> {
   const firestore = getFirestore();
@@ -22,14 +31,14 @@ function firestoreFetcher(path: string): Promise<DocumentSnapshot<DocData>> {
 }
 
 export function getId(): string {
-  return 'a';
+  return "a";
 }
 
 type UpdateCountViews = (p: {
-  updatedCollectionName: string;
-  spec: Dictionary<CollectionSpec>;
-  incrementValue: 1 | -1;
-  data: DocData;
+  readonly updatedCollectionName: string;
+  readonly spec: Dictionary<CollectionSpec>;
+  readonly incrementValue: 1 | -1;
+  readonly data: DocData;
 }) => void;
 
 function useUpdateCountViews(): UpdateCountViews {
@@ -40,13 +49,17 @@ function useUpdateCountViews(): UpdateCountViews {
       Object.entries(spec).forEach(([viewCollectionName, { views }]) =>
         Object.entries(views).forEach(([viewName, { countSpecs }]) =>
           countSpecs.forEach(
-            ({ countedCollectionName, fieldName: counterFieldName, groupBy: refIdFieldName }) => {
+            ({
+              countedCollectionName,
+              fieldName: counterFieldName,
+              groupBy: refIdFieldName,
+            }) => {
               if (countedCollectionName !== updatedCollectionName) {
                 return;
               }
 
               const viewId = data[refIdFieldName];
-              if (typeof viewId !== 'string') {
+              if (typeof viewId !== "string") {
                 throw Error(JSON.stringify({ data, refIdFieldName }));
               }
 
@@ -55,11 +68,12 @@ function useUpdateCountViews(): UpdateCountViews {
               // update count view if exists in cache
               updateView(viewKey, (viewData) => {
                 const counterFieldValue = viewData[counterFieldName];
-                if (typeof counterFieldValue !== 'number') {
+                if (typeof counterFieldValue !== "number") {
                   throw Error(JSON.stringify({ counterFieldName, viewData }));
                 }
 
-                const updatedCounterFieldValue = counterFieldValue + incrementValue;
+                const updatedCounterFieldValue =
+                  counterFieldValue + incrementValue;
 
                 const updatedViewData = {
                   ...viewData,
@@ -87,26 +101,26 @@ export function _useDocCreation(
   const updateCountViews = useUpdateCountViews();
 
   const [state, setState] = useState<DocCreation>({
-    state: 'initial',
+    state: "initial",
   });
 
-  const reset = useCallback(() => setState({ state: 'initial' }), []);
+  const reset = useCallback(() => setState({ state: "initial" }), []);
 
   const createDoc = useCallback(
     (data: DocCreationData) => {
       const id = getId();
 
-      setState({ state: 'creating', id, data });
+      setState({ state: "creating", id, data });
 
       const docKey: DocKey = [collectionName, id];
       const docRef = getDocRef(docKey);
       firestoreSetDoc(docRef, data)
         .then(() => {
-          setState({ state: 'created', id, data, reset });
+          setState({ state: "created", id, data, reset });
 
           // update document cache
           mutateDoc(docKey, {
-            state: 'loaded',
+            state: "loaded",
             exists: true,
             data,
             revalidate: () => mutateDoc(docKey),
@@ -126,7 +140,7 @@ export function _useDocCreation(
         })
         .catch((reason) =>
           setState({
-            state: 'error',
+            state: "error",
             reason,
             reset,
             retry: () => createDoc(data),
@@ -137,18 +151,24 @@ export function _useDocCreation(
   );
 
   useEffect(() => {
-    if (state.state === 'initial') {
-      setState({ state: 'notCreated', createDoc });
+    if (state.state === "initial") {
+      setState({ state: "notCreated", createDoc });
     }
   }, [createDoc, state]);
 
   return state;
 }
 
-export function _useViewable([collectionName, id]: DocKey, viewName: string | undefined): Doc {
-  const [doc, setDoc] = useState<Doc>({ state: 'fetching' });
-  const viewSuffix = viewName !== undefined ? `_${viewName}` : '';
-  const { data, error, mutate } = useSWR(`${collectionName}${viewSuffix}/${id}`, firestoreFetcher);
+export function _useViewable(
+  [collectionName, id]: DocKey,
+  viewName: string | undefined
+): Doc {
+  const [doc, setDoc] = useState<Doc>({ state: "fetching" });
+  const viewSuffix = viewName !== undefined ? `_${viewName}` : "";
+  const { data, error, mutate } = useSWR(
+    `${collectionName}${viewSuffix}/${id}`,
+    firestoreFetcher
+  );
 
   useEffect(() => {
     if (data === undefined) {
@@ -156,13 +176,13 @@ export function _useViewable([collectionName, id]: DocKey, viewName: string | un
     }
 
     if (error) {
-      setDoc({ state: 'error', reason: error, revalidate: mutate });
+      setDoc({ state: "error", reason: error, revalidate: mutate });
       return;
     }
 
     if (data.exists()) {
       setDoc({
-        state: 'loaded',
+        state: "loaded",
         exists: true,
         data: data.data(),
         revalidate: mutate,
@@ -171,7 +191,7 @@ export function _useViewable([collectionName, id]: DocKey, viewName: string | un
     }
 
     setDoc({
-      state: 'loaded',
+      state: "loaded",
       exists: false,
       revalidate: mutate,
     });

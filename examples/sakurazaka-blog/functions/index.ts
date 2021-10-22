@@ -1,5 +1,5 @@
-import { initializeApp } from 'firebase-admin/app';
-import { makeMasmottTriggers } from 'masmott-server';
+import { initializeApp } from "firebase-admin/app";
+import { makeMasmottTriggers } from "masmott-server";
 
 const app = initializeApp();
 
@@ -7,15 +7,15 @@ export const triggers = makeMasmottTriggers(app, {
   user: {
     src: {
       uid: {
-        type: 'string',
+        type: "string",
       },
       bio: {
-        type: 'string',
+        type: "string",
       },
     },
     views: {
       card: {
-        selectedFieldNames: ['bio'],
+        selectedFieldNames: ["bio"],
         joinSpecs: {},
         countSpecs: {},
       },
@@ -24,8 +24,8 @@ export const triggers = makeMasmottTriggers(app, {
         joinSpecs: {},
         countSpecs: {
           articleCount: {
-            countedCollectionName: 'article',
-            groupBy: 'ownerUser',
+            countedCollectionName: "article",
+            groupBy: "ownerUser",
           },
         },
       },
@@ -34,11 +34,11 @@ export const triggers = makeMasmottTriggers(app, {
   article: {
     src: {
       text: {
-        type: 'string',
+        type: "string",
       },
       ownerUser: {
-        type: 'refId',
-        refCollection: 'user',
+        type: "refId",
+        refCollection: "user",
       },
     },
     views: {
@@ -47,8 +47,8 @@ export const triggers = makeMasmottTriggers(app, {
         joinSpecs: {},
         countSpecs: {
           commentCount: {
-            countedCollectionName: 'comment',
-            groupBy: 'commentedArticle',
+            countedCollectionName: "comment",
+            groupBy: "commentedArticle",
           },
         },
       },
@@ -57,8 +57,8 @@ export const triggers = makeMasmottTriggers(app, {
   clap: {
     src: {
       clappedArticle: {
-        type: 'refId',
-        refCollection: 'article',
+        type: "refId",
+        refCollection: "article",
       },
     },
     views: {
@@ -67,16 +67,16 @@ export const triggers = makeMasmottTriggers(app, {
         joinSpecs: {
           clappedArticleOwner: {
             firstRef: {
-              collectionName: 'article',
-              fieldName: 'clappedArticle',
+              collectionName: "article",
+              fieldName: "clappedArticle",
             },
             refChain: [
               {
-                collectionName: 'user',
-                fieldName: 'ownerUser',
+                collectionName: "user",
+                fieldName: "ownerUser",
               },
             ],
-            selectedFieldNames: ['bio'],
+            selectedFieldNames: ["bio"],
           },
         },
         countSpecs: {},
@@ -86,11 +86,11 @@ export const triggers = makeMasmottTriggers(app, {
   comment: {
     src: {
       text: {
-        type: 'string',
+        type: "string",
       },
       commentedArticle: {
-        type: 'refId',
-        refCollection: 'article',
+        type: "refId",
+        refCollection: "article",
       },
     },
     views: {},

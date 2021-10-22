@@ -1,94 +1,101 @@
-import { _useDocCreation, _useViewable } from './_useDoc';
-import { CollectionSpec, Dictionary } from './type';
-import { Doc, DocCreation } from './types';
+import { CollectionSpec, Dictionary } from "./type";
+import { Doc, DocCreation } from "./types";
+import { _useDocCreation, _useViewable } from "./_useDoc";
 
-export type Collection = 'article' | 'user' | 'clap' | 'comment';
+export type Collection = "article" | "user" | "clap" | "comment";
 
-export type View = ['user', 'card'] | ['user', 'detail'] | ['article', 'card'] | ['clap', 'detail'];
+export type View =
+  | readonly ["user", "card"]
+  | readonly ["user", "detail"]
+  | readonly ["article", "card"]
+  | readonly ["clap", "detail"];
 
-export type Viewable = [Collection] | View;
+export type Viewable = readonly [Collection] | View;
 
-export type DocKey<C extends Collection> = [C, string];
+export type DocKey<C extends Collection> = readonly [C, string];
 
 export type User = {
-  uid: string;
-  bio: string;
+  readonly uid: string;
+  readonly bio: string;
 };
 
 export type User_Card = {
-  bio: string;
+  readonly bio: string;
 };
 
 export type User_Detail = {
-  articleCount: number;
+  readonly articleCount: number;
 };
 
 export type Article = {
-  text: string;
-  ownerUser: string;
+  readonly text: string;
+  readonly ownerUser: string;
 };
 
 export type Article_Card = {
-  commentCount: number;
+  readonly commentCount: number;
 };
 
 export type Clap = {
-  clappedArticle: string;
+  readonly clappedArticle: string;
 };
 
 export type Clap_Detail = {
-  clappedArticle_ownerUser_bio: string;
+  readonly clappedArticle_ownerUser_bio: string;
 };
 
 export type Comment = {
-  text: string;
-  commentedArticle: string;
+  readonly text: string;
+  readonly commentedArticle: string;
 };
 
 export type CreateUser = {
-  uid: string;
-  bio: string;
+  readonly uid: string;
+  readonly bio: string;
 };
 
 export type CreateArticle = {
-  text: string;
-  ownerUser: string;
+  readonly text: string;
+  readonly ownerUser: string;
 };
 
 export type CreateClap = {
-  clappedArticle: string;
+  readonly clappedArticle: string;
 };
 
 export type CreateComment = {
-  text: string;
-  commentedArticle: string;
+  readonly text: string;
+  readonly commentedArticle: string;
 };
 
-export type DataOfViewable<C extends Collection, V extends ViewOf<C> | undefined> = C extends 'user'
-  ? V extends { view: 'card' }
+export type DataOfViewable<
+  C extends Collection,
+  V extends ViewOf<C> | undefined
+> = C extends "user"
+  ? V extends { readonly view: "card" }
     ? User_Card
-    : V extends { view: 'detail' }
+    : V extends { readonly view: "detail" }
     ? User_Detail
     : User
-  : C extends 'article'
-  ? V extends { view: 'card' }
+  : C extends "article"
+  ? V extends { readonly view: "card" }
     ? Article_Card
     : Article
-  : C extends 'clap'
-  ? V extends { view: 'clap_detail' }
+  : C extends "clap"
+  ? V extends { readonly view: "clap_detail" }
     ? Clap_Detail
     : Clap
-  : C extends 'comment'
+  : C extends "comment"
   ? Comment
   : never;
 
-export type CreateDataOfCollection<C extends Collection> = C extends 'user'
+export type CreateDataOfCollection<C extends Collection> = C extends "user"
   ? CreateUser
-  : C extends 'article'
+  : C extends "article"
   ? CreateArticle
-  : C extends 'clap'
+  : C extends "clap"
   ? CreateClap
-  : C extends 'comment'
+  : C extends "comment"
   ? CreateComment
   : never;
 
@@ -96,15 +103,15 @@ export const schema = {
   user: {
     src: {
       uid: {
-        type: 'string',
+        type: "string",
       },
       bio: {
-        type: 'string',
+        type: "string",
       },
     },
     views: {
       card: {
-        selectedFieldNames: ['bio'],
+        selectedFieldNames: ["bio"],
         joinSpecs: [],
         countSpecs: [],
       },
@@ -113,9 +120,9 @@ export const schema = {
         joinSpecs: [],
         countSpecs: [
           {
-            fieldName: 'articleCount',
-            countedCollectionName: 'article',
-            groupBy: 'ownerUser',
+            fieldName: "articleCount",
+            countedCollectionName: "article",
+            groupBy: "ownerUser",
           },
         ],
       },
@@ -124,11 +131,11 @@ export const schema = {
   article: {
     src: {
       text: {
-        type: 'string',
+        type: "string",
       },
       ownerUser: {
-        type: 'refId',
-        refCollection: 'user',
+        type: "refId",
+        refCollection: "user",
       },
     },
     views: {
@@ -137,9 +144,9 @@ export const schema = {
         joinSpecs: [],
         countSpecs: [
           {
-            fieldName: 'commentCount',
-            countedCollectionName: 'comment',
-            groupBy: 'commentedArticle',
+            fieldName: "commentCount",
+            countedCollectionName: "comment",
+            groupBy: "commentedArticle",
           },
         ],
       },
@@ -148,8 +155,8 @@ export const schema = {
   clap: {
     src: {
       clappedArticle: {
-        type: 'refId',
-        refCollection: 'article',
+        type: "refId",
+        refCollection: "article",
       },
     },
     views: {
@@ -158,16 +165,16 @@ export const schema = {
         joinSpecs: [
           {
             firstRef: {
-              collectionName: 'article',
-              fieldName: 'clappedArticle',
+              collectionName: "article",
+              fieldName: "clappedArticle",
             },
             refChain: [
               {
-                collectionName: 'user',
-                fieldName: 'ownerUser',
+                collectionName: "user",
+                fieldName: "ownerUser",
               },
             ],
-            selectedFieldNames: ['bio'],
+            selectedFieldNames: ["bio"],
           },
         ],
         countSpecs: [],
@@ -177,11 +184,11 @@ export const schema = {
   comment: {
     src: {
       text: {
-        type: 'string',
+        type: "string",
       },
       commentedArticle: {
-        type: 'refId',
-        refCollection: 'article',
+        type: "refId",
+        refCollection: "article",
       },
     },
     views: {},
@@ -191,19 +198,19 @@ export const schema = {
 export function useDocCreation<C extends Collection>(
   collectionName: C
 ): DocCreation<DataOfViewable<C, undefined>, CreateDataOfCollection<C>> {
-  return _useDocCreation(collectionName, schema as Dictionary<CollectionSpec>) as DocCreation<
-    DataOfViewable<C, undefined>,
-    CreateDataOfCollection<C>
-  >;
+  return _useDocCreation(
+    collectionName,
+    schema as Dictionary<CollectionSpec>
+  ) as DocCreation<DataOfViewable<C, undefined>, CreateDataOfCollection<C>>;
 }
 
-export type ViewOf<C extends Collection> = C extends 'user'
-  ? { view: 'card' | 'detail' }
-  : C extends 'article'
-  ? { view: 'card' }
-  : C extends 'clap'
-  ? { view: 'detail' }
-  : C extends 'comment'
+export type ViewOf<C extends Collection> = C extends "user"
+  ? { readonly view: "card" | "detail" }
+  : C extends "article"
+  ? { readonly view: "card" }
+  : C extends "clap"
+  ? { readonly view: "detail" }
+  : C extends "comment"
   ? never
   : never;
 

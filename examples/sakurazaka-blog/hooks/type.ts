@@ -3,11 +3,11 @@ export interface Dictionary<T> {
 }
 
 export type StringFieldSpec = {
-  readonly type: 'string';
+  readonly type: "string";
 };
 
 export type RefIdFieldSpec = {
-  readonly type: 'refId';
+  readonly type: "refId";
   readonly refCollection: string;
 };
 

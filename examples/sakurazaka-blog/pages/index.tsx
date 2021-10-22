@@ -1,22 +1,22 @@
-import type { NextPage } from 'next';
+import type { NextPage } from "next";
 
-import { useDocCreation } from '../hooks/useDoc';
+import { useDocCreation } from "../hooks/useDoc";
 
 const Home: NextPage = () => {
-  const userCreation = useDocCreation('article');
+  const userCreation = useDocCreation("article");
   const { state } = userCreation;
   return (
     <>
-      {state === 'initial' && <div>Initial</div>}
-      {state === 'creating' && <div>Creating</div>}
-      {state === 'error' && <div>Error</div>}
-      {state === 'created' && <div>Created</div>}
-      {state === 'notCreated' && (
+      {state === "initial" && <div>Initial</div>}
+      {state === "creating" && <div>Creating</div>}
+      {state === "error" && <div>Error</div>}
+      {state === "created" && <div>Created</div>}
+      {state === "notCreated" && (
         <>
           Not Created
           <button
             onClick={() => {
-              userCreation.createDoc({ text: 'a', ownerUser: 'a' });
+              userCreation.createDoc({ text: "a", ownerUser: "a" });
             }}
           >
             Create
