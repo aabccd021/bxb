@@ -1,4 +1,4 @@
-import { CollectionSpec } from "masmott-server";
+import { CollectionSpec } from "./masmott/core/types";
 import { Doc, DocCreation } from "./masmott/types";
 import { useDoc } from "./masmott/use-doc";
 import { useDocCreation } from "./masmott/use-doc-creation";

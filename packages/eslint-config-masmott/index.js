@@ -4,6 +4,9 @@ module.exports = {
 		'only-warn',
 		'ts-immutable'
 	],
+	ignorePatterns: [
+		"**/*.js"
+	],
 	extends: [
 		'eslint:recommended',
 		'plugin:@typescript-eslint/recommended',

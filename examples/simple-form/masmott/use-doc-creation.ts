@@ -1,6 +1,6 @@
 import { setDoc } from "firebase/firestore/lite";
-import { CollectionSpec, Dict } from "masmott-server";
 import { useCallback, useEffect, useState } from "react";
+import { CollectionSpec, Dict } from "./core/types";
 import { getDocRef } from "./get-doc-ref";
 import { getId } from "./get-id";
 import { DocCreation, DocCreationData, DocData, DocKey } from "./types";

@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
-import { PostCreationData, usePost, usePostCreation } from "./generated";
-import { DocCreation_NotCreated } from "./masmott/types";
-import { useInput } from "./masmott/use-input";
+import { PostCreationData, usePost, usePostCreation } from "../generated";
+import { DocCreation_NotCreated } from "../masmott/types";
+import { useInput } from "../masmott/use-input";
 
 function PostCard(props: { readonly id: string }): JSX.Element {
   const post = usePost(props.id);
@@ -53,4 +53,5 @@ const Home: NextPage = () => {
     </>
   );
 };
+
 export default Home;

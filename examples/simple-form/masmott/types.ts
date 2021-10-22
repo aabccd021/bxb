@@ -1,8 +1,4 @@
-import { CollectionSpec } from "masmott-server";
-
-export type Dict<T> = {
-  readonly [key: string]: T;
-};
+import { CollectionSpec, Dict } from "./core/types";
 
 export type Field = string | number;
 
