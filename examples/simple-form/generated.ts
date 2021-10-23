@@ -1,3 +1,5 @@
+// NOTE: This file should not be edited
+
 import { CollectionSpec } from "./masmott/core/types";
 import { Doc, DocCreation } from "./masmott/types";
 import { useDoc } from "./masmott/use-doc";

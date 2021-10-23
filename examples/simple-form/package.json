@@ -2,16 +2,23 @@
   "name": "simple-form",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "14"
+  },
+  "main": "server.js",
   "scripts": {
     "lint": "eslint ./ --ext ts,tsx",
-    "server:build": "cd .masmott && rm -rf functions && tsc",
-    "server:dev:cached": "cd .masmott && firebase emulators:start",
+    "server:build": "rm -rf .functions && tsc --project tsconfig.functions.json",
+    "server:dev:cached": "firebase emulators:start",
     "server:dev": "yarn server:build && yarn server:dev:cached",
     "client:dev": "next dev",
     "client:build": "next build",
     "client:start": "next start"
   },
   "dependencies": {
+    "firebase-admin": "^10.0.0",
+    "firebase-functions": "^3.15.7",
+    "masmott-server": "file:../../packages/server",
     "firebase": "^9.1.3",
     "next": "11.1.2",
     "react": "17.0.2",
