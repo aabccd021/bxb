@@ -1,15 +1,14 @@
 import { initializeApp } from "firebase-admin/app";
-import { makeMasmottTriggers } from "masmott-server";
+import * as functions from "firebase-functions";
+import next from "next";
+import * as conf from "../next.config";
 
-const app = initializeApp();
+initializeApp();
 
-export const masmott = makeMasmottTriggers(app, {
-  post: {
-    src: {
-      text: {
-        type: "string",
-      },
-    },
-    views: {},
-  },
-});
+const nextjsServer = next({ dev: false, conf });
+
+const nextjsHandle = nextjsServer.getRequestHandler();
+
+export const nextjs = functions.https.onRequest((request, response) =>
+  nextjsServer.prepare().then(() => nextjsHandle(request, response))
+);

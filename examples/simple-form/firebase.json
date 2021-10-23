@@ -33,7 +33,7 @@
 			"rewrites": [
 				{
 					"source": "**",
-					"function": "nextjs-server"
+					"function": "nextjs"
 				}
 			]
 		}

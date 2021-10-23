@@ -34,7 +34,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "functions/zz"  ],
   "exclude": [
     "node_modules"
   ]

@@ -1,24 +1,17 @@
-import { initializeApp } from "firebase-admin/app";
+// import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 
 export const getStaticPaths: GetStaticPaths = () => {
-  return {
-    paths: [],
-    fallback: true,
-  };
+  return { paths: [], fallback: true };
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const id = params?.["id"];
   if (typeof id !== "string") {
-    return {
-      notFound: true,
-    };
+    return { notFound: true };
   }
-  const app = initializeApp({ projectId: "demo-simple-form" });
-  const firestore = getFirestore(app);
-  const snapshot = await firestore.collection("post").doc(id).get();
+  const snapshot = await getFirestore().collection("post").doc(id).get();
   return {
     props: {
       data: snapshot.data()?.["text"],
