@@ -1,5 +1,3 @@
-import { CollectionSpec, Dict } from "./core/types";
-
 export type Field = string | number;
 
 export type DocKey<C extends string = string> = readonly [C, string];
@@ -42,11 +40,22 @@ export type Doc<DD extends DocData = DocData> =
       readonly revalidate: () => void;
     };
 
+export type CreateDoc<CDD extends DocCreationData = DocCreationData> = (
+  data: CDD
+) => void;
+
 export type DocCreation_NotCreated<
   CDD extends DocCreationData = DocCreationData
 > = {
   readonly state: "notCreated";
-  readonly createDoc: (data: CDD) => void;
+  readonly createDoc: CreateDoc<CDD>;
+};
+
+export type Retry = () => void;
+
+export type DocWithId<DD extends DocData = DocData> = {
+  readonly id: string;
+  readonly data: DD;
 };
 
 export type DocCreation<
@@ -63,15 +72,11 @@ export type DocCreation<
     }
   | {
       readonly state: "creating";
-      readonly id: string;
-      readonly data: DD;
+      readonly createdDoc: DocWithId<DD>;
     }
   | {
       readonly state: "created";
-      readonly createdDoc: {
-        readonly id: string;
-        readonly data: DD;
-      };
+      readonly createdDoc: DocWithId<DD>;
       readonly reset: () => void;
     };
 
@@ -89,12 +94,7 @@ export type MutateUpdateView = (
   shouldRevalidate?: boolean
 ) => Promise<void>;
 
-export type UpdateCountViews = (p: {
-  readonly updatedCollectionName: string;
-  readonly spec: Dict<CollectionSpec>;
-  readonly incrementValue: 1 | -1;
-  readonly data: DocData;
-}) => void;
+export type UpdateCountViews = (data: DocData) => void;
 
 export type UpdateView = (
   key: ViewKey,

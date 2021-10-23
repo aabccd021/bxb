@@ -3,7 +3,13 @@ import { useCallback, useEffect, useState } from "react";
 import { CollectionSpec, Dict } from "./core/types";
 import { getDocRef } from "./get-doc-ref";
 import { getId } from "./get-id";
-import { DocCreation, DocCreationData, DocData, DocKey } from "./types";
+import {
+  CreateDoc,
+  DocCreation,
+  DocCreationData,
+  DocData,
+  DocKey,
+} from "./types";
 import { useMutateDoc } from "./use-mutate-doc";
 import { useUpdateCountViews } from "./use-update-count-views";
 
@@ -13,47 +19,24 @@ export function useDocCreation<
 >(collection: string, spec: Dict<CollectionSpec>): DocCreation<DD, CDD> {
   const mutateDoc = useMutateDoc();
 
-  const updateCountViews = useUpdateCountViews();
+  const incrementCountViews = useUpdateCountViews(collection, spec, 1);
 
-  const [state, setState] = useState<DocCreation>({
-    state: "initial",
-  });
+  const [state, setState] = useState<DocCreation>({ state: "initial" });
 
   const reset = useCallback(() => setState({ state: "initial" }), []);
 
-  const createDoc = useCallback(
-    (data: DocCreationData) => {
+  const createDoc = useCallback<CreateDoc>(
+    (data) => {
       const id = getId(collection);
-
-      setState({ state: "creating", id, data });
-
+      const createdDoc = { id, data };
+      setState({ state: "creating", createdDoc });
       const docKey: DocKey = [collection, id];
       const docRef = getDocRef(docKey);
       setDoc(docRef, data)
         .then(() => {
-          setState({
-            state: "created",
-            reset,
-            createdDoc: {
-              id,
-              data,
-            },
-          });
-
-          // update document cache
+          setState({ state: "created", reset, createdDoc });
           mutateDoc(docKey, { exists: true, data });
-
-          updateCountViews({
-            updatedCollectionName: collection,
-            spec,
-            data,
-            incrementValue: 1,
-          });
-          // There is no logic to materialize view, because:
-          // (1) A view should not be read before the source document is
-          // created
-          // (2) Aggregating or joining from limited document on cache does not
-          // make sense
+          incrementCountViews(data);
         })
         .catch((reason) =>
           setState({
@@ -64,7 +47,7 @@ export function useDocCreation<
           })
         );
     },
-    [collection, updateCountViews, reset, mutateDoc, spec]
+    [collection, incrementCountViews, reset, mutateDoc]
   );
 
   useEffect(() => {
