@@ -12,7 +12,7 @@
     "server:dev:cached": "firebase emulators:start",
     "server:dev": "yarn server:build && yarn server:dev:cached",
     "client:dev": "next dev",
-    "client:build": "next build",
+    "client:build": "next build && next export",
     "client:start": "next start"
   },
   "dependencies": {

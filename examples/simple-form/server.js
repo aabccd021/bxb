@@ -1,13 +1,11 @@
 // NOTE: This file should not be edited
 const functions = require("firebase-functions");
-const next = require("next");
-const { masmott } = require('./.functions')
+const { default: next } = require("next");
 
-exports.masmott = masmott;
-
-const dev = process.env.NODE_ENV !== "production";
+// const dev = process.env.NODE_ENV !== "production";
+// console.log({ dev });
 const nextApp = next({
-	dev,
+	dev: false,
 	// the absolute directory from the package.json file that initialises this module
 	// IE: the absolute path from the root of the Cloud Function
 	conf: { distDir: ".next" }

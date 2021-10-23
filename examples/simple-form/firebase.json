@@ -28,7 +28,7 @@
 	},
 	"hosting": [
 		{
-			"public": "out/",
+			"public": "public",
 			"cleanUrls": true,
 			"rewrites": [
 				{
