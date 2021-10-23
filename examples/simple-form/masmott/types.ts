@@ -96,7 +96,6 @@ export type MutateUpdateView = (
 
 export type UpdateCountViews = (data: DocData) => void;
 
-export type UpdateView = (
-  key: ViewKey,
-  mutate: (data: DocData) => DocData
-) => void;
+export type ViewUpdate = (data: DocData) => DocData;
+
+export type UpdateView = (key: ViewKey, mutate: ViewUpdate) => void;

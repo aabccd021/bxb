@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { CollectionSpec, Dict } from "./core/types";
 import { getNumberField, getStringField } from "./type-util";
-import { DocData, UpdateCountViews, ViewKey } from "./types";
+import { DocData, UpdateCountViews, ViewKey, ViewUpdate } from "./types";
 import { useUpdateView } from "./use-update-view";
 
 type UpdateCountView = (p: {
@@ -12,6 +12,18 @@ type UpdateCountView = (p: {
   readonly viewName: string;
   readonly counterFieldName: string;
 }) => void;
+
+function incrementField(fieldName: string, incrementValue: 1 | -1): ViewUpdate {
+  return (viewData) => {
+    const counterFieldValue = getNumberField(viewData, fieldName);
+    const updatedCounterFieldValue = counterFieldValue + incrementValue;
+    const updatedViewData = {
+      ...viewData,
+      [fieldName]: updatedCounterFieldValue,
+    };
+    return updatedViewData;
+  };
+}
 
 export function useUpdateCountViews(
   updatedCollectionName: string,
@@ -37,15 +49,7 @@ export function useUpdateCountViews(
       const viewKey: ViewKey = [viewCollectionName, viewName, viewId];
 
       // update count view if exists in cache
-      updateView(viewKey, (viewData) => {
-        const counterFieldValue = getNumberField(viewData, counterFieldName);
-        const updatedCounterFieldValue = counterFieldValue + incrementValue;
-        const updatedViewData = {
-          ...viewData,
-          [counterFieldName]: updatedCounterFieldValue,
-        };
-        return updatedViewData;
-      });
+      updateView(viewKey, incrementField(counterFieldName, incrementValue));
     },
     [incrementValue, updateView, updatedCollectionName]
   );

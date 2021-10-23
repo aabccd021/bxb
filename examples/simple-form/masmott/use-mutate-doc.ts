@@ -5,9 +5,9 @@ import { MutateSetDoc } from "./types";
 export function useMutateDoc(): MutateSetDoc {
   const { mutate } = useSWRConfig();
   const mutateDoc = useCallback<MutateSetDoc>(
-    ([collectionName, id], data, shouldRevalidate) => {
+    async ([collectionName, id], data, shouldRevalidate) => {
       const path = `${collectionName}/${id}`;
-      return mutate(path, data, shouldRevalidate);
+      await mutate(path, data, shouldRevalidate);
     },
     [mutate]
   );
