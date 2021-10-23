@@ -1,8 +1,15 @@
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { GetServerSideProps, NextPage } from "next";
+import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getStaticPaths: GetStaticPaths = () => {
+  return {
+    paths: [],
+    fallback: true,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
   const id = params?.["id"];
   if (typeof id !== "string") {
     return {
