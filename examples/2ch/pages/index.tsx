@@ -1,53 +1,34 @@
 import type { NextPage } from "next";
-import { PostCreationData, usePost, usePostCreation } from "../generated";
-import { DocCreation_NotCreated } from "../masmott/types";
+import {
+  ThreadCreation_NotCreatedComponent,
+  useThreadCreation,
+} from "../generated";
 import { useInput } from "../masmott/use-input";
 
-function PostCard(props: { readonly id: string }): JSX.Element {
-  const post = usePost(props.id);
-  return (
-    <>
-      {post.state === "error" && "Error"}
-      {post.state === "fetching" && "Fetching"}
-      {post.state === "loaded" && post.exists && (
-        <>
-          <p>text: </p>
-          <p>{post.data.text}</p>
-        </>
-      )}
-    </>
-  );
-}
-
-function Form(props: {
-  readonly postCreation: DocCreation_NotCreated<PostCreationData>;
-}): JSX.Element {
+const Form: ThreadCreation_NotCreatedComponent = (props) => {
   const [text, setText] = useInput("");
   return (
     <>
       <input type="text" value={text} onChange={setText} />
-      <button onClick={() => props.postCreation.createDoc({ text })}>
-        Create
-      </button>
+      <button onClick={() => props.creation.createDoc({})}>Create</button>
     </>
   );
-}
+};
 
 const Home: NextPage = () => {
-  const postCreation = usePostCreation();
+  const creation = useThreadCreation();
   return (
     <>
-      {postCreation.state === "notCreated" && <Form {...{ postCreation }} />}
-      {postCreation.state === "creating" && <>Creating</>}
-      {postCreation.state === "error" && <>Error</>}
-      {postCreation.state === "initial" && <>Loading</>}
-      {postCreation.state === "created" && (
+      {creation.state === "notCreated" && <Form creation={creation} />}
+      {creation.state === "creating" && <>Creating</>}
+      {creation.state === "error" && <>Error</>}
+      {creation.state === "initial" && <>Loading</>}
+      {creation.state === "created" && (
         <>
           <p>data:</p>
-          <p>{JSON.stringify(postCreation.createdDoc.data)}</p>
+          <p>{JSON.stringify(creation.createdDoc.data)}</p>
           <p>card:</p>
-          <PostCard id={postCreation.createdDoc.id} />
-          <button onClick={postCreation.reset}>reset</button>
+          <button onClick={creation.reset}>reset</button>
         </>
       )}
     </>

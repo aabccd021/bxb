@@ -1,20 +1,37 @@
 // NOTE: This file should not be edited
 
-import { CollectionSpec } from "./masmott/core/types";
-import { Doc, DocCreation } from "./masmott/types";
-import { useDoc } from "./masmott/use-doc";
-import { useDocCreation } from "./masmott/use-doc-creation";
+import {
+  CollectionSpec,
+  Doc,
+  DocCreation,
+  DocCreation_NotCreatedComponent,
+  useDoc,
+  useDocCreation,
+  useMasmottWithOption,
+} from "./masmott";
 
-export type PostData = {
-  readonly text: string;
+export const thread: CollectionSpec = {
+  src: {},
+  views: {
+    detail: {
+      selectedFieldNames: [],
+      joinSpecs: {},
+      countSpecs: {
+        replyCount: {
+          countedCollectionName: "reply",
+          groupBy: "threadId",
+        },
+      },
+    },
+  },
 };
 
-export type PostCreationData = {
-  readonly text: string;
-};
-
-export const post: CollectionSpec = {
+export const reply: CollectionSpec = {
   src: {
+    threadId: {
+      type: "refId",
+      refCollection: "thread",
+    },
     text: {
       type: "string",
     },
@@ -23,17 +40,65 @@ export const post: CollectionSpec = {
 };
 
 export const schema = {
-  post,
+  thread,
+  reply,
 };
 
-export type PostCreation = DocCreation<PostData, PostCreationData>;
+export type ThreadData = Record<string, never>;
 
-export function usePostCreation(): PostCreation {
-  return useDocCreation("post", schema);
+export type ThreadCreationData = Record<string, never>;
+
+export type ThreadDetailData = {
+  readonly replyCount: number;
+};
+
+export type ReplyData = {
+  readonly theadId: string;
+  readonly text: string;
+};
+
+export type ReplyCreationData = {
+  readonly theadId: string;
+  readonly text: string;
+};
+
+export type ThreadCreation = DocCreation<ThreadData, ThreadCreationData>;
+
+export function useThreadCreation(): ThreadCreation {
+  return useDocCreation("thread", schema);
 }
 
-export type PostDoc = Doc<PostData>;
+export type ReplyCreation = DocCreation<ReplyData, ReplyCreationData>;
 
-export function usePost(id: string): PostDoc {
-  return useDoc(["post", id], undefined);
+export function useReplyCreation(): ReplyCreation {
+  return useDocCreation("reply", schema);
 }
+
+export type ThreadDoc = Doc<ThreadData>;
+
+export function useThread(id: string): ThreadDoc {
+  return useDoc(["thread", id], undefined);
+}
+
+export type ThreadDetail = Doc<ThreadDetailData>;
+
+export function useThreadDetail(id: string): ThreadDetail {
+  return useDoc(["thread", id], "detail");
+}
+
+export type ReplyDoc = Doc<ReplyData>;
+
+export function useReply(id: string): ReplyDoc {
+  return useDoc(["reply", id], undefined);
+}
+
+const options = {
+  projectId: "demo-2ch",
+};
+
+export function useMasmott(): void {
+  return useMasmottWithOption(options);
+}
+
+export type ThreadCreation_NotCreatedComponent =
+  DocCreation_NotCreatedComponent<ThreadCreationData>;

@@ -1,5 +1,5 @@
 import type { AppProps } from "next/app";
-import { useMasmott } from "../masmott/use-masmott";
+import { useMasmott } from "../generated";
 
 function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   useMasmott();

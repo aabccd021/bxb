@@ -99,3 +99,7 @@ export type UpdateCountViews = (data: DocData) => void;
 export type ViewUpdate = (data: DocData) => DocData;
 
 export type UpdateView = (key: ViewKey, mutate: ViewUpdate) => void;
+
+export type DocCreation_NotCreatedComponent<
+  CDD extends DocCreationData = DocCreationData
+> = (props: { readonly creation: DocCreation_NotCreated<CDD> }) => JSX.Element;

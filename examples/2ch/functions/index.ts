@@ -1,14 +1,34 @@
 import { initializeApp } from "firebase-admin/app";
-import * as functions from "firebase-functions";
-import next from "next";
-import * as conf from "../next.config";
+import { makeMasmottTriggers } from "masmott-server";
 
-initializeApp();
+const app = initializeApp();
 
-const nextjsServer = next({ dev: false, conf });
-
-const nextjsHandle = nextjsServer.getRequestHandler();
-
-export const nextjs = functions.https.onRequest((request, response) =>
-  nextjsServer.prepare().then(() => nextjsHandle(request, response))
-);
+export const trigger = makeMasmottTriggers(app, {
+  thread: {
+    src: {},
+    views: {
+      detail: {
+        selectedFieldNames: [],
+        joinSpecs: {},
+        countSpecs: {
+          replyCount: {
+            countedCollectionName: "reply",
+            groupBy: "threadId",
+          },
+        },
+      },
+    },
+  },
+  reply: {
+    src: {
+      threadId: {
+        type: "refId",
+        refCollection: "thread",
+      },
+      text: {
+        type: "string",
+      },
+    },
+    views: {},
+  },
+});
