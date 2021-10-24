@@ -5,12 +5,12 @@ import {
 } from "../generated";
 import { useInput } from "../masmott/use-input";
 
-const Form: ThreadCreation_NotCreatedComponent = (props) => {
+const Form: ThreadCreation_NotCreatedComponent = ({ creation }) => {
   const [text, setText] = useInput("");
   return (
     <>
       <input type="text" value={text} onChange={setText} />
-      <button onClick={() => props.creation.createDoc({})}>Create</button>
+      <button onClick={() => creation.createDoc({})}>Create</button>
     </>
   );
 };
