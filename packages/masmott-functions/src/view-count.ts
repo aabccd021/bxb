@@ -1,7 +1,6 @@
 import { firestore, updateDoc } from './firebase-admin';
 import { makeOnCreateTrigger, makeOnDeleteTrigger } from './firebase-functions';
 import {
-  App,
   CountSpec,
   Dict,
   DocumentData,
@@ -31,7 +30,6 @@ function makeIncrementDocData(
 }
 
 function makeOnCountedDocCreatedTrigger(
-  app: App,
   counterCollectionName: string,
   viewName: string,
   countName: string,
@@ -44,19 +42,17 @@ function makeOnCountedDocCreatedTrigger(
       viewName
     );
     const incrementedData = _.makeIncrementDocData(countName, 1);
-    await updateDoc(app, viewCollectionName, counterDocId, incrementedData);
+    await updateDoc(viewCollectionName, counterDocId, incrementedData);
   };
 }
 
 export function onCountedDocCreated<T extends string>(
-  app: App,
   counterCollectionName: string,
   viewName: string,
   countSpecs: Mapped<T, CountSpec>
 ): Mapped<T, OnCreateTrigger> {
   return mapValues(countSpecs, (countSpec, countName) => {
     const handler = makeOnCountedDocCreatedTrigger(
-      app,
       counterCollectionName,
       viewName,
       countName,
@@ -71,7 +67,6 @@ export function onCountedDocCreated<T extends string>(
 }
 
 function makeOnCountedDocDeletedHandler(
-  app: App,
   counterCollectionName: string,
   viewName: string,
   countName: string,
@@ -84,30 +79,25 @@ function makeOnCountedDocDeletedHandler(
       viewName
     );
     const decrementedData = _.makeIncrementDocData(countName, -1);
-    await updateDoc(
-      app,
-      viewCollectionName,
-      counterDocId,
-      decrementedData
-    ).catch((reason) => {
-      if (reason.code === firestore.GrpcStatus.NOT_FOUND) {
-        // Ignore if counter document not exists.
-        return;
+    await updateDoc(viewCollectionName, counterDocId, decrementedData).catch(
+      (reason) => {
+        if (reason.code === firestore.GrpcStatus.NOT_FOUND) {
+          // Ignore if counter document not exists.
+          return;
+        }
+        throw reason;
       }
-      throw reason;
-    });
+    );
   };
 }
 
 export function onCountedDocDeleted(
-  app: App,
   counterCollectionName: string,
   viewName: string,
   countSpecs: Dict<CountSpec>
 ): Dict<OnDeleteTrigger> {
   return mapValues(countSpecs, (countSpec, countName) => {
     const handler = _.makeOnCountedDocDeletedHandler(
-      app,
       counterCollectionName,
       viewName,
       countName,

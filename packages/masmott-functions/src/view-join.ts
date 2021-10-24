@@ -1,9 +1,7 @@
 import { isEmpty, mapKeys, mapValues, pick } from 'lodash';
-import { getDoc, getCollection, updateDoc } from './firebase-admin';
+import { getCollection, getDoc, updateDoc } from './firebase-admin';
 import { makeOnUpdateTrigger } from './firebase-functions';
-
 import {
-  App,
   Dict,
   DocumentData,
   DocumentSnapshot,
@@ -13,9 +11,9 @@ import {
 } from './type';
 import {
   compactObject,
-  mergeObjectArray,
   getDocDataChange,
   getViewCollectionName,
+  mergeObjectArray,
   throwRejectedPromises,
 } from './util';
 
@@ -23,13 +21,11 @@ import {
  * Recursively returns a document referred by join view. Returns latest document
  * snapshot if it is the last document in the whole chain.
  *
- * @param app Firebase app.
  * @param refChain Chain of reference to the document.
  * @param snapshot Latest document snapshot in the chain.
  * @returns Document snapshot of first reference in current chain.
  */
 async function getRefDocFromRefSpecChainRecursive(
-  app: App,
   refChain: readonly RefSpec[],
   snapshot: DocumentSnapshot
 ): Promise<DocumentSnapshot> {
@@ -50,10 +46,9 @@ async function getRefDocFromRefSpecChainRecursive(
     );
   }
 
-  const currentRefDoc = await getDoc(app, currentRefSpec.collectionName, refId);
+  const currentRefDoc = await getDoc(currentRefSpec.collectionName, refId);
 
   const refDoc = getRefDocFromRefSpecChainRecursive(
-    app,
     nextRefChain,
     currentRefDoc
   );
@@ -64,13 +59,11 @@ async function getRefDocFromRefSpecChainRecursive(
 /**
  * Get a document referenced by a join view.
  *
- * @param app Firebase app.
  * @param joinSpec Specification of the join view.
  * @param data Data of source document of the join view.
  * @returns Document referenced.
  */
 async function getRefDocFromRefSpecs(
-  app: App,
   joinSpec: JoinSpec,
   data: DocumentData
 ): Promise<DocumentSnapshot> {
@@ -81,9 +74,9 @@ async function getRefDocFromRefSpecs(
     throw Error(`Invalid Type: ${JSON.stringify({ data, firstRef })}`);
   }
 
-  const firstRefDoc = await getDoc(app, firstRef.collectionName, refId);
+  const firstRefDoc = await getDoc(firstRef.collectionName, refId);
 
-  const refDoc = getRefDocFromRefSpecChainRecursive(app, refChain, firstRefDoc);
+  const refDoc = getRefDocFromRefSpecChainRecursive(refChain, firstRefDoc);
 
   return refDoc;
 }
@@ -129,18 +122,16 @@ function prefixJoinNameOnDocData(
 /**
  * Materialize join view data from a specification.
  *
- * @param app Firebase app.
  * @param srcDocData Source document data of the join view.
  * @param spec Materialization specification.
  * @returns Materialized join view data.
  */
 async function materializeJoinData(
-  app: App,
   srcDocData: DocumentData,
   joinName: string,
   spec: JoinSpec
 ): Promise<DocumentData> {
-  const refDoc = await getRefDocFromRefSpecs(app, spec, srcDocData);
+  const refDoc = await getRefDocFromRefSpecs(spec, srcDocData);
 
   const selectedFieldDocData = pick(refDoc.data, spec.selectedFieldNames);
   const compactDocData = compactObject(selectedFieldDocData);
@@ -160,18 +151,16 @@ async function materializeJoinData(
 /**
  * Maps array of join view specification into array of materialized data.
  *
- * @param app Firebase app.
  * @param srcDocData Source document data of the join view.
  * @param specs Array of join view specification.
  * @returns Array of materialized datas.
  */
 export async function materializeJoinViewData(
-  app: App,
   srcDocData: DocumentData,
   specs: Dict<JoinSpec>
 ): Promise<DocumentData> {
   const docDataPromises = Object.entries(specs).map(([joinName, spec]) =>
-    materializeJoinData(app, srcDocData, joinName, spec)
+    materializeJoinData(srcDocData, joinName, spec)
   );
 
   const docDataArray = await Promise.all(docDataPromises);
@@ -199,14 +188,12 @@ function makeJoinRefCollectionName({ refChain, firstRef }: JoinSpec): string {
  * join view. The trigger will update all document with join view(s) referencing
  * to the source document.
  *
- * @param app Firebase app.
  * @param collectionName Name of the view's collection.
  * @param viewName Name of the view.
  * @param spec Specification of the join view.
  * @returns Trigger that runs on source document update.
  */
 function makeOnJoinRefDocUpdatedTrigger(
-  app: App,
   collectionName: string,
   viewName: string,
   joinName: string,
@@ -231,13 +218,12 @@ function makeOnJoinRefDocUpdatedTrigger(
     const viewCollectionName = getViewCollectionName(collectionName, viewName);
 
     const referrerViews = await getCollection(
-      app,
       viewCollectionName,
       (collection) => collection.where(refIdFieldName, '==', refDoc.id)
     );
 
     const referrerViewsUpdates = referrerViews.docs.map((doc) =>
-      updateDoc(app, viewCollectionName, doc.id, prefixedDocDataUpdate)
+      updateDoc(viewCollectionName, doc.id, prefixedDocDataUpdate)
     );
 
     const promisesResult = await Promise.allSettled(referrerViewsUpdates);
@@ -250,7 +236,6 @@ function makeOnJoinRefDocUpdatedTrigger(
  * Create triggers that run on update of documents that referenecd by a
  * collection's join views.
  *
- * @param app Firebase app.
  * @param collectionName Name of the collection.
  * @param viewName Name of the view.
  * @param joinSpecs Specifications of the collection's join views.
@@ -258,18 +243,11 @@ function makeOnJoinRefDocUpdatedTrigger(
  * updated.
  */
 export function onJoinRefDocUpdated(
-  app: App,
   collectionName: string,
   viewName: string,
   joinSpecs: Dict<JoinSpec>
 ): Dict<OnUpdateTrigger> {
   return mapValues(joinSpecs, (joinSpec, joinName) =>
-    makeOnJoinRefDocUpdatedTrigger(
-      app,
-      collectionName,
-      viewName,
-      joinName,
-      joinSpec
-    )
+    makeOnJoinRefDocUpdatedTrigger(collectionName, viewName, joinName, joinSpec)
   );
 }

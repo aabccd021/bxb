@@ -1,13 +1,11 @@
-import { initializeApp } from "firebase-admin/app";
-import { makeMasmottTriggers } from "masmott-server";
+import { makeFunctions } from "masmott-functions";
+import conf from "../next.config";
 
-const app = initializeApp();
-
-export const trigger = makeMasmottTriggers(app, {
+const { nextjs, firestore } = makeFunctions(conf, {
   thread: {
     src: {},
     views: {
-      detail: {
+      page: {
         selectedFieldNames: [],
         joinSpecs: {},
         countSpecs: {
@@ -32,3 +30,5 @@ export const trigger = makeMasmottTriggers(app, {
     views: {},
   },
 });
+
+export { nextjs, firestore };

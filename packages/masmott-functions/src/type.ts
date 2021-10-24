@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-imports */
-import { App } from 'firebase-admin/app';
 import {
   DocumentReference,
   DocumentSnapshot as FirestoreDocumentSnapshot,
@@ -11,6 +10,7 @@ import {
   CloudFunction,
   EventContext,
   firestore,
+  HttpsFunction,
   SUPPORTED_REGIONS,
 } from 'firebase-functions';
 import { DocumentBuilder } from 'firebase-functions/v1/firestore';
@@ -19,7 +19,6 @@ export type {
   FirestoreDocumentSnapshot,
   Change,
   QueryDocumentSnapshot,
-  App,
   DocumentReference,
   DocumentBuilder,
 };
@@ -65,6 +64,8 @@ export type CollectionSpec = {
   readonly src: Dict<SrcFieldSpec>;
   readonly views: Dict<ViewSpec>;
 };
+
+export type Spec = Dict<CollectionSpec>;
 
 export type FirestoreDataType = string | number;
 
@@ -115,6 +116,8 @@ export type CollectionTriggers = {
   readonly view: Dict<ViewTriggers>;
 };
 
+export type FirestoreTriggers = Dict<CollectionTriggers>;
+
 export type OnCreateTriggerHandler = (
   snapshot: DocumentSnapshot,
   context: EventContext
@@ -151,3 +154,8 @@ export const WHERE_FILTER_OP = [
 ] as const;
 
 export type WhereFilterOp = typeof WHERE_FILTER_OP[number];
+
+export type Functions = {
+  readonly firestore: FirestoreTriggers;
+  readonly nextjs: HttpsFunction;
+};
