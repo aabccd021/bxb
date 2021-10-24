@@ -8,11 +8,11 @@
   "main": ".functions/functions/index.js",
   "scripts": {
     "lint": "eslint ./ --ext ts,tsx",
-    "start:cached": "firebase emulators:start",
-    "start": "yarn build && yarn start:cached",
     "server:build": "tsc --project tsconfig.functions.json",
     "client:build": "next build",
     "build": "yarn client:build && yarn server:build",
+    "start:cached": "firebase emulators:start",
+    "start": "yarn build && yarn start:cached",
     "server:dev:cached": "firebase emulators:start",
     "server:dev": "yarn server:build && yarn server:dev:cached",
     "client:dev": "next dev",

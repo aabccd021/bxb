@@ -18,6 +18,12 @@ export function makeGetStaticProps(
         revalidate: 60,
       };
     }
+    if (process.env.NODE_ENV === "development") {
+      return {
+        props: { fallback: {} },
+        revalidate: 60,
+      };
+    }
     const [collection, viewName] = path;
     const collectionPath = makeCollectionPath(collection, viewName);
     const docPath = makeDocPath(collection, id, viewName);

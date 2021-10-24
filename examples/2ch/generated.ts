@@ -52,12 +52,12 @@ export type ThreadPageData = {
 };
 
 export type ReplyData = {
-  readonly theadId: string;
+  readonly threadId: string;
   readonly text: string;
 };
 
 export type ReplyCreationData = {
-  readonly theadId: string;
+  readonly threadId: string;
   readonly text: string;
 };
 
@@ -67,11 +67,11 @@ export function useThreadCreation(): ThreadCreation {
   return useDocCreation("thread", spec);
 }
 
-// export type ReplyCreation = DocCreation<ReplyData, ReplyCreationData>;
+export type ReplyCreation = DocCreation.Type<ReplyData, ReplyCreationData>;
 
-// export function useReplyCreation(): ReplyCreation {
-//   return useDocCreation("reply", schema);
-// }
+export function useReplyCreation(): ReplyCreation {
+  return useDocCreation("reply", spec);
+}
 
 export type ThreadDoc = Doc.Type<ThreadData>;
 

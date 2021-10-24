@@ -1,4 +1,6 @@
+import { useRouter } from "next/dist/client/router";
 import Link from "next/link";
+import { useEffect } from "react";
 import {
   ThreadCreation_Created,
   ThreadCreation_Creating,
@@ -8,6 +10,12 @@ import {
 } from "../../generated";
 
 const Created: ThreadCreation_Created = ({ creation: { createdDoc } }) => {
+  const router = useRouter();
+  useEffect(() => {
+    // eslint-disable-next-line ts-immutable/immutable-data
+    router.push(`/thread/${encodeURIComponent(createdDoc.id)}`);
+  }, [router, createdDoc.id]);
+
   return (
     <Link href={`/thread/${encodeURIComponent(createdDoc.id)}`}>
       <a>Go</a>
