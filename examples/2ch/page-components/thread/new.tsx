@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   ThreadCreation_Created,
   ThreadCreation_Creating,
@@ -5,10 +6,13 @@ import {
   ThreadCreation_Initial,
   ThreadCreation_NotCreated,
 } from "../../generated";
-import { useInput } from "../../masmott";
 
-const Created: ThreadCreation_Created = () => {
-  return <>Created</>;
+const Created: ThreadCreation_Created = ({ creation: { createdDoc } }) => {
+  return (
+    <Link href={`/thread/${encodeURIComponent(createdDoc.id)}`}>
+      <a>Go</a>
+    </Link>
+  );
 };
 
 const Creating: ThreadCreation_Creating = () => {
@@ -24,10 +28,8 @@ const Initial: ThreadCreation_Initial = () => {
 };
 
 const NotCreated: ThreadCreation_NotCreated = ({ creation }) => {
-  const [text, setText] = useInput("");
   return (
     <>
-      <input type="text" value={text} onChange={setText} />
       <button onClick={() => creation.createDoc({})}>Create</button>
     </>
   );

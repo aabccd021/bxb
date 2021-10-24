@@ -21,7 +21,8 @@ function getDocRef(
   collectionName: string,
   documentId: string
 ): DocumentReference {
-  return getFirestore(app).collection(collectionName).doc(documentId);
+  app;
+  return getFirestore().collection(collectionName).doc(documentId);
 }
 
 export async function getDoc(

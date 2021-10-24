@@ -27,16 +27,22 @@ export type Type<DD extends DocData = DocData> =
   | LoadedNotExists
   | LoadedExists<DD>;
 
-export type ErrorComponent = (props: { readonly doc: Error }) => JSX.Element;
+export type ErrorComponent = (props: {
+  readonly doc: Error;
+  readonly id: string;
+}) => JSX.Element;
 
 export type FetchingComponent = (props: {
   readonly doc: Fetching;
+  readonly id: string;
 }) => JSX.Element;
 
 export type LoadedNotExistsComponent = (props: {
   readonly doc: LoadedNotExists;
+  readonly id: string;
 }) => JSX.Element;
 
 export type LoadedExistsComponent<DD extends DocData = DocData> = (props: {
   readonly doc: LoadedExists<DD>;
+  readonly id: string;
 }) => JSX.Element;

@@ -7,7 +7,7 @@ export const trigger = makeMasmottTriggers(app, {
   thread: {
     src: {},
     views: {
-      page: {
+      detail: {
         selectedFieldNames: [],
         joinSpecs: {},
         countSpecs: {

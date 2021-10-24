@@ -26,10 +26,10 @@ function DocPage<DD extends DocData = DocData>({
   readonly id: string;
 }): JSX.Element {
   const doc = useDoc<Doc.Type<DD>>([collection, id], view);
-  if (doc.state === "error") return <Error doc={doc} />;
-  if (doc.state === "fetching") return <Fetching doc={doc} />;
-  if (doc.exists) return <LoadedExists doc={doc} />;
-  return <LoadedNotExists doc={doc} />;
+  if (doc.state === "error") return <Error doc={doc} id={id} />;
+  if (doc.state === "fetching") return <Fetching doc={doc} id={id} />;
+  if (doc.exists) return <LoadedExists doc={doc} id={id} />;
+  return <LoadedNotExists doc={doc} id={id} />;
 }
 
 function Page<DD extends DocData = DocData>({
