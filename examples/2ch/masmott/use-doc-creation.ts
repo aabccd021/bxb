@@ -16,12 +16,12 @@ import { useUpdateCountViews } from "./use-update-count-views";
 export function useDocCreation<
   DD extends DocData = DocData,
   CDD extends DocCreationData = DocCreationData
->(collection: string, spec: Dict<CollectionSpec>): DocCreation<DD, CDD> {
+>(collection: string, spec: Dict<CollectionSpec>): DocCreation.Type<DD, CDD> {
   const mutateDoc = useMutateDoc();
 
   const incrementCountViews = useUpdateCountViews(collection, spec, 1);
 
-  const [state, setState] = useState<DocCreation>({ state: "initial" });
+  const [state, setState] = useState<DocCreation.Type>({ state: "initial" });
 
   const reset = useCallback(() => setState({ state: "initial" }), []);
 
@@ -56,5 +56,5 @@ export function useDocCreation<
     }
   }, [createDoc, state]);
 
-  return state as DocCreation<DD, CDD>;
+  return state as DocCreation.Type<DD, CDD>;
 }

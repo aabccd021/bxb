@@ -4,7 +4,6 @@ import {
   CollectionSpec,
   Doc,
   DocCreation,
-  DocCreation_NotCreatedComponent,
   useDoc,
   useDocCreation,
   useMasmottWithOption,
@@ -13,7 +12,7 @@ import {
 export const thread: CollectionSpec = {
   src: {},
   views: {
-    detail: {
+    page: {
       selectedFieldNames: [],
       joinSpecs: {},
       countSpecs: {
@@ -39,7 +38,7 @@ export const reply: CollectionSpec = {
   views: {},
 };
 
-export const schema = {
+export const spec = {
   thread,
   reply,
 };
@@ -48,7 +47,7 @@ export type ThreadData = Record<string, never>;
 
 export type ThreadCreationData = Record<string, never>;
 
-export type ThreadDetailData = {
+export type ThreadPageData = {
   readonly replyCount: number;
 };
 
@@ -62,17 +61,17 @@ export type ReplyCreationData = {
   readonly text: string;
 };
 
-export type ThreadCreation = DocCreation<ThreadData, ThreadCreationData>;
+export type ThreadCreation = DocCreation.Type<ThreadData, ThreadCreationData>;
 
 export function useThreadCreation(): ThreadCreation {
-  return useDocCreation("thread", schema);
+  return useDocCreation("thread", spec);
 }
 
-export type ReplyCreation = DocCreation<ReplyData, ReplyCreationData>;
+// export type ReplyCreation = DocCreation<ReplyData, ReplyCreationData>;
 
-export function useReplyCreation(): ReplyCreation {
-  return useDocCreation("reply", schema);
-}
+// export function useReplyCreation(): ReplyCreation {
+//   return useDocCreation("reply", schema);
+// }
 
 export type ThreadDoc = Doc<ThreadData>;
 
@@ -80,10 +79,10 @@ export function useThread(id: string): ThreadDoc {
   return useDoc(["thread", id], undefined);
 }
 
-export type ThreadDetail = Doc<ThreadDetailData>;
+export type ThreadPage = Doc<ThreadPageData>;
 
-export function useThreadDetail(id: string): ThreadDetail {
-  return useDoc(["thread", id], "detail");
+export function useThreadPage(id: string): ThreadPage {
+  return useDoc(["thread", id], "page");
 }
 
 export type ReplyDoc = Doc<ReplyData>;
@@ -100,5 +99,9 @@ export function useMasmott(): void {
   return useMasmottWithOption(options);
 }
 
-export type ThreadCreation_NotCreatedComponent =
-  DocCreation_NotCreatedComponent<ThreadCreationData>;
+export type ThreadCreation_Creating = DocCreation.CreatingComponent<ThreadData>;
+export type ThreadCreation_Created = DocCreation.CreatedComponent<ThreadData>;
+export type ThreadCreation_Error = DocCreation.ErrorComponent;
+export type ThreadCreation_Initial = DocCreation.InitialComponent;
+export type ThreadCreation_NotCreated =
+  DocCreation.NotCreatedComponent<ThreadCreationData>;

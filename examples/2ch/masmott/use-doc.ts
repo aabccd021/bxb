@@ -1,34 +1,21 @@
-import { doc, getDoc, getFirestore } from "firebase/firestore/lite";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
-import { Doc, DocKey, DocSnapshot } from "./types";
+import { fetcher } from "./fetcher";
+import { Doc, DocKey } from "./types";
+import { makeDocPath } from "./util";
 
-async function firestoreFetcher(path: string): Promise<DocSnapshot> {
-  const firestore = getFirestore();
-  const docRef = doc(firestore, path);
-  const snapshot = await getDoc(docRef);
-  if (snapshot.exists()) {
-    return {
-      exists: true,
-      data: snapshot.data(),
-    };
-  }
-  return {
-    exists: false,
-  };
-}
-
-export function useDoc<T extends Doc>(
+export function useDoc<T extends Doc.Type>(
   [collectionName, id]: DocKey,
-  viewName: string | undefined
+  viewName?: string
 ): T {
-  const [doc, setDoc] = useState<Doc>({ state: "fetching" });
-  const viewSuffix = viewName !== undefined ? `_${viewName}` : "";
-  const {
-    data: snapshot,
-    error,
-    mutate,
-  } = useSWR(`${collectionName}${viewSuffix}/${id}`, firestoreFetcher);
+  const [doc, setDoc] = useState<Doc.Type>({ state: "fetching" });
+
+  const docPath = useMemo(
+    () => makeDocPath(collectionName, id, viewName),
+    [collectionName, viewName, id]
+  );
+
+  const { data: snapshot, error, mutate } = useSWR(docPath, fetcher);
 
   useEffect(() => {
     if (snapshot === undefined) {

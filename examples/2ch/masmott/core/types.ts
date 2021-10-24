@@ -64,3 +64,5 @@ export type DocumentSnapshot = {
 export type QuerySnapshot = {
   readonly docs: readonly DocumentSnapshot[];
 };
+
+export type AppSpec = Dict<CollectionSpec>;
