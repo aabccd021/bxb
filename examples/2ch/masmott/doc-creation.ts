@@ -29,22 +29,3 @@ export type Type<
   DD extends DocData = DocData,
   CDD extends DocCreationData = DocCreationData
 > = Initial | NotCreated<CDD> | Error | Creating<DD> | Created<DD>;
-
-export type CreatedComponent<DD extends DocData = DocData> = (props: {
-  readonly creation: Created<DD>;
-}) => JSX.Element;
-
-export type CreatingComponent<DD extends DocData = DocData> = (props: {
-  readonly creation: Creating<DD>;
-}) => JSX.Element;
-
-export type ErrorComponent = (props: {
-  readonly creation: Error;
-}) => JSX.Element;
-
-export type InitialComponent = (props: {
-  readonly creation: Initial;
-}) => JSX.Element;
-
-export type NotCreatedComponent<CDD extends DocCreationData = DocCreationData> =
-  (props: { readonly creation: NotCreated<CDD> }) => JSX.Element;

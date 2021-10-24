@@ -1,15 +1,20 @@
-import { ThreadPageData, useReplyCreation } from "../../generated";
+import {
+  TheradPageSnapshot,
+  ThreadPageData,
+  useReplyCreation,
+} from "../../generated";
 import { useInput } from "../../masmott";
-import { LoadedExistsComponent } from "../../masmott/doc";
-import { PageComponents } from "../../masmott/isr";
 
-const LoadedExists: LoadedExistsComponent<ThreadPageData> = (thread) => {
+function ThreadDetail(thread: {
+  readonly data: ThreadPageData;
+  readonly id: string;
+}): JSX.Element {
   const [text, setText] = useInput("");
   const replyCreation = useReplyCreation();
   return (
     <>
       <p>Thread Id : {thread.id}</p>
-      <p>replyCount : {thread.doc.data.replyCount}</p>
+      <p>replyCount : {thread.data.replyCount}</p>
       {replyCreation.state === "notCreated" && (
         <>
           <input type="text" value={text} onChange={setText} />
@@ -30,12 +35,28 @@ const LoadedExists: LoadedExistsComponent<ThreadPageData> = (thread) => {
       )}
     </>
   );
-};
+}
 
-export const components: PageComponents<ThreadPageData> = {
-  Error: () => <div>Error</div>,
-  Fetching: () => <div>Fetching</div>,
-  LoadedExists,
-  LoadedNotExists: () => <div>LoadedNotExists</div>,
-  RouterLoading: () => <div>RouterLoading</div>,
-};
+export default function Page({
+  snapshot,
+}: {
+  readonly snapshot?: TheradPageSnapshot;
+}): JSX.Element {
+  return (
+    <>
+      {snapshot === undefined && <p>Loading</p>}
+      {snapshot !== undefined && (
+        <>
+          {snapshot.doc.state === "error" && <p>Error gan</p>}
+          {snapshot.doc.state === "fetching" && <p>Fetching gan</p>}
+          {snapshot.doc.state === "loaded" && !snapshot.doc.exists && (
+            <p>Gaada gan</p>
+          )}
+          {snapshot.doc.state === "loaded" && snapshot.doc.exists && (
+            <ThreadDetail data={snapshot.doc.data} id={snapshot.id} />
+          )}
+        </>
+      )}
+    </>
+  );
+}

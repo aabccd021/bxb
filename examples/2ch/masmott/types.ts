@@ -1,4 +1,4 @@
-import { Dict } from ".";
+import { Dict } from "masmott-functions";
 import * as Doc from "./doc";
 import * as DocCreation from "./doc-creation";
 
@@ -61,5 +61,9 @@ export type UpdateView = (key: ViewKey, mutate: ViewUpdate) => void;
 export type ISRPageProps = {
   readonly fallback: Dict<DocSnapshot>;
 };
+
+export type ISRPage<DD extends DocData> = (props: {
+  readonly snapshot?: { readonly id: string; readonly doc: Doc.Type<DD> };
+}) => JSX.Element;
 
 export type ViewPath = readonly [string] | readonly [string, string];

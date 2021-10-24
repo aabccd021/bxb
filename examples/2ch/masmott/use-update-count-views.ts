@@ -1,5 +1,5 @@
+import { Spec } from "masmott-functions";
 import { useCallback } from "react";
-import { CollectionSpec, Dict } from "./core/types";
 import { getNumberField, getStringField } from "./type-util";
 import { DocData, UpdateCountViews, ViewKey, ViewUpdate } from "./types";
 import { useUpdateView } from "./use-update-view";
@@ -27,7 +27,7 @@ function incrementField(fieldName: string, incrementValue: 1 | -1): ViewUpdate {
 
 export function useUpdateCountViews(
   updatedCollectionName: string,
-  spec: Dict<CollectionSpec>,
+  spec: Spec,
   incrementValue: 1 | -1
 ): UpdateCountViews {
   const updateView = useUpdateView();

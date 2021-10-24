@@ -1,7 +1,7 @@
 // NOTE: This file should not be edited
 
+import { CollectionSpec } from "masmott-functions";
 import {
-  CollectionSpec,
   Doc,
   DocCreation,
   useDoc,
@@ -81,6 +81,11 @@ export function useThread(id: string): ThreadDoc {
 
 export type ThreadPage = Doc.Type<ThreadPageData>;
 
+export type TheradPageSnapshot = {
+  readonly id: string;
+  readonly doc: ThreadPage;
+};
+
 export function useThreadPage(id: string): ThreadPage {
   return useDoc(["thread", id], "page");
 }
@@ -98,10 +103,3 @@ const options = {
 export function useMasmott(): void {
   return useMasmottWithOption(options);
 }
-
-export type ThreadCreation_Creating = DocCreation.CreatingComponent<ThreadData>;
-export type ThreadCreation_Created = DocCreation.CreatedComponent<ThreadData>;
-export type ThreadCreation_Error = DocCreation.ErrorComponent;
-export type ThreadCreation_Initial = DocCreation.InitialComponent;
-export type ThreadCreation_NotCreated =
-  DocCreation.NotCreatedComponent<ThreadCreationData>;

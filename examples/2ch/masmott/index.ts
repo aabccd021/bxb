@@ -1,4 +1,3 @@
-export * from "./core/types";
 export * from "./get-doc-ref";
 export * from "./get-id";
 export * from "./type-util";

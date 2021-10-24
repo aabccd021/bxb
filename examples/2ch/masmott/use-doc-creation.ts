@@ -1,6 +1,6 @@
 import { setDoc } from "firebase/firestore/lite";
+import { Spec } from "masmott-functions";
 import { useCallback, useEffect, useState } from "react";
-import { CollectionSpec, Dict } from "./core/types";
 import { getDocRef } from "./get-doc-ref";
 import { getId } from "./get-id";
 import {
@@ -16,7 +16,7 @@ import { useUpdateCountViews } from "./use-update-count-views";
 export function useDocCreation<
   DD extends DocData = DocData,
   CDD extends DocCreationData = DocCreationData
->(collection: string, spec: Dict<CollectionSpec>): DocCreation.Type<DD, CDD> {
+>(collection: string, spec: Spec): DocCreation.Type<DD, CDD> {
   const mutateDoc = useMutateDoc();
 
   const incrementCountViews = useUpdateCountViews(collection, spec, 1);

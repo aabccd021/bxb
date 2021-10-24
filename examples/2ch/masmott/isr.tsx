@@ -2,42 +2,28 @@ import { NextPage } from "next";
 import { useRouter } from "next/dist/client/router";
 import React, { useEffect, useState } from "react";
 import { SWRConfig } from "swr";
-import { Doc, DocData, ISRPageProps, useDoc, ViewPath } from ".";
+import { Doc, DocData, ISRPage, ISRPageProps, ViewPath } from "./types";
+import { useDoc } from "./use-doc";
 
-export type PageDocComponents<DD extends DocData = DocData> = {
-  readonly Error: Doc.ErrorComponent;
-  readonly Fetching: Doc.FetchingComponent;
-  readonly LoadedExists: Doc.LoadedExistsComponent<DD>;
-  readonly LoadedNotExists: Doc.LoadedNotExistsComponent;
-};
-
-export type PageComponents<DD extends DocData = DocData> =
-  PageDocComponents<DD> & {
-    readonly RouterLoading: () => JSX.Element;
-  };
-
-function DocPage<DD extends DocData = DocData>({
-  viewPath: [collection, view],
-  components: { Error, Fetching, LoadedExists, LoadedNotExists },
+function PageWithSnapshot<DD extends DocData>({
+  Page,
   id,
+  viewPath: [collection, view],
 }: {
-  readonly viewPath: ViewPath;
-  readonly components: PageDocComponents<DD>;
+  readonly Page: ISRPage<DD>;
   readonly id: string;
+  readonly viewPath: ViewPath;
 }): JSX.Element {
   const doc = useDoc<Doc.Type<DD>>([collection, id], view);
-  if (doc.state === "error") return <Error doc={doc} id={id} />;
-  if (doc.state === "fetching") return <Fetching doc={doc} id={id} />;
-  if (doc.exists) return <LoadedExists doc={doc} id={id} />;
-  return <LoadedNotExists doc={doc} id={id} />;
+  return <Page snapshot={{ doc, id }} />;
 }
 
-function Page<DD extends DocData = DocData>({
+function PageWithId<DD extends DocData>({
+  Page,
   viewPath,
-  components,
 }: {
+  readonly Page: ISRPage<DD>;
   readonly viewPath: ViewPath;
-  readonly components: PageComponents<DD>;
 }): JSX.Element {
   const router = useRouter();
   const [id, setId] = useState<string | undefined>(undefined);
@@ -50,20 +36,24 @@ function Page<DD extends DocData = DocData>({
     }
   }, [router]);
 
-  if (id === undefined) {
-    return <components.RouterLoading />;
-  }
-
-  return <DocPage viewPath={viewPath} components={components} id={id} />;
+  return (
+    <>
+      {id !== undefined ? (
+        <PageWithSnapshot Page={Page} viewPath={viewPath} id={id} />
+      ) : (
+        <Page />
+      )}
+    </>
+  );
 }
 
-export function makeStaticPage<DD extends DocData = DocData>(
+export function withISR<DD extends DocData>(
   viewPath: ViewPath,
-  components: PageComponents<DD>
+  Page: ISRPage<DD>
 ): NextPage<ISRPageProps> {
   const StaticPage: NextPage<ISRPageProps> = ({ fallback }) => (
     <SWRConfig value={{ fallback }}>
-      <Page viewPath={viewPath} components={components} />
+      <PageWithId Page={Page} viewPath={viewPath} />
     </SWRConfig>
   );
   return StaticPage;
