@@ -1,10 +1,13 @@
 import { NextPage } from "next";
+import React from "react";
 import { useThreadCreation } from "../../generated";
-import { Created } from "../../page-components/thread/creation/created";
-import { Creating } from "../../page-components/thread/creation/creating";
-import { Error } from "../../page-components/thread/creation/error";
-import { Initial } from "../../page-components/thread/creation/initial";
-import { NotCreated } from "../../page-components/thread/creation/not-created";
+import {
+  Created,
+  Creating,
+  Error,
+  Initial,
+  NotCreated,
+} from "../../page-components/thread/new";
 
 const Page: NextPage = () => {
   const creation = useThreadCreation();

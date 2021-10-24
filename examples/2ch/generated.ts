@@ -73,19 +73,19 @@ export function useThreadCreation(): ThreadCreation {
 //   return useDocCreation("reply", schema);
 // }
 
-export type ThreadDoc = Doc<ThreadData>;
+export type ThreadDoc = Doc.Type<ThreadData>;
 
 export function useThread(id: string): ThreadDoc {
   return useDoc(["thread", id], undefined);
 }
 
-export type ThreadPage = Doc<ThreadPageData>;
+export type ThreadPage = Doc.Type<ThreadPageData>;
 
 export function useThreadPage(id: string): ThreadPage {
   return useDoc(["thread", id], "page");
 }
 
-export type ReplyDoc = Doc<ReplyData>;
+export type ReplyDoc = Doc.Type<ReplyData>;
 
 export function useReply(id: string): ReplyDoc {
   return useDoc(["reply", id], undefined);
