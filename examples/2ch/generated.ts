@@ -37,7 +37,7 @@ export const spec = {
   reply,
 };
 
-export type ThreadData = Record<string, never>;
+export type ThreadData = {};
 
 export type ThreadCreationData = Record<string, never>;
 

@@ -39,7 +39,9 @@ export type DocWithId<DD extends DocData = DocData> = {
 export type MutateSetDoc = (
   key: DocKey,
   data?: DocSnapshot,
-  shouldRevalidate?: boolean
+  options?: {
+    readonly viewName?: string;
+  }
 ) => Promise<void>;
 
 export type DeleteView = (key: ViewKey) => void;
