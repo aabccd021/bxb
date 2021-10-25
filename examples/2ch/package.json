@@ -15,8 +15,7 @@
     "start": "yarn build && yarn start:cached",
     "server:dev:cached": "firebase emulators:start",
     "server:dev": "yarn server:build && yarn server:dev:cached",
-    "client:dev": "next dev",
-    "client:start": "next start"
+    "client:dev": "next dev"
   },
   "dependencies": {
     "assert-never": "^1.2.1",
