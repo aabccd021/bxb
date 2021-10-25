@@ -13,15 +13,15 @@ import {
   HttpsFunction,
   SUPPORTED_REGIONS,
 } from 'firebase-functions';
-import { DocumentBuilder } from 'firebase-functions/v1/firestore';
 
 export type {
   FirestoreDocumentSnapshot,
   Change,
   QueryDocumentSnapshot,
   DocumentReference,
-  DocumentBuilder,
 };
+
+export type DocumentBuilder = firestore.DocumentBuilder;
 
 export type Dict<T> = {
   readonly [key: string]: T;
