@@ -1,15 +1,15 @@
-describe('Navigation', function () {
-  it('should navigate to the about page', function () {
+describe('Creation', function () {
+  it('should be able to create a thread', function () {
     // Start from the index page
     cy.visit('/');
 
     // Find a link with an href attribute containing "about" and click it
-    cy.get('a[href*="about"]').click();
+    cy.get('button').contains('Create').click();
 
-    // The new url should include "/about"
-    cy.url().should('include', '/about');
+    cy.url().should('include', '/thread/');
 
     // The new page should contain an h1 with "About page"
-    cy.get('h1').contains('About Page');
+    cy.contains('Thread Id : ');
+    cy.contains('replyCount : 0');
   });
 });
