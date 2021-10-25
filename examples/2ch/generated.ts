@@ -1,43 +1,39 @@
 // NOTE: This file should not be edited
 
-import { CollectionSpec } from 'masmott-functions';
+import { Spec } from 'masmott-functions';
 import { Doc, DocCreation, useDoc, useDocCreation, useMasmottWithOption } from './masmott';
 
-export const thread: CollectionSpec = {
-  src: {},
-  views: {
-    page: {
-      selectedFieldNames: [],
-      joinSpecs: {},
-      countSpecs: {
-        replyCount: {
-          countedCollectionName: 'reply',
-          groupBy: 'threadId',
+export const spec = {
+  thread: {
+    src: {},
+    views: {
+      page: {
+        selectedFieldNames: [],
+        joinSpecs: {},
+        countSpecs: {
+          replyCount: {
+            countedCollectionName: 'reply',
+            groupBy: 'threadId',
+          },
         },
       },
     },
   },
-};
-
-export const reply: CollectionSpec = {
-  src: {
-    threadId: {
-      type: 'refId',
-      refCollection: 'thread',
+  reply: {
+    src: {
+      threadId: {
+        type: 'refId',
+        refCollection: 'thread',
+      },
+      text: {
+        type: 'string',
+      },
     },
-    text: {
-      type: 'string',
-    },
+    views: {},
   },
-  views: {},
 };
 
-export const spec = {
-  thread,
-  reply,
-};
-
-export type ThreadData = {};
+export type ThreadData = Record<string, never>;
 
 export type ThreadCreationData = Record<string, never>;
 
@@ -58,13 +54,13 @@ export type ReplyCreationData = {
 export type ThreadCreation = DocCreation.Type<ThreadData, ThreadCreationData>;
 
 export function useThreadCreation(): ThreadCreation {
-  return useDocCreation('thread', spec);
+  return useDocCreation('thread', spec as Spec);
 }
 
 export type ReplyCreation = DocCreation.Type<ReplyData, ReplyCreationData>;
 
 export function useReplyCreation(): ReplyCreation {
-  return useDocCreation('reply', spec);
+  return useDocCreation('reply', spec as Spec);
 }
 
 export type ThreadDoc = Doc.Type<ThreadData>;

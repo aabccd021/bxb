@@ -1,4 +1,5 @@
 import { Dict } from 'masmott-functions';
+import { Cache } from 'swr';
 import * as Doc from './doc';
 import * as DocCreation from './doc-creation';
 
@@ -36,27 +37,24 @@ export type DocWithId<DD extends DocData = DocData> = {
   readonly data: DD;
 };
 
-export type MutateSetDoc = (
+export type DocSnapshotMutatorCallback = (snapshot: DocSnapshot) => DocSnapshot;
+
+export type MutateDoc = (
   key: DocKey,
-  data?: DocSnapshot,
+  data?: DocSnapshot | DocSnapshotMutatorCallback,
   options?: {
-    readonly viewName?: string;
+    readonly view?: string | undefined;
   }
 ) => Promise<void>;
 
-export type DeleteView = (key: ViewKey) => void;
+export type DocCache = Cache<DocSnapshot>;
 
-export type MutateUpdateView = (
-  key: ViewKey,
-  data?: Doc.Type | ((doc: Doc.Type) => Doc.Type),
-  shouldRevalidate?: boolean
-) => Promise<void>;
+export type DocSWRConfig = {
+  readonly docCache: DocCache;
+  readonly mutateDoc: MutateDoc;
+};
 
 export type UpdateCountViews = (data: DocData) => void;
-
-export type ViewUpdate = (data: DocData) => DocData;
-
-export type UpdateView = (key: ViewKey, mutate: ViewUpdate) => void;
 
 export type ISRPageProps = {
   readonly fallback: Dict<DocSnapshot>;

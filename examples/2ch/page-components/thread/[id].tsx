@@ -1,4 +1,4 @@
-import { TheradPageSnapshot, useReplyCreation, useThread } from '../../generated';
+import { TheradPageSnapshot, useReplyCreation } from '../../generated';
 import { useInput } from '../../masmott';
 
 function ThreadDetail(thread: {
@@ -29,19 +29,6 @@ function ThreadDetail(thread: {
   );
 }
 
-function PageOnThreadNotExists({ id }: { readonly id: string }): JSX.Element {
-  const thread = useThread(id);
-  return (
-    <>
-      {thread.state === 'error' && <p>Error gan</p>}
-      {thread.state === 'fetching' && <p>Fetching gan</p>}
-
-      {thread.state === 'loaded' && !thread.exists && <PageOnThreadNotExists id={id} />}
-      {thread.state === 'loaded' && thread.exists && <ThreadDetail id={id} />}
-    </>
-  );
-}
-
 export default function Page({
   snapshot,
 }: {
@@ -54,9 +41,7 @@ export default function Page({
         <>
           {snapshot.doc.state === 'error' && <p>Error gan</p>}
           {snapshot.doc.state === 'fetching' && <p>Fetching gan</p>}
-          {snapshot.doc.state === 'loaded' && !snapshot.doc.exists && (
-            <PageOnThreadNotExists id={snapshot.id} />
-          )}
+          {snapshot.doc.state === 'loaded' && !snapshot.doc.exists && <p>Gaada gan</p>}
           {snapshot.doc.state === 'loaded' && snapshot.doc.exists && (
             <ThreadDetail data={snapshot.doc.data} id={snapshot.id} />
           )}

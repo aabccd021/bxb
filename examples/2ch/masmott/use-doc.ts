@@ -4,13 +4,10 @@ import { fetcher } from './fetcher';
 import { Doc, DocKey } from './types';
 import { makeDocPath } from './util';
 
-export function useDoc<T extends Doc.Type>([collectionName, id]: DocKey, viewName?: string): T {
+export function useDoc<T extends Doc.Type>([collectionName, id]: DocKey, view?: string): T {
   const [doc, setDoc] = useState<Doc.Type>({ state: 'fetching' });
 
-  const docPath = useMemo(
-    () => makeDocPath(collectionName, id, viewName),
-    [collectionName, viewName, id]
-  );
+  const docPath = useMemo(() => makeDocPath(collectionName, id, view), [collectionName, view, id]);
 
   const { data: snapshot, error, mutate } = useSWR(docPath, fetcher);
 

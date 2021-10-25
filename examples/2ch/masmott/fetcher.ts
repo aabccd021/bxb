@@ -1,5 +1,5 @@
 import { doc, getDoc, getFirestore } from 'firebase/firestore/lite';
-import { DocSnapshot } from './types';
+import { DocSnapshot } from '.';
 
 export async function fetcher(path: string): Promise<DocSnapshot> {
   const firestore = getFirestore();

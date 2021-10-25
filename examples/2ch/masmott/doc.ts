@@ -21,6 +21,8 @@ export type LoadedExists<DD extends DocData = DocData> = {
   readonly revalidate: () => void;
 };
 
+export type Loaded<DD extends DocData = DocData> = LoadedExists<DD> | LoadedNotExists;
+
 export type Type<DD extends DocData = DocData> =
   | Error
   | Fetching
