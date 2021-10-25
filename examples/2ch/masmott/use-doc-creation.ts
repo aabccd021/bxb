@@ -1,17 +1,11 @@
-import { setDoc } from "firebase/firestore/lite";
-import { Spec } from "masmott-functions";
-import { useCallback, useEffect, useState } from "react";
-import { getDocRef } from "./get-doc-ref";
-import { getId } from "./get-id";
-import {
-  CreateDoc,
-  DocCreation,
-  DocCreationData,
-  DocData,
-  DocKey,
-} from "./types";
-import { useMutateDoc } from "./use-mutate-doc";
-import { useUpdateCountViews } from "./use-update-count-views";
+import { setDoc } from 'firebase/firestore/lite';
+import { Spec } from 'masmott-functions';
+import { useCallback, useEffect, useState } from 'react';
+import { getDocRef } from './get-doc-ref';
+import { getId } from './get-id';
+import { CreateDoc, DocCreation, DocCreationData, DocData, DocKey } from './types';
+import { useMutateDoc } from './use-mutate-doc';
+import { useUpdateCountViews } from './use-update-count-views';
 
 export function useDocCreation<
   DD extends DocData = DocData,
@@ -21,26 +15,26 @@ export function useDocCreation<
 
   const incrementCountViews = useUpdateCountViews(collection, spec, 1);
 
-  const [state, setState] = useState<DocCreation.Type>({ state: "initial" });
+  const [state, setState] = useState<DocCreation.Type>({ state: 'initial' });
 
-  const reset = useCallback(() => setState({ state: "initial" }), []);
+  const reset = useCallback(() => setState({ state: 'initial' }), []);
 
   const createDoc = useCallback<CreateDoc>(
     (data) => {
       const id = getId(collection);
       const createdDoc = { id, data };
-      setState({ state: "creating", createdDoc });
+      setState({ state: 'creating', createdDoc });
       const docKey: DocKey = [collection, id];
       const docRef = getDocRef(docKey);
       setDoc(docRef, data)
         .then(() => {
-          setState({ state: "created", reset, createdDoc });
+          setState({ state: 'created', reset, createdDoc });
           mutateDoc(docKey, { exists: true, data });
           incrementCountViews(data);
         })
         .catch((reason) =>
           setState({
-            state: "error",
+            state: 'error',
             reason,
             reset,
             retry: () => createDoc(data),
@@ -51,8 +45,8 @@ export function useDocCreation<
   );
 
   useEffect(() => {
-    if (state.state === "initial") {
-      setState({ state: "notCreated", createDoc });
+    if (state.state === 'initial') {
+      setState({ state: 'notCreated', createDoc });
     }
   }, [createDoc, state]);
 

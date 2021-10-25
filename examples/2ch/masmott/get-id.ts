@@ -1,4 +1,4 @@
-import { collection, doc, getFirestore } from "firebase/firestore/lite";
+import { collection, doc, getFirestore } from 'firebase/firestore/lite';
 
 export function getId(collectionName: string): string {
   const firestore = getFirestore();

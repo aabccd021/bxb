@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "main": "index.js",
   "license": "MIT",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "prepare": "node prepare.js"
+  },
   "peerDependencies": {
     "eslint": ">= 7"
   },

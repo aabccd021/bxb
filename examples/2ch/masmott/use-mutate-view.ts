@@ -1,6 +1,6 @@
-import { useCallback } from "react";
-import { useSWRConfig } from "swr";
-import { MutateUpdateView } from "./types";
+import { useCallback } from 'react';
+import { useSWRConfig } from 'swr';
+import { MutateUpdateView } from './types';
 
 export function useMutateView(): MutateUpdateView {
   const { mutate } = useSWRConfig();

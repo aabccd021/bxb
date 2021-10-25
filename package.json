@@ -1,0 +1,11 @@
+{
+  "name": "masmott",
+  "repository": "https://github.com/aabccd021/masmott-demo.git",
+  "author": "aabccd021 <aabccd021@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "prepare:functions": "cd packages/masmott-functions && yarn prepare",
+    "prepare:eslint": "cd packages/eslint-config-masmott && yarn prepare",
+    "prepare": "yarn prepare:functions && yarn prepare:eslint"
+  }
+}

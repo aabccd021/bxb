@@ -1,7 +1,7 @@
-import { useRouter } from "next/dist/client/router";
-import { useEffect } from "react";
-import { ThreadData, useThreadCreation } from "../../generated";
-import { DocCreation } from "../../masmott";
+import { useRouter } from 'next/dist/client/router';
+import { useEffect } from 'react';
+import { ThreadData, useThreadCreation } from '../../generated';
+import { DocCreation } from '../../masmott';
 
 function Created({
   creation: { createdDoc },
@@ -21,11 +21,11 @@ export default function Page(): JSX.Element {
   const creation = useThreadCreation();
   return (
     <>
-      {creation.state === "notCreated" && (
+      {creation.state === 'notCreated' && (
         <button onClick={() => creation.createDoc({})}>Create</button>
       )}
 
-      {creation.state === "created" && <Created creation={creation} />}
+      {creation.state === 'created' && <Created creation={creation} />}
     </>
   );
 }

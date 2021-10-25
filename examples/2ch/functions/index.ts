@@ -1,5 +1,5 @@
-import { makeFunctions } from "masmott-functions";
-import conf from "../next.config";
+import { makeFunctions } from 'masmott-functions';
+import conf from '../next.config';
 
 const { nextjs, firestore } = makeFunctions(conf, {
   thread: {
@@ -10,8 +10,8 @@ const { nextjs, firestore } = makeFunctions(conf, {
         joinSpecs: {},
         countSpecs: {
           replyCount: {
-            countedCollectionName: "reply",
-            groupBy: "threadId",
+            countedCollectionName: 'reply',
+            groupBy: 'threadId',
           },
         },
       },
@@ -20,11 +20,11 @@ const { nextjs, firestore } = makeFunctions(conf, {
   reply: {
     src: {
       threadId: {
-        type: "refId",
-        refCollection: "thread",
+        type: 'refId',
+        refCollection: 'thread',
       },
       text: {
-        type: "string",
+        type: 'string',
       },
     },
     views: {},

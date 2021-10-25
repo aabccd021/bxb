@@ -1,8 +1,8 @@
-import { Spec } from "masmott-functions";
-import { useCallback } from "react";
-import { getNumberField, getStringField } from "./type-util";
-import { DocData, UpdateCountViews, ViewKey, ViewUpdate } from "./types";
-import { useUpdateView } from "./use-update-view";
+import { Spec } from 'masmott-functions';
+import { useCallback } from 'react';
+import { getNumberField, getStringField } from './type-util';
+import { DocData, UpdateCountViews, ViewKey, ViewUpdate } from './types';
+import { useUpdateView } from './use-update-view';
 
 type UpdateCountView = (p: {
   readonly countedCollectionName: string;
@@ -59,10 +59,7 @@ export function useUpdateCountViews(
       Object.entries(spec).forEach(([viewCollectionName, { views }]) =>
         Object.entries(views).forEach(([viewName, { countSpecs }]) =>
           Object.entries(countSpecs).forEach(
-            ([
-              counterFieldName,
-              { countedCollectionName, groupBy: refIdFieldName },
-            ]) =>
+            ([counterFieldName, { countedCollectionName, groupBy: refIdFieldName }]) =>
               updateCountView({
                 data,
                 viewCollectionName,

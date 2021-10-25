@@ -1,13 +1,7 @@
 // NOTE: This file should not be edited
 
-import { CollectionSpec } from "masmott-functions";
-import {
-  Doc,
-  DocCreation,
-  useDoc,
-  useDocCreation,
-  useMasmottWithOption,
-} from "./masmott";
+import { CollectionSpec } from 'masmott-functions';
+import { Doc, DocCreation, useDoc, useDocCreation, useMasmottWithOption } from './masmott';
 
 export const thread: CollectionSpec = {
   src: {},
@@ -17,8 +11,8 @@ export const thread: CollectionSpec = {
       joinSpecs: {},
       countSpecs: {
         replyCount: {
-          countedCollectionName: "reply",
-          groupBy: "threadId",
+          countedCollectionName: 'reply',
+          groupBy: 'threadId',
         },
       },
     },
@@ -28,11 +22,11 @@ export const thread: CollectionSpec = {
 export const reply: CollectionSpec = {
   src: {
     threadId: {
-      type: "refId",
-      refCollection: "thread",
+      type: 'refId',
+      refCollection: 'thread',
     },
     text: {
-      type: "string",
+      type: 'string',
     },
   },
   views: {},
@@ -64,19 +58,19 @@ export type ReplyCreationData = {
 export type ThreadCreation = DocCreation.Type<ThreadData, ThreadCreationData>;
 
 export function useThreadCreation(): ThreadCreation {
-  return useDocCreation("thread", spec);
+  return useDocCreation('thread', spec);
 }
 
 export type ReplyCreation = DocCreation.Type<ReplyData, ReplyCreationData>;
 
 export function useReplyCreation(): ReplyCreation {
-  return useDocCreation("reply", spec);
+  return useDocCreation('reply', spec);
 }
 
 export type ThreadDoc = Doc.Type<ThreadData>;
 
 export function useThread(id: string): ThreadDoc {
-  return useDoc(["thread", id], undefined);
+  return useDoc(['thread', id], undefined);
 }
 
 export type ThreadPage = Doc.Type<ThreadPageData>;
@@ -87,17 +81,17 @@ export type TheradPageSnapshot = {
 };
 
 export function useThreadPage(id: string): ThreadPage {
-  return useDoc(["thread", id], "page");
+  return useDoc(['thread', id], 'page');
 }
 
 export type ReplyDoc = Doc.Type<ReplyData>;
 
 export function useReply(id: string): ReplyDoc {
-  return useDoc(["reply", id], undefined);
+  return useDoc(['reply', id], undefined);
 }
 
 const options = {
-  projectId: "demo-2ch",
+  projectId: 'demo-2ch',
 };
 
 export function useMasmott(): void {

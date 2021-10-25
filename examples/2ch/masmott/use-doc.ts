@@ -1,14 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
-import useSWR from "swr";
-import { fetcher } from "./fetcher";
-import { Doc, DocKey } from "./types";
-import { makeDocPath } from "./util";
+import { useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
+import { fetcher } from './fetcher';
+import { Doc, DocKey } from './types';
+import { makeDocPath } from './util';
 
-export function useDoc<T extends Doc.Type>(
-  [collectionName, id]: DocKey,
-  viewName?: string
-): T {
-  const [doc, setDoc] = useState<Doc.Type>({ state: "fetching" });
+export function useDoc<T extends Doc.Type>([collectionName, id]: DocKey, viewName?: string): T {
+  const [doc, setDoc] = useState<Doc.Type>({ state: 'fetching' });
 
   const docPath = useMemo(
     () => makeDocPath(collectionName, id, viewName),
@@ -23,13 +20,13 @@ export function useDoc<T extends Doc.Type>(
     }
 
     if (error) {
-      setDoc({ state: "error", reason: error, revalidate: mutate });
+      setDoc({ state: 'error', reason: error, revalidate: mutate });
       return;
     }
 
     if (snapshot.exists) {
       setDoc({
-        state: "loaded",
+        state: 'loaded',
         exists: true,
         data: snapshot.data,
         revalidate: mutate,
@@ -38,7 +35,7 @@ export function useDoc<T extends Doc.Type>(
     }
 
     setDoc({
-      state: "loaded",
+      state: 'loaded',
       exists: false,
       revalidate: mutate,
     });

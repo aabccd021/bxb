@@ -1,9 +1,9 @@
-import { NextPage } from "next";
-import { useRouter } from "next/dist/client/router";
-import React, { useEffect, useState } from "react";
-import { SWRConfig } from "swr";
-import { Doc, DocData, ISRPage, ISRPageProps, ViewPath } from "./types";
-import { useDoc } from "./use-doc";
+import { NextPage } from 'next';
+import { useRouter } from 'next/dist/client/router';
+import { useEffect, useState } from 'react';
+import { SWRConfig } from 'swr';
+import { Doc, DocData, ISRPage, ISRPageProps, ViewPath } from './types';
+import { useDoc } from './use-doc';
 
 function PageWithSnapshot<DD extends DocData>({
   Page,
@@ -29,8 +29,8 @@ function PageWithId<DD extends DocData>({
   const [id, setId] = useState<string | undefined>(undefined);
   useEffect(() => {
     if (router.isReady) {
-      const value = router.query["id"];
-      if (typeof value === "string" || typeof value === "undefined") {
+      const value = router.query['id'];
+      if (typeof value === 'string' || typeof value === 'undefined') {
         setId(value);
       }
     }
@@ -38,11 +38,7 @@ function PageWithId<DD extends DocData>({
 
   return (
     <>
-      {id !== undefined ? (
-        <PageWithSnapshot Page={Page} viewPath={viewPath} id={id} />
-      ) : (
-        <Page />
-      )}
+      {id !== undefined ? <PageWithSnapshot Page={Page} viewPath={viewPath} id={id} /> : <Page />}
     </>
   );
 }

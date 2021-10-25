@@ -1,21 +1,21 @@
-import { DocData } from "./types";
+import { DocData } from './types';
 
 export type Error = {
-  readonly state: "error";
+  readonly state: 'error';
   readonly reason: unknown;
   readonly revalidate: () => void;
 };
 
-export type Fetching = { readonly state: "fetching" };
+export type Fetching = { readonly state: 'fetching' };
 
 export type LoadedNotExists = {
-  readonly state: "loaded";
+  readonly state: 'loaded';
   readonly exists: false;
   readonly revalidate: () => void;
 };
 
 export type LoadedExists<DD extends DocData = DocData> = {
-  readonly state: "loaded";
+  readonly state: 'loaded';
   readonly exists: true;
   readonly data: DD;
   readonly revalidate: () => void;

@@ -1,24 +1,22 @@
-import { getFirestore } from "firebase-admin/firestore";
-import { GetStaticPaths, GetStaticProps } from "next";
-import { DocSnapshot, ISRPageProps, ViewPath } from ".";
-import { makeCollectionPath, makeDocPath } from "./util";
+import { getFirestore } from 'firebase-admin/firestore';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { DocSnapshot, ISRPageProps, ViewPath } from '.';
+import { makeCollectionPath, makeDocPath } from './util';
 
 export function makeGetStaticPaths(): GetStaticPaths {
   return () => ({ paths: [], fallback: true });
 }
 
-export function makeGetStaticProps(
-  path: ViewPath
-): GetStaticProps<ISRPageProps> {
+export function makeGetStaticProps(path: ViewPath): GetStaticProps<ISRPageProps> {
   return async ({ params }) => {
-    const id = params?.["id"];
-    if (typeof id !== "string") {
+    const id = params?.['id'];
+    if (typeof id !== 'string') {
       return {
         notFound: true,
         revalidate: 60,
       };
     }
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === 'development') {
       return {
         props: { fallback: {} },
         revalidate: 60,
@@ -27,13 +25,9 @@ export function makeGetStaticProps(
     const [collection, viewName] = path;
     const collectionPath = makeCollectionPath(collection, viewName);
     const docPath = makeDocPath(collection, id, viewName);
-    const snapshot = await getFirestore()
-      .collection(collectionPath)
-      .doc(id)
-      .get();
+    const snapshot = await getFirestore().collection(collectionPath).doc(id).get();
     const data = snapshot.data();
-    const doc: DocSnapshot =
-      data !== undefined ? { exists: true, data } : { exists: false };
+    const doc: DocSnapshot = data !== undefined ? { exists: true, data } : { exists: false };
     return {
       props: {
         fallback: { [docPath]: doc },

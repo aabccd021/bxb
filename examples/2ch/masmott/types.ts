@@ -1,6 +1,6 @@
-import { Dict } from "masmott-functions";
-import * as Doc from "./doc";
-import * as DocCreation from "./doc-creation";
+import { Dict } from 'masmott-functions';
+import * as Doc from './doc';
+import * as DocCreation from './doc-creation';
 
 export { Doc, DocCreation };
 
@@ -27,9 +27,7 @@ export type DocSnapshot =
       readonly exists: false;
     };
 
-export type CreateDoc<CDD extends DocCreationData = DocCreationData> = (
-  data: CDD
-) => void;
+export type CreateDoc<CDD extends DocCreationData = DocCreationData> = (data: CDD) => void;
 
 export type Retry = () => void;
 

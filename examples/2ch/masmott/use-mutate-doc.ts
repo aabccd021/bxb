@@ -1,6 +1,6 @@
-import { useCallback } from "react";
-import { useSWRConfig } from "swr";
-import { MutateSetDoc } from "./types";
+import { useCallback } from 'react';
+import { useSWRConfig } from 'swr';
+import { MutateSetDoc } from './types';
 
 export function useMutateDoc(): MutateSetDoc {
   const { mutate } = useSWRConfig();
