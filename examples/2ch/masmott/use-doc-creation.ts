@@ -15,25 +15,25 @@ export function useDocCreation<
 
   const incrementCountViews = useUpdateCountViews(collection, spec, 1);
 
-  const [state, setState] = useState<DocCreation.Type>({ state: 'initial' });
+  const [creation, setCreation] = useState<DocCreation.Type>({ state: 'initial' });
 
-  const reset = useCallback(() => setState({ state: 'initial' }), []);
+  const reset = useCallback(() => setCreation({ state: 'initial' }), []);
 
   const createDoc = useCallback<CreateDoc>(
     (data) => {
       const id = getId(collection);
       const createdDoc = { id, data };
-      setState({ state: 'creating', createdDoc });
+      setCreation({ state: 'creating', createdDoc });
       const docKey: DocKey = [collection, id];
       const docRef = getDocRef(docKey);
       setDoc(docRef, data)
         .then(() => {
-          setState({ state: 'created', reset, createdDoc });
+          setCreation({ state: 'created', reset, createdDoc });
           mutateDoc(docKey, { exists: true, data });
           incrementCountViews(data);
         })
         .catch((reason) =>
-          setState({
+          setCreation({
             state: 'error',
             reason,
             reset,
@@ -45,10 +45,10 @@ export function useDocCreation<
   );
 
   useEffect(() => {
-    if (state.state === 'initial') {
-      setState({ state: 'notCreated', createDoc });
+    if (creation.state === 'initial') {
+      setCreation({ state: 'notCreated', createDoc });
     }
-  }, [createDoc, state]);
+  }, [createDoc, creation]);
 
-  return state as DocCreation.Type<DD, CDD>;
+  return creation as DocCreation.Type<DD, CDD>;
 }
