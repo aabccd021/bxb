@@ -13,8 +13,10 @@
     "build": "yarn client:build && yarn server:build",
     "start:cached": "firebase emulators:start",
     "start": "yarn build && yarn start:cached",
-    "test:cached": "firebase emulators:exec \"cypress\"",
+    "test:cached": "firebase emulators:exec \"cypress run\"",
     "test": "yarn build && yarn test:cached",
+    "test:gui:cached": "firebase emulators:exec \"cypress open\"",
+    "test:gui": "yarn build && yarn test:gui:cached",
     "server:dev:cached": "firebase emulators:start",
     "server:dev": "yarn server:build && yarn server:dev:cached",
     "client:dev": "next dev"
@@ -33,6 +35,7 @@
   "devDependencies": {
     "@types/react": "17.0.32",
     "@types/react-dom": "^17.0.10",
+    "cypress": "^8.6.0",
     "eslint": "7",
     "eslint-config-masmott": "file:./../../packages/eslint-config-masmott",
     "start-server-and-test": "^1.14.0",

@@ -2,7 +2,9 @@ module.exports = {
 	plugins: [
 		'@typescript-eslint',
 		'only-warn',
-		'ts-immutable'
+		'functional',
+		'cypress',
+		'mocha'
 	],
 	ignorePatterns: [
 		"**/*.js"
@@ -10,8 +12,10 @@ module.exports = {
 	extends: [
 		'eslint:recommended',
 		'plugin:@typescript-eslint/recommended',
+		'plugin:cypress/recommended',
+		'plugin:mocha/recommended',
 		'plugin:prettier/recommended',
-		'plugin:ts-immutable/recommended',
+		'plugin:functional/lite',
 		'next',
 		'prettier'
 	],
@@ -46,6 +50,18 @@ module.exports = {
 				"singleQuote": true,
 				"printWidth": 100
 			}
-		]
-	}
+		],
+		"functional/no-return-void": "off",
+		"functional/no-mixed-type": "off",
+	},
+	overrides: [
+		{
+			files: [
+				"cypress/**/*.spec.ts"
+			],
+			rules: {
+				"prefer-arrow-callback": "off"
+			}
+		}
+	],
 }

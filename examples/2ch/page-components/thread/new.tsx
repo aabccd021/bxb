@@ -10,7 +10,6 @@ function Created({
 }): JSX.Element {
   const router = useRouter();
   useEffect(() => {
-    // eslint-disable-next-line ts-immutable/immutable-data
     router.push(`/thread/${encodeURIComponent(createdDoc.id)}`);
   }, [router, createdDoc.id]);
 

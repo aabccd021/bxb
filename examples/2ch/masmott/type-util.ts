@@ -1,3 +1,4 @@
+/* eslint-disable functional/no-throw-statement */
 import { DocData } from './types';
 
 export function getStringField(data: DocData, fieldName: string): string {
