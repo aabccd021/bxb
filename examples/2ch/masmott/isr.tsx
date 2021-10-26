@@ -9,12 +9,17 @@ function PageWithSnapshot<VDD extends DocData>({
   Page,
   id,
   viewPath: [collection, view],
+  useLocalData,
 }: {
   readonly Page: ISRPage<VDD>;
   readonly id: string;
   readonly viewPath: ViewPath;
+  readonly useLocalData: boolean;
 }): JSX.Element {
-  const viewDoc = useDoc<Doc.Type<VDD>>([collection, id], { view, revalidateOnMount: false });
+  const viewDoc = useDoc<Doc.Type<VDD>>([collection, id], {
+    view,
+    revalidateOnMount: !useLocalData,
+  });
   return <Page snapshot={{ doc: viewDoc, id }} />;
 }
 
@@ -34,10 +39,13 @@ function PageWithId<DD extends DocData>({
       const queryId = router.query['id'];
       if (typeof queryId === 'string') {
         setId(queryId);
-      }
-      const queryUseLocalData = router.query['useLocalData'];
-      if (queryUseLocalData === undefined) {
-        setUseLocalData(false);
+        if (router.query['useLocalData'] === undefined) {
+          setUseLocalData(false);
+          return;
+        }
+        router.push(`${router.pathname.replace('[id]', '')}${queryId}`, undefined, {
+          shallow: true,
+        });
       }
     }
   }, [router]);
@@ -45,7 +53,11 @@ function PageWithId<DD extends DocData>({
   return (
     <>
       <p>useLocalData: {JSON.stringify(useLocalData)}</p>
-      {id !== undefined ? <PageWithSnapshot Page={Page} viewPath={viewPath} id={id} /> : <Page />}
+      {id !== undefined ? (
+        <PageWithSnapshot Page={Page} viewPath={viewPath} id={id} useLocalData={useLocalData} />
+      ) : (
+        <Page />
+      )}
     </>
   );
 }

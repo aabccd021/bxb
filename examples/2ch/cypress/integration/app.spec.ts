@@ -12,5 +12,12 @@ describe('Creation', function () {
     cy.get('button').contains('post').click();
 
     cy.contains('replyCount : 1');
+
+    cy.reload();
+
+    cy.get('input').type('kira masumoto').should('have.value', 'kira masumoto');
+    cy.get('button').contains('post').click();
+
+    cy.contains('replyCount : 1');
   });
 });

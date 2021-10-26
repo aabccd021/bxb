@@ -8,7 +8,7 @@ export function useDoc<T extends Doc.Type>(
   [collectionName, id]: DocKey,
   options?: {
     readonly view?: string | undefined;
-    readonly revalidateOnMount?: false;
+    readonly revalidateOnMount?: boolean;
   }
 ): T {
   const [doc, setDoc] = useState<Doc.Type>({ state: 'fetching' });
