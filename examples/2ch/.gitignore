@@ -36,3 +36,4 @@ yarn-error.log*
 .functions
 cypress/videos
 cypress/screenshots
+.nyc_output
