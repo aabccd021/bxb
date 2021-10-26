@@ -1,5 +1,7 @@
 import { setDoc } from 'firebase/firestore/lite';
-import { Spec } from 'masmott-functions';
+import mapValues from 'lodash-es/mapValues';
+import pick from 'lodash-es/pick';
+import { Dict, Spec, ViewSpec } from 'masmott-functions';
 import { useCallback, useEffect, useState } from 'react';
 import { useDocSWRConfig } from '.';
 import { getDocRef } from './get-doc-ref';
@@ -10,7 +12,7 @@ import { useUpdateCountViews } from './use-update-count-views';
 export function useDocCreation<
   DD extends DocData = DocData,
   CDD extends DocCreationData = DocCreationData
->(collection: string, spec: Spec): DocCreation.Type<DD, CDD> {
+>(collection: string, spec: Spec, views: Dict<ViewSpec>): DocCreation.Type<DD, CDD> {
   const { mutateDoc } = useDocSWRConfig();
 
   const incrementCountViews = useUpdateCountViews(collection, spec, 1);
@@ -18,6 +20,26 @@ export function useDocCreation<
   const [creation, setCreation] = useState<DocCreation.Type>({ state: 'initial' });
 
   const reset = useCallback(() => setCreation({ state: 'initial' }), []);
+
+  const createViews = useCallback(
+    (id: string, data: DocData) => {
+      Object.entries(views).forEach(([view, viewSpec]) => {
+        const materializedSelects = pick(data, viewSpec.selectedFieldNames);
+        const materializedCounts = mapValues(viewSpec.countSpecs, () => 0);
+        const materializedData = {
+          ...materializedSelects,
+          ...materializedCounts,
+        };
+        const materializedDoc = {
+          exists: true,
+          data: materializedData,
+        };
+        const viewDocKey: DocKey = [collection, id];
+        mutateDoc(viewDocKey, materializedDoc, { view });
+      });
+    },
+    [collection, mutateDoc, views]
+  );
 
   const createDoc = useCallback<CreateDoc>(
     (data) => {
@@ -31,6 +53,7 @@ export function useDocCreation<
           setCreation({ state: 'created', reset, createdDoc });
           mutateDoc(docKey, { exists: true, data });
           incrementCountViews(data);
+          createViews(id, data);
         })
         .catch((reason) =>
           setCreation({
@@ -41,7 +64,7 @@ export function useDocCreation<
           })
         );
     },
-    [collection, incrementCountViews, reset, mutateDoc]
+    [collection, incrementCountViews, reset, mutateDoc, createViews]
   );
 
   useEffect(() => {

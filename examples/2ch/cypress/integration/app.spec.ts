@@ -8,9 +8,6 @@ describe('Creation', function () {
     cy.contains('Thread Id : ');
     cy.contains('replyCount : 0');
 
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(500);
-
     cy.get('input').type('aabccd').should('have.value', 'aabccd');
     cy.get('button').contains('post').click();
 

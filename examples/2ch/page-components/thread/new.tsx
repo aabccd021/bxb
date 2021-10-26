@@ -10,7 +10,7 @@ function Created({
 }): JSX.Element {
   const router = useRouter();
   useEffect(() => {
-    router.push(`/thread/${encodeURIComponent(createdDoc.id)}`);
+    router.push(`/thread/${encodeURIComponent(createdDoc.id)}?useLocalData=true`);
   }, [router, createdDoc.id]);
 
   return <p>Redirecting</p>;

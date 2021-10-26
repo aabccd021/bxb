@@ -55,13 +55,13 @@ export type ReplyCreationData = {
 export type ThreadCreation = DocCreation.Type<ThreadData, ThreadCreationData>;
 
 export function useThreadCreation(): ThreadCreation {
-  return useDocCreation('thread', spec as Spec);
+  return useDocCreation('thread', spec as Spec, spec.thread.views);
 }
 
 export type ReplyCreation = DocCreation.Type<ReplyData, ReplyCreationData>;
 
 export function useReplyCreation(): ReplyCreation {
-  return useDocCreation('reply', spec as Spec);
+  return useDocCreation('reply', spec as Spec, spec.reply.views);
 }
 
 export type ThreadDoc = Doc.Type<ThreadData>;

@@ -16,7 +16,7 @@
     "start": "yarn build && yarn start:cached",
     "test:cached": "yarn clean-coverage && firebase emulators:exec \"cypress run\"",
     "test": "yarn build && yarn test:cached",
-    "test:gui:cached": "yarn clean-coverage && rm firebase emulators:exec \"cypress run --headed\"",
+    "test:gui:cached": "yarn clean-coverage && firebase emulators:exec \"cypress run --headed\"",
     "test:gui": "yarn build && yarn test:gui:cached",
     "test:open:cached": "firebase emulators:exec \"cypress open\"",
     "test:open": "yarn build && yarn test:open:cached",
