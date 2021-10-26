@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { spec, ThreadPageData } from '../../generated';
 import { ViewPath } from '../../masmott';
 import { makeGetStaticPaths, makeGetStaticProps } from '../../masmott/fetching';

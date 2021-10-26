@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 // NOTE: This file should not be edited
 
 import { Spec } from 'masmott-functions';

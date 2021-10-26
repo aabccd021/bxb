@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import type { AppProps } from 'next/app';
 import Link from 'next/link';
 import { useMasmott } from '../generated';
