@@ -11,6 +11,6 @@ describe('Creation', function () {
     cy.get('input').type('aabccd').should('have.value', 'aabccd');
     cy.get('button').contains('post').click();
 
-    // cy.contains('replyCount : 1');
+    cy.contains('replyCount : 1');
   });
 });

@@ -50,9 +50,13 @@ export function useDocCreation<
       const docRef = getDocRef(docKey);
       setDoc(docRef, data)
         .then(() => {
+          console.log('setCreation');
           setCreation({ state: 'created', reset, createdDoc });
+          console.log('mutateDoc');
           mutateDoc(docKey, { exists: true, data });
+          console.log('incrementCountViews');
           incrementCountViews(data);
+          console.log('createViews');
           createViews(id, data);
         })
         .catch((reason) =>
