@@ -67,7 +67,7 @@ export function useReplyCreation(): ReplyCreation {
 export type ThreadDoc = Doc.Type<ThreadData>;
 
 export function useThread(id: string): ThreadDoc {
-  return useDoc(['thread', id], undefined);
+  return useDoc(['thread', id]);
 }
 
 export type ThreadPage = Doc.Type<ThreadPageData>;
@@ -78,7 +78,7 @@ export type TheradPageSnapshot = {
 };
 
 export function useThreadPage(id: string): ThreadPage {
-  return useDoc(['thread', id], 'page');
+  return useDoc(['thread', id], { view: 'page' });
 }
 
 export type ReplyDoc = Doc.Type<ReplyData>;

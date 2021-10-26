@@ -14,7 +14,7 @@ function PageWithSnapshot<VDD extends DocData>({
   readonly id: string;
   readonly viewPath: ViewPath;
 }): JSX.Element {
-  const viewDoc = useDoc<Doc.Type<VDD>>([collection, id], view);
+  const viewDoc = useDoc<Doc.Type<VDD>>([collection, id], { view, revalidateOnMount: false });
   return <Page snapshot={{ doc: viewDoc, id }} />;
 }
 

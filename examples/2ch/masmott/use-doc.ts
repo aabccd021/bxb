@@ -4,12 +4,25 @@ import { fetcher } from './fetcher';
 import { Doc, DocKey } from './types';
 import { makeDocPath } from './util';
 
-export function useDoc<T extends Doc.Type>([collectionName, id]: DocKey, view?: string): T {
+export function useDoc<T extends Doc.Type>(
+  [collectionName, id]: DocKey,
+  options?: {
+    readonly view?: string | undefined;
+    readonly revalidateOnMount?: false;
+  }
+): T {
   const [doc, setDoc] = useState<Doc.Type>({ state: 'fetching' });
 
-  const docPath = useMemo(() => makeDocPath(collectionName, id, view), [collectionName, view, id]);
+  const docPath = useMemo(
+    () => makeDocPath(collectionName, id, options?.view),
+    [collectionName, options?.view, id]
+  );
 
-  const { data: snapshot, error, mutate } = useSWR(docPath, fetcher);
+  const {
+    data: snapshot,
+    error,
+    mutate,
+  } = useSWR(docPath, fetcher, { revalidateOnMount: options?.revalidateOnMount ?? true });
 
   useEffect(() => {
     if (snapshot === undefined) {
