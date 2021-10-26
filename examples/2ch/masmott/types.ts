@@ -44,6 +44,7 @@ export type MutateDoc = (
   data?: DocSnapshot | DocSnapshotMutatorCallback,
   options?: {
     readonly view?: string | undefined;
+    readonly shouldRevalidate?: true;
   }
 ) => Promise<void>;
 

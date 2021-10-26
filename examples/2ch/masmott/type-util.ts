@@ -20,16 +20,3 @@ export function getNumberField(data: DocData, fieldName: string): number {
   }
   return fieldValue;
 }
-
-export function getOptionalNumberField(data: DocData, fieldName: string): number | undefined {
-  const fieldValue = data[fieldName];
-  if (typeof fieldValue === 'number') {
-    return fieldValue;
-  }
-  if (fieldValue === undefined) {
-    return undefined;
-  }
-  const error = { data, fieldName };
-  console.error(error);
-  throw Error(JSON.stringify(error));
-}

@@ -10,7 +10,8 @@ export function useDocSWRConfig(): DocSWRConfig {
     async (docKey, data, options) => {
       const [collection, id] = docKey;
       const path = makeDocPath(collection, id, options?.view);
-      await mutate(path, data);
+      const shouldRevalidate = options?.shouldRevalidate ?? false;
+      await mutate(path, data, shouldRevalidate);
     },
     [mutate]
   );

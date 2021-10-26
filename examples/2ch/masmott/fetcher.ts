@@ -6,6 +6,7 @@ export async function fetcher(path: string): Promise<DocSnapshot> {
   const docRef = doc(firestore, path);
   const snapshot = await getDoc(docRef);
   const data = snapshot.data();
+  console.log('fetch gan', data);
   if (data !== undefined) {
     return { exists: true, data };
   }

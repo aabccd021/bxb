@@ -1,13 +1,7 @@
 import { Spec } from 'masmott-functions';
 import { useCallback } from 'react';
-import {
-  DocKey,
-  DocSnapshot,
-  DocSnapshotMutatorCallback,
-  getOptionalNumberField,
-  useDocSWRConfig,
-} from '.';
-import { getStringField } from './type-util';
+import { DocKey, DocSnapshot, DocSnapshotMutatorCallback, useDocSWRConfig } from '.';
+import { getNumberField, getStringField } from './type-util';
 import { DocData, UpdateCountViews } from './types';
 
 type UpdateCountView = (p: {
@@ -22,11 +16,10 @@ type UpdateCountView = (p: {
 function incrementField(fieldName: string, incrementValue: 1 | -1): DocSnapshotMutatorCallback {
   return (viewDoc) => {
     if (!viewDoc.exists) {
-      console.log('notexists');
       return viewDoc;
     }
-    const counterFieldValue = getOptionalNumberField(viewDoc.data, fieldName);
-    const updatedCounterFieldValue = (counterFieldValue ?? 0) + incrementValue;
+    const counterFieldValue = getNumberField(viewDoc.data, fieldName);
+    const updatedCounterFieldValue = counterFieldValue + incrementValue;
     const updatedViewData = {
       ...viewDoc.data,
       [fieldName]: updatedCounterFieldValue,
@@ -35,7 +28,6 @@ function incrementField(fieldName: string, incrementValue: 1 | -1): DocSnapshotM
       ...viewDoc,
       data: updatedViewData,
     };
-    console.log('exists', { updatedViewDoc });
     return updatedViewDoc;
   };
 }
@@ -56,19 +48,9 @@ export function useUpdateCountViews(
       view,
       counterFieldName,
     }) => {
-      console.log({
-        data,
-        viewCollectionName,
-        view,
-        counterFieldName,
-        countedCollectionName,
-        refIdFieldName,
-        updatedCollectionName,
-      });
       if (countedCollectionName !== updatedCollectionName) {
         return;
       }
-      console.log('pass');
 
       const viewId = getStringField(data, refIdFieldName);
       const docKey: DocKey = [viewCollectionName, viewId];
@@ -77,7 +59,6 @@ export function useUpdateCountViews(
 
       // update count view if exists in cache
       mutateDoc(docKey, mutatorCallback, { view });
-      console.log('pass2');
     },
     [incrementValue, mutateDoc, updatedCollectionName]
   );
