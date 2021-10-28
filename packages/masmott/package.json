@@ -19,12 +19,11 @@
     "server/package.json"
   ],
   "main": "./dist/index.js",
-  "module": "./dist/index.esm.js",
+  "module": "./dist/index.js",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.js",
+      "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
     "./server": {
