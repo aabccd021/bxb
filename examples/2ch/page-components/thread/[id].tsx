@@ -1,5 +1,5 @@
+import { useInput } from 'masmott';
 import { TheradPageSnapshot, useReplyCreation } from '../../generated';
-import { useInput } from '../../masmott';
 
 function ThreadDetail(thread: {
   readonly data?: { readonly replyCount: number };

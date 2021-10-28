@@ -1,4 +1,4 @@
-import { makeFunctions } from 'masmott-functions';
+import { makeFunctions } from 'masmott/server';
 import conf from '../next.config';
 
 const { nextjs, firestore } = makeFunctions(conf, {

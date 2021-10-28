@@ -7,7 +7,7 @@
     "index.js"
   ],
   "scripts": {
-    "prepare": "node prepare.js"
+    "prep": "node prepare.js"
   },
   "peerDependencies": {
     "eslint": ">= 7"

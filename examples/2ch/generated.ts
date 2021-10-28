@@ -1,8 +1,8 @@
 /* istanbul ignore file */
 // NOTE: This file should not be edited
 
+import { Doc, DocCreation, useDoc, useDocCreation, useMasmottWithOption } from 'masmott';
 import { Spec } from 'masmott-functions';
-import { Doc, DocCreation, useDoc, useDocCreation, useMasmottWithOption } from './masmott';
 
 export const spec = {
   thread: {

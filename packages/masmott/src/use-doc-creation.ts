@@ -1,77 +1,85 @@
-import { setDoc } from 'firebase/firestore/lite'
-import { useCallback, useEffect, useState } from 'react'
-import { CollectionSpec, Dict } from './core/types'
-import { getDocRef } from './get-doc-ref'
-import { getId } from './get-id'
-import { DocCreation, DocCreationData, DocData, DocKey } from './types'
-import { useMutateDoc } from './use-mutate-doc'
-import { useUpdateCountViews } from './use-update-count-views'
+import { setDoc } from 'firebase/firestore/lite';
+import mapValues from 'lodash/mapValues';
+import pick from 'lodash/pick';
+import { useCallback, useEffect, useState } from 'react';
+import { getDocRef } from './get-doc-ref';
+import { getId } from './get-id';
+import {
+  CreateDoc,
+  Dict,
+  DocCreation,
+  DocCreationData,
+  DocData,
+  DocKey,
+  Spec,
+  ViewSpec,
+} from './types';
+import { useDocSWRConfig } from './use-doc-swr-config';
+import { useUpdateCountViews } from './use-update-count-views';
 
 export function useDocCreation<
   DD extends DocData = DocData,
   CDD extends DocCreationData = DocCreationData
->(collection: string, spec: Dict<CollectionSpec>): DocCreation<DD, CDD> {
-  const mutateDoc = useMutateDoc()
+>(collection: string, spec: Spec, views: Dict<ViewSpec>): DocCreation.Type<DD, CDD> {
+  const { mutateDoc } = useDocSWRConfig();
 
-  const updateCountViews = useUpdateCountViews()
+  const incrementCountViews = useUpdateCountViews(collection, spec, 1);
 
-  const [state, setState] = useState<DocCreation>({
-    state: 'initial',
-  })
+  const [creation, setCreation] = useState<DocCreation.Type>({ state: 'initial' });
 
-  const reset = useCallback(() => setState({ state: 'initial' }), [])
+  const reset = useCallback(() => setCreation({ state: 'initial' }), []);
 
-  const createDoc = useCallback(
-    (data: DocCreationData) => {
-      const id = getId(collection)
+  const createViews = useCallback(
+    (id: string, data: DocData) => {
+      Object.entries(views).forEach(([view, viewSpec]) => {
+        const materializedSelects = pick(data, viewSpec.selectedFieldNames);
+        const materializedCounts = mapValues(viewSpec.countSpecs, () => 0);
+        const materializedData = {
+          ...materializedSelects,
+          ...materializedCounts,
+        };
+        const materializedDoc = {
+          exists: true,
+          data: materializedData,
+        };
+        const viewDocKey: DocKey = [collection, id];
+        mutateDoc(viewDocKey, materializedDoc, { view });
+      });
+    },
+    [collection, mutateDoc, views]
+  );
 
-      setState({ state: 'creating', id, data })
-
-      const docKey: DocKey = [collection, id]
-      const docRef = getDocRef(docKey)
+  const createDoc = useCallback<CreateDoc>(
+    (data) => {
+      const id = getId(collection);
+      const createdDoc = { id, data };
+      setCreation({ state: 'creating', createdDoc });
+      const docKey: DocKey = [collection, id];
+      const docRef = getDocRef(docKey);
       setDoc(docRef, data)
         .then(() => {
-          setState({
-            state: 'created',
-            reset,
-            createdDoc: {
-              id,
-              data,
-            },
-          })
-
-          // update document cache
-          mutateDoc(docKey, { exists: true, data })
-
-          updateCountViews({
-            updatedCollectionName: collection,
-            spec,
-            data,
-            incrementValue: 1,
-          })
-          // There is no logic to materialize view, because:
-          // (1) A view should not be read before the source document is
-          // created
-          // (2) Aggregating or joining from limited document on cache does not
-          // make sense
+          setCreation({ state: 'created', reset, createdDoc });
+          mutateDoc(docKey, { exists: true, data });
+          incrementCountViews(data);
+          createViews(id, data);
         })
         .catch((reason) =>
-          setState({
+          setCreation({
             state: 'error',
             reason,
             reset,
             retry: () => createDoc(data),
           })
-        )
+        );
     },
-    [collection, updateCountViews, reset, mutateDoc, spec]
-  )
+    [collection, incrementCountViews, reset, mutateDoc, createViews]
+  );
 
   useEffect(() => {
-    if (state.state === 'initial') {
-      setState({ state: 'notCreated', createDoc })
+    if (creation.state === 'initial') {
+      setCreation({ state: 'notCreated', createDoc });
     }
-  }, [createDoc, state])
+  }, [createDoc, creation]);
 
-  return state as DocCreation<DD, CDD>
+  return creation as DocCreation.Type<DD, CDD>;
 }

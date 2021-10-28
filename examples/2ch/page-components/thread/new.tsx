@@ -1,7 +1,7 @@
+import { DocCreation } from 'masmott/dist/types';
 import { useRouter } from 'next/dist/client/router';
 import { useEffect } from 'react';
 import { ThreadData, useThreadCreation } from '../../generated';
-import { DocCreation } from '../../masmott';
 
 function Created({
   creation: { createdDoc },

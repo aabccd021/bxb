@@ -1,47 +1,37 @@
-import {
-  doc as makeDocRef,
-  getDoc,
-  getFirestore,
-} from 'firebase/firestore/lite'
-import { useEffect, useState } from 'react'
-import useSWR from 'swr'
-import { Doc, DocKey, DocSnapshot } from './types'
+import { useEffect, useMemo, useState } from 'react';
+import useSWR from 'swr';
+import { fetcher } from './fetcher';
+import { Doc, DocKey } from './types';
+import { makeDocPath } from './util';
 
-async function firestoreFetcher(path: string): Promise<DocSnapshot> {
-  const firestore = getFirestore()
-  const docRef = makeDocRef(firestore, path)
-  const snapshot = await getDoc(docRef)
-  if (snapshot.exists()) {
-    return {
-      exists: true,
-      data: snapshot.data(),
-    }
-  }
-  return {
-    exists: false,
-  }
-}
-
-export function useDoc<T extends Doc>(
+export function useDoc<T extends Doc.Type>(
   [collectionName, id]: DocKey,
-  viewName: string | undefined
+  options?: {
+    readonly view?: string | undefined;
+    readonly revalidateOnMount?: boolean;
+  }
 ): T {
-  const [doc, setDoc] = useState<Doc>({ state: 'fetching' })
-  const viewSuffix = viewName !== undefined ? `_${viewName}` : ''
+  const [doc, setDoc] = useState<Doc.Type>({ state: 'fetching' });
+
+  const docPath = useMemo(
+    () => makeDocPath(collectionName, id, options?.view),
+    [collectionName, options?.view, id]
+  );
+
   const {
     data: snapshot,
     error,
     mutate,
-  } = useSWR(`${collectionName}${viewSuffix}/${id}`, firestoreFetcher)
+  } = useSWR(docPath, fetcher, { revalidateOnMount: options?.revalidateOnMount ?? true });
 
   useEffect(() => {
     if (snapshot === undefined) {
-      return
+      return;
     }
 
     if (error) {
-      setDoc({ state: 'error', reason: error, revalidate: mutate })
-      return
+      setDoc({ state: 'error', reason: error, revalidate: mutate });
+      return;
     }
 
     if (snapshot.exists) {
@@ -50,16 +40,16 @@ export function useDoc<T extends Doc>(
         exists: true,
         data: snapshot.data,
         revalidate: mutate,
-      })
-      return
+      });
+      return;
     }
 
     setDoc({
       state: 'loaded',
       exists: false,
       revalidate: mutate,
-    })
-  }, [snapshot, error, mutate])
+    });
+  }, [snapshot, error, mutate]);
 
-  return doc as T
+  return doc as T;
 }

@@ -1,53 +1,86 @@
-import { useCallback } from 'react'
-import { UpdateCountViews, ViewKey } from './types'
-import { useUpdateView } from './use-update-view'
+import { useCallback } from 'react';
+import { getNumberField, getStringField } from './type-util';
+import {
+  DocData,
+  DocKey,
+  DocSnapshot,
+  DocSnapshotMutatorCallback,
+  Spec,
+  UpdateCountView,
+  UpdateCountViews,
+} from './types';
+import { useDocSWRConfig } from './use-doc-swr-config';
 
-export function useUpdateCountViews(): UpdateCountViews {
-  const updateView = useUpdateView()
+function incrementField(fieldName: string, incrementValue: 1 | -1): DocSnapshotMutatorCallback {
+  return (viewDoc): DocSnapshot => {
+    if (!viewDoc.exists) {
+      return viewDoc;
+    }
+    const counterFieldValue = getNumberField(viewDoc.data, fieldName);
+    const updatedCounterFieldValue = counterFieldValue + incrementValue;
+    const updatedViewData: DocData = {
+      ...viewDoc.data,
+      [fieldName]: updatedCounterFieldValue,
+    };
+    const updatedViewDoc: DocSnapshot = {
+      ...viewDoc,
+      data: updatedViewData,
+    };
+    return updatedViewDoc;
+  };
+}
+
+export function useUpdateCountViews(
+  updatedCollectionName: string,
+  spec: Spec,
+  incrementValue: 1 | -1
+): UpdateCountViews {
+  const { mutateDoc } = useDocSWRConfig();
+
+  const updateCountView = useCallback<UpdateCountView>(
+    ({
+      countedCollectionName,
+      data,
+      refIdFieldName,
+      viewCollectionName,
+      view,
+      counterFieldName,
+    }) => {
+      if (countedCollectionName !== updatedCollectionName) {
+        return;
+      }
+
+      const viewId = getStringField(data, refIdFieldName);
+      const docKey: DocKey = [viewCollectionName, viewId];
+
+      const mutatorCallback = incrementField(counterFieldName, incrementValue);
+
+      // update count view if exists in cache
+      mutateDoc(docKey, mutatorCallback, { view });
+    },
+    [incrementValue, mutateDoc, updatedCollectionName]
+  );
 
   const updateCountViews = useCallback<UpdateCountViews>(
-    ({ updatedCollectionName, spec, incrementValue, data }) => {
+    (data) => {
       Object.entries(spec).forEach(([viewCollectionName, { views }]) =>
-        Object.entries(views).forEach(([viewName, { countSpecs }]) =>
+        Object.entries(views).forEach(([view, { countSpecs }]) =>
           Object.entries(countSpecs).forEach(
-            ([
-              counterFieldName,
-              { countedCollectionName, groupBy: refIdFieldName },
-            ]) => {
-              if (countedCollectionName !== updatedCollectionName) {
-                return
-              }
-
-              const viewId = data[refIdFieldName]
-              if (typeof viewId !== 'string') {
-                throw Error(JSON.stringify({ data, refIdFieldName }))
-              }
-
-              const viewKey: ViewKey = [viewCollectionName, viewName, viewId]
-
-              // update count view if exists in cache
-              updateView(viewKey, (viewData) => {
-                const counterFieldValue = viewData[counterFieldName]
-                if (typeof counterFieldValue !== 'number') {
-                  throw Error(JSON.stringify({ counterFieldName, viewData }))
-                }
-
-                const updatedCounterFieldValue =
-                  counterFieldValue + incrementValue
-
-                const updatedViewData = {
-                  ...viewData,
-                  [counterFieldName]: updatedCounterFieldValue,
-                }
-                return updatedViewData
+            ([counterFieldName, { countedCollectionName, groupBy: refIdFieldName }]) =>
+              updateCountView({
+                data,
+                viewCollectionName,
+                view,
+                counterFieldName,
+                countedCollectionName,
+                refIdFieldName,
               })
-            }
           )
         )
-      )
+      );
     },
-    [updateView]
-  )
+    [spec, updateCountView]
+  );
 
-  return updateCountViews
+  return updateCountViews;
 }

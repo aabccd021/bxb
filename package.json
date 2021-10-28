@@ -4,8 +4,8 @@
   "author": "aabccd021 <aabccd021@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "prepare:functions": "cd packages/masmott-functions && yarn prepare",
-    "prepare:eslint": "cd packages/eslint-config-masmott && yarn prepare",
-    "prepare": "yarn prepare:functions && yarn prepare:eslint"
+    "prep:core": "cd packages/masmott && yarn prep",
+    "prep:eslint": "cd packages/eslint-config-masmott && yarn prep",
+    "prep": "yarn prep:core && yarn prep:eslint"
   }
 }
