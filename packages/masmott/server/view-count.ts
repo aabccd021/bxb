@@ -7,7 +7,7 @@ import {
   OnCreateTriggerHandler,
   OnDeleteTrigger,
   OnDeleteTriggerHandler,
-  WriteDocumentData
+  WriteDocumentData,
 } from './types';
 import { getViewCollectionName, mapValues } from './util';
 

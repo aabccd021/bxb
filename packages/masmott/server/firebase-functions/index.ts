@@ -6,7 +6,7 @@ import {
   OnDeleteTrigger,
   OnDeleteTriggerHandler,
   OnUpdateTrigger,
-  OnUpdateTriggerHandler
+  OnUpdateTriggerHandler,
 } from '../types';
 import { wrapFirebaseChangeSnapshot, wrapFirebaseSnapshot } from '../util';
 import { getFunctionsFirestore } from './non-testable';

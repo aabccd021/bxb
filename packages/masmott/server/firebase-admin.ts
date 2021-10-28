@@ -1,10 +1,6 @@
 /* eslint-disable no-restricted-imports */
 import { DocumentReference, FieldValue, getFirestore, GrpcStatus } from 'firebase-admin/firestore';
-import {
-  DocumentData,
-  DocumentSnapshot,
-  QuerySnapshot
-} from '../src';
+import { DocumentData, DocumentSnapshot, QuerySnapshot } from '../src';
 import { WriteDocumentData } from './types';
 import { wrapFirebaseSnapshot } from './util';
 

@@ -1,4 +1,3 @@
-
 import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import lodashMapValues from 'lodash/mapValues';
@@ -10,7 +9,7 @@ import {
   DocumentDataChange,
   FirestoreDataType,
   FirestoreDocumentSnapshot,
-  QueryDocumentSnapshot
+  QueryDocumentSnapshot,
 } from './types';
 
 export function mapValues<T extends string | number, V, VResult>(

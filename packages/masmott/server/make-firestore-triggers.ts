@@ -6,9 +6,18 @@ import { createDoc, deleteDoc, getCollection, updateDoc } from './firebase-admin
 import {
   makeOnCreateTrigger,
   makeOnDeleteTrigger,
-  makeOnUpdateTrigger
+  makeOnUpdateTrigger,
 } from './firebase-functions';
-import { CollectionTriggers, DocumentData, DocumentSnapshot, FirestoreTriggers, OnCreateTrigger, OnDeleteTrigger, OnUpdateTrigger, ViewTriggers } from './types';
+import {
+  CollectionTriggers,
+  DocumentData,
+  DocumentSnapshot,
+  FirestoreTriggers,
+  OnCreateTrigger,
+  OnDeleteTrigger,
+  OnUpdateTrigger,
+  ViewTriggers,
+} from './types';
 import { getDocDataChange, getViewCollectionName } from './util';
 import { materializeCountViewData, onCountedDocCreated, onCountedDocDeleted } from './view-count';
 import { materializeJoinViewData, onJoinRefDocUpdated } from './view-join';

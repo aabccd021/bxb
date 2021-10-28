@@ -1,7 +1,8 @@
-import { getFirestore } from "firebase-admin/firestore";
-import { GetStaticPaths, GetStaticPathsResult, GetStaticProps, GetStaticPropsResult } from "next";
-import { DocSnapshot, ISRPageProps, ViewPath } from "../src";
-import { makeCollectionPath, makeDocPath } from "../src/util";
+// eslint-disable-next-line no-restricted-imports
+import { getFirestore } from 'firebase-admin/firestore';
+import { GetStaticPaths, GetStaticPathsResult, GetStaticProps, GetStaticPropsResult } from 'next';
+import { DocSnapshot, ISRPageProps, ViewPath } from '../src';
+import { makeCollectionPath, makeDocPath } from '../src/util';
 
 export function makeGetStaticPaths(): GetStaticPaths {
   return (): GetStaticPathsResult => ({ paths: [], fallback: true });

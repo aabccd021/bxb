@@ -2,9 +2,9 @@
 import { ChangeEvent } from 'react';
 import { Cache } from 'swr';
 // eslint-disable-next-line import/no-cycle
-import * as Doc from './doc';
+import * as Doc from './types/doc';
 // eslint-disable-next-line import/no-cycle
-import * as DocCreation from './doc-creation';
+import * as DocCreation from './types/doc-creation';
 
 export { Doc, DocCreation };
 

@@ -29,11 +29,12 @@
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
+    "incremental": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx",
+    "**/*.tsx"
   ],
   "exclude": [
     "node_modules"

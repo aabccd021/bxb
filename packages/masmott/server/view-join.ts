@@ -11,7 +11,7 @@ import {
   getDocDataChange,
   getViewCollectionName,
   mergeObjectArray,
-  throwRejectedPromises
+  throwRejectedPromises,
 } from './util';
 
 /**

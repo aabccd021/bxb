@@ -1,24 +1,22 @@
+// eslint-disable-next-line no-restricted-imports
 import {
-	DocumentReference,
-	DocumentSnapshot as FirestoreDocumentSnapshot,
-	FieldValue,
-	QueryDocumentSnapshot
+  DocumentReference,
+  DocumentSnapshot as FirestoreDocumentSnapshot,
+  FieldValue,
+  QueryDocumentSnapshot,
 } from 'firebase-admin/firestore';
 import {
-	Change,
-	CloudFunction,
-	EventContext,
-	firestore,
-	HttpsFunction,
-	SUPPORTED_REGIONS
+  Change,
+  CloudFunction,
+  EventContext,
+  firestore,
+  HttpsFunction,
+  SUPPORTED_REGIONS,
 } from 'firebase-functions';
-import {
-	Dict
-} from '../src';
+import { Dict } from '../src';
 
 export type { Change };
 export type { FirestoreDocumentSnapshot, QueryDocumentSnapshot, DocumentReference };
-
 
 export type FirestoreDataType = string | number;
 
@@ -74,7 +72,6 @@ export type OnCreateTriggerHandler = (
 
 export type OnDeleteTriggerHandler = OnCreateTriggerHandler;
 
-
 export type OnUpdateTriggerHandler = (
   change: DocumentChangeSnapshot,
   context: EventContext
@@ -109,4 +106,3 @@ export type Functions = {
   readonly firestore: FirestoreTriggers;
   readonly nextjs: HttpsFunction;
 };
-
