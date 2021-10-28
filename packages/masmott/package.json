@@ -1,7 +1,7 @@
 {
   "name": "masmott",
   "license": "MIT",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "scripts": {
     "build": "yarn build:core && yarn build:server",
     "prep": "node scripts/prepare",
@@ -14,8 +14,10 @@
     "node": "14"
   },
   "files": [
-    "dist/**",
-    "server/dist/**",
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "server/dist/**/*.js",
+    "server/dist/**/*.d.js",
     "server/package.json"
   ],
   "main": "./dist/index.js",
