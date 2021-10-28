@@ -7,17 +7,15 @@
     "prep": "node scripts/prepare",
     "lint": "eslint --ext .js,.ts .",
     "test": "nyc --reporter=text --reporter=html mocha -r ts-node/register 'test/**/*.ts'",
-    "build:core": "rm -rf dist && bunchee src/index.ts -m",
-    "build:server": "rm -rf server/dist && bunchee index.ts --cwd server -m"
+    "build:core": "rm -rf dist && bunchee src/index.ts -mp",
+    "build:server": "rm -rf server/dist && bunchee index.ts --cwd server -mp"
   },
   "engines": {
     "node": "14"
   },
   "files": [
-    "dist/**/*.js",
-    "dist/**/*.d.ts",
-    "server/dist/**/*.js",
-    "server/dist/**/*.d.js",
+    "dist/",
+    "server/dist/",
     "server/package.json"
   ],
   "main": "./dist/index.js",
