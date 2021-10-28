@@ -1,4 +1,4 @@
-import { DocCreation } from 'masmott/dist/types';
+import { DocCreation } from 'masmott';
 import { useRouter } from 'next/dist/client/router';
 import { useEffect } from 'react';
 import { ThreadData, useThreadCreation } from '../../generated';

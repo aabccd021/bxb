@@ -1,5 +1,5 @@
 import { NextPage } from 'next';
-import { useRouter } from 'next/dist/client/router';
+import { useRouter } from 'next/router';
 // eslint-disable-next-line no-use-before-define
 import React, { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';

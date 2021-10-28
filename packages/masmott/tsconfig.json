@@ -7,7 +7,7 @@
       "esnext",
       "dom"
     ],
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": false,
@@ -17,9 +17,10 @@
     "outDir": "./dist",
     "rootDir": "src",
     "strict": true,
-    "target": "es5",
+    "target": "esnext",
     "baseUrl": ".",
     "noEmitOnError": true,
+    "sourceMap": true,
     "paths": {
       "masmott": [
         "./src/index.ts"

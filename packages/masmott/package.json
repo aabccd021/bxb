@@ -7,8 +7,8 @@
     "prep": "node scripts/prepare",
     "lint": "eslint --ext .js,.ts .",
     "test": "nyc --reporter=text --reporter=html mocha -r ts-node/register 'test/**/*.ts'",
-    "build:core": "rm -rf dist && bunchee src/index.ts -m --no-sourcemap",
-    "build:server": "rm -rf server/dist && bunchee index.ts --cwd server -m --no-sourcemap"
+    "build:core": "rm -rf dist && bunchee src/index.ts -m",
+    "build:server": "rm -rf server/dist && bunchee index.ts --cwd server -m"
   },
   "engines": {
     "node": "14"
@@ -206,7 +206,8 @@
       "no-shadow": "off",
       "@typescript-eslint/no-shadow": "error",
       "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "error"
+      "react-hooks/exhaustive-deps": "error",
+      "react/prop-types": "off"
     },
     "settings": {
       "react": {
