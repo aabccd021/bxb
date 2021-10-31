@@ -3,6 +3,7 @@ schema:
     view:
       default:
         replyCount:
+          type: count
           count: reply
           groupBy: threadId
 

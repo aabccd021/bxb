@@ -19,7 +19,7 @@
     "dist/",
     "server/dist/",
     "server/package.json",
-    "bin/cli/index.js"
+    "bin"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
