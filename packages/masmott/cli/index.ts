@@ -1,19 +1,14 @@
-#!/usr/bin/env node
+import isEqual from 'lodash/isEqual';
+import { build } from './build';
+import { generate } from './generate';
 
-import { isLeft } from 'fp-ts/lib/Either';
-import * as fs from 'fs';
-import { PathReporter } from 'io-ts/PathReporter';
-import { getClientStr } from './client';
-import { parseMasmottConfig } from './parse';
+const args = process.argv.slice(2);
 
-const configStr = fs.readFileSync('./masmott.yaml', { encoding: 'utf-8' });
-
-const parseResult = parseMasmottConfig(configStr);
-
-if (isLeft(parseResult)) {
-  throw Error(PathReporter.report(parseResult)[0]);
+if (isEqual(args, ['generate'])) {
+  generate();
 }
 
-const config = parseResult.right;
+if (isEqual(args, ['build'])) {
+  build();
+}
 
-fs.writeFileSync('masmott.ts', getClientStr(config));

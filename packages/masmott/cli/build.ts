@@ -1,16 +1,18 @@
 import { existsSync, rmSync } from 'fs';
 import {
-  CompilerHost,
-  CompilerOptions,
-  createCompilerHost,
-  createProgram,
-  createSourceFile,
-  flattenDiagnosticMessageText,
-  getLineAndCharacterOfPosition,
-  getPreEmitDiagnostics,
-  ModuleKind,
-  ScriptTarget,
+	CompilerHost,
+	CompilerOptions,
+	createCompilerHost,
+	createProgram,
+	createSourceFile,
+	flattenDiagnosticMessageText,
+	getLineAndCharacterOfPosition,
+	getPreEmitDiagnostics,
+	ModuleKind,
+	ScriptTarget
 } from 'typescript';
+
+export function build(): void {
 
 const indexContent = `import { makeFunctions } from 'masmott/server';
 import conf from './next.config';
@@ -101,3 +103,5 @@ allDiagnostics.forEach((diagnostic) => {
 const exitCode = emitResult.emitSkipped ? 1 : 0;
 console.log(`Process exiting with code '${exitCode}'.`);
 process.exit(exitCode);
+
+}
