@@ -7,5 +7,8 @@
     "prep:core": "cd packages/masmott && yarn prep",
     "prep:eslint": "cd packages/eslint-config-masmott && yarn prep",
     "prep": "yarn prep:core && yarn prep:eslint"
+  },
+  "dependencies": {
+    "fp-ts": "^2.11.5"
   }
 }

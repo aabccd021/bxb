@@ -1,5 +1,4 @@
 /* istanbul ignore file */
-// NOTE: This file should not be edited
 
 import { Doc, DocCreation, FirebaseOptions, Spec, useDoc, useDocCreation } from 'masmott';
 

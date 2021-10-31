@@ -1,0 +1,18 @@
+schema:
+  thread:
+
+  reply:
+    threadId:
+      type: refId
+      referTo: thread
+    text: string
+
+views:
+  thread:
+    default:
+      replyCount:
+        count: reply
+        groupBy: threadId
+
+firebase:
+  projectId: demo-2ch
