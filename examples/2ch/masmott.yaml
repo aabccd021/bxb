@@ -1,18 +1,18 @@
 schema:
   thread:
+    view:
+      default:
+        replyCount:
+          count: reply
+          groupBy: threadId
 
   reply:
-    threadId:
-      type: refId
-      referTo: thread
-    text: string
-
-views:
-  thread:
-    default:
-      replyCount:
-        count: reply
-        groupBy: threadId
+    data:
+      threadId:
+        type: refId
+        referTo: thread
+      text:
+        type: string
 
 firebase:
   projectId: demo-2ch

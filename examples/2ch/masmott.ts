@@ -2,6 +2,13 @@
 
 import { FirebaseOptions } from 'masmott';
 
-export const options: FirebaseOptions = { projectId: 'demo-2ch' };
+export const firebaseOptions: FirebaseOptions = { projectId: 'demo-2ch' };
 
-export const spec = { spec: { thread: { src: {} }, reply: { src: {} } } };
+export const spec = {
+  spec: {
+    thread: { src: {} },
+    reply: {
+      src: { threadId: { type: 'refId', refCollection: 'thread' }, text: { type: 'string' } },
+    },
+  },
+};

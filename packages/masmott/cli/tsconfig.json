@@ -1,8 +1,8 @@
 {
 	"extends": "../tsconfig.json",
 	"compilerOptions": {
-		"rootDir": ".",
-		"outDir": "./bin",
+		"rootDir": "..",
+		"outDir": "../bin",
 		"module": "commonjs"
 	},
 	"include": [

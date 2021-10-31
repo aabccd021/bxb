@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 
+import assertNever from 'assert-never';
 import { isLeft } from 'fp-ts/lib/Either';
 import * as fs from 'fs';
 import * as t from 'io-ts';
 import { PathReporter } from 'io-ts/PathReporter';
 import * as yaml from 'js-yaml';
 import mapValues from 'lodash/mapValues';
+import { Dict, RefIdFieldSpec, SrcFieldSpec, StringFieldSpec, ViewSpec } from '../src';
 
-const StringFieldSchema = t.literal('string');
+const StringFieldSchema = t.type({ type: t.literal('string') });
 
 const RefIdFieldSchema = t.type({
   type: t.literal('refId'),
@@ -17,6 +19,8 @@ const RefIdFieldSchema = t.type({
 const FieldSchema = t.union([StringFieldSchema, RefIdFieldSchema]);
 
 const CollectionSchema = t.union([t.record(t.string, FieldSchema), t.null]);
+
+type CollectionSchema = t.TypeOf<typeof CollectionSchema>;
 
 const Schema = t.record(t.string, CollectionSchema);
 
@@ -51,20 +55,43 @@ if (isLeft(decodeResult)) {
   throw Error(PathReporter.report(decodeResult)[0]);
 }
 
-const { schema, firebase } = decodeResult.right;
+const { schema, views, firebase } = decodeResult.right;
 
-const spec = mapValues(schema, () => {
-  const src = {};
-  return { src };
+function getSrcString(collectionSchema: CollectionSchema): Dict<SrcFieldSpec> {
+  return mapValues(collectionSchema, (fieldSchema) => {
+    if (fieldSchema.type === 'string') {
+      const field: StringFieldSpec = {
+        type: 'string',
+      };
+      return field;
+    }
+    if (fieldSchema.type === 'refId') {
+      const field: RefIdFieldSpec = {
+        type: 'refId',
+        refCollection: fieldSchema.referTo,
+      };
+      return field;
+    }
+    assertNever(fieldSchema);
+  });
+}
+
+function getViewsString(): Dict<ViewSpec> {}
+
+const spec = mapValues(schema, (collectionSchema, collectionName) => {
+  return {
+    src: getSrcString(collectionSchema),
+    views: getViewsString(collectionSchema, collectionName),
+  };
 });
 
 const clientStr = `/* istanbul ignore file */
 
 import { Doc, DocCreation, FirebaseOptions, Spec, useDoc, useDocCreation } from 'masmott';
 
-export const options: FirebaseOptions = { projectId: '${firebase.projectId}' };
+export const firebaseOptions: FirebaseOptions = { projectId: '${firebase.projectId}' };
 
-export const spec = ${JSON.stringify({ spec })}
+export const spec = ${JSON.stringify(spec)}
 
   `;
 
