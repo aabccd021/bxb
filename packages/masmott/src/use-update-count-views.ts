@@ -9,7 +9,7 @@ import {
   UpdateCountView,
   UpdateCountViews,
 } from './types';
-import { useDocSWRConfig } from './use-doc-swr-config';
+import { useMutateDocWithKey } from './use-mutate-doc';
 
 function incrementField(fieldName: string, incrementValue: 1 | -1): DocSnapshotMutatorCallback {
   return (viewDoc): DocSnapshot => {
@@ -35,7 +35,7 @@ export function useUpdateCountViews(
   spec: Spec,
   incrementValue: 1 | -1
 ): UpdateCountViews {
-  const { mutateDoc } = useDocSWRConfig();
+  const mutateDocWithKey = useMutateDocWithKey();
 
   const updateCountView = useCallback<UpdateCountView>(
     ({
@@ -56,9 +56,9 @@ export function useUpdateCountViews(
       const mutatorCallback = incrementField(counterFieldName, incrementValue);
 
       // update count view if exists in cache
-      mutateDoc(docKey, mutatorCallback, { view });
+      mutateDocWithKey(docKey, mutatorCallback, { view });
     },
-    [incrementValue, mutateDoc, updatedCollectionName]
+    [incrementValue, mutateDocWithKey, updatedCollectionName]
   );
 
   const updateCountViews = useCallback<UpdateCountViews>(

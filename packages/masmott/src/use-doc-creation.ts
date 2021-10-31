@@ -1,32 +1,33 @@
-import { setDoc } from 'firebase/firestore/lite';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import { useCallback, useEffect, useState } from 'react';
-import { getDocRef } from './get-doc-ref';
-import { getId } from './get-id';
+import { getId, setDoc } from './firebase';
 import {
   CreateDoc,
   Dict,
   DocCreation,
   DocCreationData,
   DocData,
-  DocKey,
+  DocSnapshot,
+  FirebaseOptions,
   Spec,
   ViewSpec,
 } from './types';
-import { useDocSWRConfig } from './use-doc-swr-config';
+import { useMutateDocWithId } from './use-mutate-doc';
 import { useUpdateCountViews } from './use-update-count-views';
 
 export function useDocCreation<
   DD extends DocData = DocData,
   CDD extends DocCreationData = DocCreationData
->(collection: string, spec: Spec, views: Dict<ViewSpec>): DocCreation.Type<DD, CDD> {
-  const { mutateDoc } = useDocSWRConfig();
-
+>(
+  options: FirebaseOptions,
+  collection: string,
+  spec: Spec,
+  views: Dict<ViewSpec>
+): DocCreation.Type<DD, CDD> {
+  const mutateDocWithId = useMutateDocWithId(collection);
   const incrementCountViews = useUpdateCountViews(collection, spec, 1);
-
   const [creation, setCreation] = useState<DocCreation.Type>({ state: 'initial' });
-
   const reset = useCallback(() => setCreation({ state: 'initial' }), []);
 
   const createViews = useCallback(
@@ -34,32 +35,29 @@ export function useDocCreation<
       Object.entries(views).forEach(([view, viewSpec]) => {
         const materializedSelects = pick(data, viewSpec.selectedFieldNames);
         const materializedCounts = mapValues(viewSpec.countSpecs, () => 0);
-        const materializedData = {
+        const materializedData: DocData = {
           ...materializedSelects,
           ...materializedCounts,
         };
-        const materializedDoc = {
+        const materializedDoc: DocSnapshot = {
           exists: true,
           data: materializedData,
         };
-        const viewDocKey: DocKey = [collection, id];
-        mutateDoc(viewDocKey, materializedDoc, { view });
+        mutateDocWithId(id, materializedDoc, { view });
       });
     },
-    [collection, mutateDoc, views]
+    [mutateDocWithId, views]
   );
 
   const createDoc = useCallback<CreateDoc>(
-    (data) => {
-      const id = getId(collection);
+    async (data) => {
+      const id = await getId(options, collection);
       const createdDoc = { id, data };
       setCreation({ state: 'creating', createdDoc });
-      const docKey: DocKey = [collection, id];
-      const docRef = getDocRef(docKey);
-      setDoc(docRef, data)
+      setDoc(options, collection, id, data)
         .then(() => {
           setCreation({ state: 'created', reset, createdDoc });
-          mutateDoc(docKey, { exists: true, data });
+          mutateDocWithId(id, { exists: true, data });
           incrementCountViews(data);
           createViews(id, data);
         })
@@ -72,7 +70,7 @@ export function useDocCreation<
           })
         );
     },
-    [collection, incrementCountViews, reset, mutateDoc, createViews]
+    [incrementCountViews, reset, mutateDocWithId, createViews, options, collection]
   );
 
   useEffect(() => {

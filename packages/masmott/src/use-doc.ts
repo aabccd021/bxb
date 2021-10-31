@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { fetcher } from './fetcher';
-import { Doc, DocKey } from './types';
+import { makeFetcher } from './firebase';
+import { Doc, DocKey, FirebaseOptions } from './types';
 import { makeDocPath } from './util';
 
 export function useDoc<T extends Doc.Type>(
+  firebaseOptions: FirebaseOptions,
   [collectionName, id]: DocKey,
   options?: {
     readonly view?: string | undefined;
@@ -17,6 +18,8 @@ export function useDoc<T extends Doc.Type>(
     () => makeDocPath(collectionName, id, options?.view),
     [collectionName, options?.view, id]
   );
+
+  const fetcher = useMemo(() => makeFetcher(firebaseOptions), [firebaseOptions]);
 
   const {
     data: snapshot,

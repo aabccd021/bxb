@@ -3,12 +3,12 @@
   "license": "MIT",
   "version": "0.1.4",
   "scripts": {
-    "build": "yarn build:core && yarn build:server",
+    "build": "yarn build:core && yarn build:server && yarn prep",
     "prep": "node scripts/prepare",
     "lint": "eslint --ext .js,.ts .",
     "test": "nyc --reporter=text --reporter=html mocha -r ts-node/register 'test/**/*.ts'",
-    "build:core": "rm -rf dist && bunchee src/index.ts -mp",
-    "build:server": "rm -rf server/dist && bunchee index.ts --cwd server -mp"
+    "build:core": "rm -rf dist && tsc",
+    "build:server": "rm -rf server/dist && cd server && tsc"
   },
   "engines": {
     "node": "14"
@@ -27,8 +27,7 @@
       "types": "./dist/index.d.ts"
     },
     "./server": {
-      "import": "./server/dist/index.esm.js",
-      "require": "./server/dist/index.js",
+      "require": "./server/dist/server/index.js",
       "types": "./server/dist/server/index.d.ts"
     }
   },

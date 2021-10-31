@@ -1,4 +1,6 @@
 /* eslint-disable no-restricted-imports */
+import { FirebaseOptions } from 'firebase/app';
+import { DocumentReference } from 'firebase/firestore/lite';
 import { ChangeEvent } from 'react';
 import { Cache } from 'swr';
 // eslint-disable-next-line import/no-cycle
@@ -6,7 +8,7 @@ import * as Doc from './types/doc';
 // eslint-disable-next-line import/no-cycle
 import * as DocCreation from './types/doc-creation';
 
-export { Doc, DocCreation };
+export type { Doc, DocCreation, DocumentReference, FirebaseOptions };
 
 export type Dict<T> = {
   readonly [key: string]: T;
@@ -141,3 +143,34 @@ export type UpdateCountView = (p: {
 export type Mapped<T extends string | number, VResult> = {
   readonly [P in T]: VResult;
 };
+
+export type SetDoc = (
+  options: FirebaseOptions,
+  collection: string,
+  id: string,
+  data: DocCreationData
+) => Promise<void>;
+
+export type GetId = (options: FirebaseOptions, collection: string) => Promise<string>;
+
+export type InitMasmott = (options: FirebaseOptions) => Promise<void>;
+
+export type Fetcher = (path: string) => Promise<DocSnapshot>;
+
+export type MutateDocOfId = (
+  id: string,
+  data?: DocSnapshot | DocSnapshotMutatorCallback,
+  options?: {
+    readonly view?: string | undefined;
+    readonly shouldRevalidate?: true;
+  }
+) => Promise<void>;
+
+export type MutateDocOfKey = (
+  key: DocKey,
+  data?: DocSnapshot | DocSnapshotMutatorCallback,
+  options?: {
+    readonly view?: string | undefined;
+    readonly shouldRevalidate?: true;
+  }
+) => Promise<void>;

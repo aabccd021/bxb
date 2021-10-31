@@ -9,8 +9,8 @@
   "scripts": {
     "lint": "eslint ./ --ext ts,tsx",
     "clean-coverage": "rm -rf .nyc_output && rm -rf coverage",
-    "server:build": "tsc --project tsconfig.functions.json",
-    "client:build": "next build",
+    "server:build": "rm -rf .functions && tsc --project tsconfig.functions.json",
+    "client:build": "rm -rf .next && next build",
     "build": "yarn client:build && yarn server:build",
     "start:cached": "firebase emulators:start",
     "start": "yarn build && yarn start:cached",

@@ -1,7 +1,9 @@
 /* istanbul ignore file */
 // NOTE: This file should not be edited
 
-import { Doc, DocCreation, Spec, useDoc, useDocCreation, useMasmottWithOption } from 'masmott';
+import { Doc, DocCreation, FirebaseOptions, Spec, useDoc, useDocCreation } from 'masmott';
+
+export const options: FirebaseOptions = { projectId: 'demo-2ch' };
 
 export const spec = {
   thread: {
@@ -54,19 +56,19 @@ export type ReplyCreationData = {
 export type ThreadCreation = DocCreation.Type<ThreadData, ThreadCreationData>;
 
 export function useThreadCreation(): ThreadCreation {
-  return useDocCreation('thread', spec as Spec, spec.thread.views);
+  return useDocCreation(options, 'thread', spec as Spec, spec.thread.views);
 }
 
 export type ReplyCreation = DocCreation.Type<ReplyData, ReplyCreationData>;
 
 export function useReplyCreation(): ReplyCreation {
-  return useDocCreation('reply', spec as Spec, spec.reply.views);
+  return useDocCreation(options, 'reply', spec as Spec, spec.reply.views);
 }
 
 export type ThreadDoc = Doc.Type<ThreadData>;
 
 export function useThread(id: string): ThreadDoc {
-  return useDoc(['thread', id]);
+  return useDoc(options, ['thread', id]);
 }
 
 export type ThreadPage = Doc.Type<ThreadPageData>;
@@ -77,19 +79,11 @@ export type TheradPageSnapshot = {
 };
 
 export function useThreadPage(id: string): ThreadPage {
-  return useDoc(['thread', id], { view: 'page' });
+  return useDoc(options, ['thread', id], { view: 'page' });
 }
 
 export type ReplyDoc = Doc.Type<ReplyData>;
 
 export function useReply(id: string): ReplyDoc {
-  return useDoc(['reply', id], undefined);
-}
-
-const options = {
-  projectId: 'demo-2ch',
-};
-
-export function useMasmott(): void {
-  return useMasmottWithOption(options);
+  return useDoc(options, ['reply', id], undefined);
 }

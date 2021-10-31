@@ -3,21 +3,23 @@ import { useRouter } from 'next/router';
 // eslint-disable-next-line no-use-before-define
 import React, { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
-import { Doc, DocData, ISRPage, ISRPageProps, ViewPath } from './types';
+import { Doc, DocData, FirebaseOptions, ISRPage, ISRPageProps, ViewPath } from './types';
 import { useDoc } from './use-doc';
 
 function PageWithSnapshot<VDD extends DocData>({
+  options,
   Page,
   id,
   viewPath: [collection, view],
   useLocalData,
 }: {
+  readonly options: FirebaseOptions;
   readonly Page: ISRPage<VDD>;
   readonly id: string;
   readonly viewPath: ViewPath;
   readonly useLocalData: boolean;
 }): JSX.Element {
-  const viewDoc = useDoc<Doc.Type<VDD>>([collection, id], {
+  const viewDoc = useDoc<Doc.Type<VDD>>(options, [collection, id], {
     view,
     revalidateOnMount: !useLocalData,
   });
@@ -25,9 +27,11 @@ function PageWithSnapshot<VDD extends DocData>({
 }
 
 function PageWithId<DD extends DocData>({
+  options,
   Page,
   viewPath,
 }: {
+  readonly options: FirebaseOptions;
   readonly Page: ISRPage<DD>;
   readonly viewPath: ViewPath;
 }): JSX.Element {
@@ -55,7 +59,13 @@ function PageWithId<DD extends DocData>({
     <>
       <p>useLocalData: {JSON.stringify(useLocalData)}</p>
       {id !== undefined ? (
-        <PageWithSnapshot Page={Page} viewPath={viewPath} id={id} useLocalData={useLocalData} />
+        <PageWithSnapshot
+          options={options}
+          Page={Page}
+          viewPath={viewPath}
+          id={id}
+          useLocalData={useLocalData}
+        />
       ) : (
         <Page />
       )}
@@ -64,12 +74,13 @@ function PageWithId<DD extends DocData>({
 }
 
 export function makeISRPage<DD extends DocData>(
+  options: FirebaseOptions,
   viewPath: ViewPath,
   Page: ISRPage<DD>
 ): NextPage<ISRPageProps> {
   const StaticPage: NextPage<ISRPageProps> = ({ fallback }) => (
     <SWRConfig value={{ fallback }}>
-      <PageWithId Page={Page} viewPath={viewPath} />
+      <PageWithId options={options} Page={Page} viewPath={viewPath} />
     </SWRConfig>
   );
   return StaticPage;
