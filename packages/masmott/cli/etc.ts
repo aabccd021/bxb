@@ -126,3 +126,46 @@ module.exports = {
   }
 }
 `;
+
+export const cypressPlugins = `
+module.exports = (on, config) => {
+	require('@cypress/code-coverage/task')(on, config)
+	// IMPORTANT to return the config object
+	// with the any changed environment variables
+	return config
+}
+`;
+
+export const cypressSupport = `import '@cypress/code-coverage/support';`;
+
+export const cypressTsconfig = {
+  compilerOptions: {
+    target: 'es5',
+    lib: ['es5', 'dom'],
+    types: ['cypress'],
+  },
+  include: ['**/*.ts'],
+};
+
+export const apiCoverage = `/* istanbul ignore file */
+module.exports = require('@cypress/code-coverage/middleware/nextjs')`;
+
+export function pageId(): string {
+  return `/* istanbul ignore file */
+import { makeISRPage, ViewPath } from 'masmott';
+import { makeGetStaticPaths, makeGetStaticProps } from 'masmott/server';
+import { options, ThreadPageData } from '../../generated';
+import Page from '../../web/thread/[id]';
+const viewPath: ViewPath = ['thread', 'page'];
+const ISRPage = makeISRPage<ThreadPageData>(options, viewPath, Page);
+export default ISRPage;
+export const getStaticPaths = makeGetStaticPaths();
+export const getStaticProps = makeGetStaticProps(viewPath);`;
+}
+
+export function page(): string {
+  return `/* istanbul ignore file */
+import Page from '../../web/thread/new';
+
+export default Page;`;
+}
