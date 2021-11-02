@@ -40,3 +40,4 @@ cypress/screenshots
 pages
 masmott.ts
 package.json
+tsconfig.json
