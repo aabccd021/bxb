@@ -92,14 +92,7 @@ service cloud.firestore {
       // This rule allows anyone with your database reference to view, edit,
       // and delete all data in your database. It is useful for getting
       // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2021, 11, 16);
-    }
+      // leaves your app open to attackers. At that time, all client // requests to your database will be denied.  // // Make sure to write security rules for your app before that time, or // else all client requests to your database will be denied until you // update your rules.  allow read, write: if request.time < timestamp.date(2021, 11, 16); }
   }
 }
 `;
@@ -137,14 +130,14 @@ module.exports = (on, config) => {
 
 export const cypressSupport = `import '@cypress/code-coverage/support';`;
 
-export const cypressTsconfig = {
+export const cypressTsconfig = JSON.stringify({
   compilerOptions: {
     target: 'es5',
     lib: ['es5', 'dom'],
     types: ['cypress'],
   },
   include: ['**/*.ts'],
-};
+});
 
 export const apiCoverage = `/* istanbul ignore file */
 module.exports = require('@cypress/code-coverage/middleware/nextjs')`;
@@ -169,9 +162,9 @@ import Page from '../../web/thread/new';
 export default Page;`;
 }
 
-export function packageJson(): string {
+export function packageJson(projectId: string): string {
   const packageJsonContent = {
-    name: '2ch',
+    name: projectId,
     version: '0.1.0',
     private: true,
     engines: {
@@ -225,7 +218,7 @@ export function packageJson(): string {
   return JSON.stringify(packageJsonContent);
 }
 
-export const tsconfig = {
+export const tsconfig = JSON.stringify({
   compilerOptions: {
     target: 'es5',
     lib: ['dom', 'dom.iterable', 'esnext'],
@@ -254,4 +247,4 @@ export const tsconfig = {
   },
   include: ['next-env.d.ts', '**/*.ts', '**/*.tsx'],
   exclude: ['node_modules'],
-};
+});

@@ -1,13 +1,14 @@
-import { DocCreation } from 'masmott';
+import type { DocCreation } from 'masmott';
 import { useRouter } from 'next/dist/client/router';
 import { useEffect } from 'react';
-import { ThreadData, useThreadCreation } from '../../generated';
+import type { ThreadData } from '../../generated';
+import { useThreadCreation } from '../../generated';
 
-function Created({
-  creation: { createdDoc },
-}: {
+type Props = {
   readonly creation: DocCreation.Created<ThreadData>;
-}): JSX.Element {
+};
+
+function Created({ creation: { createdDoc } }: Props): JSX.Element {
   const router = useRouter();
   useEffect(() => {
     router.push(`/thread/${encodeURIComponent(createdDoc.id)}?useLocalData=true`);
@@ -21,7 +22,13 @@ export default function Page(): JSX.Element {
   return (
     <>
       {creation.state === 'notCreated' && (
-        <button onClick={() => creation.createDoc({})}>Create</button>
+        <button
+          onClick={(): void => {
+            creation.createDoc({});
+          }}
+        >
+          Create
+        </button>
       )}
 
       {creation.state === 'created' && <Created creation={creation} />}

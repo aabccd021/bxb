@@ -1,4 +1,5 @@
 import * as t from 'io-ts';
+import { Dict } from 'src/types';
 
 const StringFieldSchema = t.type({ type: t.literal('string') });
 export type StringFieldSchema = t.TypeOf<typeof StringFieldSchema>;
@@ -47,3 +48,5 @@ export const MasmottConfig = t.type({
   firebase: FirebaseConfig,
 });
 export type MasmottConfig = t.TypeOf<typeof MasmottConfig>;
+
+export type WriteFileDict = Dict<string | WriteFileDict>;

@@ -1,5 +1,6 @@
 import { useInput } from 'masmott';
-import { TheradPageSnapshot, useReplyCreation } from '../../generated';
+import type { TheradPageSnapshot } from '../../generated';
+import { useReplyCreation } from '../../generated';
 
 function ThreadDetail(thread: {
   readonly data?: { readonly replyCount: number };
@@ -14,7 +15,11 @@ function ThreadDetail(thread: {
       {replyCreation.state === 'notCreated' && (
         <>
           <input type="text" value={text} onChange={setText} />
-          <button onClick={() => replyCreation.createDoc({ threadId: thread.id, text })}>
+          <button
+            onClick={(): void => {
+              replyCreation.createDoc({ threadId: thread.id, text });
+            }}
+          >
             post
           </button>
         </>

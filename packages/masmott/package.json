@@ -3,6 +3,7 @@
   "license": "MIT",
   "version": "0.1.4",
   "scripts": {
+    "clii": "yarn build:cli && yarn prep && cd ../../examples/2ch/ && yarn node ./examples/2ch/node_modules/masmott/bin/cli/index.js && cd ../../packages/masmott",
     "build": "yarn build:core && yarn build:server && yarn build:cli && yarn prep",
     "prep": "node scripts/prepare",
     "lint": "eslint --ext .js,.ts .",

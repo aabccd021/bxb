@@ -10,9 +10,10 @@ import * as DocCreation from './types/doc-creation';
 
 export type { Doc, DocCreation, DocumentReference, FirebaseOptions };
 
-export type Dict<T> = {
+// eslint-disable-next-line functional/prefer-type-literal
+export interface Dict<T> {
   readonly [key: string]: T;
-};
+}
 
 export type StringFieldSpec = {
   readonly type: 'string';

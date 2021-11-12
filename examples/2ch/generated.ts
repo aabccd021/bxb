@@ -1,6 +1,7 @@
 /* istanbul ignore file */
 
-import { Doc, DocCreation, FirebaseOptions, Spec, useDoc, useDocCreation } from 'masmott';
+import type { Doc, DocCreation, FirebaseOptions, Spec } from 'masmott';
+import { useDoc, useDocCreation } from 'masmott';
 
 export const options: FirebaseOptions = { projectId: 'demo-2ch' };
 
