@@ -41,3 +41,12 @@ pages
 masmott.ts
 package.json
 tsconfig.json
+firebase.json
+cypress.json
+cypress/plugins
+cypress/support
+firestore.indexes.json
+firestore.rules
+next-env.d.ts
+next.config.js
+.babelrc

@@ -11,6 +11,9 @@ function writeFiles(writeFileDict: WriteFileDict, cwd: string): void {
   forEach(writeFileDict, (content, name) => {
     const path = `${cwd}/${name}`;
     if (typeof content === 'string') {
+      if (!fs.existsSync(cwd)) {
+        fs.mkdirSync(cwd, { recursive: true });
+      }
       fs.writeFileSync(path, content);
       return;
     }
