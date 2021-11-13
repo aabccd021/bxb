@@ -1,5 +1,5 @@
 import { useInput } from 'masmott';
-import type { TheradPageSnapshot } from '../../generated';
+import type { ThreadPageSnapshot } from '../../generated';
 import { useReplyCreation } from '../../generated';
 
 function ThreadDetail(thread: {
@@ -37,7 +37,7 @@ function ThreadDetail(thread: {
 export default function Page({
   snapshot,
 }: {
-  readonly snapshot?: TheradPageSnapshot;
+  readonly snapshot?: ThreadPageSnapshot;
 }): JSX.Element {
   return (
     <>

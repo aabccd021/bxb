@@ -120,7 +120,9 @@ const nextEnv = `
 // see https://nextjs.org/docs/basic-features/typescript for more information.
 `;
 
-const nextConfig = `{
+const nextConfig = `
+/** @type {import('next').NextConfig} */
+module.exports = {
   reactStrictMode: true,
   redirects: () => {
     return [

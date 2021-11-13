@@ -73,7 +73,7 @@ export function useThread(id: string): ThreadDoc {
 
 export type ThreadPage = Doc.Type<ThreadPageData>;
 
-export type TheradPageSnapshot = {
+export type ThreadPageSnapshot = {
   readonly id: string;
   readonly doc: ThreadPage;
 };

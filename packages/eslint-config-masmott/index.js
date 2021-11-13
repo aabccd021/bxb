@@ -1,4 +1,9 @@
 module.exports = {
+	parserOptions: {
+		project: [
+			"**/tsconfig.json"
+		],
+	},
 	plugins: [
 		'@typescript-eslint',
 		'only-warn',
@@ -10,12 +15,12 @@ module.exports = {
 	ignorePatterns: [
 		"**/*.js",
 		"generated.ts",
-		"masmott.ts",
 		"pages/**/*.tsx",
 	],
 	overrides: [
 		{
 			files: [
+				'masmott.ts',
 				'web/**/*.tsx'
 			],
 			extends: [

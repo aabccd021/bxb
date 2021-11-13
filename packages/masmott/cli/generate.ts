@@ -1,5 +1,4 @@
-#!/usr/bin/env node
-
+import { exec } from 'child_process';
 import { isLeft } from 'fp-ts/lib/Either';
 import * as fs from 'fs';
 import { PathReporter } from 'io-ts/PathReporter';
@@ -28,4 +27,5 @@ export function generate(): void {
     throw Error(PathReporter.report(parseResult)[0]);
   }
   writeFiles(getWriteFileDict(parseResult.right), '.');
+  exec('yarn lint --fix');
 }
