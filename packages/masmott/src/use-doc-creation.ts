@@ -30,12 +30,10 @@ export function useDocCreation<DCD extends DocCreationData = DocCreationData>(
       const createdDoc: DocCreationWithId<DCD> = { id, data };
       setState({ state: 'creating', createdDoc });
 
-      // add doc to cache
       mutateDocWithId(id, { exists: true, data });
 
       incrementCountViews(data, 1);
 
-      // materialize views
       const materializedDocs = makeMaterializedDocs(data, collectionViews);
       materializedDocs.forEach((materializedDoc) =>
         mutateDocWithId(id, materializedDoc.snapshot, { viewName: materializedDoc.viewName })
@@ -50,11 +48,11 @@ export function useDocCreation<DCD extends DocCreationData = DocCreationData>(
             reset,
             retry: () => createDoc(data),
           });
+
           mutateDocWithId(id, { exists: false });
 
           incrementCountViews(data, -1);
 
-          // materialize views
           materializedDocs.forEach((materializedDoc) =>
             mutateDocWithId(id, { exists: false }, { viewName: materializedDoc.viewName })
           );

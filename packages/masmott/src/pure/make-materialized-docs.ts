@@ -12,10 +12,10 @@ export function makeMaterializedDocs(
 }[] {
   return Object.entries(collectionViews).map(([viewName, viewSpec]) => {
     const selectedFieldNames: readonly string[] = Object.entries(viewSpec).reduce(
-      (acc: readonly string[], [viewFieldName, viewFieldSpec]) => {
-        const isSelectViewField = viewFieldSpec === undefined;
-        if (isSelectViewField) {
-          return [...acc, viewFieldName];
+      (acc: readonly string[], [fieldName, fieldSpec]) => {
+        const isSelectedFieldSpec = fieldSpec === undefined;
+        if (isSelectedFieldSpec) {
+          return [...acc, fieldName];
         }
         return acc;
       },

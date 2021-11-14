@@ -1,6 +1,5 @@
 export * from './firebase';
 export * from './isr';
-export * from './type-util';
 export * from './types';
 export * from './use-doc';
 export * from './use-doc-creation';
