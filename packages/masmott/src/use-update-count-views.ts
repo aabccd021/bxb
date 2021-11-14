@@ -1,29 +1,22 @@
 import { useCallback } from 'react';
 import { makeViewDocMutations } from './pure/make-view-doc-mutation';
-import { UpdateCountViews } from './types';
-import { Schema } from './types/io';
+import { DocCreationData, IncrementSpecs, UpdateCountViews } from './types';
 import { useMutateDocWithKey } from './use-mutate-doc';
 
-export function useUpdateCountViews(
+export function useUpdateCountViews<DCD extends DocCreationData>(
   incrementValue: 1 | -1,
-  schema: Schema,
-  updatedCollectionName: string
-): UpdateCountViews {
+  incrementSpecs: IncrementSpecs<DCD>
+): UpdateCountViews<DCD> {
   const mutateDocWithKey = useMutateDocWithKey();
 
-  const updateCountViews = useCallback<UpdateCountViews>(
+  const updateCountViews = useCallback<UpdateCountViews<DCD>>(
     (data) => {
-      const viewDocMutations = makeViewDocMutations(
-        data,
-        incrementValue,
-        schema,
-        updatedCollectionName
-      );
+      const viewDocMutations = makeViewDocMutations<DCD>(data, incrementValue, incrementSpecs);
       viewDocMutations.forEach(({ docKey, mutatorCallback, viewName }) =>
         mutateDocWithKey(docKey, mutatorCallback, { viewName })
       );
     },
-    [incrementValue, schema, updatedCollectionName, mutateDocWithKey]
+    [incrementValue, incrementSpecs, mutateDocWithKey]
   );
 
   return updateCountViews;

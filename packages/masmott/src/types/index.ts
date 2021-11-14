@@ -91,7 +91,7 @@ export type DocSWRConfig = {
   readonly mutateDoc: MutateDoc;
 };
 
-export type UpdateCountViews = (data: DocData) => void;
+export type UpdateCountViews<DD extends DocData> = (data: DD) => void;
 
 export type ISRPageProps = {
   readonly fallback: Dict<DocSnapshot>;
@@ -148,3 +148,24 @@ export type MutateDocWithKey = (
     readonly shouldRevalidate?: true;
   }
 ) => Promise<void>;
+
+export type ViewDocMutationGen<
+  COUNTED_DCD extends DocCreationData,
+  COUNT_FN extends string = string,
+  COUNTER_DD extends { readonly [P in COUNT_FN]: number } & DocData = {
+    readonly [P in COUNT_FN]: number;
+  } & DocData
+> = {
+  readonly getDocId: (countedDocData: COUNTED_DCD) => string;
+  readonly makeMutatorCallback: (incrementValue: 1 | -1) => DocSnapshotMutatorCallback<COUNTER_DD>;
+};
+
+export type ViewDocMutation = {
+  readonly docKey: DocKey;
+  readonly mutatorCallback: DocSnapshotMutatorCallback;
+  readonly viewName: string;
+};
+
+export type IncrementSpecs<COUNTED_DCD extends DocCreationData> = Dict<
+  Dict<Dict<ViewDocMutationGen<COUNTED_DCD>>>
+>;

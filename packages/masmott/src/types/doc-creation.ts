@@ -1,13 +1,13 @@
 // eslint-disable-next-line import/no-cycle
-import { CreateDoc, DocCreationData, DocData, DocWithId } from '.';
+import { CreateDoc, DocCreationData, DocCreationData, DocWithId } from '.';
 
-export type Created<DD extends DocData = DocData> = {
+export type Created<DD extends DocCreationData = DocCreationData> = {
   readonly state: 'created';
   readonly createdDoc: DocWithId<DD>;
   readonly reset: () => void;
 };
 
-export type Creating<DD extends DocData = DocData> = {
+export type Creating<DD extends DocCreationData = DocCreationData> = {
   readonly state: 'creating';
   readonly createdDoc: DocWithId<DD>;
 };
@@ -26,7 +26,7 @@ export type NotCreated<CDD extends DocCreationData = DocCreationData> = {
   readonly createDoc: CreateDoc<CDD>;
 };
 
-export type Type<DD extends DocData = DocData, CDD extends DocCreationData = DocCreationData> =
+export type Type<DD extends DocCreationData = DocCreationData, CDD extends DocCreationData = DocCreationData> =
   | Initial
   | NotCreated<CDD>
   | Error

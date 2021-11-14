@@ -1,31 +1,39 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getId, setDoc } from './firebase';
 import { makeMaterializedDocs } from './pure/make-materialized-docs';
-import { CreateDoc, DocCreation, DocCreationData, DocData, FirebaseOptions } from './types';
-import { CollectionViews, Schema } from './types/io';
+import {
+  CreateDoc,
+  DocCreation,
+  DocCreationData,
+  DocData,
+  DocWithId,
+  FirebaseOptions,
+  IncrementSpecs,
+} from './types';
+import { CollectionViews } from './types/io';
 import { useMutateDocWithId } from './use-mutate-doc';
 import { useUpdateCountViews } from './use-update-count-views';
 
 export function useDocCreation<
   DD extends DocData = DocData,
-  CDD extends DocCreationData = DocCreationData
+  DCD extends DocCreationData = DocCreationData
 >(
+  collectionName: string,
+  collectionViews: CollectionViews,
   firebaseOptions: FirebaseOptions,
-  collection: string,
-  schema: Schema,
-  collectionViews: CollectionViews
-): DocCreation.Type<DD, CDD> {
-  const mutateDocWithId = useMutateDocWithId(collection);
-  const incrementCountViews = useUpdateCountViews(collection, schema, 1);
+  incrementSpecs: IncrementSpecs<DCD>
+): DocCreation.Type<DD, DCD> {
+  const mutateDocWithId = useMutateDocWithId(collectionName);
+  const incrementCountViews = useUpdateCountViews<DCD>(1, incrementSpecs);
   const [creation, setCreation] = useState<DocCreation.Type>({ state: 'initial' });
   const reset = useCallback(() => setCreation({ state: 'initial' }), []);
 
-  const createDoc = useCallback<CreateDoc>(
+  const createDoc = useCallback<CreateDoc<DCD>>(
     async (data) => {
-      const id = await getId(firebaseOptions, collection);
-      const createdDoc = { id, data };
+      const id = await getId(firebaseOptions, collectionName);
+      const createdDoc: DocWithId = { id, data };
       setCreation({ state: 'creating', createdDoc });
-      setDoc(firebaseOptions, collection, id, data)
+      setDoc(firebaseOptions, collectionName, id, data)
         .then(() => {
           setCreation({ state: 'created', reset, createdDoc });
 
@@ -49,14 +57,17 @@ export function useDocCreation<
           })
         );
     },
-    [incrementCountViews, reset, mutateDocWithId, firebaseOptions, collection, collectionViews]
+    [incrementCountViews, reset, mutateDocWithId, firebaseOptions, collectionName, collectionViews]
   );
 
   useEffect(() => {
     if (creation.state === 'initial') {
-      setCreation({ state: 'notCreated', createDoc });
+      setCreation({
+        state: 'notCreated',
+        createDoc: createDoc as CreateDoc,
+      });
     }
   }, [createDoc, creation]);
 
-  return creation as DocCreation.Type<DD, CDD>;
+  return creation as DocCreation.Type<DD, DCD>;
 }

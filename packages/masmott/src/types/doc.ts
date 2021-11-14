@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-cycle
-import { DocData } from '.';
+import { DocCreationData } from '.';
 
 export type Error = {
   readonly state: 'error';
@@ -15,16 +15,16 @@ export type LoadedNotExists = {
   readonly revalidate: () => void;
 };
 
-export type LoadedExists<DD extends DocData = DocData> = {
+export type LoadedExists<DD extends DocCreationData = DocCreationData> = {
   readonly state: 'loaded';
   readonly exists: true;
   readonly data: DD;
   readonly revalidate: () => void;
 };
 
-export type Loaded<DD extends DocData = DocData> = LoadedExists<DD> | LoadedNotExists;
+export type Loaded<DD extends DocCreationData = DocCreationData> = LoadedExists<DD> | LoadedNotExists;
 
-export type Type<DD extends DocData = DocData> =
+export type Type<DD extends DocCreationData = DocCreationData> =
   | Error
   | Fetching
   | LoadedNotExists
