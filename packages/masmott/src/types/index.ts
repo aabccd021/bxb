@@ -41,13 +41,13 @@ export type QuerySnapshot = {
 
 export type Field = string | number;
 
+export type CreationField = string | number;
+
 export type DocKey<C extends string = string> = readonly [C, string];
 
 export type ViewKey = readonly [string, string, string];
 
-export type DocCreationData = {
-  readonly [key: string]: Field;
-};
+export type DocCreationData = Dict<CreationField>;
 
 export type DocData = {
   readonly [key: string]: Field;

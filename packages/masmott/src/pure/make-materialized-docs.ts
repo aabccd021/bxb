@@ -1,82 +1,46 @@
+/* eslint-disable no-use-before-define */
 import pick from 'lodash/pick';
-import { CollectionViews } from 'src/types/io';
-import { Dict, DocData, DocSnapshot, Field } from '../types';
+import { Dict, DocCreationData, DocData } from '../types';
 
 function fromEntries<T extends string, V>(arr: readonly (readonly [T, V])[]): Record<T, V> {
   return Object.fromEntries(arr) as Record<T, V>;
 }
 
-export function materialize<
-  SELECT_FIELD_NAME extends string,
-  DD extends Record<SELECT_FIELD_NAME, Field>,
-  COUNT_FIELD_NAME extends string
+export type Materialize<
+  DD extends DocCreationData,
+  SELECT_FIELD_NAME extends keyof DD = keyof DD,
+  COUNT_FIELD_NAME extends Exclude<string, keyof DD> = Exclude<string, keyof DD>
+> = (
+  data: DD
+) => { readonly [P in SELECT_FIELD_NAME]: DD[P] } & Record<
+  Exclude<COUNT_FIELD_NAME, keyof DD>,
+  number
+>;
+
+export function makeMaterialize<
+  DD extends DocCreationData,
+  SELECT_FIELD_NAME extends keyof DD,
+  COUNT_FIELD_NAME extends Exclude<string, keyof DD>
 >(
   selectedFieldNames: readonly SELECT_FIELD_NAME[],
   countFieldNames: readonly COUNT_FIELD_NAME[]
-): (
-  data: DD
-) => { readonly [P in SELECT_FIELD_NAME]: DD[P] } & Record<Exclude<COUNT_FIELD_NAME, keyof DD>, 0> {
+): Materialize<DD, SELECT_FIELD_NAME, COUNT_FIELD_NAME> {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   return (data) => ({
-    ...fromEntries(countFieldNames.map((fieldName) => [fieldName, 0 as const])),
+    ...fromEntries(countFieldNames.map((fieldName) => [fieldName, 0])),
     ...pick(data, selectedFieldNames),
   });
 }
 
-const x = materialize<'foo'>(['foo'], ['foo']);
-x.foo;
-
-export const schema = {
-  foo: {
-    view: {
-      page: {
-        bar: {
-          type: 'select',
-        },
-      },
-    },
-  },
-};
-
-export function makeMaterializedDocs(
-  data: DocData,
-  collectionViews: CollectionViews
+export function materializeDocs<DCD extends DocCreationData>(
+  materializeViews: Dict<Materialize<DCD>>,
+  data: DCD
 ): readonly {
-  readonly snapshot: DocSnapshot;
+  readonly data: DocData;
   readonly viewName: string;
 }[] {
-  return Object.entries(collectionViews).map(([viewName, view]) => {
-    const selectedFieldNames = Object.entries(view).reduce(
-      (acc: readonly string[], [fieldName, fieldSpec]) => {
-        const isSelectedFieldSpec = fieldSpec === undefined;
-        if (isSelectedFieldSpec) {
-          return [...acc, fieldName];
-        }
-        return acc;
-      },
-      []
-    );
-    const materializedSelects = pick(data, selectedFieldNames);
-
-    const materializedCounts = Object.entries(view).reduce(
-      (acc: Dict<0>, [fieldName, fieldSpec]) => {
-        const isCountFieldSpec = fieldSpec?.type === 'count';
-        if (isCountFieldSpec) {
-          return { ...acc, [fieldName]: 0 as const };
-        }
-        return acc;
-      },
-      {}
-    );
-
-    const materializedData: DocData = {
-      ...materializedSelects,
-      ...materializedCounts,
-    };
-    const materializedDocSnapshot: DocSnapshot = {
-      exists: true,
-      data: materializedData,
-    };
-    return { snapshot: materializedDocSnapshot, viewName };
-  });
+  return Object.entries(materializeViews).map(([viewName, materializeView]) => ({
+    data: materializeView(data),
+    viewName,
+  }));
 }
