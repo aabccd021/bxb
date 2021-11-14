@@ -62,13 +62,18 @@ export type DocSnapshot<DD extends DocData = DocData> =
       readonly exists: false;
     };
 
-export type CreateDoc<CDD extends DocCreationData = DocCreationData> = (data: CDD) => void;
+export type CreateDoc<DCD extends DocCreationData = DocCreationData> = (data: DCD) => void;
 
 export type Retry = () => void;
 
 export type DocWithId<DD extends DocData = DocData> = {
   readonly id: string;
   readonly data: DD;
+};
+
+export type DocCreationWithId<DCD extends DocCreationData> = {
+  readonly id: string;
+  readonly data: DCD;
 };
 
 export type DocSnapshotMutatorCallback<DD extends DocData = DocData> = (
@@ -91,7 +96,7 @@ export type DocSWRConfig = {
   readonly mutateDoc: MutateDoc;
 };
 
-export type UpdateCountViews<DD extends DocData> = (data: DD) => void;
+export type UpdateCountViews<DD extends DocData> = (data: DD, incrementValue: 1 | -1) => void;
 
 export type ISRPageProps = {
   readonly fallback: Dict<DocSnapshot>;

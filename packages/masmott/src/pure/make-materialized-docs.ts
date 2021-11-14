@@ -7,7 +7,7 @@ export function makeMaterializedDocs(
   data: DocData,
   collectionViews: CollectionViews
 ): readonly {
-  readonly materializedDoc: DocSnapshot;
+  readonly snapshot: DocSnapshot;
   readonly viewName: string;
 }[] {
   return Object.entries(collectionViews).map(([viewName, viewSpec]) => {
@@ -27,10 +27,10 @@ export function makeMaterializedDocs(
       ...materializedSelects,
       ...materializedCounts,
     };
-    const materializedDoc: DocSnapshot = {
+    const materializedDocSnapshot: DocSnapshot = {
       exists: true,
       data: materializedData,
     };
-    return { materializedDoc, viewName };
+    return { snapshot: materializedDocSnapshot, viewName };
   });
 }
