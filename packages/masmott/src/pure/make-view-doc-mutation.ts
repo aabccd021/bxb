@@ -8,10 +8,9 @@ import {
   ViewDocMutation,
 } from 'masmott';
 
-export function makeIncrementField<
-  FN extends string,
-  DD extends { readonly [P in FN]: number } & DocData
->(fieldName: FN): (incrementValue: 1 | -1) => DocSnapshotMutatorCallback<DD> {
+export function makeIncrementField<FN extends string, DD extends Record<FN, number> & DocData>(
+  fieldName: FN
+): (incrementValue: 1 | -1) => DocSnapshotMutatorCallback<DD> {
   return (incrementValue) =>
     (viewDoc): DocSnapshot => {
       if (!viewDoc.exists) {

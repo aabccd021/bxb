@@ -26,13 +26,12 @@ export function useDocCreation<DCD extends DocCreationData = DocCreationData>(
 
   const createDoc = useCallback<CreateDoc<DCD>>(
     async (data) => {
+      incrementCountViews(data, 1);
       const id = await getId(firebaseOptions, collectionName);
       const createdDoc: DocCreationWithId<DCD> = { id, data };
       setState({ state: 'creating', createdDoc });
 
       mutateDocWithId(id, { exists: true, data });
-
-      incrementCountViews(data, 1);
 
       const materializedDocs = makeMaterializedDocs(data, collectionViews);
       materializedDocs.forEach((materializedDoc) =>

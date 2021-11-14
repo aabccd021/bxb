@@ -1,7 +1,6 @@
-import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import { CollectionViews } from 'src/types/io';
-import { DocData, DocSnapshot } from '../types';
+import { Dict, DocData, DocSnapshot } from '../types';
 
 export function makeMaterializedDocs(
   data: DocData,
@@ -11,7 +10,7 @@ export function makeMaterializedDocs(
   readonly viewName: string;
 }[] {
   return Object.entries(collectionViews).map(([viewName, viewSpec]) => {
-    const selectedFieldNames: readonly string[] = Object.entries(viewSpec).reduce(
+    const selectedFieldNames = Object.entries(viewSpec).reduce(
       (acc: readonly string[], [fieldName, fieldSpec]) => {
         const isSelectedFieldSpec = fieldSpec === undefined;
         if (isSelectedFieldSpec) {
@@ -22,7 +21,18 @@ export function makeMaterializedDocs(
       []
     );
     const materializedSelects = pick(data, selectedFieldNames);
-    const materializedCounts = mapValues(viewSpec.countSpecs, () => 0);
+
+    const materializedCounts = Object.entries(viewSpec).reduce(
+      (acc: Dict<0>, [fieldName, fieldSpec]) => {
+        const isCountFieldSpec = fieldSpec?.type === 'count';
+        if (isCountFieldSpec) {
+          return { ...acc, [fieldName]: 0 as const };
+        }
+        return acc;
+      },
+      {}
+    );
+
     const materializedData: DocData = {
       ...materializedSelects,
       ...materializedCounts,
