@@ -16,6 +16,7 @@ const CollectionDataSpec = t.union([t.record(t.string, FieldSchema), t.undefined
 export type CollectionDataSpec = t.TypeOf<typeof CollectionDataSpec>;
 
 const SelectViewSpec = t.undefined;
+export type SelectViewSpec = t.TypeOf<typeof SelectViewSpec>;
 
 const CountViewSpec = t.type({
   type: t.literal('count'),
@@ -24,10 +25,10 @@ const CountViewSpec = t.type({
 });
 export type CountViewSpec = t.TypeOf<typeof CountViewSpec>;
 
-const ViewSpec = t.union([CountViewSpec, SelectViewSpec]);
-export type ViewSpec = t.TypeOf<typeof ViewSpec>;
+const ViewFieldSpec = t.union([CountViewSpec, SelectViewSpec]);
+export type ViewSpec = t.TypeOf<typeof ViewFieldSpec>;
 
-const View = t.record(t.string, ViewSpec);
+const View = t.record(t.string, ViewFieldSpec);
 export type View = t.TypeOf<typeof View>;
 
 const CollectionViews = t.record(t.string, View);
