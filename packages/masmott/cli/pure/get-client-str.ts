@@ -1,7 +1,7 @@
 import assertNever from 'assert-never';
 import { isEmpty, mapValues } from 'lodash';
 import capitalize from 'lodash/capitalize';
-import { CollectionDataSpec, MasmottConfig, Schema, View, ViewSchemas } from '../types';
+import { CollectionDataSpec, MasmottConfig, Schema, View, CollectionViews } from '../../src/types/io';
 import { jsonStringify } from './json-stringify';
 
 function makeCollectionDataTypeStr(collectionDataSpec: CollectionDataSpec): string {

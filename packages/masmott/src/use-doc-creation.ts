@@ -1,18 +1,8 @@
-import mapValues from 'lodash/mapValues';
-import pick from 'lodash/pick';
 import { useCallback, useEffect, useState } from 'react';
 import { getId, setDoc } from './firebase';
-import {
-  CreateDoc,
-  Dict,
-  DocCreation,
-  DocCreationData,
-  DocData,
-  DocSnapshot,
-  FirebaseOptions,
-  Spec,
-  ViewSpec,
-} from './types';
+import { makeMaterializedDocs } from './pure/make-materialized-docs';
+import { CreateDoc, DocCreation, DocCreationData, DocData, FirebaseOptions } from './types';
+import { CollectionViews, Schema } from './types/io';
 import { useMutateDocWithId } from './use-mutate-doc';
 import { useUpdateCountViews } from './use-update-count-views';
 
@@ -20,46 +10,35 @@ export function useDocCreation<
   DD extends DocData = DocData,
   CDD extends DocCreationData = DocCreationData
 >(
-  options: FirebaseOptions,
+  firebaseOptions: FirebaseOptions,
   collection: string,
-  spec: Spec,
-  views: Dict<ViewSpec>
+  schema: Schema,
+  collectionViews: CollectionViews
 ): DocCreation.Type<DD, CDD> {
   const mutateDocWithId = useMutateDocWithId(collection);
-  const incrementCountViews = useUpdateCountViews(collection, spec, 1);
+  const incrementCountViews = useUpdateCountViews(collection, schema, 1);
   const [creation, setCreation] = useState<DocCreation.Type>({ state: 'initial' });
   const reset = useCallback(() => setCreation({ state: 'initial' }), []);
 
-  const createViews = useCallback(
-    (id: string, data: DocData) => {
-      Object.entries(views).forEach(([view, viewSpec]) => {
-        const materializedSelects = pick(data, viewSpec.selectedFieldNames);
-        const materializedCounts = mapValues(viewSpec.countSpecs, () => 0);
-        const materializedData: DocData = {
-          ...materializedSelects,
-          ...materializedCounts,
-        };
-        const materializedDoc: DocSnapshot = {
-          exists: true,
-          data: materializedData,
-        };
-        mutateDocWithId(id, materializedDoc, { view });
-      });
-    },
-    [mutateDocWithId, views]
-  );
-
   const createDoc = useCallback<CreateDoc>(
     async (data) => {
-      const id = await getId(options, collection);
+      const id = await getId(firebaseOptions, collection);
       const createdDoc = { id, data };
       setCreation({ state: 'creating', createdDoc });
-      setDoc(options, collection, id, data)
+      setDoc(firebaseOptions, collection, id, data)
         .then(() => {
           setCreation({ state: 'created', reset, createdDoc });
+
+          // add doc to cache
           mutateDocWithId(id, { exists: true, data });
+
           incrementCountViews(data);
-          createViews(id, data);
+
+          // create views
+          const materializedDocs = makeMaterializedDocs(data, collectionViews);
+          materializedDocs.forEach(({ materializedDoc, viewName }) =>
+            mutateDocWithId(id, materializedDoc, { viewName })
+          );
         })
         .catch((reason) =>
           setCreation({
@@ -70,7 +49,7 @@ export function useDocCreation<
           })
         );
     },
-    [incrementCountViews, reset, mutateDocWithId, createViews, options, collection]
+    [incrementCountViews, reset, mutateDocWithId, firebaseOptions, collection, collectionViews]
   );
 
   useEffect(() => {

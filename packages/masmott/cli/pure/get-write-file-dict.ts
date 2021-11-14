@@ -1,6 +1,6 @@
 import { Validation } from 'io-ts';
 import * as yaml from 'js-yaml';
-import { MasmottConfig, WriteFileDict } from '../types';
+import { MasmottConfig, WriteFileDict } from '../../src/types/io';
 import { makeClientStr } from './get-client-str';
 import { jsonStringify } from './json-stringify';
 

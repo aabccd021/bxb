@@ -4,9 +4,9 @@ import { DocumentReference } from 'firebase/firestore/lite';
 import { ChangeEvent } from 'react';
 import { Cache } from 'swr';
 // eslint-disable-next-line import/no-cycle
-import * as Doc from './types/doc';
+import * as Doc from './doc';
 // eslint-disable-next-line import/no-cycle
-import * as DocCreation from './types/doc-creation';
+import * as DocCreation from './doc-creation';
 
 export type { Doc, DocCreation, DocumentReference, FirebaseOptions };
 
@@ -15,45 +15,16 @@ export interface Dict<T> {
   readonly [key: string]: T;
 }
 
-export type StringFieldSpec = {
-  readonly type: 'string';
-};
+// export type RefSpec = {
+//   readonly collectionName: string;
+//   readonly fieldName: string;
+// };
 
-export type RefIdFieldSpec = {
-  readonly type: 'refId';
-  readonly refCollection: string;
-};
-
-export type SrcFieldSpec = StringFieldSpec | RefIdFieldSpec;
-
-export type RefSpec = {
-  readonly collectionName: string;
-  readonly fieldName: string;
-};
-
-export type JoinSpec = {
-  readonly firstRef: RefSpec;
-  readonly refChain: readonly RefSpec[];
-  readonly selectedFieldNames: readonly string[];
-};
-
-export type CountSpec = {
-  readonly groupBy: string;
-  readonly countedCollectionName: string;
-};
-
-export type ViewSpec = {
-  readonly selectedFieldNames: readonly string[];
-  readonly joinSpecs: Dict<JoinSpec>;
-  readonly countSpecs: Dict<CountSpec>;
-};
-
-export type CollectionSpec = {
-  readonly src: Dict<SrcFieldSpec>;
-  readonly views: Dict<ViewSpec>;
-};
-
-export type Spec = Dict<CollectionSpec>;
+// export type JoinSpec = {
+//   readonly firstRef: RefSpec;
+//   readonly refChain: readonly RefSpec[];
+//   readonly selectedFieldNames: readonly string[];
+// };
 
 export type FirestoreDataType = string | number;
 
@@ -82,10 +53,10 @@ export type DocData = {
   readonly [key: string]: Field;
 };
 
-export type DocSnapshot =
+export type DocSnapshot<DD extends DocData = DocData> =
   | {
       readonly exists: true;
-      readonly data: DocData;
+      readonly data: DD;
     }
   | {
       readonly exists: false;
@@ -100,7 +71,9 @@ export type DocWithId<DD extends DocData = DocData> = {
   readonly data: DD;
 };
 
-export type DocSnapshotMutatorCallback = (snapshot: DocSnapshot) => DocSnapshot;
+export type DocSnapshotMutatorCallback<DD extends DocData = DocData> = (
+  snapshot: DocSnapshot<DD>
+) => DocSnapshot;
 
 export type MutateDoc = (
   key: DocKey,
@@ -158,20 +131,20 @@ export type InitMasmott = (options: FirebaseOptions) => Promise<void>;
 
 export type Fetcher = (path: string) => Promise<DocSnapshot>;
 
-export type MutateDocOfId = (
+export type MutateDocWithId = (
   id: string,
   data?: DocSnapshot | DocSnapshotMutatorCallback,
   options?: {
-    readonly view?: string | undefined;
+    readonly viewName?: string | undefined;
     readonly shouldRevalidate?: true;
   }
 ) => Promise<void>;
 
-export type MutateDocOfKey = (
+export type MutateDocWithKey = (
   key: DocKey,
   data?: DocSnapshot | DocSnapshotMutatorCallback,
   options?: {
-    readonly view?: string | undefined;
+    readonly viewName?: string | undefined;
     readonly shouldRevalidate?: true;
   }
 ) => Promise<void>;

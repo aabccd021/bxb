@@ -1,14 +1,14 @@
 import { useCallback } from 'react';
 import { useSWRConfig } from 'swr';
-import { MutateDocOfId, MutateDocOfKey } from './types';
+import { MutateDocWithId, MutateDocWithKey } from './types';
 import { makeDocPath } from './util';
 
-export function useMutateDocWithId(collection: string): MutateDocOfId {
+export function useMutateDocWithId(collection: string): MutateDocWithId {
   const { mutate } = useSWRConfig();
 
-  const mutateDoc = useCallback<MutateDocOfId>(
+  const mutateDoc = useCallback<MutateDocWithId>(
     async (id, data, options) => {
-      const path = makeDocPath(collection, id, options?.view);
+      const path = makeDocPath(collection, id, options?.viewName);
       const shouldRevalidate = options?.shouldRevalidate ?? false;
       await mutate(path, data, shouldRevalidate);
     },
@@ -17,12 +17,12 @@ export function useMutateDocWithId(collection: string): MutateDocOfId {
   return mutateDoc;
 }
 
-export function useMutateDocWithKey(): MutateDocOfKey {
+export function useMutateDocWithKey(): MutateDocWithKey {
   const { mutate } = useSWRConfig();
 
-  const mutateDoc = useCallback<MutateDocOfKey>(
+  const mutateDoc = useCallback<MutateDocWithKey>(
     async ([collection, id], data, options) => {
-      const path = makeDocPath(collection, id, options?.view);
+      const path = makeDocPath(collection, id, options?.viewName);
       const shouldRevalidate = options?.shouldRevalidate ?? false;
       await mutate(path, data, shouldRevalidate);
     },
