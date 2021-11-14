@@ -23,10 +23,10 @@ export const setDoc: SetDoc = async (options, collection, id, data) => {
 
 export const getId: GetId = async (options, collection) => {
   await initMasmott(options);
-  const _module = await import('firebase/firestore/lite');
-  const firestore = _module.getFirestore();
-  const collectionRef = _module.collection(firestore, collection);
-  const docRef = _module.doc(collectionRef);
+  const _ = await import('firebase/firestore/lite');
+  const firestore = _.getFirestore();
+  const collectionRef = _.collection(firestore, collection);
+  const docRef = _.doc(collectionRef);
   return docRef.id;
 };
 

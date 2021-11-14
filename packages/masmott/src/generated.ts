@@ -92,5 +92,3 @@ export const threadCreationContext: DocCreationContext<ThreadCreationData> = {
     card: materializeThreadCard as Materialize<ThreadCreationData>,
   },
 };
-
-// const threadDocCreation = useDocCreation<ThreadCreationData>(threadCreationContext);
