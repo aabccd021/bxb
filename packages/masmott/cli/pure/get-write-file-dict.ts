@@ -1,11 +1,8 @@
 import { Validation } from 'io-ts';
 import * as yaml from 'js-yaml';
-import { getClientStr } from './client';
-import { MasmottConfig, WriteFileDict } from './types';
-
-function jsonStringify(object: unknown): string {
-  return JSON.stringify(object, undefined, 2);
-}
+import { MasmottConfig, WriteFileDict } from '../types';
+import { makeClientStr } from './get-client-str';
+import { jsonStringify } from './json-stringify';
 
 const firebaseJson = jsonStringify({
   emulators: {
@@ -273,7 +270,7 @@ export function parseMasmottConfig(configStr: string): Validation<MasmottConfig>
 
 export function getWriteFileDict(config: MasmottConfig): WriteFileDict {
   return {
-    'masmott.ts': getClientStr(config),
+    'masmott.ts': makeClientStr(config),
     'tsconfig.json': tsconfig,
     'package.json': packageJson(config.firebase.projectId),
     'firebase.json': firebaseJson,

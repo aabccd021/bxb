@@ -1,7 +1,7 @@
 schema:
   thread:
     view:
-      default:
+      page:
         replyCount:
           type: count
           count: reply

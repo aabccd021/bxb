@@ -7,5 +7,5 @@
 	},
 	"include": [
 		"./*.ts"
-	]
+, "pure/client.ts", "pure/pure.ts"	]
 }

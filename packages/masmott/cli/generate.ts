@@ -3,7 +3,7 @@ import { isLeft } from 'fp-ts/lib/Either';
 import * as fs from 'fs';
 import { PathReporter } from 'io-ts/PathReporter';
 import { forEach } from 'lodash';
-import { getWriteFileDict, parseMasmottConfig } from './pure';
+import { getWriteFileDict, parseMasmottConfig } from './pure/get-write-file-dict';
 import { WriteFileDict } from './types';
 
 function writeFiles(writeFileDict: WriteFileDict, cwd: string): void {
