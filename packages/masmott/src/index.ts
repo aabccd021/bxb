@@ -5,5 +5,4 @@ export * from './use-doc';
 export * from './use-doc-creation';
 export * from './use-input';
 export * from './use-masmott';
-export * from './use-mutate-doc';
-export * from './use-update-count-views';
+export * from './use-mutate-docs';

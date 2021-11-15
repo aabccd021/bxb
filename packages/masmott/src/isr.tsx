@@ -48,9 +48,8 @@ function PageWithId<DD extends DocData>({
           setUseLocalData(false);
           return;
         }
-        router.push(`${router.pathname.replace('[id]', '')}${queryId}`, undefined, {
-          shallow: true,
-        });
+        const urlWithoutLocalData = `${router.pathname.replace('[id]', '')}${queryId}`;
+        router.push(urlWithoutLocalData, undefined, { shallow: true });
       }
     }
   }, [router]);

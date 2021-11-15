@@ -14,7 +14,7 @@ import {
   FirebaseOptions,
   IncrementSpecs,
 } from './types';
-import { useMutateDocs } from './use-mutate-doc';
+import { useMutateDocs } from './use-mutate-docs';
 
 export type DocCreationContext<DCD extends DocCreationData> = {
   readonly collectionName: string;
