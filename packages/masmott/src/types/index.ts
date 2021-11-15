@@ -154,6 +154,17 @@ export type MutateDocWithKey = (
   }
 ) => Promise<void>;
 
+export type MutateDocAction = {
+  readonly key: DocKey;
+  readonly data: DocSnapshot | DocSnapshotMutatorCallback;
+  readonly options?: {
+    readonly viewName?: string | undefined;
+    readonly shouldRevalidate?: true;
+  };
+};
+
+export type MutateDocs = (actions: readonly MutateDocAction[]) => Promise<unknown>;
+
 export type ViewDocMutationGen<
   COUNTED_DCD extends DocCreationData,
   COUNT_FN extends string = string,

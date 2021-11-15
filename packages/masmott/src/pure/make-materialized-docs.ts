@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 import pick from 'lodash/pick';
-import { Dict, DocCreationData, DocData } from '../types';
+import { Dict, DocCreationData, MutateDocAction } from '../types';
 
 function fromEntries<T extends string, V>(arr: readonly (readonly [T, V])[]): Record<T, V> {
   return Object.fromEntries(arr) as Record<T, V>;
@@ -32,15 +32,18 @@ export function makeMaterialize<
   });
 }
 
-export function materializeDocs<DCD extends DocCreationData>(
+export function makeMaterializedDocMutateActions<DCD extends DocCreationData>(
+  collectionName: string,
+  id: string,
   materializeViews: Dict<Materialize<DCD>>,
   data: DCD
-): readonly {
-  readonly data: DocData;
-  readonly viewName: string;
-}[] {
+): readonly MutateDocAction[] {
   return Object.entries(materializeViews).map(([viewName, materializeView]) => ({
-    data: materializeView(data),
-    viewName,
+    key: [collectionName, id],
+    data: {
+      exists: true,
+      data: materializeView(data),
+    },
+    options: { viewName },
   }));
 }

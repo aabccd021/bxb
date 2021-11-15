@@ -5,7 +5,7 @@ import {
   DocSnapshot,
   DocSnapshotMutatorCallback,
   IncrementSpecs,
-  ViewDocMutation,
+  MutateDocAction,
 } from 'masmott';
 
 export function makeIncrementField<FN extends string, DD extends Record<FN, number> & DocData>(
@@ -30,25 +30,27 @@ export function makeIncrementField<FN extends string, DD extends Record<FN, numb
     };
 }
 
-export function makeViewDocMutations<DCD extends DocCreationData>(
+export function makeCountDocMutateActions<DCD extends DocCreationData>(
   data: DCD,
   incrementValue: 1 | -1,
   incrementSpecs: IncrementSpecs<DCD>
-): readonly ViewDocMutation[] {
+): readonly MutateDocAction[] {
   return Object.entries(incrementSpecs).flatMap(([viewCollectionName, collectionViews]) =>
     Object.entries(collectionViews ?? {}).flatMap(([viewName, viewDocMutation]) =>
       Object.entries(viewDocMutation).map(([, { getDocId, makeMutatorCallback }]) => {
         const viewId = getDocId(data);
-        const docKey: DocKey = [viewCollectionName, viewId];
+        const key: DocKey = [viewCollectionName, viewId];
         const mutatorCallback = makeMutatorCallback(incrementValue) as DocSnapshotMutatorCallback;
 
-        const mutation: ViewDocMutation = {
-          docKey,
-          mutatorCallback,
-          viewName,
+        const action: MutateDocAction = {
+          key,
+          data: mutatorCallback,
+          options: {
+            viewName,
+          },
         };
 
-        return mutation;
+        return action;
       })
     )
   );
