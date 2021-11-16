@@ -1,21 +1,10 @@
 /* eslint-disable no-use-before-define */
 import pick from 'lodash/pick';
-import { Dict, DocCreationData, MutateDocAction } from '../types';
+import { Dict, DocCreationData, Materialize, MutateDocAction } from '../types';
 
 function fromEntries<T extends string, V>(arr: readonly (readonly [T, V])[]): Record<T, V> {
   return Object.fromEntries(arr) as Record<T, V>;
 }
-
-export type Materialize<
-  DD extends DocCreationData,
-  SELECT_FIELD_NAME extends keyof DD = keyof DD,
-  COUNT_FIELD_NAME extends Exclude<string, keyof DD> = Exclude<string, keyof DD>
-> = (
-  data: DD
-) => { readonly [P in SELECT_FIELD_NAME]: DD[P] } & Record<
-  Exclude<COUNT_FIELD_NAME, keyof DD>,
-  number
->;
 
 export function makeMaterialize<
   DD extends DocCreationData,

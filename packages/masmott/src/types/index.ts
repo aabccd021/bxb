@@ -185,3 +185,21 @@ export type ViewDocMutation = {
 export type IncrementSpecs<COUNTED_DCD extends DocCreationData> = Dict<
   Dict<Dict<ViewDocMutationGen<COUNTED_DCD>>>
 >;
+
+export type Materialize<
+  DD extends DocCreationData,
+  SELECT_FIELD_NAME extends keyof DD = keyof DD,
+  COUNT_FIELD_NAME extends Exclude<string, keyof DD> = Exclude<string, keyof DD>
+> = (
+  data: DD
+) => { readonly [P in SELECT_FIELD_NAME]: DD[P] } & Record<
+  Exclude<COUNT_FIELD_NAME, keyof DD>,
+  number
+>;
+
+export type DocCreationContext<DCD extends DocCreationData> = {
+  readonly collectionName: string;
+  readonly firebaseOptions: FirebaseOptions;
+  readonly incrementSpecs: IncrementSpecs<DCD>;
+  readonly materializeViews: Dict<Materialize<DCD>>;
+};

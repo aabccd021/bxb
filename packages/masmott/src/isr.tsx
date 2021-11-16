@@ -58,13 +58,7 @@ function PageWithId<DD extends DocData>({
     <>
       <p>useLocalData: {JSON.stringify(useLocalData)}</p>
       {id !== undefined ? (
-        <PageWithSnapshot
-          options={options}
-          Page={Page}
-          viewPath={viewPath}
-          id={id}
-          useLocalData={useLocalData}
-        />
+        <PageWithSnapshot {...{ options, Page, viewPath, id, useLocalData }} />
       ) : (
         <Page />
       )}
@@ -79,7 +73,7 @@ export function makeISRPage<DD extends DocData>(
 ): NextPage<ISRPageProps> {
   const StaticPage: NextPage<ISRPageProps> = ({ fallback }) => (
     <SWRConfig value={{ fallback }}>
-      <PageWithId options={options} Page={Page} viewPath={viewPath} />
+      <PageWithId {...{ options, Page, viewPath }} />
     </SWRConfig>
   );
   return StaticPage;

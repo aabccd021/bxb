@@ -1,5 +1,12 @@
-import { Dict, DocCreationData, DocKey, IncrementSpecs, MutateDocAction } from '../types';
-import { makeMaterializedDocMutateActions, Materialize } from './make-materialized-docs';
+import {
+  Dict,
+  DocCreationData,
+  DocKey,
+  IncrementSpecs,
+  Materialize,
+  MutateDocAction,
+} from '../types';
+import { makeMaterializedDocMutateActions } from './make-materialized-docs';
 import { makeCountDocMutateActions } from './make-view-doc-mutation';
 
 export function makeDocCreationPreSetActions<DCD extends DocCreationData>(

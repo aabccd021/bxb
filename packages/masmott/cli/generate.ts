@@ -2,22 +2,14 @@ import { exec } from 'child_process';
 import { isLeft } from 'fp-ts/lib/Either';
 import * as fs from 'fs';
 import { PathReporter } from 'io-ts/PathReporter';
-import { forEach } from 'lodash';
-import { getWriteFileDict, parseMasmottConfig } from './pure/get-write-file-dict';
-import { WriteFileDict } from './types';
+import { makeWriteFileActions, parseMasmottConfig } from './pure';
+import { WriteFileAction } from './types';
 
-function writeFiles(writeFileDict: WriteFileDict, cwd: string): void {
-  forEach(writeFileDict, (content, name) => {
-    const path = `${cwd}/${name}`;
-    if (typeof content === 'string') {
-      if (!fs.existsSync(cwd)) {
-        fs.mkdirSync(cwd, { recursive: true });
-      }
-      fs.writeFileSync(path, content);
-      return;
-    }
-    writeFiles(content, path);
-  });
+function handleFileWriteAction({ dir, name, content }: WriteFileAction): void {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  fs.writeFileSync(`${dir}/${name}`, content);
 }
 
 export function generate(): void {
@@ -26,6 +18,6 @@ export function generate(): void {
   if (isLeft(parseResult)) {
     throw Error(PathReporter.report(parseResult)[0]);
   }
-  writeFiles(getWriteFileDict(parseResult.right), '.');
+  makeWriteFileActions(parseResult.right).forEach(handleFileWriteAction);
   exec('yarn lint --fix');
 }

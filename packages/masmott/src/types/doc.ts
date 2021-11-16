@@ -22,7 +22,9 @@ export type LoadedExists<DD extends DocCreationData = DocCreationData> = {
   readonly revalidate: () => void;
 };
 
-export type Loaded<DD extends DocCreationData = DocCreationData> = LoadedExists<DD> | LoadedNotExists;
+export type Loaded<DD extends DocCreationData = DocCreationData> =
+  | LoadedExists<DD>
+  | LoadedNotExists;
 
 export type Type<DD extends DocCreationData = DocCreationData> =
   | Error

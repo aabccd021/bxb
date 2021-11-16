@@ -1,8 +1,9 @@
+import { WriteFileAction, WriteFileDict } from 'cli/types';
 import { Validation } from 'io-ts';
 import * as yaml from 'js-yaml';
-import { MasmottConfig, WriteFileDict } from '../../src/types/io';
-import { makeClientStr } from './get-client-str';
+import { MasmottConfig } from '../../src/types/io';
 import { jsonStringify } from './json-stringify';
+import { makeClientStr } from './make-client-str';
 
 const firebaseJson = jsonStringify({
   emulators: {
@@ -268,8 +269,17 @@ export function parseMasmottConfig(configStr: string): Validation<MasmottConfig>
   return decodeResult;
 }
 
-export function getWriteFileDict(config: MasmottConfig): WriteFileDict {
-  return {
+function writeFileDictToActions(dict: WriteFileDict, baseDir: string): readonly WriteFileAction[] {
+  return Object.entries(dict).flatMap(([key, content]) => {
+    if (typeof content === 'string') {
+      return { dir: baseDir, name: key, content };
+    }
+    return writeFileDictToActions(content, `${baseDir}/${key}`);
+  });
+}
+
+export function makeWriteFileActions(config: MasmottConfig): readonly WriteFileAction[] {
+  const writeFileDict: WriteFileDict = {
     'masmott.ts': makeClientStr(config),
     'tsconfig.json': tsconfig,
     'package.json': packageJson(config.firebase.projectId),
@@ -295,4 +305,8 @@ export function getWriteFileDict(config: MasmottConfig): WriteFileDict {
       },
     },
   };
+
+  const writeFileActions = writeFileDictToActions(writeFileDict, '.');
+
+  return writeFileActions;
 }

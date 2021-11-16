@@ -1,27 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getId, setDoc } from './firebase';
-import { Materialize } from './pure/make-materialized-docs';
-import {
-  makeDocCreationOnSetErrorActions,
-  makeDocCreationPreSetActions,
-} from './pure/make-use-doc-creation-actions';
+import { makeDocCreationOnSetErrorActions, makeDocCreationPreSetActions } from './pure';
 import {
   CreateDoc,
-  Dict,
   DocCreation,
+  DocCreationContext,
   DocCreationData,
   DocCreationWithId,
-  FirebaseOptions,
-  IncrementSpecs,
 } from './types';
 import { useMutateDocs } from './use-mutate-docs';
-
-export type DocCreationContext<DCD extends DocCreationData> = {
-  readonly collectionName: string;
-  readonly firebaseOptions: FirebaseOptions;
-  readonly incrementSpecs: IncrementSpecs<DCD>;
-  readonly materializeViews: Dict<Materialize<DCD>>;
-};
 
 export function useDocCreation<DCD extends DocCreationData>({
   collectionName,

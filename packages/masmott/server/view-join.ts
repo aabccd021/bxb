@@ -2,7 +2,7 @@ import isEmpty from 'lodash/isEmpty';
 import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
-import { Dict, JoinSpec, RefSpec } from '../src';
+import { Dict,  } from '../src';
 import { getCollection, getDoc, updateDoc } from './firebase-admin';
 import { makeOnUpdateTrigger } from './firebase-functions';
 import { DocumentData, DocumentSnapshot, OnUpdateTrigger } from './types';
