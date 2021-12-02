@@ -1,14 +1,21 @@
+import { pipe } from 'fp-ts/lib/function';
 import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import lodashMapValues from 'lodash/mapValues';
 import { Dict, DocumentSnapshot, Mapped } from '../src';
+
+import * as T from 'fp-ts/lib/Task';
+
 import {
   Change,
   DocumentChangeSnapshot,
   DocumentData,
   DocumentDataChange,
+  EventContext,
   FirestoreDataType,
   FirestoreDocumentSnapshot,
+  OnCreateTriggerHandler,
+  OnUpdateTriggerHandler,
   QueryDocumentSnapshot,
 } from './types';
 
@@ -130,25 +137,33 @@ export function getDocDataChange({ before, after }: DocumentDataChange): Documen
   return compactDocDataDiff;
 }
 
-export function getViewCollectionName(collectionName: string, viewName: string): string {
-  return `${collectionName}_${viewName}`;
-}
+export const getViewCollectionName = (collectionName: string, viewName: string): string =>
+  `${collectionName}_${viewName}`;
 
-export function wrapFirebaseSnapshot(snapshot: FirestoreDocumentSnapshot): DocumentSnapshot {
-  return {
-    id: snapshot.id,
-    data: snapshot.data() ?? {},
-  };
-}
+export const wrapFirebaseSnapshot = (snapshot: FirestoreDocumentSnapshot): DocumentSnapshot => ({
+  id: snapshot.id,
+  data: snapshot.data() ?? {},
+});
 
-export function wrapFirebaseChangeSnapshot(
+export const wrapSnapshotTriggerHandler =
+  (handler: OnCreateTriggerHandler) =>
+  (snapshot: FirestoreDocumentSnapshot, context: EventContext): Promise<unknown> =>
+    pipe(snapshot, wrapFirebaseSnapshot, handler(context))();
+
+export const wrapFirebaseChangeSnapshot = (
   change: Change<QueryDocumentSnapshot>
-): DocumentChangeSnapshot {
-  return {
-    id: change.after.id,
-    data: {
-      before: change.before.data(),
-      after: change.after.data(),
-    },
-  };
-}
+): DocumentChangeSnapshot => ({
+  id: change.after.id,
+  data: {
+    before: change.before.data(),
+    after: change.after.data(),
+  },
+});
+
+export const wrapChangeTriggerHandler =
+  (handler: OnUpdateTriggerHandler) =>
+  (change: Change<QueryDocumentSnapshot>, context: EventContext): Promise<unknown> =>
+    pipe(change, wrapFirebaseChangeSnapshot, handler(context))();
+
+export const makeDocTriggerPath = (collectionName: string): string =>
+  `${collectionName}/{documentId}`;

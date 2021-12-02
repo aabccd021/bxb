@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
 import {
+  CollectionReference,
   DocumentReference,
   DocumentSnapshot as FirestoreDocumentSnapshot,
   FieldValue,
@@ -13,10 +14,11 @@ import {
   HttpsFunction,
   SUPPORTED_REGIONS,
 } from 'firebase-functions';
+import { Task } from 'fp-ts/lib/Task';
 import { Dict } from '../src';
 
 export type { Change };
-export type { FirestoreDocumentSnapshot, QueryDocumentSnapshot, DocumentReference };
+export type { FirestoreDocumentSnapshot, QueryDocumentSnapshot, DocumentReference, EventContext };
 
 export type FirestoreDataType = string | number;
 
@@ -38,7 +40,7 @@ export type DocumentChangeSnapshot = {
 
 export type DocumentSnapshot = {
   readonly id: string;
-  readonly data: DocumentData;
+  readonly data: unknown;
 };
 
 export type DocumentBuilder = firestore.DocumentBuilder;
@@ -66,16 +68,14 @@ export type CollectionTriggers = {
 export type FirestoreTriggers = Dict<CollectionTriggers>;
 
 export type OnCreateTriggerHandler = (
-  snapshot: DocumentSnapshot,
   context: EventContext
-) => Promise<unknown>;
+) => (snapshot: DocumentSnapshot) => Task<unknown>;
 
 export type OnDeleteTriggerHandler = OnCreateTriggerHandler;
 
 export type OnUpdateTriggerHandler = (
-  change: DocumentChangeSnapshot,
   context: EventContext
-) => Promise<unknown>;
+) => (change: DocumentChangeSnapshot) => Task<unknown>;
 
 export type GetDocTriggerOptions = {
   readonly regions?: ReadonlyArray<typeof SUPPORTED_REGIONS[number]>;
@@ -106,3 +106,9 @@ export type Functions = {
   readonly firestore: FirestoreTriggers;
   readonly nextjs: HttpsFunction;
 };
+
+export type Query = (
+  collectionRef: FirebaseFirestore.CollectionReference<DocumentData>
+) => FirebaseFirestore.Query<DocumentData>;
+
+export type CollectionQuery = CollectionReference | FirebaseFirestore.Query;

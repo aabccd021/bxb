@@ -23,6 +23,10 @@ export function useDocCreation<DCD extends DocCreationData>({
 
   const createDoc = useCallback<CreateDoc<DCD>>(
     async (data) => {
+      function retry(): void {
+        createDoc(data);
+      }
+
       const id = await getId(firebaseOptions, collectionName);
       const createdDoc: DocCreationWithId<DCD> = { id, data };
 
@@ -38,7 +42,7 @@ export function useDocCreation<DCD extends DocCreationData>({
             state: 'error',
             reason,
             reset,
-            retry: () => createDoc(data),
+            retry,
           });
           mutateDocs(
             makeDocCreationOnSetErrorActions(

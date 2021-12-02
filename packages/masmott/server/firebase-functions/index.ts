@@ -1,3 +1,4 @@
+import { pipe } from 'fp-ts/lib/function';
 import {
   DocumentBuilder,
   GetDocTriggerOptions,
@@ -8,55 +9,31 @@ import {
   OnUpdateTrigger,
   OnUpdateTriggerHandler,
 } from '../types';
-import { wrapFirebaseChangeSnapshot, wrapFirebaseSnapshot } from '../util';
+import { makeDocTriggerPath, wrapChangeTriggerHandler, wrapSnapshotTriggerHandler } from '../util';
 import { getFunctionsFirestore } from './non-testable';
 
 /**
  * Type safe and convenience firebase-functions wrapper
  */
 
-function makeDocTriggerPath(collectionName: string): string {
-  return `${collectionName}/{documentId}`;
-}
+const makeDocTrigger = (collectionName: string, options?: GetDocTriggerOptions): DocumentBuilder =>
+  pipe(collectionName, makeDocTriggerPath, getFunctionsFirestore(options?.regions).document);
 
-function makeDocTrigger(collectionName: string, options?: GetDocTriggerOptions): DocumentBuilder {
-  const functionsFirestore = getFunctionsFirestore(options?.regions);
-  const docPath = _.makeDocTriggerPath(collectionName);
-  const docTrigger = functionsFirestore.document(docPath);
-  return docTrigger;
-}
-
-export function makeOnCreateTrigger(
+export const makeOnCreateTrigger = (
   collectionName: string,
   handler: OnCreateTriggerHandler
-): OnCreateTrigger {
-  return _.makeDocTrigger(collectionName).onCreate((snapshot, context) => {
-    const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
-    const result = handler(wrappedSnapshot, context);
-    return result;
-  });
-}
+): OnCreateTrigger =>
+  _.makeDocTrigger(collectionName).onCreate(wrapSnapshotTriggerHandler(handler));
 
-export function makeOnUpdateTrigger(
+export const makeOnUpdateTrigger = (
   collectionName: string,
   handler: OnUpdateTriggerHandler
-): OnUpdateTrigger {
-  return _.makeDocTrigger(collectionName).onUpdate((change, context) => {
-    const wrappedChange = wrapFirebaseChangeSnapshot(change);
-    const result = handler(wrappedChange, context);
-    return result;
-  });
-}
+): OnUpdateTrigger => _.makeDocTrigger(collectionName).onUpdate(wrapChangeTriggerHandler(handler));
 
-export function makeOnDeleteTrigger(
+export const makeOnDeleteTrigger = (
   collectionName: string,
   handler: OnDeleteTriggerHandler
-): OnDeleteTrigger {
-  return _.makeDocTrigger(collectionName).onDelete((snapshot, context) => {
-    const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
-    const result = handler(wrappedSnapshot, context);
-    return result;
-  });
-}
+): OnDeleteTrigger =>
+  _.makeDocTrigger(collectionName).onCreate(wrapSnapshotTriggerHandler(handler));
 
 export const _ = { makeDocTrigger, makeDocTriggerPath };

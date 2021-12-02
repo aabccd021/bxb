@@ -6,11 +6,7 @@ function fromEntries<T extends string, V>(arr: readonly (readonly [T, V])[]): Re
   return Object.fromEntries(arr) as Record<T, V>;
 }
 
-export function makeMaterialize<
-  DD extends DocCreationData,
-  SELECT_FIELD_NAME extends keyof DD,
-  COUNT_FIELD_NAME extends Exclude<string, keyof DD>
->(
+export function makeMaterialize(
   selectedFieldNames: readonly SELECT_FIELD_NAME[],
   countFieldNames: readonly COUNT_FIELD_NAME[]
 ): Materialize<DD, SELECT_FIELD_NAME, COUNT_FIELD_NAME> {
@@ -31,7 +27,10 @@ export function makeMaterializedDocMutateActions<DCD extends DocCreationData>(
     key: [collectionName, id],
     data: {
       exists: true,
-      data: materializeView(data),
+      data: {
+        ...fromEntries(countFieldNames.map((fieldName) => [fieldName, 0])),
+        ...pick(data, selectedFieldNames),
+      },
     },
     options: { viewName },
   }));

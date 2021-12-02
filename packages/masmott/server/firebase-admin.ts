@@ -1,24 +1,50 @@
 /* eslint-disable no-restricted-imports */
-import { DocumentReference, FieldValue, getFirestore, GrpcStatus } from 'firebase-admin/firestore';
-import { DocumentData, DocumentSnapshot, QuerySnapshot } from '../src';
-import { WriteDocumentData } from './types';
+import {
+  CollectionReference,
+  DocumentReference,
+  FieldValue,
+  getFirestore,
+  GrpcStatus,
+  QuerySnapshot,
+} from 'firebase-admin/firestore';
+import * as A from 'fp-ts/lib/ReadonlyArray';
+import { flow, pipe } from 'fp-ts/lib/function';
+import * as O from 'fp-ts/lib/Option';
+import * as T from 'fp-ts/lib/Task';
+import { DocumentData, DocumentSnapshot } from '../src';
+import { CollectionQuery, FirestoreDocumentSnapshot, Query, WriteDocumentData } from './types';
 import { wrapFirebaseSnapshot } from './util';
 
 export const firestore = { FieldValue, GrpcStatus };
 
-/**
- * Type safe and convenience firebase-admin wrapper
- */
+const makeCollectionRef = (collectionName: string): CollectionReference =>
+  getFirestore().collection(collectionName);
 
-function getDocRef(collectionName: string, documentId: string): DocumentReference {
-  return getFirestore().collection(collectionName).doc(documentId);
-}
+const makeDocRef = (collectionName: string, documentId: string): DocumentReference =>
+  makeCollectionRef(collectionName).doc(documentId);
+
+const makeQueryFromCollectionRef =
+  (query: O.Option<Query>) =>
+  (collectionRef: CollectionReference): CollectionQuery =>
+    pipe(
+      query,
+      O.foldW(
+        () => collectionRef,
+        (queryValue) => queryValue(collectionRef)
+      )
+    );
+
+const getDocument = (collectionQuery: CollectionQuery): T.Task<QuerySnapshot> =>
+  collectionQuery.get;
+
+const getSnapshotDocs = (snapshot: QuerySnapshot): readonly FirestoreDocumentSnapshot[] =>
+  snapshot.docs;
 
 export async function getDoc(
   collectionName: string,
   documentId: string
 ): Promise<DocumentSnapshot> {
-  const snapshot = await _.getDocRef(collectionName, documentId).get();
+  const snapshot = await makeDocRef(collectionName, documentId).get();
   const wrappedSnapshot = wrapFirebaseSnapshot(snapshot);
   return wrappedSnapshot;
 }
@@ -27,7 +53,7 @@ export function deleteDoc(
   collectionName: string,
   documentId: string
 ): Promise<FirebaseFirestore.WriteResult> {
-  return _.getDocRef(collectionName, documentId).delete();
+  return makeDocRef(collectionName, documentId).delete();
 }
 
 export function createDoc(
@@ -35,7 +61,7 @@ export function createDoc(
   documentId: string,
   data: DocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return _.getDocRef(collectionName, documentId).create(data);
+  return makeDocRef(collectionName, documentId).create(data);
 }
 
 export function updateDoc(
@@ -43,23 +69,19 @@ export function updateDoc(
   documentId: string,
   data: WriteDocumentData
 ): Promise<FirebaseFirestore.WriteResult> {
-  return _.getDocRef(collectionName, documentId).update(data);
+  return makeDocRef(collectionName, documentId).update(data);
 }
 
-export async function getCollection(
+export const getCollection = (
   collectionName: string,
-  query?: (
-    collectionRef: FirebaseFirestore.CollectionReference<DocumentData>
-  ) => FirebaseFirestore.Query<DocumentData>
-): Promise<QuerySnapshot> {
-  const collectionRef = getFirestore().collection(collectionName);
-  const collectionQuery = query === undefined ? collectionRef : query(collectionRef);
-  const snapshot = await collectionQuery.get();
-  const wrappedDocs = snapshot.docs.map(wrapFirebaseSnapshot);
-  const wrappedQuerySnapshot = {
-    docs: wrappedDocs,
-  };
-  return wrappedQuerySnapshot;
-}
+  query: O.Option<Query>
+): T.Task<readonly DocumentSnapshot[]> =>
+  pipe(
+    collectionName,
+    makeCollectionRef,
+    makeQueryFromCollectionRef(query),
+    getDocument,
+    T.map(flow(getSnapshotDocs, A.map(wrapFirebaseSnapshot)))
+  );
 
-export const _ = { getDocRef };
+// export const _ = { getDocRef };
