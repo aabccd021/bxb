@@ -1,13 +1,27 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { flow, pipe } from 'fp-ts/lib/function';
 import isEmpty from 'lodash/isEmpty';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import { CollectionSpec, Dict, Spec, SrcFieldSpec, ViewSpec } from '../src';
-import { createDoc, deleteDoc, getCollection, updateDoc } from './firebase-admin';
+import {
+  createDoc,
+  deleteDoc,
+  deleteDoc_,
+  getCollection,
+  getDocument,
+  makeCollectionRef,
+  toCollectionQuery,
+  toDocumentIds,
+  updateDoc,
+} from './firebase-admin';
 import {
   makeOnCreateTrigger,
   makeOnDeleteTrigger,
   makeOnUpdateTrigger,
 } from './firebase-functions';
+
+import * as T from 'fp-ts/lib/Task';
 import {
   CollectionTriggers,
   DocumentData,
@@ -15,9 +29,13 @@ import {
   FirestoreTriggers,
   OnCreateTrigger,
   OnDeleteTrigger,
+  OnDeleteTriggerHandler,
   OnUpdateTrigger,
+  Query,
   ViewTriggers,
 } from './types';
+import * as O from 'fp-ts/lib/Option';
+import * as A from 'fp-ts/lib/ReadonlyArray';
 import { getDocDataChange, getViewCollectionName } from './util';
 import { materializeCountViewData, onCountedDocCreated, onCountedDocDeleted } from './view-count';
 import { materializeJoinViewData, onJoinRefDocUpdated } from './view-join';
@@ -133,13 +151,32 @@ function onSrcDocUpdated(
  * @param viewName
  * @returns
  */
-function onSrcDocDeleted(collectionName: string, viewName: string): OnDeleteTrigger {
-  return makeOnDeleteTrigger(collectionName, async (srcDoc) => {
-    const viewDocId = srcDoc.id;
-    const viewCollectionName = getViewCollectionName(collectionName, viewName);
-    await deleteDoc(viewCollectionName, viewDocId);
-  });
-}
+const onSrcDocDeleted = (collectionName: string, viewName: string): OnDeleteTrigger =>
+  pipe(
+    collectionName,
+    makeOnDeleteTrigger(
+      (_) => (srcDoc) =>
+        pipe(collectionName, getViewCollectionName(viewName), deleteDoc_(srcDoc.id))
+    )
+  );
+
+const makeQuery =
+  (refIdFieldName: string, refDocId: string): Query =>
+  (collection) =>
+    collection.where(refIdFieldName, '==', refDocId);
+
+const makeOnSrcRefDocDeletedHandler =
+  (collectionName: string, sourceFieldName: string): OnDeleteTriggerHandler =>
+  (_) =>
+  (refDoc) =>
+    pipe(
+      collectionName,
+      makeCollectionRef,
+      makeQuery(sourceFieldName, refDoc.id),
+      getDocument,
+      T.map(flow(toDocumentIds, A.map(deleteDoc(collectionName)))),
+      T.chain(T.sequenceArray)
+    );
 
 /**
  * Make a trigger to run on deletion of a document referenced by source
@@ -150,31 +187,19 @@ function onSrcDocDeleted(collectionName: string, viewName: string): OnDeleteTrig
  * @param src
  * @returns
  */
-function onSrcRefDocDeleted(
+const onSrcRefDocDeleted = (
   collectionName: string,
   src: Dict<SrcFieldSpec>
-): Dict<OnDeleteTrigger | undefined> {
-  return mapValues(src, (sourceField, sourceFieldName) => {
-    // only create trigger if the field is type of refId (the document has
-    // reference to another document)
-    if (sourceField.type !== 'refId') {
-      return undefined;
-    }
-    const { refCollection } = sourceField;
-    const refidFieldName = sourceFieldName;
-    return makeOnDeleteTrigger(refCollection, async (refDoc) => {
-      const referrerSrcDocsSnapshot = await getCollection(collectionName, (collection) =>
-        collection.where(refidFieldName, '==', refDoc.id)
-      );
-
-      const referrerDocsDeletes = referrerSrcDocsSnapshot.docs.map((doc) =>
-        deleteDoc(collectionName, doc.id)
-      );
-
-      await Promise.allSettled(referrerDocsDeletes);
-    });
-  });
-}
+): Dict<O.Option<OnDeleteTrigger>> =>
+  mapValues(src, (sourceField, sourceFieldName) =>
+    sourceField.type !== 'refId'
+      ? O.none
+      : pipe(
+          sourceField.refCollection,
+          makeOnDeleteTrigger(makeOnSrcRefDocDeletedHandler(collectionName, sourceFieldName)),
+          O.some
+        )
+  );
 
 /**
  * Make triggers for a view.

@@ -15,6 +15,7 @@ import {
   SUPPORTED_REGIONS,
 } from 'firebase-functions';
 import { Task } from 'fp-ts/lib/Task';
+import { Option } from 'fp-ts/lib/Option';
 import { Dict } from '../src';
 
 export type { Change };
@@ -61,7 +62,7 @@ export type ViewTriggers = {
 };
 
 export type CollectionTriggers = {
-  readonly onRefDocDeleted: Dict<OnDeleteTrigger | undefined>;
+  readonly onRefDocDeleted: Dict<Option<OnDeleteTrigger>>;
   readonly view: Dict<ViewTriggers>;
 };
 

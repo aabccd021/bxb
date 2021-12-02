@@ -12,10 +12,6 @@ import {
 import { makeDocTriggerPath, wrapChangeTriggerHandler, wrapSnapshotTriggerHandler } from '../util';
 import { getFunctionsFirestore } from './non-testable';
 
-/**
- * Type safe and convenience firebase-functions wrapper
- */
-
 const makeDocTrigger = (collectionName: string, options?: GetDocTriggerOptions): DocumentBuilder =>
   pipe(collectionName, makeDocTriggerPath, getFunctionsFirestore(options?.regions).document);
 
@@ -30,10 +26,9 @@ export const makeOnUpdateTrigger = (
   handler: OnUpdateTriggerHandler
 ): OnUpdateTrigger => _.makeDocTrigger(collectionName).onUpdate(wrapChangeTriggerHandler(handler));
 
-export const makeOnDeleteTrigger = (
-  collectionName: string,
-  handler: OnDeleteTriggerHandler
-): OnDeleteTrigger =>
-  _.makeDocTrigger(collectionName).onCreate(wrapSnapshotTriggerHandler(handler));
+export const makeOnDeleteTrigger =
+  (handler: OnDeleteTriggerHandler) =>
+  (collectionName: string): OnDeleteTrigger =>
+    _.makeDocTrigger(collectionName).onCreate(wrapSnapshotTriggerHandler(handler));
 
 export const _ = { makeDocTrigger, makeDocTriggerPath };

@@ -3,9 +3,6 @@ import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import lodashMapValues from 'lodash/mapValues';
 import { Dict, DocumentSnapshot, Mapped } from '../src';
-
-import * as T from 'fp-ts/lib/Task';
-
 import {
   Change,
   DocumentChangeSnapshot,
@@ -137,8 +134,10 @@ export function getDocDataChange({ before, after }: DocumentDataChange): Documen
   return compactDocDataDiff;
 }
 
-export const getViewCollectionName = (collectionName: string, viewName: string): string =>
-  `${collectionName}_${viewName}`;
+export const getViewCollectionName =
+  (viewName: string) =>
+  (collectionName: string): string =>
+    `${collectionName}_${viewName}`;
 
 export const wrapFirebaseSnapshot = (snapshot: FirestoreDocumentSnapshot): DocumentSnapshot => ({
   id: snapshot.id,

@@ -7,34 +7,22 @@ import {
   GrpcStatus,
   QuerySnapshot,
 } from 'firebase-admin/firestore';
+import { flow } from 'fp-ts/lib/function';
 import * as A from 'fp-ts/lib/ReadonlyArray';
-import { flow, pipe } from 'fp-ts/lib/function';
-import * as O from 'fp-ts/lib/Option';
 import * as T from 'fp-ts/lib/Task';
 import { DocumentData, DocumentSnapshot } from '../src';
-import { CollectionQuery, FirestoreDocumentSnapshot, Query, WriteDocumentData } from './types';
+import { CollectionQuery, FirestoreDocumentSnapshot, WriteDocumentData } from './types';
 import { wrapFirebaseSnapshot } from './util';
 
 export const firestore = { FieldValue, GrpcStatus };
 
-const makeCollectionRef = (collectionName: string): CollectionReference =>
+export const makeCollectionRef = (collectionName: string): CollectionReference =>
   getFirestore().collection(collectionName);
 
 const makeDocRef = (collectionName: string, documentId: string): DocumentReference =>
   makeCollectionRef(collectionName).doc(documentId);
 
-const makeQueryFromCollectionRef =
-  (query: O.Option<Query>) =>
-  (collectionRef: CollectionReference): CollectionQuery =>
-    pipe(
-      query,
-      O.foldW(
-        () => collectionRef,
-        (queryValue) => queryValue(collectionRef)
-      )
-    );
-
-const getDocument = (collectionQuery: CollectionQuery): T.Task<QuerySnapshot> =>
+export const getDocument = (collectionQuery: CollectionQuery): T.Task<QuerySnapshot> =>
   collectionQuery.get;
 
 const getSnapshotDocs = (snapshot: QuerySnapshot): readonly FirestoreDocumentSnapshot[] =>
@@ -49,12 +37,15 @@ export async function getDoc(
   return wrappedSnapshot;
 }
 
-export function deleteDoc(
-  collectionName: string,
-  documentId: string
-): Promise<FirebaseFirestore.WriteResult> {
-  return makeDocRef(collectionName, documentId).delete();
-}
+export const deleteDoc_ =
+  (documentId: string) =>
+  (collectionName: string): T.Task<FirebaseFirestore.WriteResult> =>
+    deleteDoc(collectionName)(documentId);
+
+export const deleteDoc =
+  (collectionName: string) =>
+  (documentId: string): T.Task<FirebaseFirestore.WriteResult> =>
+    makeDocRef(collectionName, documentId).delete;
 
 export function createDoc(
   collectionName: string,
@@ -72,16 +63,22 @@ export function updateDoc(
   return makeDocRef(collectionName, documentId).update(data);
 }
 
-export const getCollection = (
-  collectionName: string,
-  query: O.Option<Query>
-): T.Task<readonly DocumentSnapshot[]> =>
-  pipe(
-    collectionName,
-    makeCollectionRef,
-    makeQueryFromCollectionRef(query),
-    getDocument,
-    T.map(flow(getSnapshotDocs, A.map(wrapFirebaseSnapshot)))
-  );
+export const toDocumentIds = flow(
+  getSnapshotDocs,
+  A.map(wrapFirebaseSnapshot),
+  A.map((snapshot) => snapshot.id)
+);
+
+// export const getCollection = (
+//   collectionName: string,
+//   query: O.Option<Query>
+// ): T.Task<readonly DocumentSnapshot[]> =>
+//   pipe(
+//     collectionName,
+//     makeCollectionRef,
+//     makeQueryFromCollectionRef(query),
+//     getDocument,
+//     T.map(flow(getSnapshotDocs, A.map(wrapFirebaseSnapshot)))
+//   );
 
 // export const _ = { getDocRef };
