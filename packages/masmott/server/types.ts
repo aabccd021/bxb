@@ -66,6 +66,8 @@ export type CollectionTriggers = {
   readonly view: Dict<ViewTriggers>;
 };
 
+export type MakeFirestoreTriggers = (collectionSpecs: Spec) => FirestoreTriggers;
+
 export type FirestoreTriggers = Dict<CollectionTriggers>;
 
 export type OnCreateTriggerHandler = (

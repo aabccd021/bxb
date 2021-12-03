@@ -5,9 +5,9 @@ import * as A from 'fp-ts/lib/ReadonlyArray';
 import * as T from 'fp-ts/lib/Task';
 import * as O from 'fp-ts/lib/Option';
 import isEmpty from 'lodash/isEmpty';
+import * as R from 'fp-ts/lib/Record';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
-import { CollectionSpec, Dict, Spec, SrcFieldSpec, ViewSpec } from '../src';
 import {
   createDoc,
   deleteDoc,
@@ -27,6 +27,7 @@ import {
   DocumentData,
   DocumentSnapshot,
   FirestoreTriggers,
+  MakeFirestoreTriggers,
   OnCreateTrigger,
   OnDeleteTrigger,
   OnDeleteTriggerHandler,
@@ -217,34 +218,29 @@ const onSrcRefDocDeleted = (
 /**
  * Make triggers for a view.
  */
-const makeViewTriggers = (
-  collectionName: string,
-  viewName: string,
-  viewSpec: ViewSpec
-): ViewTriggers => ({
-  onViewSrcDocCreated: onSrcDocCreated(collectionName, viewName, viewSpec),
-  onViewSrcDocUpdated: onViewSrcDocUpdated(collectionName, viewName, viewSpec.selectedFieldNames),
-  onViewSrcDocDeleted: onViewSrcDocDeleted(collectionName, viewName),
-  onJoinRefDocUpdated: onJoinRefDocUpdated(collectionName, viewName, viewSpec.joinSpecs),
-  onCountedDocCreated: onCountedDocCreated(collectionName, viewName, viewSpec.countSpecs),
-  onCountedDocDeleted: onCountedDocDeleted(collectionName, viewName, viewSpec.countSpecs),
-});
+const makeViewTriggers =
+  (collectionName: string) =>
+  (viewName: string, viewSpec: ViewSpec): ViewTriggers => ({
+    onViewSrcDocCreated: onSrcDocCreated(collectionName, viewName, viewSpec),
+    onViewSrcDocUpdated: onViewSrcDocUpdated(collectionName, viewName, viewSpec.selectedFieldNames),
+    onViewSrcDocDeleted: onViewSrcDocDeleted(collectionName, viewName),
+    onJoinRefDocUpdated: onJoinRefDocUpdated(collectionName, viewName, viewSpec.joinSpecs),
+    onCountedDocCreated: onCountedDocCreated(collectionName, viewName, viewSpec.countSpecs),
+    onCountedDocDeleted: onCountedDocDeleted(collectionName, viewName, viewSpec.countSpecs),
+  });
 
 /**
  * Make triggers for a collection.
  */
 const makeCollectionTriggers = (
-  { src, views }: CollectionSpec,
-  collectionName: string
+  collectionName: string,
+  { src, views }: CollectionSpec
 ): CollectionTriggers => ({
   onRefDocDeleted: onSrcRefDocDeleted(collectionName, src),
-  view: mapValues(views, (view, viewName) => makeViewTriggers(collectionName, viewName, view)),
+  view: mapValues(views, makeViewTriggers(collectionName)),
 });
 
 /**
  * Make triggers for firestore.
  */
-export const makeFirestoreTriggers = (collectionSpecs: Spec): FirestoreTriggers =>
-  mapValues(collectionSpecs, (collectionSpec, collectionName) =>
-    makeCollectionTriggers(collectionSpec, collectionName)
-  );
+export const makeFirestoreTriggers: MakeFirestoreTriggers = R.mapWithIndex(makeCollectionTriggers);
