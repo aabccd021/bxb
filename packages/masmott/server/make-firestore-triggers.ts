@@ -11,16 +11,16 @@ import { CollectionSpec, Dict, Spec, SrcFieldSpec, ViewSpec } from '../src';
 import {
   createDoc,
   deleteDoc,
-  deleteDoc_,
+  deleteDocWithId,
   getDocument as getDocuments,
   toCollectionRef,
   toDocumentIds,
-  updateDoc,
+  updateDocWithId,
 } from './firebase-admin';
 import {
   makeOnCreateTrigger,
-  toTriggerOnCollection as toTriggerOn,
-  makeOnUpdateTrigger,
+  toDeleteTriggerOn,
+  toUpdateTriggerOnCollection,
 } from './firebase-functions';
 import {
   CollectionTriggers,
@@ -35,10 +35,10 @@ import {
   Query,
   ViewTriggers,
 } from './types';
-import { getDocDataChange, getViewCollectionName } from './util';
+import { getDocDataChange, toViewCollectionPathWithViewName } from './util';
 import { materializeCountViewData, onCountedDocCreated, onCountedDocDeleted } from './view-count';
 import { materializeJoinViewData, onJoinRefDocUpdated } from './view-join';
-import { doNothing, makeQuery, makeToViewDocUpdate } from './pure';
+import { doNothing, makeQuery, makeToViewDocUpdate as toUpdateDataWith } from './pure';
 
 /**
  * Materialize view document data based on given specification.
@@ -82,7 +82,7 @@ export async function createViewDoc(
 ): T.Task<FirebaseFirestore.WriteResult> {
   const viewDocData = await materializeViewData(srcDoc.data, viewSpec);
   const viewDocId = srcDoc.id;
-  const viewCollectionName = getViewCollectionName(collectionName, viewName);
+  const viewCollectionName = toViewCollectionPathWithViewName(collectionName, viewName);
   return createDoc(viewCollectionName, viewDocId, viewDocData);
 }
 
@@ -106,12 +106,24 @@ function onSrcDocCreated(
   );
 }
 
-const makeUpdateViewDoc = (collectionName: string, viewName: string, docId: string) => {
-  const toViewCollectionName = getViewCollectionName(viewName);
-  const updateViewDoc = updateDoc(docId);
-  return pipe(collectionName, toViewCollectionName, updateViewDoc);
-};
+/**
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 
+/**
+ *
+ */
+const updateDocWith = (collectionName: string, viewName: string, docId: string) =>
+  pipe(collectionName, toViewCollectionPathWithViewName(viewName), updateDocWithId(docId));
+
+/**
+ *
+ */
 const makeOnViewSrcDocUpdateTriggerHandler =
   (
     collectionName: string,
@@ -119,21 +131,17 @@ const makeOnViewSrcDocUpdateTriggerHandler =
     selectedFieldNames: readonly string[]
   ): OnUpdateTriggerHandler =>
   (_) =>
-  (srcDoc) => {
-    const toViewDocUpdate = makeToViewDocUpdate(selectedFieldNames);
-    const updateViewDoc = makeUpdateViewDoc(collectionName, viewName, srcDoc.id);
-    return pipe(srcDoc.data, toViewDocUpdate, O.fold(doNothing, updateViewDoc));
-  };
+  (srcDoc) =>
+    pipe(
+      srcDoc.data,
+      toUpdateDataWith(selectedFieldNames),
+      O.fold(doNothing, updateDocWith(collectionName, viewName, srcDoc.id))
+    );
 
 /**
  * Make a trigger to run on source document update. The trigger will update all
  * view documents with the same id as updated source document, if there is a
  * change.
- *
- * @param collectionName
- * @param viewName
- * @param selectedFieldNames
- * @returns
  */
 const onViewSrcDocUpdated = (
   collectionName: string,
@@ -145,18 +153,17 @@ const onViewSrcDocUpdated = (
     viewName,
     selectedFieldNames
   );
-  const toTrigger = makeOnUpdateTrigger(collectionName);
-  return pipe(handler, toTrigger);
+  return pipe(handler, toUpdateTriggerOnCollection(collectionName));
 };
 
+/**
+ *
+ */
 const makeOnViewSrcDocDeletedTriggerHandler =
   (collectionName: string, viewName: string): OnDeleteTriggerHandler =>
   (_) =>
-  (srcDoc) => {
-    const toViewCollectionName = getViewCollectionName(viewName);
-    const deleteViewDoc = deleteDoc_(srcDoc.id);
-    return pipe(collectionName, toViewCollectionName, deleteViewDoc);
-  };
+  (srcDoc) =>
+    pipe(collectionName, toViewCollectionPathWithViewName(viewName), deleteDocWithId(srcDoc.id));
 
 /**
  * Make a trigger to run on source document delete. The trigger will delete all
@@ -164,8 +171,7 @@ const makeOnViewSrcDocDeletedTriggerHandler =
  */
 const onViewSrcDocDeleted = (collectionName: string, viewName: string) => {
   const handler = makeOnViewSrcDocDeletedTriggerHandler(collectionName, viewName);
-  const toTrigger = toTriggerOn(collectionName);
-  return pipe(handler, toTrigger);
+  return pipe(handler, toDeleteTriggerOn(collectionName));
 };
 
 /**
@@ -203,7 +209,7 @@ const onSrcRefDocDeleted = (
       ? pipe(
           collectionName,
           toHandlerWith(sourceRefFieldName),
-          toTriggerOn(sourceField.refCollection)
+          toDeleteTriggerOn(sourceField.refCollection)
         )
       : undefined
   );

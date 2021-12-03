@@ -4,12 +4,13 @@ import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import { Dict,  } from '../src';
 import { getCollection, getDoc, updateDoc__ } from './firebase-admin';
-import { makeOnUpdateTrigger } from './firebase-functions';
+import { toTriggerOnCollection } from './firebase-functions';
+import { materializeJoinData } from './pure';
 import { DocumentData, DocumentSnapshot, OnUpdateTrigger } from './types';
 import {
   compactObject,
   getDocDataChange,
-  getViewCollectionName,
+  toViewCollectionPathWithViewName,
   mergeObjectArray,
   throwRejectedPromises,
 } from './util';
@@ -135,7 +136,7 @@ function makeOnJoinRefDocUpdatedTrigger(
 ): OnUpdateTrigger {
   const refCollectionName = makeJoinRefCollectionName(spec);
 
-  return makeOnUpdateTrigger(refCollectionName, async (refDoc) => {
+  return toTriggerOnCollection(refCollectionName, async (refDoc) => {
     const allDocDataUpdate = getDocDataChange(refDoc.data);
     const docDataUpdate = pick(allDocDataUpdate, spec.selectedFieldNames);
 
@@ -146,7 +147,7 @@ function makeOnJoinRefDocUpdatedTrigger(
     const prefixedDocDataUpdate = prefixJoinNameOnDocData(docDataUpdate, joinName);
     const refIdFieldName = makeRefIdFieldName(joinName);
 
-    const viewCollectionName = getViewCollectionName(collectionName, viewName);
+    const viewCollectionName = toViewCollectionPathWithViewName(collectionName, viewName);
 
     const referrerViews = await getCollection(viewCollectionName, (collection) =>
       collection.where(refIdFieldName, '==', refDoc.id)

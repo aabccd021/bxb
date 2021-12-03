@@ -37,7 +37,7 @@ export async function getDoc(
   return wrappedSnapshot;
 }
 
-export const deleteDoc_ =
+export const deleteDocWithId =
   (documentId: string) =>
   (collectionName: string): T.Task<FirebaseFirestore.WriteResult> =>
     deleteDoc(collectionName)(documentId);
@@ -55,23 +55,20 @@ export function createDoc(
   return makeDocRef(collectionName, documentId).create(data);
 }
 
-export const updateDoc =
+const updateDocWithId =
   (documentId: string) =>
   (collectionName: string) =>
   (data: WriteDocumentData): T.Task<FirebaseFirestore.WriteResult> =>
   () =>
     makeDocRef(collectionName, documentId).update(data);
 
-export const updateDoc__ =
-  (collectionName: string, documentId: string) =>
-  (data: WriteDocumentData): T.Task<FirebaseFirestore.WriteResult> =>
-    updateDoc(documentId)(collectionName)(data);
-
-export const toDocumentIds = flow(
+const toDocumentIds = flow(
   getSnapshotDocs,
   A.map(wrapFirebaseSnapshot),
   A.map((snapshot) => snapshot.id)
 );
+
+export { updateDocWithId, toDocumentIds };
 
 // export const getCollection = (
 //   collectionName: string,

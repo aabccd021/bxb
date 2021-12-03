@@ -41,7 +41,7 @@ export type DocumentChangeSnapshot = {
 
 export type DocumentSnapshot = {
   readonly id: string;
-  readonly data: unknown;
+  readonly data: DocumentData;
 };
 
 export type DocumentBuilder = firestore.DocumentBuilder;

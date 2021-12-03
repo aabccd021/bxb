@@ -9,7 +9,7 @@ import {
   OnDeleteTriggerHandler,
   WriteDocumentData,
 } from './types';
-import { getViewCollectionName, mapValues } from './util';
+import { toViewCollectionPathWithViewName, mapValues } from './util';
 
 function getStringField(data: DocumentData, fieldName: string): string {
   const fieldValue = data[fieldName];
@@ -33,7 +33,7 @@ function makeOnCountedDocCreatedTrigger(
 ): OnCreateTriggerHandler {
   return async (snapshot): Promise<void> => {
     const counterDocId = _.getStringField(snapshot.data, counterRefIdFieldName);
-    const viewCollectionName = getViewCollectionName(counterCollectionName, viewName);
+    const viewCollectionName = toViewCollectionPathWithViewName(counterCollectionName, viewName);
     const incrementedData = _.makeIncrementDocData(countName, 1);
     await updateDoc__(viewCollectionName, counterDocId, incrementedData);
   };
@@ -64,7 +64,7 @@ function makeOnCountedDocDeletedHandler(
 ): OnDeleteTriggerHandler {
   return async (snapshot): Promise<void> => {
     const counterDocId = _.getStringField(snapshot.data, counterRefIdFieldName);
-    const viewCollectionName = getViewCollectionName(counterCollectionName, viewName);
+    const viewCollectionName = toViewCollectionPathWithViewName(counterCollectionName, viewName);
     const decrementedData = _.makeIncrementDocData(countName, -1);
     await updateDoc__(viewCollectionName, counterDocId, decrementedData).catch((reason) => {
       if (reason.code === firestore.GrpcStatus.NOT_FOUND) {

@@ -82,32 +82,7 @@ export function compactObject<T>(object: Dict<T | undefined>): Dict<T> {
   }, {});
 }
 
-/**
- * Get value difference before and after a change.
- * Returns undefined if value not changed.
- *
- * @example
- * const change1 = getValueChange('foo', 'bar')
- * // change1 => 'bar'
- *
- * @example
- * const change2 = getValueChange('lorem', 'lorem')
- * // change2 => undefined
- *
- * @param beforeValue Value before change.
- * @param afterValue Value after change.
- * @returns Difference between before and after.
- */
-
-
-/**
- *
- * @param documentDataChange
- * @returns
- */
-
-
-export const getViewCollectionName =
+export const toViewCollectionPathWithViewName =
   (viewName: string) =>
   (collectionName: string): string =>
     `${collectionName}_${viewName}`;
