@@ -98,41 +98,14 @@ export function compactObject<T>(object: Dict<T | undefined>): Dict<T> {
  * @param afterValue Value after change.
  * @returns Difference between before and after.
  */
-export function getValueChange(
-  beforeValue: FirestoreDataType,
-  afterValue: FirestoreDataType
-): FirestoreDataType | undefined {
-  if (typeof beforeValue === 'string' && typeof afterValue === 'string') {
-    if (beforeValue !== afterValue) {
-      return afterValue;
-    }
-    return undefined;
-  }
-  throw Error(JSON.stringify({ beforeValue, afterValue }));
-}
+
 
 /**
  *
  * @param documentDataChange
  * @returns
  */
-export function getDocDataChange({ before, after }: DocumentDataChange): DocumentData {
-  const docDataDiff = mapValues(before, (beforeFieldData, fieldName) => {
-    const afterFieldData = after[fieldName];
 
-    // undefined (optional) field is not supported
-    if (afterFieldData === undefined) {
-      throw Error(JSON.stringify({ before, afterFieldData, fieldName }));
-    }
-
-    const fieldDiff = getValueChange(beforeFieldData, afterFieldData);
-    return fieldDiff;
-  });
-
-  const compactDocDataDiff = compactObject(docDataDiff);
-
-  return compactDocDataDiff;
-}
 
 export const getViewCollectionName =
   (viewName: string) =>

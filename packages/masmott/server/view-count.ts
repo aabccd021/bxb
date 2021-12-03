@@ -1,6 +1,6 @@
 import { CountSpec, Dict, Mapped } from '../src';
-import { firestore, updateDoc } from './firebase-admin';
-import { makeOnCreateTrigger, makeOnDeleteTrigger } from './firebase-functions';
+import { firestore, updateDoc__ } from './firebase-admin';
+import { makeOnCreateTrigger, toTriggerOnCollection } from './firebase-functions';
 import {
   DocumentData,
   OnCreateTrigger,
@@ -35,7 +35,7 @@ function makeOnCountedDocCreatedTrigger(
     const counterDocId = _.getStringField(snapshot.data, counterRefIdFieldName);
     const viewCollectionName = getViewCollectionName(counterCollectionName, viewName);
     const incrementedData = _.makeIncrementDocData(countName, 1);
-    await updateDoc(viewCollectionName, counterDocId, incrementedData);
+    await updateDoc__(viewCollectionName, counterDocId, incrementedData);
   };
 }
 
@@ -66,7 +66,7 @@ function makeOnCountedDocDeletedHandler(
     const counterDocId = _.getStringField(snapshot.data, counterRefIdFieldName);
     const viewCollectionName = getViewCollectionName(counterCollectionName, viewName);
     const decrementedData = _.makeIncrementDocData(countName, -1);
-    await updateDoc(viewCollectionName, counterDocId, decrementedData).catch((reason) => {
+    await updateDoc__(viewCollectionName, counterDocId, decrementedData).catch((reason) => {
       if (reason.code === firestore.GrpcStatus.NOT_FOUND) {
         // Ignore if counter document not exists.
         return;
@@ -88,7 +88,7 @@ export function onCountedDocDeleted(
       countName,
       countSpec.groupBy
     );
-    const trigger = makeOnDeleteTrigger(countSpec.countedCollectionName, handler);
+    const trigger = toTriggerOnCollection(countSpec.countedCollectionName, handler);
     return trigger;
   });
 }

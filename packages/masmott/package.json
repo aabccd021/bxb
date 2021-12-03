@@ -176,7 +176,6 @@
       "prefer-destructuring": "error",
       "prefer-template": "error",
       "eqeqeq": "error",
-      "@typescript-eslint/explicit-function-return-type": "error",
       "prettier/prettier": [
         "error",
         {

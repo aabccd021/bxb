@@ -16,11 +16,11 @@ import { wrapFirebaseSnapshot } from './util';
 
 export const firestore = { FieldValue, GrpcStatus };
 
-export const makeCollectionRef = (collectionName: string): CollectionReference =>
+export const toCollectionRef = (collectionName: string): CollectionReference =>
   getFirestore().collection(collectionName);
 
 const makeDocRef = (collectionName: string, documentId: string): DocumentReference =>
-  makeCollectionRef(collectionName).doc(documentId);
+  toCollectionRef(collectionName).doc(documentId);
 
 export const getDocument = (collectionQuery: CollectionQuery): T.Task<QuerySnapshot> =>
   collectionQuery.get;
@@ -55,13 +55,17 @@ export function createDoc(
   return makeDocRef(collectionName, documentId).create(data);
 }
 
-export function updateDoc(
-  collectionName: string,
-  documentId: string,
-  data: WriteDocumentData
-): Promise<FirebaseFirestore.WriteResult> {
-  return makeDocRef(collectionName, documentId).update(data);
-}
+export const updateDoc =
+  (documentId: string) =>
+  (collectionName: string) =>
+  (data: WriteDocumentData): T.Task<FirebaseFirestore.WriteResult> =>
+  () =>
+    makeDocRef(collectionName, documentId).update(data);
+
+export const updateDoc__ =
+  (collectionName: string, documentId: string) =>
+  (data: WriteDocumentData): T.Task<FirebaseFirestore.WriteResult> =>
+    updateDoc(documentId)(collectionName)(data);
 
 export const toDocumentIds = flow(
   getSnapshotDocs,

@@ -53,16 +53,16 @@ export type OnDeleteTrigger = OnCreateTrigger;
 export type OnUpdateTrigger = CloudFunction<Change<firestore.QueryDocumentSnapshot>>;
 
 export type ViewTriggers = {
-  readonly onSrcDocCreated: OnCreateTrigger;
-  readonly onSrcDocUpdated: OnUpdateTrigger;
-  readonly onSrcDocDeleted: OnDeleteTrigger;
+  readonly onViewSrcDocCreated: OnCreateTrigger;
+  readonly onViewSrcDocUpdated: OnUpdateTrigger;
+  readonly onViewSrcDocDeleted: OnDeleteTrigger;
   readonly onJoinRefDocUpdated: Dict<OnUpdateTrigger>;
   readonly onCountedDocCreated: Dict<OnCreateTrigger>;
   readonly onCountedDocDeleted: Dict<OnDeleteTrigger>;
 };
 
 export type CollectionTriggers = {
-  readonly onRefDocDeleted: Dict<Option<OnDeleteTrigger>>;
+  readonly onRefDocDeleted: Dict<OnDeleteTrigger | undefined>;
   readonly view: Dict<ViewTriggers>;
 };
 

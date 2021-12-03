@@ -3,7 +3,7 @@ import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import { Dict,  } from '../src';
-import { getCollection, getDoc, updateDoc } from './firebase-admin';
+import { getCollection, getDoc, updateDoc__ } from './firebase-admin';
 import { makeOnUpdateTrigger } from './firebase-functions';
 import { DocumentData, DocumentSnapshot, OnUpdateTrigger } from './types';
 import {
@@ -94,7 +94,7 @@ async function getRefDocFromRefSpecs(
 export async function materializeJoinViewData(
   srcDocData: DocumentData,
   specs: Dict<JoinSpec>
-): Promise<DocumentData> {
+): T.Task<DocumentData> {
   const docDataPromises = Object.entries(specs).map(([joinName, spec]) =>
     materializeJoinData(srcDocData, joinName, spec)
   );
@@ -153,7 +153,7 @@ function makeOnJoinRefDocUpdatedTrigger(
     );
 
     const referrerViewsUpdates = referrerViews.docs.map((doc) =>
-      updateDoc(viewCollectionName, doc.id, prefixedDocDataUpdate)
+      updateDoc__(viewCollectionName, doc.id, prefixedDocDataUpdate)
     );
 
     const promisesResult = await Promise.allSettled(referrerViewsUpdates);

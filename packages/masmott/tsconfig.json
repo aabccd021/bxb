@@ -13,6 +13,7 @@
     "noImplicitReturns": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": true,
     "strictBindCallApply": true,
     "outDir": "./dist",
     "rootDir": "src",

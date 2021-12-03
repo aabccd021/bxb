@@ -4,9 +4,7 @@ import {
   GetDocTriggerOptions,
   OnCreateTrigger,
   OnCreateTriggerHandler,
-  OnDeleteTrigger,
   OnDeleteTriggerHandler,
-  OnUpdateTrigger,
   OnUpdateTriggerHandler,
 } from '../types';
 import { makeDocTriggerPath, wrapChangeTriggerHandler, wrapSnapshotTriggerHandler } from '../util';
@@ -21,14 +19,11 @@ export const makeOnCreateTrigger = (
 ): OnCreateTrigger =>
   _.makeDocTrigger(collectionName).onCreate(wrapSnapshotTriggerHandler(handler));
 
-export const makeOnUpdateTrigger = (
-  collectionName: string,
-  handler: OnUpdateTriggerHandler
-): OnUpdateTrigger => _.makeDocTrigger(collectionName).onUpdate(wrapChangeTriggerHandler(handler));
+export const makeOnUpdateTrigger = (collectionName: string) => (handler: OnUpdateTriggerHandler) =>
+  _.makeDocTrigger(collectionName).onUpdate(wrapChangeTriggerHandler(handler));
 
-export const makeOnDeleteTrigger =
-  (handler: OnDeleteTriggerHandler) =>
-  (collectionName: string): OnDeleteTrigger =>
+export const toTriggerOnCollection =
+  (collectionName: string) => (handler: OnDeleteTriggerHandler) =>
     _.makeDocTrigger(collectionName).onCreate(wrapSnapshotTriggerHandler(handler));
 
 export const _ = { makeDocTrigger, makeDocTriggerPath };

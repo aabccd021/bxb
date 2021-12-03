@@ -1,5 +1,9 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { EventContext } from 'firebase-functions/v1';
+import { string } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/lib/function';
+import * as A from 'fp-ts/lib/ReadonlyArray';
+import * as T from 'fp-ts/lib/Task';
+import * as O from 'fp-ts/lib/Option';
 import isEmpty from 'lodash/isEmpty';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
@@ -8,20 +12,16 @@ import {
   createDoc,
   deleteDoc,
   deleteDoc_,
-  getCollection,
-  getDocument,
-  makeCollectionRef,
-  toCollectionQuery,
+  getDocument as getDocuments,
+  toCollectionRef,
   toDocumentIds,
   updateDoc,
 } from './firebase-admin';
 import {
   makeOnCreateTrigger,
-  makeOnDeleteTrigger,
+  toTriggerOnCollection as toTriggerOn,
   makeOnUpdateTrigger,
 } from './firebase-functions';
-
-import * as T from 'fp-ts/lib/Task';
 import {
   CollectionTriggers,
   DocumentData,
@@ -31,14 +31,14 @@ import {
   OnDeleteTrigger,
   OnDeleteTriggerHandler,
   OnUpdateTrigger,
+  OnUpdateTriggerHandler,
   Query,
   ViewTriggers,
 } from './types';
-import * as O from 'fp-ts/lib/Option';
-import * as A from 'fp-ts/lib/ReadonlyArray';
 import { getDocDataChange, getViewCollectionName } from './util';
 import { materializeCountViewData, onCountedDocCreated, onCountedDocDeleted } from './view-count';
 import { materializeJoinViewData, onJoinRefDocUpdated } from './view-join';
+import { doNothing, makeQuery, makeToViewDocUpdate } from './pure';
 
 /**
  * Materialize view document data based on given specification.
@@ -50,7 +50,7 @@ import { materializeJoinViewData, onJoinRefDocUpdated } from './view-join';
 async function materializeViewData(
   srcDocData: DocumentData,
   { selectedFieldNames, joinSpecs, countSpecs }: ViewSpec
-): Promise<DocumentData> {
+): T.Task<DocumentData> {
   const selectViewData = pick(srcDocData, selectedFieldNames);
 
   const joinViewData = await materializeJoinViewData(srcDocData, joinSpecs);
@@ -79,7 +79,7 @@ export async function createViewDoc(
   viewName: string,
   srcDoc: DocumentSnapshot,
   viewSpec: ViewSpec
-): Promise<FirebaseFirestore.WriteResult> {
+): T.Task<FirebaseFirestore.WriteResult> {
   const viewDocData = await materializeViewData(srcDoc.data, viewSpec);
   const viewDocId = srcDoc.id;
   const viewCollectionName = getViewCollectionName(collectionName, viewName);
@@ -106,6 +106,25 @@ function onSrcDocCreated(
   );
 }
 
+const makeUpdateViewDoc = (collectionName: string, viewName: string, docId: string) => {
+  const toViewCollectionName = getViewCollectionName(viewName);
+  const updateViewDoc = updateDoc(docId);
+  return pipe(collectionName, toViewCollectionName, updateViewDoc);
+};
+
+const makeOnViewSrcDocUpdateTriggerHandler =
+  (
+    collectionName: string,
+    viewName: string,
+    selectedFieldNames: readonly string[]
+  ): OnUpdateTriggerHandler =>
+  (_) =>
+  (srcDoc) => {
+    const toViewDocUpdate = makeToViewDocUpdate(selectedFieldNames);
+    const updateViewDoc = makeUpdateViewDoc(collectionName, viewName, srcDoc.id);
+    return pipe(srcDoc.data, toViewDocUpdate, O.fold(doNothing, updateViewDoc));
+  };
+
 /**
  * Make a trigger to run on source document update. The trigger will update all
  * view documents with the same id as updated source document, if there is a
@@ -116,139 +135,110 @@ function onSrcDocCreated(
  * @param selectedFieldNames
  * @returns
  */
-function onSrcDocUpdated(
+const onViewSrcDocUpdated = (
   collectionName: string,
   viewName: string,
   selectedFieldNames: readonly string[]
-): OnUpdateTrigger {
-  return makeOnUpdateTrigger(collectionName, async (srcDoc) => {
-    const allDocDataUpdate = getDocDataChange(srcDoc.data);
+): OnUpdateTrigger => {
+  const handler = makeOnViewSrcDocUpdateTriggerHandler(
+    collectionName,
+    viewName,
+    selectedFieldNames
+  );
+  const toTrigger = makeOnUpdateTrigger(collectionName);
+  return pipe(handler, toTrigger);
+};
 
-    const selectViewUpdateData = pick(allDocDataUpdate, selectedFieldNames);
-
-    // Changing referenceId is not supported at the moment.
-    const joinViewUpdateData = {};
-
-    const viewUpdateData = {
-      ...selectViewUpdateData,
-      ...joinViewUpdateData,
-    };
-
-    if (isEmpty(viewUpdateData)) {
-      return;
-    }
-    const viewDocId = srcDoc.id;
-    const viewCollectionName = getViewCollectionName(collectionName, viewName);
-    await updateDoc(viewCollectionName, viewDocId, viewUpdateData);
-  });
-}
+const makeOnViewSrcDocDeletedTriggerHandler =
+  (collectionName: string, viewName: string): OnDeleteTriggerHandler =>
+  (_) =>
+  (srcDoc) => {
+    const toViewCollectionName = getViewCollectionName(viewName);
+    const deleteViewDoc = deleteDoc_(srcDoc.id);
+    return pipe(collectionName, toViewCollectionName, deleteViewDoc);
+  };
 
 /**
  * Make a trigger to run on source document delete. The trigger will delete all
  * view documents with the same id as deleted source document.
- *
- * @param collectionName
- * @param viewName
- * @returns
  */
-const onSrcDocDeleted = (collectionName: string, viewName: string): OnDeleteTrigger =>
-  pipe(
-    collectionName,
-    makeOnDeleteTrigger(
-      (_) => (srcDoc) =>
-        pipe(collectionName, getViewCollectionName(viewName), deleteDoc_(srcDoc.id))
-    )
-  );
+const onViewSrcDocDeleted = (collectionName: string, viewName: string) => {
+  const handler = makeOnViewSrcDocDeletedTriggerHandler(collectionName, viewName);
+  const toTrigger = toTriggerOn(collectionName);
+  return pipe(handler, toTrigger);
+};
 
-const makeQuery =
-  (refIdFieldName: string, refDocId: string): Query =>
-  (collection) =>
-    collection.where(refIdFieldName, '==', refDocId);
+/**
+ *
+ */
+const makeDeleteAllDocs = (collectionName: string) => {
+  const deleteDocs = A.map(deleteDoc(collectionName));
+  return flow(toDocumentIds, deleteDocs, T.sequenceArray);
+};
 
-const makeOnSrcRefDocDeletedHandler =
-  (collectionName: string, sourceFieldName: string): OnDeleteTriggerHandler =>
+/**
+ *
+ */
+const toHandlerWith =
+  (sourceFieldName: string) =>
+  (collectionName: string): OnDeleteTriggerHandler =>
   (_) =>
-  (refDoc) =>
-    pipe(
-      collectionName,
-      makeCollectionRef,
-      makeQuery(sourceFieldName, refDoc.id),
-      getDocument,
-      T.map(flow(toDocumentIds, A.map(deleteDoc(collectionName)))),
-      T.chain(T.sequenceArray)
-    );
+  (refDoc) => {
+    const toQuery = makeQuery(sourceFieldName, refDoc.id);
+    const deleteAllDocs = T.chain(makeDeleteAllDocs(collectionName));
+    return pipe(collectionName, toCollectionRef, toQuery, getDocuments, deleteAllDocs);
+  };
 
 /**
  * Make a trigger to run on deletion of a document referenced by source
  * document. The trigger will delete all document that refers to that referenced
  * document.
- *
- * @param collectionName
- * @param src
- * @returns
  */
 const onSrcRefDocDeleted = (
   collectionName: string,
   src: Dict<SrcFieldSpec>
-): Dict<O.Option<OnDeleteTrigger>> =>
-  mapValues(src, (sourceField, sourceFieldName) =>
-    sourceField.type !== 'refId'
-      ? O.none
-      : pipe(
-          sourceField.refCollection,
-          makeOnDeleteTrigger(makeOnSrcRefDocDeletedHandler(collectionName, sourceFieldName)),
-          O.some
+): Dict<OnDeleteTrigger | undefined> =>
+  mapValues(src, (sourceField, sourceRefFieldName) =>
+    sourceField.type === 'refId'
+      ? pipe(
+          collectionName,
+          toHandlerWith(sourceRefFieldName),
+          toTriggerOn(sourceField.refCollection)
         )
+      : undefined
   );
 
 /**
  * Make triggers for a view.
- *
- * @param collectionName Name of the view's collection.
- * @param viewName Name of the view.
- * @param viewSpec Specification of the view.
- * @returns
  */
-function makeViewTriggers(
+const makeViewTriggers = (
   collectionName: string,
   viewName: string,
   viewSpec: ViewSpec
-): ViewTriggers {
-  return {
-    onSrcDocCreated: onSrcDocCreated(collectionName, viewName, viewSpec),
-    onSrcDocUpdated: onSrcDocUpdated(collectionName, viewName, viewSpec.selectedFieldNames),
-    onSrcDocDeleted: onSrcDocDeleted(collectionName, viewName),
-    onJoinRefDocUpdated: onJoinRefDocUpdated(collectionName, viewName, viewSpec.joinSpecs),
-    onCountedDocCreated: onCountedDocCreated(collectionName, viewName, viewSpec.countSpecs),
-    onCountedDocDeleted: onCountedDocDeleted(collectionName, viewName, viewSpec.countSpecs),
-  };
-}
+): ViewTriggers => ({
+  onViewSrcDocCreated: onSrcDocCreated(collectionName, viewName, viewSpec),
+  onViewSrcDocUpdated: onViewSrcDocUpdated(collectionName, viewName, viewSpec.selectedFieldNames),
+  onViewSrcDocDeleted: onViewSrcDocDeleted(collectionName, viewName),
+  onJoinRefDocUpdated: onJoinRefDocUpdated(collectionName, viewName, viewSpec.joinSpecs),
+  onCountedDocCreated: onCountedDocCreated(collectionName, viewName, viewSpec.countSpecs),
+  onCountedDocDeleted: onCountedDocDeleted(collectionName, viewName, viewSpec.countSpecs),
+});
 
 /**
  * Make triggers for a collection.
- *
- * @param collectionSpec Specification of the collection.
- * @param collectionName Name of the collection.
- * @returns Triggers made for the collection.
  */
-function makeCollectionTriggers(
+const makeCollectionTriggers = (
   { src, views }: CollectionSpec,
   collectionName: string
-): CollectionTriggers {
-  return {
-    onRefDocDeleted: onSrcRefDocDeleted(collectionName, src),
-    view: mapValues(views, (view, viewName) => makeViewTriggers(collectionName, viewName, view)),
-  };
-}
+): CollectionTriggers => ({
+  onRefDocDeleted: onSrcRefDocDeleted(collectionName, src),
+  view: mapValues(views, (view, viewName) => makeViewTriggers(collectionName, viewName, view)),
+});
 
 /**
  * Make triggers for firestore.
- *
- * @param collectionSpecs Collections specs of the app.
- * @returns Triggers made by masmott.
  */
-export function makeFirestoreTriggers(collectionSpecs: Spec): FirestoreTriggers {
-  return mapValues(collectionSpecs, (collectionSpec, collectionName) =>
+export const makeFirestoreTriggers = (collectionSpecs: Spec): FirestoreTriggers =>
+  mapValues(collectionSpecs, (collectionSpec, collectionName) =>
     makeCollectionTriggers(collectionSpec, collectionName)
   );
-}
