@@ -10,7 +10,6 @@ import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
 import {
   createDoc,
-  deleteDoc,
   deleteDocWithId,
   getDocument as getDocuments,
   toCollectionRef,
@@ -19,9 +18,9 @@ import {
 } from './firebase-admin';
 import {
   makeOnCreateTrigger,
-  toDeleteTriggerOn,
+  makeDeleteTrigger,
   toUpdateTriggerOnCollection,
-} from './firebase-functions';
+} from './firebase-functions/pure';
 import {
   CollectionTriggers,
   DocumentData,
@@ -30,16 +29,24 @@ import {
   MakeFirestoreTriggers,
   OnCreateTrigger,
   OnDeleteTrigger,
-  OnDeleteTriggerHandler,
+  OnDeleteHandler,
   OnUpdateTrigger,
   OnUpdateTriggerHandler,
   Query,
   ViewTriggers,
 } from './types';
-import { getDocDataChange, toViewCollectionPathWithViewName } from './util';
-import { materializeCountViewData, onCountedDocCreated, onCountedDocDeleted } from './view-count';
+import { getDocDataChange, makeViewCollectionPath } from './util';
+import {
+  materializeCountViewData,
+  onCountedDocCreated,
+  onCountedDocDeleted,
+} from './view-count';
 import { materializeJoinViewData, onJoinRefDocUpdated } from './view-join';
-import { doNothing, makeQuery, makeToViewDocUpdate as toUpdateDataWith } from './pure';
+import {
+  doNothing,
+  makeQuery as makeWhereEqualQuery,
+  makeToViewDocUpdate as toUpdateDataWith,
+} from './pure';
 
 /**
  * Materialize view document data based on given specification.
@@ -83,7 +90,7 @@ export async function createViewDoc(
 ): T.Task<FirebaseFirestore.WriteResult> {
   const viewDocData = await materializeViewData(srcDoc.data, viewSpec);
   const viewDocId = srcDoc.id;
-  const viewCollectionName = toViewCollectionPathWithViewName(collectionName, viewName);
+  const viewCollectionName = makeViewCollectionPath(collectionName, viewName);
   return createDoc(viewCollectionName, viewDocId, viewDocData);
 }
 
@@ -119,8 +126,16 @@ function onSrcDocCreated(
 /**
  *
  */
-const updateDocWith = (collectionName: string, viewName: string, docId: string) =>
-  pipe(collectionName, toViewCollectionPathWithViewName(viewName), updateDocWithId(docId));
+const updateDocWith = (
+  collectionName: string,
+  viewName: string,
+  docId: string
+) =>
+  pipe(
+    collectionName,
+    makeViewCollectionPath(viewName),
+    updateDocWithId(docId)
+  );
 
 /**
  *
@@ -161,40 +176,14 @@ const onViewSrcDocUpdated = (
  *
  */
 const makeOnViewSrcDocDeletedTriggerHandler =
-  (collectionName: string, viewName: string): OnDeleteTriggerHandler =>
+  (collectionName: string, viewName: string): OnDeleteHandler =>
   (_) =>
   (srcDoc) =>
-    pipe(collectionName, toViewCollectionPathWithViewName(viewName), deleteDocWithId(srcDoc.id));
-
-/**
- * Make a trigger to run on source document delete. The trigger will delete all
- * view documents with the same id as deleted source document.
- */
-const onViewSrcDocDeleted = (collectionName: string, viewName: string) => {
-  const handler = makeOnViewSrcDocDeletedTriggerHandler(collectionName, viewName);
-  return pipe(handler, toDeleteTriggerOn(collectionName));
-};
-
-/**
- *
- */
-const makeDeleteAllDocs = (collectionName: string) => {
-  const deleteDocs = A.map(deleteDoc(collectionName));
-  return flow(toDocumentIds, deleteDocs, T.sequenceArray);
-};
-
-/**
- *
- */
-const toHandlerWith =
-  (sourceFieldName: string) =>
-  (collectionName: string): OnDeleteTriggerHandler =>
-  (_) =>
-  (refDoc) => {
-    const toQuery = makeQuery(sourceFieldName, refDoc.id);
-    const deleteAllDocs = T.chain(makeDeleteAllDocs(collectionName));
-    return pipe(collectionName, toCollectionRef, toQuery, getDocuments, deleteAllDocs);
-  };
+    pipe(
+      collectionName,
+      makeViewCollectionPath(viewName),
+      deleteDocWithId(srcDoc.id)
+    );
 
 /**
  * Make a trigger to run on deletion of a document referenced by source
@@ -209,8 +198,8 @@ const onSrcRefDocDeleted = (
     sourceField.type === 'refId'
       ? pipe(
           collectionName,
-          toHandlerWith(sourceRefFieldName),
-          toDeleteTriggerOn(sourceField.refCollection)
+          toSrcRefDocDeletedHandlerWith(sourceRefFieldName),
+          makeDeleteTrigger(sourceField.refCollection)
         )
       : undefined
   );
@@ -222,11 +211,27 @@ const makeViewTriggers =
   (collectionName: string) =>
   (viewName: string, viewSpec: ViewSpec): ViewTriggers => ({
     onViewSrcDocCreated: onSrcDocCreated(collectionName, viewName, viewSpec),
-    onViewSrcDocUpdated: onViewSrcDocUpdated(collectionName, viewName, viewSpec.selectedFieldNames),
+    onViewSrcDocUpdated: onViewSrcDocUpdated(
+      collectionName,
+      viewName,
+      viewSpec.selectedFieldNames
+    ),
     onViewSrcDocDeleted: onViewSrcDocDeleted(collectionName, viewName),
-    onJoinRefDocUpdated: onJoinRefDocUpdated(collectionName, viewName, viewSpec.joinSpecs),
-    onCountedDocCreated: onCountedDocCreated(collectionName, viewName, viewSpec.countSpecs),
-    onCountedDocDeleted: onCountedDocDeleted(collectionName, viewName, viewSpec.countSpecs),
+    onJoinRefDocUpdated: onJoinRefDocUpdated(
+      collectionName,
+      viewName,
+      viewSpec.joinSpecs
+    ),
+    onCountedDocCreated: onCountedDocCreated(
+      collectionName,
+      viewName,
+      viewSpec.countSpecs
+    ),
+    onCountedDocDeleted: onCountedDocDeleted(
+      collectionName,
+      viewName,
+      viewSpec.countSpecs
+    ),
   });
 
 /**
@@ -243,4 +248,6 @@ const makeCollectionTriggers = (
 /**
  * Make triggers for firestore.
  */
-export const makeFirestoreTriggers: MakeFirestoreTriggers = R.mapWithIndex(makeCollectionTriggers);
+export const makeFirestoreTriggers: MakeFirestoreTriggers = R.mapWithIndex(
+  makeCollectionTriggers
+);

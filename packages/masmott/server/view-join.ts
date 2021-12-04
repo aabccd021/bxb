@@ -2,15 +2,15 @@ import isEmpty from 'lodash/isEmpty';
 import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
 import pick from 'lodash/pick';
-import { Dict,  } from '../src';
+import { Dict } from '../src';
 import { getCollection, getDoc, updateDoc__ } from './firebase-admin';
-import { toTriggerOnCollection } from './firebase-functions';
+import { toTriggerOnCollection } from './firebase-functions/pure';
 import { materializeJoinData } from './pure';
 import { DocumentData, DocumentSnapshot, OnUpdateTrigger } from './types';
 import {
   compactObject,
   getDocDataChange,
-  toViewCollectionPathWithViewName,
+  makeViewCollectionPath,
   mergeObjectArray,
   throwRejectedPromises,
 } from './util';
@@ -46,7 +46,10 @@ async function getRefDocFromRefSpecChainRecursive(
 
   const currentRefDoc = await getDoc(currentRefSpec.collectionName, refId);
 
-  const refDoc = getRefDocFromRefSpecChainRecursive(nextRefChain, currentRefDoc);
+  const refDoc = getRefDocFromRefSpecChainRecursive(
+    nextRefChain,
+    currentRefDoc
+  );
 
   return refDoc;
 }
@@ -84,7 +87,6 @@ async function getRefDocFromRefSpecs(
  * @returns Materialized join view data.
  */
 
-
 /**
  * Maps array of join view specification into array of materialized data.
  *
@@ -115,7 +117,9 @@ export async function materializeJoinViewData(
  * @returns Name of the view's reference collection.
  */
 function makeJoinRefCollectionName({ refChain, firstRef }: JoinSpec): string {
-  return refChain[refChain.length - 1]?.collectionName ?? firstRef.collectionName;
+  return (
+    refChain[refChain.length - 1]?.collectionName ?? firstRef.collectionName
+  );
 }
 
 /**
@@ -144,13 +148,17 @@ function makeOnJoinRefDocUpdatedTrigger(
       return;
     }
 
-    const prefixedDocDataUpdate = prefixJoinNameOnDocData(docDataUpdate, joinName);
+    const prefixedDocDataUpdate = prefixJoinNameOnDocData(
+      docDataUpdate,
+      joinName
+    );
     const refIdFieldName = makeRefIdFieldName(joinName);
 
-    const viewCollectionName = toViewCollectionPathWithViewName(collectionName, viewName);
+    const viewCollectionName = makeViewCollectionPath(collectionName, viewName);
 
-    const referrerViews = await getCollection(viewCollectionName, (collection) =>
-      collection.where(refIdFieldName, '==', refDoc.id)
+    const referrerViews = await getCollection(
+      viewCollectionName,
+      (collection) => collection.where(refIdFieldName, '==', refDoc.id)
     );
 
     const referrerViewsUpdates = referrerViews.docs.map((doc) =>

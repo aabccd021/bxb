@@ -2,7 +2,9 @@
 import pick from 'lodash/pick';
 import { Dict, DocCreationData, Materialize, MutateDocAction } from '../types';
 
-function fromEntries<T extends string, V>(arr: readonly (readonly [T, V])[]): Record<T, V> {
+function fromEntries<T extends string, V>(
+  arr: readonly (readonly [T, V])[]
+): Record<T, V> {
   return Object.fromEntries(arr) as Record<T, V>;
 }
 
@@ -23,15 +25,17 @@ export function makeMaterializedDocMutateActions<DCD extends DocCreationData>(
   materializeViews: Dict<Materialize<DCD>>,
   data: DCD
 ): readonly MutateDocAction[] {
-  return Object.entries(materializeViews).map(([viewName, materializeView]) => ({
-    key: [collectionName, id],
-    data: {
-      exists: true,
+  return Object.entries(materializeViews).map(
+    ([viewName, materializeView]) => ({
+      key: [collectionName, id],
       data: {
-        ...fromEntries(countFieldNames.map((fieldName) => [fieldName, 0])),
-        ...pick(data, selectedFieldNames),
+        exists: true,
+        data: {
+          ...fromEntries(countFieldNames.map((fieldName) => [fieldName, 0])),
+          ...pick(data, selectedFieldNames),
+        },
       },
-    },
-    options: { viewName },
-  }));
+      options: { viewName },
+    })
+  );
 }

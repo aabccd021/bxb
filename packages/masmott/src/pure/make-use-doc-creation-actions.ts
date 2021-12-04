@@ -21,7 +21,11 @@ export function makeDocCreationPreSetActions<DCD extends DocCreationData>(
     data: { exists: true, data },
   };
 
-  const countDocMutateActions = makeCountDocMutateActions(data, 1, incrementSpecs);
+  const countDocMutateActions = makeCountDocMutateActions(
+    data,
+    1,
+    incrementSpecs
+  );
 
   const materializedDocMutateActions = makeMaterializedDocMutateActions(
     collectionName,
@@ -30,7 +34,11 @@ export function makeDocCreationPreSetActions<DCD extends DocCreationData>(
     data
   );
 
-  return [creationDocMutateAction, ...countDocMutateActions, ...materializedDocMutateActions];
+  return [
+    creationDocMutateAction,
+    ...countDocMutateActions,
+    ...materializedDocMutateActions,
+  ];
 }
 
 export function makeDocCreationOnSetErrorActions<DCD extends DocCreationData>(
@@ -42,9 +50,16 @@ export function makeDocCreationOnSetErrorActions<DCD extends DocCreationData>(
 ): readonly MutateDocAction[] {
   const createdDocKey: DocKey = [collectionName, id];
 
-  const creationDocMutateAction: MutateDocAction = { key: createdDocKey, data: { exists: false } };
+  const creationDocMutateAction: MutateDocAction = {
+    key: createdDocKey,
+    data: { exists: false },
+  };
 
-  const countDocMutateActions = makeCountDocMutateActions(data, -1, incrementSpecs);
+  const countDocMutateActions = makeCountDocMutateActions(
+    data,
+    -1,
+    incrementSpecs
+  );
 
   const materializedDocMutateActions: readonly MutateDocAction[] = Object.keys(
     materializeViews
@@ -54,5 +69,9 @@ export function makeDocCreationOnSetErrorActions<DCD extends DocCreationData>(
     options: { viewName },
   }));
 
-  return [creationDocMutateAction, ...countDocMutateActions, ...materializedDocMutateActions];
+  return [
+    creationDocMutateAction,
+    ...countDocMutateActions,
+    ...materializedDocMutateActions,
+  ];
 }

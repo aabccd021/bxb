@@ -84,16 +84,30 @@ export { nextjs, firestore };
     },
   };
 
-  const program = createProgram([indexFileName, nextConfigFileName], options, customCompilerHost);
+  const program = createProgram(
+    [indexFileName, nextConfigFileName],
+    options,
+    customCompilerHost
+  );
   const emitResult = program.emit();
 
-  const allDiagnostics = getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
+  const allDiagnostics = getPreEmitDiagnostics(program).concat(
+    emitResult.diagnostics
+  );
 
   allDiagnostics.forEach((diagnostic) => {
     if (diagnostic.file) {
-      const { line, character } = getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start!);
-      const message = flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-      console.log(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
+      const { line, character } = getLineAndCharacterOfPosition(
+        diagnostic.file,
+        diagnostic.start!
+      );
+      const message = flattenDiagnosticMessageText(
+        diagnostic.messageText,
+        '\n'
+      );
+      console.log(
+        `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`
+      );
     } else {
       console.log(flattenDiagnosticMessageText(diagnostic.messageText, '\n'));
     }

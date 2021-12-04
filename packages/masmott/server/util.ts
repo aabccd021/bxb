@@ -49,7 +49,9 @@ export function throwRejectedPromises(
  * @param objectArray The array of object to merge.
  * @returns The merged object
  */
-export function mergeObjectArray<T>(objectArray: readonly { readonly [key: string]: T }[]): {
+export function mergeObjectArray<T>(
+  objectArray: readonly { readonly [key: string]: T }[]
+): {
   readonly [key: string]: T;
 } {
   return objectArray.reduce((acc, object) => ({ ...acc, ...object }), {});
@@ -82,19 +84,17 @@ export function compactObject<T>(object: Dict<T | undefined>): Dict<T> {
   }, {});
 }
 
-export const toViewCollectionPathWithViewName =
+export const makeViewCollectionPath =
   (viewName: string) =>
   (collectionName: string): string =>
     `${collectionName}_${viewName}`;
 
-export const wrapFirebaseSnapshot = (snapshot: FirestoreDocumentSnapshot): DocumentSnapshot => ({
-  id: snapshot.id,
-  data: snapshot.data() ?? {},
-});
-
 export const wrapSnapshotTriggerHandler =
   (handler: OnCreateTriggerHandler) =>
-  (snapshot: FirestoreDocumentSnapshot, context: EventContext): Promise<unknown> =>
+  (
+    snapshot: FirestoreDocumentSnapshot,
+    context: EventContext
+  ): Promise<unknown> =>
     pipe(snapshot, wrapFirebaseSnapshot, handler(context))();
 
 export const wrapFirebaseChangeSnapshot = (
@@ -109,7 +109,10 @@ export const wrapFirebaseChangeSnapshot = (
 
 export const wrapChangeTriggerHandler =
   (handler: OnUpdateTriggerHandler) =>
-  (change: Change<QueryDocumentSnapshot>, context: EventContext): Promise<unknown> =>
+  (
+    change: Change<QueryDocumentSnapshot>,
+    context: EventContext
+  ): Promise<unknown> =>
     pipe(change, wrapFirebaseChangeSnapshot, handler(context))();
 
 export const makeDocTriggerPath = (collectionName: string): string =>

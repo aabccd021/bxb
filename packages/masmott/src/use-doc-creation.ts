@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getId, setDoc } from './firebase';
-import { makeDocCreationOnSetErrorActions, makeDocCreationPreSetActions } from './pure';
+import {
+  makeDocCreationOnSetErrorActions,
+  makeDocCreationPreSetActions,
+} from './pure';
 import {
   CreateDoc,
   DocCreation,
@@ -17,7 +20,9 @@ export function useDocCreation<DCD extends DocCreationData>({
   materializeViews,
 }: DocCreationContext<DCD>): DocCreation.Type<DCD> {
   const mutateDocs = useMutateDocs();
-  const [state, setState] = useState<DocCreation.Type<DCD>>({ state: 'initial' });
+  const [state, setState] = useState<DocCreation.Type<DCD>>({
+    state: 'initial',
+  });
 
   const reset = useCallback(() => setState({ state: 'initial' }), []);
 
@@ -32,7 +37,13 @@ export function useDocCreation<DCD extends DocCreationData>({
 
       setState({ state: 'creating', createdDoc });
       mutateDocs(
-        makeDocCreationPreSetActions(collectionName, id, data, incrementSpecs, materializeViews)
+        makeDocCreationPreSetActions(
+          collectionName,
+          id,
+          data,
+          incrementSpecs,
+          materializeViews
+        )
       );
 
       setDoc(firebaseOptions, collectionName, id, data)
@@ -55,7 +66,14 @@ export function useDocCreation<DCD extends DocCreationData>({
           );
         });
     },
-    [collectionName, firebaseOptions, incrementSpecs, materializeViews, mutateDocs, reset]
+    [
+      collectionName,
+      firebaseOptions,
+      incrementSpecs,
+      materializeViews,
+      mutateDocs,
+      reset,
+    ]
   );
 
   useEffect(() => {

@@ -194,9 +194,11 @@ function packageJson(projectId: string): string {
       build: 'yarn client:build && yarn server:build',
       'start:cached': 'firebase emulators:start',
       start: 'yarn build && yarn start:cached',
-      'test:cached': 'yarn clean-coverage && firebase emulators:exec "cypress run"',
+      'test:cached':
+        'yarn clean-coverage && firebase emulators:exec "cypress run"',
       test: 'yarn build && yarn test:cached',
-      'test:gui:cached': 'yarn clean-coverage && firebase emulators:exec "cypress run --headed"',
+      'test:gui:cached':
+        'yarn clean-coverage && firebase emulators:exec "cypress run --headed"',
       'test:gui': 'yarn build && yarn test:gui:cached',
       'test:open:cached': 'firebase emulators:exec "cypress open"',
       'test:open': 'yarn build && yarn test:open:cached',
@@ -263,13 +265,18 @@ const tsconfig = jsonStringify({
   exclude: ['node_modules'],
 });
 
-export function parseMasmottConfig(configStr: string): Validation<MasmottConfig> {
+export function parseMasmottConfig(
+  configStr: string
+): Validation<MasmottConfig> {
   const unsafeSpecData = yaml.load(configStr);
   const decodeResult = MasmottConfig.decode(unsafeSpecData);
   return decodeResult;
 }
 
-function writeFileDictToActions(dict: WriteFileDict, baseDir: string): readonly WriteFileAction[] {
+function writeFileDictToActions(
+  dict: WriteFileDict,
+  baseDir: string
+): readonly WriteFileAction[] {
   return Object.entries(dict).flatMap(([key, content]) => {
     if (typeof content === 'string') {
       return { dir: baseDir, name: key, content };
@@ -278,7 +285,9 @@ function writeFileDictToActions(dict: WriteFileDict, baseDir: string): readonly 
   });
 }
 
-export function makeWriteFileActions(config: MasmottConfig): readonly WriteFileAction[] {
+export function makeWriteFileActions(
+  config: MasmottConfig
+): readonly WriteFileAction[] {
   const writeFileDict: WriteFileDict = {
     'masmott.ts': makeClientStr(config),
     'tsconfig.json': tsconfig,

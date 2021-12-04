@@ -8,9 +8,10 @@ import {
   MutateDocAction,
 } from 'masmott';
 
-export function makeIncrementField<FN extends string, DD extends Record<FN, number> & DocData>(
-  fieldName: FN
-): (incrementValue: 1 | -1) => DocSnapshotMutatorCallback<DD> {
+export function makeIncrementField<
+  FN extends string,
+  DD extends Record<FN, number> & DocData
+>(fieldName: FN): (incrementValue: 1 | -1) => DocSnapshotMutatorCallback<DD> {
   return (incrementValue) =>
     (viewDoc): DocSnapshot => {
       if (!viewDoc.exists) {
@@ -35,23 +36,29 @@ export function makeCountDocMutateActions<DCD extends DocCreationData>(
   incrementValue: 1 | -1,
   incrementSpecs: IncrementSpecs<DCD>
 ): readonly MutateDocAction[] {
-  return Object.entries(incrementSpecs).flatMap(([viewCollectionName, collectionViews]) =>
-    Object.entries(collectionViews ?? {}).flatMap(([viewName, viewDocMutation]) =>
-      Object.entries(viewDocMutation).map(([, { getDocId, makeMutatorCallback }]) => {
-        const viewId = getDocId(data);
-        const key: DocKey = [viewCollectionName, viewId];
-        const mutatorCallback = makeMutatorCallback(incrementValue) as DocSnapshotMutatorCallback;
+  return Object.entries(incrementSpecs).flatMap(
+    ([viewCollectionName, collectionViews]) =>
+      Object.entries(collectionViews ?? {}).flatMap(
+        ([viewName, viewDocMutation]) =>
+          Object.entries(viewDocMutation).map(
+            ([, { getDocId, makeMutatorCallback }]) => {
+              const viewId = getDocId(data);
+              const key: DocKey = [viewCollectionName, viewId];
+              const mutatorCallback = makeMutatorCallback(
+                incrementValue
+              ) as DocSnapshotMutatorCallback;
 
-        const action: MutateDocAction = {
-          key,
-          data: mutatorCallback,
-          options: {
-            viewName,
-          },
-        };
+              const action: MutateDocAction = {
+                key,
+                data: mutatorCallback,
+                options: {
+                  viewName,
+                },
+              };
 
-        return action;
-      })
-    )
+              return action;
+            }
+          )
+      )
   );
 }

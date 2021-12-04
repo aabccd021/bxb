@@ -19,13 +19,18 @@ export function useDoc<T extends Doc.Type>(
     [collectionName, options?.view, id]
   );
 
-  const fetcher = useMemo(() => makeFetcher(firebaseOptions), [firebaseOptions]);
+  const fetcher = useMemo(
+    () => makeFetcher(firebaseOptions),
+    [firebaseOptions]
+  );
 
   const {
     data: snapshot,
     error,
     mutate,
-  } = useSWR(docPath, fetcher, { revalidateOnMount: options?.revalidateOnMount ?? true });
+  } = useSWR(docPath, fetcher, {
+    revalidateOnMount: options?.revalidateOnMount ?? true,
+  });
 
   useEffect(() => {
     if (snapshot === undefined) {

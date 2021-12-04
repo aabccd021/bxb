@@ -1,19 +1,24 @@
 import * as t from 'io-ts';
 
-const StringFieldSchema = t.type({ type: t.literal('string') });
-export type StringFieldSchema = t.TypeOf<typeof StringFieldSchema>;
+const StringDFS = t.type({ type: t.literal('string') });
+export type StringDFS = t.TypeOf<typeof StringDFS>;
 
-const RefIdFieldSchema = t.type({
+export const RefIdDFS = t.type({
   type: t.literal('refId'),
-  referTo: t.string,
+  refToCollection: t.string, // name of the collection of the referred doc
 });
-export type RefIdFieldSchema = t.TypeOf<typeof RefIdFieldSchema>;
+export type RefIdDFS = t.TypeOf<typeof RefIdDFS>;
 
-const FieldSchema = t.union([StringFieldSchema, RefIdFieldSchema]);
-export type FieldSchema = t.TypeOf<typeof FieldSchema>;
+const DFS = t.union([StringDFS, RefIdDFS]);
+export type DFS = t.TypeOf<typeof DFS>;
 
-const CollectionDataSpec = t.union([t.record(t.string, FieldSchema), t.undefined]);
+const CollectionDataSpec = t.record(t.string, DFS);
 export type CollectionDataSpec = t.TypeOf<typeof CollectionDataSpec>;
+
+const NullableCollectionDataSpec = t.union([CollectionDataSpec, t.undefined]);
+export type NullableCollectionDataSpec = t.TypeOf<
+  typeof NullableCollectionDataSpec
+>;
 
 const SelectViewSpec = t.undefined;
 export type SelectViewSpec = t.TypeOf<typeof SelectViewSpec>;
@@ -26,20 +31,22 @@ const CountViewSpec = t.type({
 export type CountViewSpec = t.TypeOf<typeof CountViewSpec>;
 
 const ViewFieldSpec = t.union([CountViewSpec, SelectViewSpec]);
-export type ViewSpec = t.TypeOf<typeof ViewFieldSpec>;
+export type ViewFieldSpec = t.TypeOf<typeof ViewFieldSpec>;
 
-const View = t.record(t.string, ViewFieldSpec);
-export type View = t.TypeOf<typeof View>;
+const ViewSpec = t.record(t.string, ViewFieldSpec);
+export type ViewSpec = t.TypeOf<typeof ViewSpec>;
 
-const CollectionViews = t.record(t.string, View);
-export type CollectionViews = t.TypeOf<typeof CollectionViews>;
+const CollectionViewSpecs = t.record(t.string, ViewSpec);
+export type CollectionViewSpecs = t.TypeOf<typeof CollectionViewSpecs>;
 
-const MaybeCollectionViews = t.union([CollectionViews, t.undefined]);
-export type MaybeCollectionViews = t.TypeOf<typeof MaybeCollectionViews>;
+const NullableCollectionViewSpecs = t.union([CollectionViewSpecs, t.undefined]);
+export type NullableCollectionViewSpecs = t.TypeOf<
+  typeof NullableCollectionViewSpecs
+>;
 
 const CollectionSpec = t.type({
-  data: CollectionDataSpec,
-  view: MaybeCollectionViews,
+  data: NullableCollectionDataSpec,
+  view: NullableCollectionViewSpecs,
 });
 export type CollectionSpec = t.TypeOf<typeof CollectionSpec>;
 

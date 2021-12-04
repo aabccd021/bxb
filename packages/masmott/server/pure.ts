@@ -1,6 +1,6 @@
 import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/lib/Option';
-import * as ARR from 'fp-ts/lib/ReadonlyArray';
+import * as A from 'fp-ts/lib/ReadonlyArray';
 import * as R from 'fp-ts/lib/Record';
 import * as STRING from 'fp-ts/lib/string';
 import * as T from 'fp-ts/lib/Task';
@@ -17,7 +17,8 @@ import {
 /**
  * Prefix a join name to a field name.
  */
-const prefixJoinName = (fieldName: string) => (joinName: string) => `${joinName}_${fieldName}`;
+const prefixJoinName = (fieldName: string) => (joinName: string) =>
+  `${joinName}_${fieldName}`;
 
 /**
  * Make refId field name of a join view.
@@ -55,7 +56,11 @@ const materializeJoinData = (
 const getValueChange =
   (beforeValue: FirestoreDataType) =>
   (after: O.Option<FirestoreDataType>): O.Option<FirestoreDataType> => {
-    if (typeof beforeValue === 'string' && O.isSome(after) && typeof after.value === 'string') {
+    if (
+      typeof beforeValue === 'string' &&
+      O.isSome(after) &&
+      typeof after.value === 'string'
+    ) {
       return beforeValue !== after.value ? O.some(after.value) : O.none;
     }
     throw Error(JSON.stringify({ beforeValue, afterValue: after }));
@@ -64,54 +69,59 @@ const getValueChange =
 /**
  *
  */
-const getFieldDiffWith =
-  (after: DocumentData) => (fieldName: string, beforeFieldData: FirestoreDataType) =>
+export const getFieldDiffWith =
+  (after: DocumentData) =>
+  (fieldName: string, beforeFieldData: FirestoreDataType) =>
     pipe(after, R.lookup(fieldName), getValueChange(beforeFieldData));
 
 /**
  *
  */
-const getDiffWith = (after: DocumentData) => R.mapWithIndex(getFieldDiffWith(after));
+export const getDiffWith = (after: DocumentData) =>
+  R.mapWithIndex(getFieldDiffWith(after));
 
 /**
  *
  */
-const getDocDataChange = ({ before, after }: DocumentDataChange): DocumentData =>
+export const getDocDataChange = ({
+  before,
+  after,
+}: DocumentDataChange): DocumentData =>
   pipe(before, getDiffWith(after), R.compact);
 
 /**
  *
  */
-const doNothing = (): T.Task<unknown> => () => Promise.resolve();
+export const doNothing = (): T.Task<unknown> => () => Promise.resolve();
 
 /**
  *
  */
-const noneIfEmtpyElseSome = (data: DocumentData) => (R.isEmpty(data) ? O.none : O.some(data));
+export const noneIfEmtpyElseSome = (data: DocumentData) =>
+  R.isEmpty(data) ? O.none : O.some(data);
 
 /**
  *
  */
-const keyIncludedIn = (arr: readonly string[]) => (key: string, _value: unknown) =>
-  ARR.elem(STRING.Eq)(key)(arr);
+export const keyIncludedIn =
+  (arr: readonly string[]) => (key: string, _value: unknown) =>
+    A.elem(STRING.Eq)(key)(arr);
 
 /**
  *
  */
-const pick = (keys: readonly string[]) => R.filterWithIndex(keyIncludedIn(keys));
+export const pick = (keys: readonly string[]) =>
+  R.filterWithIndex(keyIncludedIn(keys));
 
 /**
  *
  */
-const makeToViewDocUpdate = (selectedFieldNames: readonly string[]) =>
+export const makeToViewDocUpdate = (selectedFieldNames: readonly string[]) =>
   flow(getDocDataChange, pick(selectedFieldNames), noneIfEmtpyElseSome);
 
 /**
  *
  */
-const makeQuery =
-  (refIdFieldName: string, refDocId: string): Query =>
-  (collectionRef) =>
-    collectionRef.where(refIdFieldName, '==', refDocId);
-
-export { doNothing, makeToViewDocUpdate, makeQuery, materializeJoinData };
+export function get<T, K extends keyof T>(key: K) {
+  return (t: T): T[K] => t[key];
+}

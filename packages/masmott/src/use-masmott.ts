@@ -1,5 +1,8 @@
 import { FirebaseOptions, initializeApp } from 'firebase/app';
-import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore/lite';
+import {
+  connectFirestoreEmulator,
+  getFirestore,
+} from 'firebase/firestore/lite';
 import { useEffect } from 'react';
 
 function initMasmott(options: FirebaseOptions): void {

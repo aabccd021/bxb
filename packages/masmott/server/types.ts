@@ -19,7 +19,12 @@ import { Option } from 'fp-ts/lib/Option';
 import { Dict } from '../src';
 
 export type { Change };
-export type { FirestoreDocumentSnapshot, QueryDocumentSnapshot, DocumentReference, EventContext };
+export type {
+  FirestoreDocumentSnapshot,
+  QueryDocumentSnapshot,
+  DocumentReference,
+  EventContext,
+};
 
 export type FirestoreDataType = string | number;
 
@@ -50,7 +55,9 @@ export type OnCreateTrigger = CloudFunction<firestore.QueryDocumentSnapshot>;
 
 export type OnDeleteTrigger = OnCreateTrigger;
 
-export type OnUpdateTrigger = CloudFunction<Change<firestore.QueryDocumentSnapshot>>;
+export type OnUpdateTrigger = CloudFunction<
+  Change<firestore.QueryDocumentSnapshot>
+>;
 
 export type ViewTriggers = {
   readonly onViewSrcDocCreated: OnCreateTrigger;
@@ -66,15 +73,21 @@ export type CollectionTriggers = {
   readonly view: Dict<ViewTriggers>;
 };
 
-export type MakeFirestoreTriggers = (collectionSpecs: Spec) => FirestoreTriggers;
+export type MakeFirestoreTriggers = (
+  collectionSpecs: Spec
+) => FirestoreTriggers;
 
 export type FirestoreTriggers = Dict<CollectionTriggers>;
 
+export type OneOrMore<T> = T | readonly T[];
+
+export type HandlerResult = OneOrMore<FirebaseFirestore.WriteResult>;
+
 export type OnCreateTriggerHandler = (
   context: EventContext
-) => (snapshot: DocumentSnapshot) => Task<unknown>;
+) => (snapshot: DocumentSnapshot) => Task<HandlerResult>;
 
-export type OnDeleteTriggerHandler = OnCreateTriggerHandler;
+export type OnDeleteHandler = OnCreateTriggerHandler;
 
 export type OnUpdateTriggerHandler = (
   context: EventContext
@@ -110,8 +123,13 @@ export type Functions = {
   readonly nextjs: HttpsFunction;
 };
 
-export type Query = (
-  collectionRef: FirebaseFirestore.CollectionReference<DocumentData>
-) => FirebaseFirestore.Query<DocumentData>;
+export type WhereQuerySpec = readonly [string, WhereFilterOp, string];
+
+export type WhereQuerySpecs = readonly WhereQuerySpec[];
+
+export type Query = {
+  readonly collection: string;
+  readonly where?: WhereQuerySpecs;
+};
 
 export type CollectionQuery = CollectionReference | FirebaseFirestore.Query;

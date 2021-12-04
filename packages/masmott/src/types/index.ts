@@ -62,7 +62,9 @@ export type DocSnapshot<DD extends DocData = DocData> =
       readonly exists: false;
     };
 
-export type CreateDoc<DCD extends DocCreationData = DocCreationData> = (data: DCD) => void;
+export type CreateDoc<DCD extends DocCreationData = DocCreationData> = (
+  data: DCD
+) => void;
 
 export type Retry = () => void;
 
@@ -96,7 +98,10 @@ export type DocSWRConfig = {
   readonly mutateDoc: MutateDoc;
 };
 
-export type UpdateCountViews<DD extends DocData> = (data: DD, incrementValue: 1 | -1) => void;
+export type UpdateCountViews<DD extends DocData> = (
+  data: DD,
+  incrementValue: 1 | -1
+) => void;
 
 export type ISRPageProps = {
   readonly fallback: Dict<DocSnapshot>;
@@ -130,7 +135,10 @@ export type SetDoc = (
   data: DocCreationData
 ) => Promise<void>;
 
-export type GetId = (options: FirebaseOptions, collection: string) => Promise<string>;
+export type GetId = (
+  options: FirebaseOptions,
+  collection: string
+) => Promise<string>;
 
 export type InitMasmott = (options: FirebaseOptions) => Promise<void>;
 
@@ -163,7 +171,9 @@ export type MutateDocAction = {
   };
 };
 
-export type MutateDocs = (actions: readonly MutateDocAction[]) => Promise<unknown>;
+export type MutateDocs = (
+  actions: readonly MutateDocAction[]
+) => Promise<unknown>;
 
 export type ViewDocMutationGen<
   COUNTED_DCD extends DocCreationData,
@@ -173,7 +183,9 @@ export type ViewDocMutationGen<
   } & DocData
 > = {
   readonly getDocId: (countedDocData: COUNTED_DCD) => string;
-  readonly makeMutatorCallback: (incrementValue: 1 | -1) => DocSnapshotMutatorCallback<COUNTER_DD>;
+  readonly makeMutatorCallback: (
+    incrementValue: 1 | -1
+  ) => DocSnapshotMutatorCallback<COUNTER_DD>;
 };
 
 export type ViewDocMutation = {

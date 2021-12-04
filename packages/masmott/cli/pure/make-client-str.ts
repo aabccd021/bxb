@@ -10,7 +10,9 @@ import {
 } from '../../src/types/io';
 import { jsonStringify } from './json-stringify';
 
-function makeCollectionDataTypeStr(collectionDataSpec: CollectionDataSpec): string {
+function makeCollectionDataTypeStr(
+  collectionDataSpec: CollectionDataSpec
+): string {
   if (isEmpty(collectionDataSpec)) {
     return 'Record<string, never>';
   }
@@ -26,7 +28,9 @@ function makeCollectionDataTypeStr(collectionDataSpec: CollectionDataSpec): stri
   return jsonStringify(mappedDataTypes);
 }
 
-function makeCollectionCreationDataTypeStr(collectionDataSpec: CollectionDataSpec): string {
+function makeCollectionCreationDataTypeStr(
+  collectionDataSpec: CollectionDataSpec
+): string {
   if (isEmpty(collectionDataSpec)) {
     return 'Record<string, never>';
   }
@@ -42,7 +46,11 @@ function makeCollectionCreationDataTypeStr(collectionDataSpec: CollectionDataSpe
   return jsonStringify(mappedDataTypes);
 }
 
-function makeViewStr(collectionName: string, viewName: string, view: View): string {
+function makeViewStr(
+  collectionName: string,
+  viewName: string,
+  view: View
+): string {
   const capColName = capitalize(collectionName);
   const capViewName = capitalize(viewName);
   const materializeVarStr = `materialize${capColName}${capViewName}`;
@@ -58,7 +66,8 @@ function makeViewStr(collectionName: string, viewName: string, view: View): stri
   const countFieldStrs = viewFields
     .filter(([, field]) => field?.type === 'count')
     .map(([fieldName]) => `'${fieldName}'`);
-  const genericsCountFieldStrs = countFieldStrs.length > 0 ? countFieldStrs.join('|') : 'never';
+  const genericsCountFieldStrs =
+    countFieldStrs.length > 0 ? countFieldStrs.join('|') : 'never';
 
   return `const ${materializeVarStr} 
   = makeMaterialize<
@@ -87,7 +96,9 @@ function makeCollectionStr([collectionName, collectionSchema]: readonly [
   CollectionSpec
 ]): string {
   const capName = capitalize(collectionName);
-  return `export type ${capName}Data = ${makeCollectionDataTypeStr(collectionSchema.data)}
+  return `export type ${capName}Data = ${makeCollectionDataTypeStr(
+    collectionSchema.data
+  )}
 
         export type ${capName}CreationData = 
           ${makeCollectionCreationDataTypeStr(collectionSchema.data)}
@@ -108,7 +119,9 @@ import {
   useDocCreation
  } from 'masmott';
 
-export const firebaseOptions: FirebaseOptions = { projectId: '${firebase.projectId}' };
+export const firebaseOptions: FirebaseOptions = { projectId: '${
+    firebase.projectId
+  }' };
 
 export const spec = ${jsonStringify(schema)}
 

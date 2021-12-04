@@ -35,7 +35,7 @@ const makeRefDeletedHandler =
 /**
  *
  */
-export const makeOnRefDeletedTrigger =
+const makeOnRefDeletedTrigger =
   (collection: string) =>
   (refIdField: string, refedCollection: string): OnDeleteTrigger => {
     const handler = makeRefDeletedHandler(refIdField)(collection);
@@ -46,7 +46,7 @@ export const makeOnRefDeletedTrigger =
 /**
  *
  */
-export const makeOnRefDeletedTriggers = (
+export const makeOnRefsDeletedTriggers = (
   collection: string,
   nullableCollectionDataSpec: NullableCollectionDataSpec
 ) =>
