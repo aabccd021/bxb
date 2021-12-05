@@ -1,5 +1,5 @@
 import { flow, pipe } from 'fp-ts/function';
-import { map } from 'fp-ts/ReadonlyArray';
+import * as A from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
 
 import { deleteDoc, getDocuments } from './library/firebase-admin';
@@ -11,8 +11,11 @@ import {
   WriteResult,
 } from './type';
 
-export const parallel = <A, B>(scheduler: (t: A) => T.Task<B>) =>
-  flow(map(scheduler), T.sequenceArray);
+/**
+ *
+ */
+export const parallel = <A, B>(mapper: (t: A) => T.Task<B>) =>
+  flow(A.map(mapper), T.sequenceArray);
 
 /**
  * Trigger handler that run on source doc `srcDoc` deleted. The trigger will

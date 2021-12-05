@@ -57,11 +57,13 @@ export type ChangeHanlder<T = unknown> = (
 ) => NonNestedTask<T>;
 
 export type DeleteDocAction = {
+  readonly _task: 'deleteDoc';
   readonly collection: string;
   readonly id: string;
 };
 
 export type GetDocsAction = {
+  readonly _task: 'getDocs';
   readonly collection: string;
   readonly where?: WhereQuerySpecs;
 };

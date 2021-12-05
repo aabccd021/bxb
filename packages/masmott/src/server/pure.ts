@@ -22,12 +22,14 @@ export const toViewCollectionPath = (
   collection: string,
   view: string
 ): string => `${collection}_${view}`;
+
 /**
  *
  */
 export const toViewDeleteDocAction =
   (collection: string, srcId: string) =>
   (view: string): DeleteDocAction => ({
+    _task: 'deleteDoc',
     collection: toViewCollectionPath(collection, view),
     id: srcId,
   });
@@ -50,6 +52,7 @@ export const getReferDocs = ({
 }: {
   readonly ctx: OnRefDeletedCtx;
 }): GetDocsAction => ({
+  _task: 'getDocs',
   collection: referCollection,
   where: [[refIdField, '==', refDoc.id]],
 });
@@ -66,5 +69,11 @@ export const deleteReferDocs = ({
 }): readonly DeleteDocAction[] =>
   pipe(
     referDocs,
-    map(flow(get('id'), (id) => ({ collection: referCollection, id })))
+    map(
+      flow(get('id'), (id) => ({
+        _task: 'deleteDoc',
+        collection: referCollection,
+        id,
+      }))
+    )
   );
