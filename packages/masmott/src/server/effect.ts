@@ -21,8 +21,22 @@ export const parallel = <A, B>(mapper: (t: A) => T.Task<B>) =>
  * Trigger handler that run on source doc `srcDoc` deleted. The trigger will
  * delete all view docs with the same id as srcDoc.
  */
+// export const onViewSrcCreated =
+//   (param: OnViewSrcCreatedParam): SnapshotHandler<readonly WriteResult[]> =>
+//   (_context) =>
+//   (srcDoc) =>
+//     pipe(
+//       T.bindTo('ctx')(T.of({ ...param, srcDoc })),
+//       T.chain(flow(deleteViewDocs, parallel(deleteDoc)))
+//     );
+
+/**
+ * Trigger handler that run on source doc `srcDoc` deleted. The trigger will
+ * delete all view docs with the same id as srcDoc.
+ */
 export const onViewSrcDeleted =
   (param: OnViewSrcDeletedParam): SnapshotHandler<readonly WriteResult[]> =>
+  (_context) =>
   (srcDoc) =>
     pipe(
       T.bindTo('ctx')(T.of({ ...param, srcDoc })),
@@ -35,6 +49,7 @@ export const onViewSrcDeleted =
  */
 export const onRefDeleted =
   (param: OnRefDeletedParam): SnapshotHandler<readonly WriteResult[]> =>
+  (_context) =>
   (refDoc) =>
     pipe(
       T.bindTo('ctx')(T.of({ ...param, refDoc })),
