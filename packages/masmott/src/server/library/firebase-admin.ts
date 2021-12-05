@@ -1,4 +1,5 @@
 import {
+  CreateDocAction,
   DeleteDocAction,
   DocSnapshot,
   GetDocsAction,
@@ -13,7 +14,7 @@ import {
 } from 'firebase-admin/firestore';
 import { flow, pipe } from 'fp-ts/function';
 import { fromNullable, getOrElseW, map } from 'fp-ts/Option';
-import { map as A_map, reduce } from 'fp-ts/ReadonlyArray';
+import * as A from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
 
 type Queryable = FirebaseFirestore.Query | CollectionReference;
@@ -21,14 +22,14 @@ type Queryable = FirebaseFirestore.Query | CollectionReference;
 /**
  *
  */
-const toCollectionRef = (collectionName: string) =>
-  getFirestore().collection(collectionName);
+const toCollectionRef = (collection: string) =>
+  getFirestore().collection(collection);
 
 /**
  *
  */
-const makeDocRef = (documentId: string) => (collectionName: string) =>
-  toCollectionRef(collectionName).doc(documentId);
+const makeDocRef = (collection: string) => (documentId: string) =>
+  toCollectionRef(collection).doc(documentId);
 
 /**
  *
@@ -53,7 +54,7 @@ const getDocumentsFromQueryable =
  */
 const wrapDocs = flow(
   (querySnapshot: FirebaseFirestore.QuerySnapshot) => querySnapshot.docs,
-  A_map(wrapFirebaseSnapshot)
+  A.map(wrapFirebaseSnapshot)
 );
 
 /**
@@ -63,7 +64,7 @@ const handleWhereSpec =
   (collectionRef: CollectionReference) => (whereSpecs: WhereQuerySpecs) =>
     pipe(
       whereSpecs,
-      reduce<WhereQuerySpec, Queryable>(
+      A.reduce<WhereQuerySpec, Queryable>(
         collectionRef,
         (collectionQueryAcc, whereSpec) =>
           collectionQueryAcc.where(whereSpec[0], whereSpec[1], whereSpec[2])
@@ -101,6 +102,14 @@ export const getDocuments = flow(
  *
  */
 export const deleteDoc =
-  (action: DeleteDocAction): T.Task<WriteResult> =>
+  ({ collection, id }: DeleteDocAction): T.Task<WriteResult> =>
   () =>
-    makeDocRef(action.id)(action.collection).delete();
+    makeDocRef(collection)(id).delete();
+
+/**
+ *
+ */
+export const createDoc =
+  ({ collection, id, data }: CreateDocAction): T.Task<WriteResult> =>
+  () =>
+    makeDocRef(collection)(id).create(data);

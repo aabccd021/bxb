@@ -1,6 +1,6 @@
-import { flow, pipe } from 'fp-ts/function';
-import { map } from 'fp-ts/ReadonlyArray';
-import { keys } from 'fp-ts/ReadonlyRecord';
+import { pipe } from 'fp-ts/function';
+import * as A from 'fp-ts/ReadonlyArray';
+import * as R from 'fp-ts/ReadonlyRecord';
 
 import {
   DeleteDocAction,
@@ -10,29 +10,13 @@ import {
   OnViewSrcDeletedCtx,
 } from './type';
 
-export const get =
-  <U, K extends keyof U>(key: K) =>
-  (obj: U) =>
-    obj[key];
-
 /**
  *
  */
-export const toViewCollectionPath = (
-  collection: string,
-  view: string
-): string => `${collection}_${view}`;
-
-/**
- *
- */
-export const toViewDeleteDocAction =
-  (collection: string, srcId: string) =>
-  (view: string): DeleteDocAction => ({
-    _task: 'deleteDoc',
-    collection: toViewCollectionPath(collection, view),
-    id: srcId,
-  });
+export const makeViewCollectionPath =
+  (collection: string) =>
+  (view: string): string =>
+    `${collection}_${view}`;
 
 /**
  *
@@ -42,7 +26,15 @@ export const deleteViewDocs = ({
 }: {
   readonly ctx: OnViewSrcDeletedCtx;
 }): readonly DeleteDocAction[] =>
-  pipe(viewSpecs, keys, map(toViewDeleteDocAction(collection, srcDoc.id)));
+  pipe(
+    viewSpecs,
+    R.keys,
+    A.map((view) => ({
+      _task: 'deleteDoc',
+      collection: makeViewCollectionPath(collection)(view),
+      id: srcDoc.id,
+    }))
+  );
 
 /**
  *
@@ -69,11 +61,9 @@ export const deleteReferDocs = ({
 }): readonly DeleteDocAction[] =>
   pipe(
     referDocs,
-    map(
-      flow(get('id'), (id) => ({
-        _task: 'deleteDoc',
-        collection: referCollection,
-        id,
-      }))
-    )
+    A.map((snapshot) => ({
+      _task: 'deleteDoc',
+      collection: referCollection,
+      id: snapshot.id,
+    }))
   );

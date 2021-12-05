@@ -72,7 +72,7 @@ const wrapChangeHandler =
     change: Change<QueryDocumentSnapshot>,
     context: EventContext
   ): Promise<unknown> =>
-    handler(wrapChange(change), context)();
+    pipe(change, wrapChange, handler(context))();
 
 /**
  *
@@ -91,7 +91,7 @@ const wrapSnapshotHandler =
     snapshot: FunctionDocumentSnapshot,
     context: EventContext
   ): Promise<unknown> =>
-    handler(wrapSnapshot(snapshot), context)();
+    pipe(snapshot, wrapSnapshot, handler(context))();
 
 /**
  *

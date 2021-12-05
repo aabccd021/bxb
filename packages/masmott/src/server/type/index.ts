@@ -1,4 +1,4 @@
-import { CollectionViewSpecs } from '@core/type';
+import { CollectionViewSpecs, Dict } from '@core/type';
 import { Task } from 'fp-ts/Task';
 
 export type DocSnapshot = {
@@ -47,14 +47,19 @@ export type WriteResult = unknown;
 export type NonNestedTask<T> = T extends Task<unknown> ? never : Task<T>;
 
 export type SnapshotHandler<T = unknown> = (
-  snapshot: DocSnapshot,
   context: EventContext
-) => NonNestedTask<T>;
+) => (snapshot: DocSnapshot) => NonNestedTask<T>;
 
 export type ChangeHanlder<T = unknown> = (
-  change: DocumentChangeSnapshot,
   context: EventContext
-) => NonNestedTask<T>;
+) => (change: DocumentChangeSnapshot) => NonNestedTask<T>;
+
+export type CreateDocAction = {
+  readonly _task: 'createDoc';
+  readonly collection: string;
+  readonly data: Dict<unknown>;
+  readonly id: string;
+};
 
 export type DeleteDocAction = {
   readonly _task: 'deleteDoc';
@@ -66,6 +71,15 @@ export type GetDocsAction = {
   readonly _task: 'getDocs';
   readonly collection: string;
   readonly where?: WhereQuerySpecs;
+};
+
+export type OnViewSrcCreatedParam = {
+  readonly collection: string;
+  readonly viewSpecs: CollectionViewSpecs;
+};
+
+export type OnViewSrcCreatedCtx = OnViewSrcCreatedParam & {
+  readonly srcDoc: DocSnapshot;
 };
 
 export type OnViewSrcDeletedParam = {

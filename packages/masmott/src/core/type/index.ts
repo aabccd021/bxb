@@ -31,15 +31,18 @@ export type NullableCollectionDataSpec = t.TypeOf<
 export const SelectViewSpec = t.undefined;
 export type SelectViewSpec = t.TypeOf<typeof SelectViewSpec>;
 
-export const CountViewSpec = t.type({
-  count: t.string,
-  groupBy: t.string,
-  type: t.literal('count'),
-});
-export type CountViewSpec = t.TypeOf<typeof CountViewSpec>;
+// export const CountViewSpec = t.type({
+//   count: t.string,
+//   groupBy: t.string,
+//   type: t.literal('count'),
+// });
+// export type CountViewSpec = t.TypeOf<typeof CountViewSpec>;
 
-export const ViewFieldSpec = t.union([CountViewSpec, SelectViewSpec]);
-export type ViewFieldSpec = t.TypeOf<typeof ViewFieldSpec>;
+// export const ViewFieldSpec = t.union([SelectViewSpec]);
+// export type ViewFieldSpec = t.TypeOf<typeof ViewFieldSpec>;
+
+export const ViewFieldSpec = SelectViewSpec;
+export type ViewFieldSpec = SelectViewSpec;
 
 export const ViewSpec = t.record(t.string, ViewFieldSpec);
 export type ViewSpec = t.TypeOf<typeof ViewSpec>;
