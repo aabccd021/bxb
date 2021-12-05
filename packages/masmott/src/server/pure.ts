@@ -60,8 +60,8 @@ export const deleteReferDocs = ({
   referDocs,
   ctx: { referCollection },
 }: {
-  readonly referDocs: readonly DocSnapshot[];
   readonly ctx: OnRefDeletedCtx;
+  readonly referDocs: readonly DocSnapshot[];
 }): readonly DeleteDocAction[] =>
   pipe(
     referDocs,

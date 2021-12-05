@@ -2,9 +2,9 @@ import {
   DeleteDocAction,
   DocSnapshot,
   GetDocsAction,
-  Query,
   WhereQuerySpec,
   WhereQuerySpecs,
+  WriteResult,
 } from '@server/type';
 import {
   CollectionReference,
@@ -16,9 +16,6 @@ import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
 
-/**
- *
- */
 type Queryable = FirebaseFirestore.Query | CollectionReference;
 
 /**
@@ -102,7 +99,5 @@ export const getDocuments = flow(
 /**
  *
  */
-export const deleteDoc = (
-  action: DeleteDocAction
-): T.Task<FirebaseFirestore.WriteResult> =>
+export const deleteDoc = (action: DeleteDocAction): T.Task<WriteResult> =>
   makeDocRef(action.id)(action.collection).delete;

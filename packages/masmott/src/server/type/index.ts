@@ -2,8 +2,8 @@ import { CollectionViewSpecs } from '@core/type';
 import { Task } from 'fp-ts/Task';
 
 export type DocSnapshot = {
-  readonly id: string;
   readonly data: unknown;
+  readonly id: string;
 };
 
 export const WHERE_FILTER_OP = [
@@ -31,16 +31,18 @@ export type Query = {
 };
 
 export type DocumentDataChange = {
-  readonly before: unknown;
   readonly after: unknown;
+  readonly before: unknown;
 };
 
 export type DocumentChangeSnapshot = {
-  readonly id: string;
   readonly data: DocumentDataChange;
+  readonly id: string;
 };
 
 export type EventContext = unknown;
+
+export type WriteResult = unknown;
 
 export type NonNestedTask<T> = T extends Task<unknown> ? never : Task<T>;
 
@@ -74,8 +76,8 @@ export type OnViewSrcDeletedCtx = OnViewSrcDeletedParam & {
 };
 
 export type OnRefDeletedParam = {
-  readonly referCollection: string;
   readonly refIdField: string;
+  readonly referCollection: string;
 };
 
 export type OnRefDeletedCtx = OnRefDeletedParam & {

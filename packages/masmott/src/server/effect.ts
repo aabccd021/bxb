@@ -1,13 +1,13 @@
-import { WriteResult } from 'firebase-admin/firestore';
 import { flow, pipe } from 'fp-ts/function';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
 import { deleteDoc, getDocuments } from './library/firebase-admin';
 import { deleteReferDocs, deleteViewDocs, getReferDocs } from './pure';
 import {
-  SnapshotHandler,
   OnRefDeletedParam,
   OnViewSrcDeletedParam,
+  SnapshotHandler,
+  WriteResult,
 } from './type';
 
 export const parallel = <A, B>(scheduler: (t: A) => T.Task<B>) =>
