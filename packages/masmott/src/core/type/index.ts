@@ -9,8 +9,8 @@ export const StringDFS = t.type({ type: t.literal('string') });
 export type StringDFS = t.TypeOf<typeof StringDFS>;
 
 export const RefIdDFS = t.type({
-  type: t.literal('refId'),
-  refToCollection: t.string, // name of the collection of the referred doc
+  refToCollection: t.string,
+  type: t.literal('refId'), // name of the collection of the referred doc
 });
 export type RefIdDFS = t.TypeOf<typeof RefIdDFS>;
 
@@ -32,9 +32,9 @@ export const SelectViewSpec = t.undefined;
 export type SelectViewSpec = t.TypeOf<typeof SelectViewSpec>;
 
 export const CountViewSpec = t.type({
-  type: t.literal('count'),
   count: t.string,
   groupBy: t.string,
+  type: t.literal('count'),
 });
 export type CountViewSpec = t.TypeOf<typeof CountViewSpec>;
 
@@ -70,7 +70,7 @@ export const FirebaseConfig = t.type({
 export type FirebaseConfig = t.TypeOf<typeof FirebaseConfig>;
 
 export const MasmottConfig = t.type({
-  schema: Schema,
   firebase: FirebaseConfig,
+  schema: Schema,
 });
 export type MasmottConfig = t.TypeOf<typeof MasmottConfig>;

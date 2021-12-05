@@ -1,6 +1,7 @@
 import { flow, pipe } from 'fp-ts/function';
-import * as A from 'fp-ts/ReadonlyArray';
-import * as R from 'fp-ts/ReadonlyRecord';
+import { map } from 'fp-ts/ReadonlyArray';
+import { keys } from 'fp-ts/ReadonlyRecord';
+
 import {
   DeleteDocAction,
   DocSnapshot,
@@ -39,7 +40,7 @@ export const deleteViewDocs = ({
 }: {
   readonly ctx: OnViewSrcDeletedCtx;
 }): readonly DeleteDocAction[] =>
-  pipe(viewSpecs, R.keys, A.map(toViewDeleteDocAction(collection, srcDoc.id)));
+  pipe(viewSpecs, keys, map(toViewDeleteDocAction(collection, srcDoc.id)));
 
 /**
  *
@@ -65,5 +66,5 @@ export const deleteReferDocs = ({
 }): readonly DeleteDocAction[] =>
   pipe(
     referDocs,
-    A.map(flow(get('id'), (id) => ({ collection: referCollection, id })))
+    map(flow(get('id'), (id) => ({ collection: referCollection, id })))
   );

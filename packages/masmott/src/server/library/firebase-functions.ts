@@ -56,11 +56,11 @@ const makeDocTrigger = (
 const wrapChange = (
   change: Change<QueryDocumentSnapshot>
 ): DocumentChangeSnapshot => ({
-  id: change.after.id,
   data: {
-    before: change.before.data(),
     after: change.after.data(),
+    before: change.before.data(),
   },
+  id: change.after.id,
 });
 
 /**
@@ -78,8 +78,8 @@ const wrapChangeHandler =
  *
  */
 const wrapSnapshot = (snapshot: FunctionDocumentSnapshot): DocSnapshot => ({
-  id: snapshot.id,
   data: snapshot.data() ?? {},
+  id: snapshot.id,
 });
 
 /**

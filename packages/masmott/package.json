@@ -14,9 +14,7 @@
     "react-dom": "^17.0.2"
   },
   "dependencies": {
-    "eslint-plugin-jest": "^25.3.0",
     "firebase": "^9.6.0",
-    "firebase-admin": "^10.0.0",
     "fp-ts": "^2.11.5",
     "io-ts": "^2.2.16",
     "js-yaml": "^4.1.0",
@@ -40,6 +38,7 @@
     "eslint-plugin-fp-ts": "^0.3.0",
     "eslint-plugin-functional": "^3.7.2",
     "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^25.3.0",
     "eslint-plugin-jest-dom": "^3.9.2",
     "eslint-plugin-only-warn": "^1.0.3",
     "eslint-plugin-prettier": "^4.0.0",
@@ -121,7 +120,9 @@
     ],
     "extends": [
       "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
       "plugin:@typescript-eslint/recommended",
+      "plugin:@typescript-eslint/recommended-requiring-type-checking",
       "plugin:fp-ts/recommended",
       "plugin:fp-ts/recommended-requiring-type-checking",
       "plugin:functional/all",
@@ -138,23 +139,28 @@
       "prettier"
     ],
     "rules": {
-      "no-unsafe-optional-chaining": "error",
-      "no-else-return": "error",
-      "no-useless-return": "error",
-      "no-undef-init": "error",
-      "no-useless-rename": "error",
-      "object-shorthand": "error",
-      "prefer-arrow-callback": "error",
-      "prefer-destructuring": "error",
-      "prefer-template": "error",
+      "@typescript-eslint/no-shadow": "error",
+      "@typescript-eslint/no-unused-vars": "off",
+      "curly": [
+        "error",
+        "all"
+      ],
       "eqeqeq": "error",
-      "no-shadow": "off",
-      "no-use-before-define": [
+      "functional/functional-parameters": "off",
+      "import/exports-last": "error",
+      "import/first": "error",
+      "import/no-cycle": "error",
+      "import/no-named-default": "error",
+      "import/no-namespace": "off",
+      "import/no-unresolved": "off",
+      "import/no-useless-path-segments": "error",
+      "max-len": [
         "error",
         {
-          "variables": false
+          "code": 80
         }
       ],
+      "no-else-return": "error",
       "no-restricted-imports": [
         "error",
         {
@@ -164,12 +170,15 @@
           ]
         }
       ],
-      "max-len": [
-        "error",
-        {
-          "code": 80
-        }
-      ],
+      "no-undef-init": "error",
+      "no-unsafe-optional-chaining": "error",
+      "no-use-before-define": "error",
+      "no-useless-rename": "error",
+      "no-useless-return": "error",
+      "object-shorthand": "error",
+      "prefer-arrow-callback": "error",
+      "prefer-destructuring": "error",
+      "prefer-template": "error",
       "prettier/prettier": [
         "error",
         {
@@ -177,14 +186,12 @@
           "printWidth": 80
         }
       ],
-      "functional/functional-parameters": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-shadow": "error",
-      "import/no-cycle": "error",
-      "import/no-unresolved": "off",
-      "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "error",
-      "react/prop-types": "off",
+      "react-hooks/rules-of-hooks": "error",
+      "simple-import-sort/exports": "error",
+      "simple-import-sort/imports": "error",
+      "sort-keys-fix/sort-keys-fix": "error",
+      "unused-imports/no-unused-imports-ts": "error",
       "unused-imports/no-unused-vars": [
         "error",
         {
