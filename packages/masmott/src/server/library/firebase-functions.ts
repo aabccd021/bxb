@@ -34,18 +34,14 @@ const getFunctionsFirestore = (
 /**
  *
  */
-const makeDocTriggerPath = (collectionName: string) =>
-  `${collectionName}/{documentId}`;
+const makeDocTriggerPath = (collection: string) => `${collection}/{docId}`;
 
 /**
  *
  */
-const makeDocTrigger = (
-  collectionName: string,
-  options?: GetDocTriggerOptions
-) =>
+const makeDocTrigger = (collection: string, options?: GetDocTriggerOptions) =>
   pipe(
-    collectionName,
+    collection,
     makeDocTriggerPath,
     getFunctionsFirestore(options?.regions).document
   );
@@ -97,20 +93,20 @@ const wrapSnapshotHandler =
  *
  */
 export const makeOnCreateTrigger = (
-  collectionName: string,
+  collection: string,
   handler: SnapshotHandler
-) => makeDocTrigger(collectionName).onCreate(wrapSnapshotHandler(handler));
+) => makeDocTrigger(collection).onCreate(wrapSnapshotHandler(handler));
 
 /**
  *
  */
 export const makeOnUpdateTrigger =
-  (collectionName: string) => (handler: ChangeHandler) =>
-    makeDocTrigger(collectionName).onUpdate(wrapChangeHandler(handler));
+  (collection: string) => (handler: ChangeHandler) =>
+    makeDocTrigger(collection).onUpdate(wrapChangeHandler(handler));
 
 /**
  *
  */
 export const makeDeleteTrigger =
-  (collectionName: string) => (handler: SnapshotHandler) =>
-    makeDocTrigger(collectionName).onCreate(wrapSnapshotHandler(handler));
+  (collection: string) => (handler: SnapshotHandler) =>
+    makeDocTrigger(collection).onCreate(wrapSnapshotHandler(handler));

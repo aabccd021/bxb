@@ -23,11 +23,9 @@ export type WhereFilterOp = typeof WHERE_FILTER_OP[number];
 
 export type WhereQuerySpec = readonly [string, WhereFilterOp, string];
 
-export type WhereQuerySpecs = readonly WhereQuerySpec[];
-
 export type Query = {
   readonly collection: string;
-  readonly where?: WhereQuerySpecs;
+  readonly where?: readonly WhereQuerySpec[];
 };
 
 export type DocumentDataChange = {
@@ -54,23 +52,28 @@ export type ChangeHanlder<T = unknown> = (
   context: EventContext
 ) => (change: DocumentChangeSnapshot) => NonNestedTask<T>;
 
-export type CreateDocAction = {
-  readonly _task: 'createDoc';
-  readonly collection: string;
+export type DataDocWriteType = {
+  readonly _type: 'create' | 'update';
   readonly data: Dict<unknown>;
-  readonly id: string;
 };
 
-export type DeleteDocAction = {
-  readonly _task: 'deleteDoc';
+export type DeleteDocWriteType = {
+  readonly _type: 'delete';
+};
+
+export type DocWriteType = DataDocWriteType | DeleteDocWriteType;
+
+export type WriteDocAction = {
+  readonly _task: 'writeDoc';
   readonly collection: string;
   readonly id: string;
+  readonly write: DocWriteType;
 };
 
 export type GetDocsAction = {
   readonly _task: 'getDocs';
   readonly collection: string;
-  readonly where?: WhereQuerySpecs;
+  readonly where?: readonly WhereQuerySpec[];
 };
 
 export type OnViewSrcCreatedParam = {

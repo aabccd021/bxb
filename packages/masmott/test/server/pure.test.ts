@@ -18,8 +18,18 @@ describe('deleteViewDocs', () => {
         },
       })
     ).toStrictEqual([
-      { _task: 'deleteDoc', collection: 'user_card', id: 'aabccd021' },
-      { _task: 'deleteDoc', collection: 'user_detail', id: 'aabccd021' },
+      {
+        _task: 'writeDoc',
+        collection: 'user_card',
+        id: 'aabccd021',
+        write: { _type: 'delete' },
+      },
+      {
+        _task: 'writeDoc',
+        collection: 'user_detail',
+        id: 'aabccd021',
+        write: { _type: 'delete' },
+      },
     ]);
   });
 });
@@ -63,8 +73,18 @@ describe('deleteReferDocs', () => {
         ],
       })
     ).toStrictEqual([
-      { _task: 'deleteDoc', collection: 'article', id: '21' },
-      { _task: 'deleteDoc', collection: 'article', id: '46' },
+      {
+        _task: 'writeDoc',
+        collection: 'article',
+        id: '21',
+        write: { _type: 'delete' },
+      },
+      {
+        _task: 'writeDoc',
+        collection: 'article',
+        id: '46',
+        write: { _type: 'delete' },
+      },
     ]);
   });
 });
