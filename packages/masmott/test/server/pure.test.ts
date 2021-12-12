@@ -14,26 +14,13 @@ describe('deleteViewDocs', () => {
         ctx: {
           collection: 'user',
           errorMessage: 'onViewSrcDeleted',
-          viewSpecs: {
-            card: {},
-            detail: {},
-          },
+          viewSpecs: { card: {}, detail: {} },
         },
-        triggerCtx: {
-          snapshot: { data: {}, id: 'aabccd021' },
-        },
+        triggerCtx: { snapshot: { data: {}, id: 'aabccd021' } },
       })
     ).toStrictEqual([
-      {
-        _task: 'deleteDoc',
-        collection: 'user_card',
-        id: 'aabccd021',
-      },
-      {
-        _task: 'deleteDoc',
-        collection: 'user_detail',
-        id: 'aabccd021',
-      },
+      { _task: 'deleteDoc', collection: 'user_card', id: 'aabccd021' },
+      { _task: 'deleteDoc', collection: 'user_detail', id: 'aabccd021' },
     ]));
 });
 
@@ -67,27 +54,13 @@ describe('deleteReferDocs', () => {
           referCollection: 'article',
         },
         referDocs: [
-          {
-            data: {},
-            id: '21',
-          },
-          {
-            data: {},
-            id: '46',
-          },
+          { data: {}, id: '21' },
+          { data: {}, id: '46' },
         ],
       })
     ).toStrictEqual([
-      {
-        _task: 'deleteDoc',
-        collection: 'article',
-        id: '21',
-      },
-      {
-        _task: 'deleteDoc',
-        collection: 'article',
-        id: '46',
-      },
+      { _task: 'deleteDoc', collection: 'article', id: '21' },
+      { _task: 'deleteDoc', collection: 'article', id: '46' },
     ]));
 });
 
@@ -104,10 +77,7 @@ describe('logErrors', () => {
     ).toStrictEqual([
       {
         _task: 'log',
-        jsonPayload: {
-          action: 'action2',
-          error: 'some_error',
-        },
+        jsonPayload: { action: 'action2', error: 'some_error' },
         message: 'fooErrorMessage',
         severity: 'ERROR',
       },
