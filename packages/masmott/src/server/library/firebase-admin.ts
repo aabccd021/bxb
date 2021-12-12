@@ -1,7 +1,9 @@
 import {
+  CreateDocAction,
+  DeleteDocAction,
   GetDocsAction,
+  UpdateDocAction,
   WhereQuerySpec,
-  WriteDocAction,
   WriteResult,
 } from '@server/type';
 import { CollectionReference, getFirestore } from 'firebase-admin/firestore';
@@ -9,6 +11,7 @@ import { flow, pipe } from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
+import * as TE from 'fp-ts/TaskEither';
 
 type Queryable = FirebaseFirestore.Query | CollectionReference;
 
@@ -17,6 +20,17 @@ type Queryable = FirebaseFirestore.Query | CollectionReference;
  */
 const toCollectionRef = (collection: string) =>
   getFirestore().collection(collection);
+
+/**
+ *
+ */
+const toDocRef = ({
+  collection,
+  id,
+}: {
+  readonly collection: string;
+  readonly id: string;
+}) => toCollectionRef(collection).doc(id);
 
 /**
  *
@@ -58,20 +72,39 @@ export const getDocs = ({ collection, where }: GetDocsAction) =>
     )
   );
 
-/**
- *
- */
-export const writeDoc = ({
+export type GetDocs = typeof getDocs;
+
+export const createDoc = ({
   collection,
   id,
-  write,
-}: WriteDocAction): T.Task<WriteResult> =>
-  pipe(
-    toCollectionRef(collection).doc(id),
-    (docRef) => () =>
-      write._type === 'create'
-        ? docRef.create(write.data)
-        : write._type === 'update'
-        ? docRef.update(write.data)
-        : docRef.delete()
+  data,
+}: CreateDocAction): TE.TaskEither<unknown, WriteResult> =>
+  TE.tryCatch(
+    () => toDocRef({ collection, id }).create(data),
+    (reason) => reason
   );
+
+export type CreateDoc = typeof createDoc;
+
+export const updateDoc = ({
+  collection,
+  id,
+  data,
+}: UpdateDocAction): TE.TaskEither<unknown, WriteResult> =>
+  TE.tryCatch(
+    () => toDocRef({ collection, id }).update(data),
+    (reason) => reason
+  );
+
+export type UpdateDoc = typeof updateDoc;
+
+export const deleteDoc = ({
+  collection,
+  id,
+}: DeleteDocAction): TE.TaskEither<unknown, WriteResult> =>
+  TE.tryCatch(
+    () => toDocRef({ collection, id }).delete(),
+    (reason) => reason
+  );
+
+export type DeleteDoc = typeof deleteDoc;

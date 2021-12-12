@@ -10,25 +10,25 @@ describe('deleteViewDocs', () => {
       deleteViewDocs({
         ctx: {
           collection: 'user',
-          srcDoc: { data: {}, id: 'aabccd021' },
           viewSpecs: {
             card: {},
             detail: {},
           },
         },
+        triggerCtx: {
+          snapshot: { data: {}, id: 'aabccd021' },
+        },
       })
     ).toStrictEqual([
       {
-        _task: 'writeDoc',
+        _task: 'deleteDoc',
         collection: 'user_card',
         id: 'aabccd021',
-        write: { _type: 'delete' },
       },
       {
-        _task: 'writeDoc',
+        _task: 'deleteDoc',
         collection: 'user_detail',
         id: 'aabccd021',
-        write: { _type: 'delete' },
       },
     ]);
   });
@@ -39,9 +39,11 @@ describe('getReferDocs', () => {
     expect(
       getReferDocs({
         ctx: {
-          refDoc: { data: {}, id: 'aabccd021' },
           refIdField: 'authorUser',
           referCollection: 'article',
+        },
+        triggerCtx: {
+          snapshot: { data: {}, id: 'aabccd021' },
         },
       })
     ).toStrictEqual({
@@ -57,7 +59,6 @@ describe('deleteReferDocs', () => {
     expect(
       deleteReferDocs({
         ctx: {
-          refDoc: { data: {}, id: 'aabccd021' },
           refIdField: 'authorUser',
           referCollection: 'article',
         },
@@ -74,16 +75,14 @@ describe('deleteReferDocs', () => {
       })
     ).toStrictEqual([
       {
-        _task: 'writeDoc',
+        _task: 'deleteDoc',
         collection: 'article',
         id: '21',
-        write: { _type: 'delete' },
       },
       {
-        _task: 'writeDoc',
+        _task: 'deleteDoc',
         collection: 'article',
         id: '46',
-        write: { _type: 'delete' },
       },
     ]);
   });

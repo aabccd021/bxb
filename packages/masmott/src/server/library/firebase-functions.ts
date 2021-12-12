@@ -2,12 +2,13 @@ import {
   ChangeHanlder as ChangeHandler,
   DocSnapshot,
   DocumentChangeSnapshot,
-  SnapshotHandler,
+  LogAction,
+  SnapshotTrigger,
 } from '@server/type';
 import {
   Change,
-  EventContext,
   firestore,
+  logger,
   region,
   SUPPORTED_REGIONS,
 } from 'firebase-functions';
@@ -16,6 +17,7 @@ import {
   QueryDocumentSnapshot,
 } from 'firebase-functions/v1/firestore';
 import { pipe } from 'fp-ts/function';
+import * as IO from 'fp-ts/IO';
 
 /**
  *
@@ -64,11 +66,8 @@ const wrapChange = (
  */
 const wrapChangeHandler =
   (handler: ChangeHandler) =>
-  (
-    change: Change<QueryDocumentSnapshot>,
-    context: EventContext
-  ): Promise<unknown> =>
-    pipe(change, wrapChange, handler(context))();
+  (change: Change<QueryDocumentSnapshot>): Promise<unknown> =>
+    handler({ change: wrapChange(change) })();
 
 /**
  *
@@ -82,19 +81,16 @@ const wrapSnapshot = (snapshot: FunctionDocumentSnapshot): DocSnapshot => ({
  *
  */
 const wrapSnapshotHandler =
-  (handler: SnapshotHandler) =>
-  (
-    snapshot: FunctionDocumentSnapshot,
-    context: EventContext
-  ): Promise<unknown> =>
-    pipe(snapshot, wrapSnapshot, handler(context))();
+  (handler: SnapshotTrigger) =>
+  (snapshot: FunctionDocumentSnapshot): Promise<unknown> =>
+    handler({ snapshot: wrapSnapshot(snapshot) })();
 
 /**
  *
  */
 export const makeOnCreateTrigger = (
   collection: string,
-  handler: SnapshotHandler
+  handler: SnapshotTrigger
 ) => makeDocTrigger(collection).onCreate(wrapSnapshotHandler(handler));
 
 /**
@@ -108,5 +104,15 @@ export const makeOnUpdateTrigger =
  *
  */
 export const makeDeleteTrigger =
-  (collection: string) => (handler: SnapshotHandler) =>
+  (collection: string) => (handler: SnapshotTrigger) =>
     makeDocTrigger(collection).onCreate(wrapSnapshotHandler(handler));
+
+/**
+ *
+ */
+export const log =
+  ({ jsonPayload, message, severity }: LogAction): IO.IO<void> =>
+  () =>
+    logger.write({ ...jsonPayload, message, severity });
+
+export type Log = typeof log;

@@ -1,5 +1,5 @@
 import { CollectionViewSpecs, Dict } from '@core/type';
-import { Task } from 'fp-ts/Task';
+import * as T from 'fp-ts/Task';
 
 export type DocSnapshot = {
   readonly data: unknown;
@@ -40,34 +40,62 @@ export type DocumentChangeSnapshot = {
 
 export type EventContext = unknown;
 
-export type WriteResult = unknown;
+export type WriteResult = {
+  readonly writeTime: {
+    readonly nanoseconds: number;
+    readonly seconds: number;
+  };
+};
 
-export type NonNestedTask<T> = T extends Task<unknown> ? never : Task<T>;
+export type SnapshotTriggerCtx = {
+  readonly snapshot: DocSnapshot;
+};
 
-export type SnapshotHandler<T = unknown> = (
-  context: EventContext
-) => (snapshot: DocSnapshot) => NonNestedTask<T>;
+export type SnapshotTrigger<U = unknown> = (
+  params: SnapshotTriggerCtx
+) => T.Task<U>;
 
-export type ChangeHanlder<T = unknown> = (
-  context: EventContext
-) => (change: DocumentChangeSnapshot) => NonNestedTask<T>;
+export type ChangeHanlder<U = unknown> = (params: {
+  readonly change: DocumentChangeSnapshot;
+}) => T.Task<U>;
 
-export type DataDocWriteType = {
-  readonly _type: 'create' | 'update';
+export declare type LogSeverity =
+  | 'DEBUG'
+  | 'INFO'
+  | 'NOTICE'
+  | 'WARNING'
+  | 'ERROR'
+  | 'CRITICAL'
+  | 'ALERT'
+  | 'EMERGENCY';
+
+export type LogAction = {
+  readonly _task: 'log';
+  readonly jsonPayload?: {
+    readonly [key: string]: unknown;
+  };
+  readonly message: string;
+  readonly severity: LogSeverity;
+};
+
+export type CreateDocAction = {
+  readonly _task: 'createDoc';
+  readonly collection: string;
   readonly data: Dict<unknown>;
+  readonly id: string;
 };
 
-export type DeleteDocWriteType = {
-  readonly _type: 'delete';
+export type UpdateDocAction = {
+  readonly _task: 'createDoc';
+  readonly collection: string;
+  readonly data: Dict<unknown>;
+  readonly id: string;
 };
 
-export type DocWriteType = DataDocWriteType | DeleteDocWriteType;
-
-export type WriteDocAction = {
-  readonly _task: 'writeDoc';
+export type DeleteDocAction = {
+  readonly _task: 'deleteDoc';
   readonly collection: string;
   readonly id: string;
-  readonly write: DocWriteType;
 };
 
 export type GetDocsAction = {
@@ -85,20 +113,12 @@ export type OnViewSrcCreatedCtx = OnViewSrcCreatedParam & {
   readonly srcDoc: DocSnapshot;
 };
 
-export type OnViewSrcDeletedParam = {
+export type OnViewSrcDeletedCtx = {
   readonly collection: string;
   readonly viewSpecs: CollectionViewSpecs;
 };
 
-export type OnViewSrcDeletedCtx = OnViewSrcDeletedParam & {
-  readonly srcDoc: DocSnapshot;
-};
-
-export type OnRefDeletedParam = {
+export type OnRefDeletedCtx = {
   readonly refIdField: string;
   readonly referCollection: string;
-};
-
-export type OnRefDeletedCtx = OnRefDeletedParam & {
-  readonly refDoc: DocSnapshot;
 };
