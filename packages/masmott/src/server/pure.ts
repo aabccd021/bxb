@@ -3,6 +3,7 @@ import { flow, pipe } from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as R from 'fp-ts/ReadonlyRecord';
+import * as TUPLE from 'fp-ts/ReadonlyTuple';
 
 import {
   DeleteDocAction,
@@ -13,6 +14,17 @@ import {
   OnViewSrcDeletedCtx,
   SnapshotTriggerCtx,
 } from './type';
+
+/**
+ *
+ */
+// export const createViews = ({
+//   ctx: { collection, viewSpecs },
+//   triggerCtx: { snapshot: srcDoc },
+// }: {
+//   readonly ctx: OnViewSrcCreatedCtx;
+//   readonly triggerCtx: SnapshotTriggerCtx;
+// }): readonly CreateDocAction[] => pipe(viewS);
 
 /**
  *
@@ -52,15 +64,27 @@ export const logErrors =
     writeResults,
   }: {
     readonly ctx: unknown;
-    readonly writeResults: readonly E.Either<unknown, unknown>[];
+    readonly writeResults: readonly (readonly [
+      unknown,
+      E.Either<unknown, unknown>
+    ])[];
   }): readonly LogAction[] =>
     pipe(
       writeResults,
-      A.map(flow(E.swap, O.fromEither)),
+      A.map(
+        flow(
+          TUPLE.mapSnd(flow(E.swap, O.fromEither)),
+          ([action, errorOption]) =>
+            pipe(
+              errorOption,
+              O.map((error) => [action, error] as const)
+            )
+        )
+      ),
       A.compact,
-      A.map((error) => ({
+      A.map(([action, error]) => ({
         _task: 'log',
-        jsonPayload: { ctx, error },
+        jsonPayload: { action, ctx, error },
         message,
         severity: 'ERROR',
       }))

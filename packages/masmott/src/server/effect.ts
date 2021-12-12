@@ -1,4 +1,4 @@
-import { flow } from 'fp-ts/function';
+import { flow, pipe } from 'fp-ts/function';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
 
@@ -10,13 +10,28 @@ import {
   getReferDocs,
   logErrorsOnViewSrcDeleted,
 } from './pure';
-import { OnRefDeletedCtx, OnViewSrcDeletedCtx, SnapshotTrigger } from './type';
+import {
+  LogAction,
+  OnRefDeletedCtx,
+  OnViewSrcCreatedCtx,
+  OnViewSrcDeletedCtx,
+  SnapshotTrigger,
+} from './type';
 
 /**
  *
  */
-export const parallel = <A, B>(mapper: (t: A) => T.Task<B>) =>
-  flow(A.map(mapper), T.sequenceArray);
+export const parallel = <A, B>(mapTask: (t: A) => T.Task<B>) =>
+  flow(
+    A.map((a: A) =>
+      pipe(
+        a,
+        mapTask,
+        T.map((b) => [a, b] as const)
+      )
+    ),
+    T.sequenceArray
+  );
 
 /**
  *
@@ -31,18 +46,13 @@ export const bindTriggerCtx = flow(T.of, T.bindTo('triggerCtx'));
 /**
  *
  */
-/**
- * Trigger handler that run on source doc `srcDoc` deleted. The trigger will
- * delete all view docs with the same id as srcDoc.
- */
-// export const onViewSrcCreated =
-//   (param: OnViewSrcCreatedParam): SnapshotHandler<readonly WriteResult[]> =>
-//   (_context) =>
-//   (srcDoc) =>
-//     pipe(
-//        T.bindTo('ctx')(T.of({ ...param, srcDoc })),
-//        T.chain(flow(deleteViewDocs, parallel(deleteDoc)))
-//     );
+export const onViewSrcCreated = (
+  ctx: OnViewSrcCreatedCtx
+): SnapshotTrigger<unknown> =>
+  flow(
+    bindTriggerCtx,
+    T.bind('ctx', () => T.of(ctx))
+  );
 
 /**
  * Trigger handler that run on source doc `srcDoc` deleted. The trigger will
@@ -50,7 +60,7 @@ export const bindTriggerCtx = flow(T.of, T.bindTo('triggerCtx'));
  */
 export const onViewSrcDeleted = (
   ctx: OnViewSrcDeletedCtx
-): SnapshotTrigger<readonly void[]> =>
+): SnapshotTrigger<readonly (readonly [LogAction, void])[]> =>
   flow(
     bindTriggerCtx,
     T.bind('ctx', () => T.of(ctx)),
@@ -62,7 +72,9 @@ export const onViewSrcDeleted = (
  * Trigger handler that run on referenced doc `refDoc` deleted. The trigger will
  * delete all docs which refers to refDoc.
  */
-export const onRefDeleted = (ctx: OnRefDeletedCtx): SnapshotTrigger<unknown> =>
+export const onRefDeleted = (
+  ctx: OnRefDeletedCtx
+): SnapshotTrigger<readonly (readonly [LogAction, void])[]> =>
   flow(
     bindTriggerCtx,
     T.bind('ctx', () => T.of(ctx)),

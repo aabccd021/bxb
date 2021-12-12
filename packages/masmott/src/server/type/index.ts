@@ -104,13 +104,9 @@ export type GetDocsAction = {
   readonly where?: readonly WhereQuerySpec[];
 };
 
-export type OnViewSrcCreatedParam = {
+export type OnViewSrcCreatedCtx = {
   readonly collection: string;
   readonly viewSpecs: CollectionViewSpecs;
-};
-
-export type OnViewSrcCreatedCtx = OnViewSrcCreatedParam & {
-  readonly srcDoc: DocSnapshot;
 };
 
 export type OnViewSrcDeletedCtx = {
