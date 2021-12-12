@@ -2,7 +2,7 @@ import { CollectionViewSpecs, Dict } from '@core/type';
 import * as T from 'fp-ts/Task';
 
 export type DocSnapshot = {
-  readonly data: unknown;
+  readonly data: Dict<unknown>;
   readonly id: string;
 };
 
@@ -106,15 +106,18 @@ export type GetDocsAction = {
 
 export type OnViewSrcCreatedCtx = {
   readonly collection: string;
+  readonly errorMessage: 'onViewSrcCreated';
   readonly viewSpecs: CollectionViewSpecs;
 };
 
 export type OnViewSrcDeletedCtx = {
   readonly collection: string;
+  readonly errorMessage: 'onViewSrcDeleted';
   readonly viewSpecs: CollectionViewSpecs;
 };
 
 export type OnRefDeletedCtx = {
+  readonly errorMessage: 'onRefDeleted';
   readonly refIdField: string;
   readonly referCollection: string;
 };

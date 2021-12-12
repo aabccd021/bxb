@@ -2,13 +2,14 @@ import { flow, pipe } from 'fp-ts/function';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
 
-import { deleteDoc, getDocs } from './library/firebase-admin';
+import { createDoc, deleteDoc, getDocs } from './library/firebase-admin';
 import { log } from './library/firebase-functions';
 import {
+  createViews,
   deleteReferDocs,
   deleteViewDocs,
   getReferDocs,
-  logErrorsOnViewSrcDeleted,
+  logErrors,
 } from './pure';
 import {
   LogAction,
@@ -21,12 +22,12 @@ import {
 /**
  *
  */
-export const parallel = <A, B>(mapTask: (t: A) => T.Task<B>) =>
+export const parallel = <A, B>(mapToTask: (a: A) => T.Task<B>) =>
   flow(
     A.map((a: A) =>
       pipe(
         a,
-        mapTask,
+        mapToTask,
         T.map((b) => [a, b] as const)
       )
     ),
@@ -46,12 +47,24 @@ export const bindTriggerCtx = flow(T.of, T.bindTo('triggerCtx'));
 /**
  *
  */
+export const k = (a: unknown) => T.bind('ctx', () => T.of(a));
+
+/**
+ *
+ */
+export const logWriteResultErrors = T.chain(flow(logErrors, parallel(tLog)));
+
+/**
+ *
+ */
 export const onViewSrcCreated = (
   ctx: OnViewSrcCreatedCtx
 ): SnapshotTrigger<unknown> =>
   flow(
     bindTriggerCtx,
-    T.bind('ctx', () => T.of(ctx))
+    T.bind('ctx', () => T.of(ctx)),
+    T.bind('writeResults', flow(createViews, parallel(createDoc))),
+    logWriteResultErrors
   );
 
 /**
@@ -65,7 +78,7 @@ export const onViewSrcDeleted = (
     bindTriggerCtx,
     T.bind('ctx', () => T.of(ctx)),
     T.bind('writeResults', flow(deleteViewDocs, parallel(deleteDoc))),
-    T.chain(flow(logErrorsOnViewSrcDeleted, parallel(tLog)))
+    logWriteResultErrors
   );
 
 /**
@@ -80,5 +93,5 @@ export const onRefDeleted = (
     T.bind('ctx', () => T.of(ctx)),
     T.bind('referDocs', flow(getReferDocs, getDocs)),
     T.bind('writeResults', flow(deleteReferDocs, parallel(deleteDoc))),
-    T.chain(flow(logErrorsOnViewSrcDeleted, parallel(tLog)))
+    logWriteResultErrors
   );

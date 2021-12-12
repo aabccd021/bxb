@@ -28,7 +28,7 @@ export type NullableCollectionDataSpec = t.TypeOf<
   typeof NullableCollectionDataSpec
 >;
 
-export const SelectViewSpec = t.undefined;
+export const SelectViewSpec = t.record(t.string, t.undefined);
 export type SelectViewSpec = t.TypeOf<typeof SelectViewSpec>;
 
 // export const CountViewSpec = t.type({
@@ -38,13 +38,8 @@ export type SelectViewSpec = t.TypeOf<typeof SelectViewSpec>;
 // });
 // export type CountViewSpec = t.TypeOf<typeof CountViewSpec>;
 
-// export const ViewFieldSpec = t.union([SelectViewSpec]);
-// export type ViewFieldSpec = t.TypeOf<typeof ViewFieldSpec>;
-
-export const ViewFieldSpec = SelectViewSpec;
-export type ViewFieldSpec = SelectViewSpec;
-
-export const ViewSpec = t.record(t.string, ViewFieldSpec);
+// export const ViewSpec = t.union([SelectViewSpec]);
+export const ViewSpec = SelectViewSpec;
 export type ViewSpec = t.TypeOf<typeof ViewSpec>;
 
 export const CollectionViewSpecs = t.record(t.string, ViewSpec);

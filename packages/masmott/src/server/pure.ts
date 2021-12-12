@@ -1,30 +1,22 @@
+import { Dict, SelectViewSpec } from '@src/core/type';
 import * as E from 'fp-ts/Either';
-import { flow, pipe } from 'fp-ts/function';
+import { pipe } from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as R from 'fp-ts/ReadonlyRecord';
 import * as TUPLE from 'fp-ts/ReadonlyTuple';
 
 import {
+  CreateDocAction,
   DeleteDocAction,
   DocSnapshot,
   GetDocsAction,
   LogAction,
   OnRefDeletedCtx,
+  OnViewSrcCreatedCtx,
   OnViewSrcDeletedCtx,
   SnapshotTriggerCtx,
 } from './type';
-
-/**
- *
- */
-// export const createViews = ({
-//   ctx: { collection, viewSpecs },
-//   triggerCtx: { snapshot: srcDoc },
-// }: {
-//   readonly ctx: OnViewSrcCreatedCtx;
-//   readonly triggerCtx: SnapshotTriggerCtx;
-// }): readonly CreateDocAction[] => pipe(viewS);
 
 /**
  *
@@ -33,6 +25,39 @@ export const makeViewCollectionPath =
   (collection: string) =>
   (view: string): string =>
     `${collection}_${view}`;
+
+/**
+ *
+ */
+export const materializeDoc = (
+  selectViewSpec: SelectViewSpec,
+  srcDocData: Dict<unknown>
+) => pipe(srcDocData, R.intersection({ concat: (x, _) => x })(selectViewSpec));
+
+/**
+ *
+ */
+export const createViews = ({
+  ctx: { collection, viewSpecs: selectViewSpecs },
+  triggerCtx: { snapshot: srcDoc },
+}: {
+  readonly ctx: OnViewSrcCreatedCtx;
+  readonly triggerCtx: SnapshotTriggerCtx;
+}): readonly CreateDocAction[] =>
+  pipe(
+    selectViewSpecs,
+    R.mapWithIndex(
+      (view, selectViewSpec) =>
+        ({
+          _task: 'createDoc',
+          collection: makeViewCollectionPath(collection)(view),
+          data: materializeDoc(selectViewSpec, srcDoc.data),
+          id: srcDoc.id,
+        } as CreateDocAction)
+    ),
+    R.toReadonlyArray,
+    A.map(TUPLE.snd)
+  );
 
 /**
  *
@@ -57,48 +82,34 @@ export const deleteViewDocs = ({
 /**
  *
  */
-export const logErrors =
-  (message: string) =>
-  ({
-    ctx,
+export const logErrors = ({
+  ctx: { errorMessage },
+  writeResults,
+}: {
+  readonly ctx: { readonly errorMessage: string };
+  readonly writeResults: readonly (readonly [
+    unknown,
+    E.Either<unknown, unknown>
+  ])[];
+}): readonly LogAction[] =>
+  pipe(
     writeResults,
-  }: {
-    readonly ctx: unknown;
-    readonly writeResults: readonly (readonly [
-      unknown,
-      E.Either<unknown, unknown>
-    ])[];
-  }): readonly LogAction[] =>
-    pipe(
-      writeResults,
-      A.map(
-        flow(
-          TUPLE.mapSnd(flow(E.swap, O.fromEither)),
-          ([action, errorOption]) =>
-            pipe(
-              errorOption,
-              O.map((error) => [action, error] as const)
-            )
-        )
-      ),
-      A.compact,
-      A.map(([action, error]) => ({
-        _task: 'log',
-        jsonPayload: { action, ctx, error },
-        message,
-        severity: 'ERROR',
-      }))
-    );
-
-/**
- *
- */
-export const logErrorsOnViewSrcDeleted = logErrors('onViewSrcDeleted');
-
-/**
- *
- */
-export const logErrorsOnRefDeleted = logErrors('onRefDeleted');
+    A.map(([action, result]) =>
+      pipe(
+        result,
+        E.swap,
+        O.fromEither,
+        O.map((error) => [action, error] as const)
+      )
+    ),
+    A.compact,
+    A.map(([action, error]) => ({
+      _task: 'log',
+      jsonPayload: { action, error },
+      message: errorMessage,
+      severity: 'ERROR',
+    }))
+  );
 
 /**
  *
