@@ -153,6 +153,7 @@
         "error",
         "all"
       ],
+      "@typescript-eslint/unbound-method": "off",
       "eqeqeq": "error",
       "functional/functional-parameters": "off",
       "import/exports-last": "error",

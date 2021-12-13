@@ -29,10 +29,15 @@ export const makeViewCollectionPath =
 /**
  *
  */
+export const intersectionFst = R.intersection({ concat: (x, _) => x });
+
+/**
+ *
+ */
 export const materializeDoc = (
   selectViewSpec: SelectViewSpec,
   srcDocData: Dict<unknown>
-) => pipe(srcDocData, R.intersection({ concat: (x, _) => x })(selectViewSpec));
+) => pipe(srcDocData, intersectionFst(selectViewSpec));
 
 /**
  *

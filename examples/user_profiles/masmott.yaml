@@ -1,0 +1,17 @@
+schema:
+  profile:
+    data:
+      name: string
+      birthPlace: string
+      hobby: string
+    view:
+      card:
+        select:
+          name:
+      page:
+        select:
+          name:
+          birthPlace:
+
+firebase:
+  projectId: demo-profile-board
