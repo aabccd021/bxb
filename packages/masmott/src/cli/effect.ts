@@ -44,7 +44,7 @@ const writeFile = ({ dir, name, content }: WriteFileAction): IO.IO<void> =>
   pipe(
     dir,
     FS.exists,
-    IO.chainFirst(
+    IO.chain(
       BOOL.fold(
         () => doNothing,
         () => FS.mkdir(dir, { recursive: true })
