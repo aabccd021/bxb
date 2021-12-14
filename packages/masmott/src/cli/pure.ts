@@ -4,7 +4,6 @@ import { flow, pipe } from 'fp-ts/function';
 import * as json from 'fp-ts/Json';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as R from 'fp-ts/ReadonlyRecord';
-import { get } from 'spectacles-ts';
 import { match } from 'ts-adt';
 
 import * as YAML from './library/yaml';
@@ -70,7 +69,7 @@ export const writeFileDictToActions =
           value,
           match({
             either: flow(
-              get('content'),
+              (_) => _.content,
               E.map(writeFileAction(baseDir, key)),
               E.getOrElseW(logErrorAction),
               A.of
@@ -79,7 +78,7 @@ export const writeFileDictToActions =
               (_) => _.content,
               writeFileDictToActions(`${baseDir}/${key}`)
             ),
-            string: flow(get('content'), writeFileAction(baseDir, key), A.of),
+            string: flow((_) => _.content, writeFileAction(baseDir, key), A.of),
           })
         )
       )
