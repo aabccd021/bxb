@@ -40,6 +40,9 @@ type MakeDirectoryOptions = {
   readonly recursive?: boolean | undefined;
 };
 
+/**
+ *
+ */
 export const readFileAsString = (
   path: PathOrFileDescriptor,
   options:
@@ -50,6 +53,9 @@ export const readFileAsString = (
     | BufferEncoding
 ) => IOE.tryCatch(() => fs.readFileSync(path, options), identity);
 
+/**
+ *
+ */
 export const writeFile =
   (
     file: PathOrFileDescriptor,
@@ -59,11 +65,17 @@ export const writeFile =
   () =>
     fs.writeFileSync(file, data, options);
 
+/**
+ *
+ */
 export const exists =
   (path: PathLike): IO.IO<boolean> =>
   () =>
     fs.existsSync(path);
 
+/**
+ *
+ */
 export const mkdir =
   (
     path: PathLike,
