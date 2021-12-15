@@ -1,9 +1,12 @@
 schema:
   profile:
     data:
-      name: string
-      birthPlace: string
-      hobby: string
+      name:
+        type: string
+      birthPlace:
+        type: string
+      hobby:
+        type: string
     view:
       card:
         select:

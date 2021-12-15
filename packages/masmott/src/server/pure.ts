@@ -1,4 +1,4 @@
-import { Dict, SelectViewSpec } from '@core/type';
+import { Dict, SelectViewSpec, ViewSpec } from '@core/type';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -34,10 +34,15 @@ export const intersectionFst = R.intersection({ concat: (x, _) => x });
 /**
  *
  */
-export const materializeDoc = (
+export const materializeSelectView = (
   selectViewSpec: SelectViewSpec,
   srcDocData: Dict<unknown>
 ) => pipe(srcDocData, intersectionFst(selectViewSpec));
+
+export const materializeView = (
+  { select }: ViewSpec,
+  srcDocData: Dict<unknown>
+) => ({ ...materializeSelectView(select, srcDocData) });
 
 /**
  *
@@ -52,11 +57,11 @@ export const createViews = ({
   pipe(
     selectViewSpecs,
     R.mapWithIndex(
-      (view, selectViewSpec) =>
+      (view, viewSpec) =>
         ({
           _task: 'createDoc',
           collection: makeViewCollectionPath(collection)(view),
-          data: materializeDoc(selectViewSpec, srcDoc.data),
+          data: materializeView(viewSpec, srcDoc.data),
           id: srcDoc.id,
         } as CreateDocAction)
     ),

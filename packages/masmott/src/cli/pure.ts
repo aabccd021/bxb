@@ -4,6 +4,8 @@ import { flow, pipe } from 'fp-ts/function';
 import * as json from 'fp-ts/Json';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as R from 'fp-ts/ReadonlyRecord';
+import { Validation } from 'io-ts';
+import { PathReporter } from 'io-ts/PathReporter';
 import { match } from 'ts-adt';
 
 import * as YAML from './library/yaml';
@@ -14,11 +16,6 @@ import {
   WriteFileAction,
   WriteFileDict,
 } from './type';
-
-/**
- *
- */
-export const decodeConfig = flow(YAML.load, E.chainW(MasmottConfig.decode));
 
 /**
  *
@@ -159,7 +156,7 @@ export const packageJson = (projectId: string) =>
         analyze: 'cross-env ANALYZE=true next build',
         build: 'yarn client:build && yarn server:build',
         'clean-coverage': 'rm -rf .nyc_output && rm -rf coverage',
-        cli: 'node node_modules/masmott/bin/cli/index.js',
+        cli: 'node node_modules/masmott/dist/cjs/cli/index.js',
         'client:build': 'rm -rf .next && next build',
         'client:dev': 'next dev',
         lint: 'eslint ./ --ext ts,tsx',
@@ -186,34 +183,49 @@ export const packageJson = (projectId: string) =>
 /**
  *
  */
-export const generateCmdActions = (
-  config: MasmottConfig
-): readonly GenerateCmdAction[] =>
+export const generateCmdActions = (config: MasmottConfig): WriteFileDict => {
+  console.log(config);
+  return {
+    // '.babelrc': babelrc,
+    // cypress: {
+    //   plugins: {
+    //     'index.js': cypressPlugins,
+    //   },
+    //   support: {
+    //     'index.js': cypressSupport,
+    //   },
+    //   'tsconfig.json': cypressTsconfig, // },
+    // 'cypress.json': cypress,
+    // 'firebase.json': firebaseJson,
+    // 'firestore.indexes.json': firestoreIndexJson,
+    // 'firestore.rules': firestoreRules,
+    // 'masmott.ts': makeClientStr(config),
+    // 'next-env.d.ts': nextEnv,
+    // 'next.config.js': nextConfig,
+    'package.json': packageJson(config.firebase.projectId),
+    // pages: {
+    //   api: {
+    //     '__coverage__.js': apiCoverage,
+    //   },
+    // },
+    'tsconfig.json': tsconfig,
+  };
+};
+
+/**
+ *
+ */
+export const reportIfLeft = <A>(validation: Validation<A>) =>
   pipe(
-    {
-      // '.babelrc': babelrc,
-      // cypress: {
-      //   plugins: {
-      //     'index.js': cypressPlugins,
-      //   },
-      //   support: {
-      //     'index.js': cypressSupport,
-      //   },
-      //   'tsconfig.json': cypressTsconfig, // },
-      // 'cypress.json': cypress,
-      // 'firebase.json': firebaseJson,
-      // 'firestore.indexes.json': firestoreIndexJson,
-      // 'firestore.rules': firestoreRules,
-      // 'masmott.ts': makeClientStr(config),
-      // 'next-env.d.ts': nextEnv,
-      // 'next.config.js': nextConfig,
-      'package.json': packageJson(config.firebase.projectId),
-      // pages: {
-      //   api: {
-      //     '__coverage__.js': apiCoverage,
-      //   },
-      // },
-      'tsconfig.json': tsconfig,
-    },
-    writeFileDictToActions('.')
+    validation,
+    E.mapLeft(() => PathReporter.report(validation))
   );
+
+/**
+ *
+ */
+export const configToAction = flow(
+  E.chain(YAML.load),
+  E.chainW(flow(MasmottConfig.decode, reportIfLeft)),
+  E.map(flow(generateCmdActions, writeFileDictToActions('.')))
+);

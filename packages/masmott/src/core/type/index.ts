@@ -20,15 +20,12 @@ export type DFS = t.TypeOf<typeof DFS>;
 export const CollectionDataSpec = t.record(t.string, DFS);
 export type CollectionDataSpec = t.TypeOf<typeof CollectionDataSpec>;
 
-export const NullableCollectionDataSpec = t.union([
-  CollectionDataSpec,
-  t.undefined,
-]);
+export const NullableCollectionDataSpec = t.union([CollectionDataSpec, t.null]);
 export type NullableCollectionDataSpec = t.TypeOf<
   typeof NullableCollectionDataSpec
 >;
 
-export const SelectViewSpec = t.record(t.string, t.undefined);
+export const SelectViewSpec = t.record(t.string, t.null);
 export type SelectViewSpec = t.TypeOf<typeof SelectViewSpec>;
 
 // export const CountViewSpec = t.type({
@@ -39,7 +36,7 @@ export type SelectViewSpec = t.TypeOf<typeof SelectViewSpec>;
 // export type CountViewSpec = t.TypeOf<typeof CountViewSpec>;
 
 // export const ViewSpec = t.union([SelectViewSpec]);
-export const ViewSpec = SelectViewSpec;
+export const ViewSpec = t.type({ select: SelectViewSpec });
 export type ViewSpec = t.TypeOf<typeof ViewSpec>;
 
 export const CollectionViewSpecs = t.record(t.string, ViewSpec);
@@ -47,7 +44,7 @@ export type CollectionViewSpecs = t.TypeOf<typeof CollectionViewSpecs>;
 
 export const NullableCollectionViewSpecs = t.union([
   CollectionViewSpecs,
-  t.undefined,
+  t.null,
 ]);
 export type NullableCollectionViewSpecs = t.TypeOf<
   typeof NullableCollectionViewSpecs

@@ -8,11 +8,10 @@ import * as IO from 'fp-ts/IO';
 import * as A from 'fp-ts/ReadonlyArray';
 import { Validation } from 'io-ts';
 import { match } from 'ts-adt';
-
-import * as CP from './library/child_process';
 import * as FS from './library/fs';
-import { decodeConfig, generateCmdActions } from './pure';
+import { configToAction } from './pure';
 import { GenerateCmdAction, GenerateCmdArgs, WriteFileAction } from './type';
+
 
 /**
  *
@@ -34,8 +33,8 @@ const writeFile = ({ dir, name, content }: WriteFileAction): IO.IO<void> =>
     FS.exists,
     IO.chain(
       BOOL.fold(
-        () => doNothing,
-        () => FS.mkdir(dir, { recursive: true })
+        () => FS.mkdir(dir, { recursive: true }),
+        () => doNothing
       )
     ),
     IO.chain(() => FS.writeFile(`${dir}/${name}`, content))
@@ -55,15 +54,13 @@ const generate = (_: GenerateCmdArgs): IO.IO<void> =>
     FS.readFileAsString('./masmott.yaml', { encoding: 'utf-8' }),
     IO.chain(
       flow(
-        E.chain(decodeConfig),
-        E.map(
-          flow(generateCmdActions, A.map(runVoidActions), IO.sequenceArray)
-        ),
+        configToAction,
+        E.map(flow(A.map(runVoidActions), IO.sequenceArray)),
         E.getOrElse(logError)
       )
     ),
-    IO.chain(() => CP.exec('yarn lint --fix')),
-    IO.chain(() => C.log('gg'))
+    // IO.chain(() => CP.exec('yarn lint --fix')),
+    IO.chain((g) => C.log(`@@@${g}`))
   );
 
 /**
