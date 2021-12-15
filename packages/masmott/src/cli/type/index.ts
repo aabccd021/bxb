@@ -1,4 +1,4 @@
-import { Dict } from '@src/core/type';
+import { Dict } from '@core/type';
 import { Either } from 'fp-ts/Either';
 import * as t from 'io-ts';
 

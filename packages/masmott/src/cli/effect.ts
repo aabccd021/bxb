@@ -59,10 +59,11 @@ const generate = (_: GenerateCmdArgs): IO.IO<void> =>
         E.map(
           flow(generateCmdActions, A.map(runVoidActions), IO.sequenceArray)
         ),
-        E.getOrElse(() => doNothing)
+        E.getOrElse(logError)
       )
     ),
-    IO.chain(() => CP.exec('yarn lint --fix'))
+    IO.chain(() => CP.exec('yarn lint --fix')),
+    IO.chain(() => C.log('gg'))
   );
 
 /**

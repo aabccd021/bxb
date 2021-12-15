@@ -1,4 +1,4 @@
-import { MasmottConfig } from '@src/core/type';
+import { MasmottConfig } from '@core/type';
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/function';
 import * as json from 'fp-ts/Json';

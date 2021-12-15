@@ -1,11 +1,4 @@
 import {
-  ChangeHanlder as ChangeHandler,
-  DocSnapshot,
-  DocumentChangeSnapshot,
-  LogAction,
-  SnapshotTrigger,
-} from '@server/type';
-import {
   Change,
   firestore,
   logger,
@@ -18,6 +11,14 @@ import {
 } from 'firebase-functions/v1/firestore';
 import { pipe } from 'fp-ts/function';
 import * as IO from 'fp-ts/IO';
+
+import {
+  ChangeHanlder as ChangeHandler,
+  DocSnapshot,
+  DocumentChangeSnapshot,
+  LogAction,
+  SnapshotTrigger,
+} from '../type';
 
 /**
  *

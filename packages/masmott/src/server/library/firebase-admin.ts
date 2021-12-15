@@ -1,3 +1,10 @@
+import { CollectionReference, getFirestore } from 'firebase-admin/firestore';
+import { flow, pipe } from 'fp-ts/function';
+import * as O from 'fp-ts/Option';
+import * as A from 'fp-ts/ReadonlyArray';
+import * as T from 'fp-ts/Task';
+import * as TE from 'fp-ts/TaskEither';
+
 import {
   CreateDocAction,
   DeleteDocAction,
@@ -5,13 +12,7 @@ import {
   UpdateDocAction,
   WhereQuerySpec,
   WriteResult,
-} from '@server/type';
-import { CollectionReference, getFirestore } from 'firebase-admin/firestore';
-import { flow, pipe } from 'fp-ts/function';
-import * as O from 'fp-ts/Option';
-import * as A from 'fp-ts/ReadonlyArray';
-import * as T from 'fp-ts/Task';
-import * as TE from 'fp-ts/TaskEither';
+} from '../type';
 
 type Queryable = FirebaseFirestore.Query | CollectionReference;
 
