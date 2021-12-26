@@ -10,7 +10,7 @@
     "dist/"
   ],
   "scripts": {
-    "clii": "yarn build && yarn prep && cd ../../examples/user_profiles/ && node ../../packages/masmott/dist/cjs/cli/index.js generate && cd ../../packages/masmott",
+    "cli": "cd ../../examples/user_profiles/ && node ../../packages/masmott/dist/cjs/cli/index.js generate && cd ../../packages/masmott",
     "build": "rm -rf dist && tsc --build tsconfig.mjs.json && tsc --build tsconfig.cjs.json",
     "example:init": "node ./dist/cjs/cli/index.js generate",
     "lint": "eslint --ext .ts .",

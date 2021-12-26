@@ -215,7 +215,9 @@ export const generateCmdActions = (config: MasmottConfig): WriteFileDict => {
 /**
  *
  */
-export const reportIfLeft = <A>(validation: Validation<A>) =>
+export const reportIfLeft = <A>(
+  validation: Validation<A>
+): E.Either<readonly string[], A> =>
   pipe(
     validation,
     E.mapLeft(() => PathReporter.report(validation))

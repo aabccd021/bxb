@@ -43,15 +43,18 @@ type MakeDirectoryOptions = {
 /**
  *
  */
-export const readFileAsString = (
-  path: PathOrFileDescriptor,
-  options:
+export const readFileAsString = ({
+  path,
+  options,
+}: {
+  readonly options:
     | {
         readonly encoding: BufferEncoding;
         readonly flag?: string | undefined;
       }
-    | BufferEncoding
-) => IOE.tryCatch(() => fs.readFileSync(path, options), identity);
+    | BufferEncoding;
+  readonly path: PathOrFileDescriptor;
+}) => IOE.tryCatch(() => fs.readFileSync(path, options), identity);
 
 /**
  *

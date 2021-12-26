@@ -8,10 +8,10 @@ import * as IO from 'fp-ts/IO';
 import * as A from 'fp-ts/ReadonlyArray';
 import { Validation } from 'io-ts';
 import { match } from 'ts-adt';
+
 import * as FS from './library/fs';
 import { configToAction } from './pure';
 import { GenerateCmdAction, GenerateCmdArgs, WriteFileAction } from './type';
-
 
 /**
  *
@@ -32,7 +32,7 @@ const writeFile = ({ dir, name, content }: WriteFileAction): IO.IO<void> =>
     dir,
     FS.exists,
     IO.chain(
-      BOOL.fold(
+      BOOL.match(
         () => FS.mkdir(dir, { recursive: true }),
         () => doNothing
       )
@@ -51,7 +51,10 @@ const runVoidActions = (action: GenerateCmdAction): IO.IO<void> =>
  */
 const generate = (_: GenerateCmdArgs): IO.IO<void> =>
   pipe(
-    FS.readFileAsString('./masmott.yaml', { encoding: 'utf-8' }),
+    FS.readFileAsString({
+      options: { encoding: 'utf-8' },
+      path: './masmott.yaml',
+    }),
     IO.chain(
       flow(
         configToAction,
