@@ -1,1 +1,51 @@
-{"dependencies":{"babel-plugin-istanbul":"^6.1.1","firebase-admin":"^10.0.0","firebase-functions":"^3.15.7","masmott":"file:./../../packages/masmott","next":"^12.0.1","react":"17.0.2","react-dom":"^17.0.2"},"devDependencies":{"@cypress/code-coverage":"^3.9.11","@next/bundle-analyzer":"^12.0.1","@types/react":"17.0.32","cross-env":"^7.0.3","cypress":"^8.6.0","eslint":"7","eslint-config-masmott":"file:./../../packages/eslint-config-masmott","typescript":"4.4.4"},"engines":{"node":"14"},"eslintConfig":{"extends":"masmott"},"main":".functions/index.js","name":"demo-profile-board","private":true,"scripts":{"analyze":"cross-env ANALYZE=true next build","build":"yarn client:build && yarn server:build","clean-coverage":"rm -rf .nyc_output && rm -rf coverage","cli":"node node_modules/masmott/dist/cjs/cli/index.js","client:build":"rm -rf .next && next build","client:dev":"next dev","lint":"eslint ./ --ext ts,tsx","server:build":"node compiler.js","server:dev":"yarn server:build && yarn server:dev:cached","server:dev:cached":"firebase emulators:start","start":"yarn build && yarn start:cached","start:cached":"firebase emulators:start","test":"yarn build && yarn test:cached","test:cached":"yarn clean-coverage && firebase emulators:exec \"cypress run\"","test:gui":"yarn build && yarn test:gui:cached","test:gui:cached":"yarn clean-coverage && firebase emulators:exec \"cypress run --headed\"","test:open":"yarn build && yarn test:open:cached","test:open:cached":"firebase emulators:exec \"cypress open\""},"version":"0.1.0"}
+{
+  "dependencies": {
+    "babel-plugin-istanbul": "^6.1.1",
+    "firebase-admin": "^10.0.0",
+    "firebase-functions": "^3.15.7",
+    "masmott": "file:./../../packages/masmott",
+    "next": "^12.0.1",
+    "react": "17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@cypress/code-coverage": "^3.9.11",
+    "@next/bundle-analyzer": "^12.0.1",
+    "@types/react": "17.0.32",
+    "cross-env": "^7.0.3",
+    "cypress": "^8.6.0",
+    "eslint": "7",
+    "eslint-config-masmott": "file:./../../packages/eslint-config-masmott",
+    "typescript": "4.4.4"
+  },
+  "engines": {
+    "node": "14"
+  },
+  "eslintConfig": {
+    "extends": "masmott"
+  },
+  "main": ".functions/index.js",
+  "name": "demo-profile-board",
+  "private": true,
+  "scripts": {
+    "analyze": "cross-env ANALYZE=true next build",
+    "build": "yarn client:build && yarn server:build",
+    "clean-coverage": "rm -rf .nyc_output && rm -rf coverage",
+    "cli": "node node_modules/masmott/dist/cjs/cli/index.js",
+    "client:build": "rm -rf .next && next build",
+    "client:dev": "next dev",
+    "lint": "eslint ./ --ext ts,tsx",
+    "server:build": "node compiler.js",
+    "server:dev": "yarn server:build && yarn server:dev:cached",
+    "server:dev:cached": "firebase emulators:start",
+    "start": "yarn build && yarn start:cached",
+    "start:cached": "firebase emulators:start",
+    "test": "yarn build && yarn test:cached",
+    "test:cached": "yarn clean-coverage && firebase emulators:exec \"cypress run\"",
+    "test:gui": "yarn build && yarn test:gui:cached",
+    "test:gui:cached": "yarn clean-coverage && firebase emulators:exec \"cypress run --headed\"",
+    "test:open": "yarn build && yarn test:open:cached",
+    "test:open:cached": "firebase emulators:exec \"cypress open\""
+  },
+  "version": "0.1.0"
+}

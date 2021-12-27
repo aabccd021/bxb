@@ -1,18 +1,24 @@
 import { MasmottConfig } from '@core/type';
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/function';
-import * as json from 'fp-ts/Json';
+import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as R from 'fp-ts/ReadonlyRecord';
+import * as STR from 'fp-ts/string';
 import { Validation } from 'io-ts';
 import { PathReporter } from 'io-ts/PathReporter';
 import { match } from 'ts-adt';
 
+import * as J from './library/json';
 import * as YAML from './library/yaml';
 import {
+  CompilerOptions,
+  CompilerProgram,
   EitherWriteFileEntry,
   GenerateCmdAction,
   LogErrorAction,
+  ModuleKind,
+  ScriptTarget,
   WriteFileAction,
   WriteFileDict,
 } from './type';
@@ -38,7 +44,7 @@ export const eitherWriteFileEntry = (
 /**
  *
  */
-export const jsonFileEntry = flow(json.stringify, eitherWriteFileEntry);
+export const jsonFileEntry = flow(J.stringify(2), eitherWriteFileEntry);
 
 /**
  *
@@ -180,37 +186,103 @@ export const packageJson = (projectId: string) =>
     jsonFileEntry
   );
 
+export const firebaseJson = pipe(
+  {
+    emulators: {
+      auth: {
+        port: 9099,
+      },
+      firestore: {
+        port: 8080,
+      },
+      functions: {
+        port: 5001,
+      },
+      hosting: {
+        port: 5000,
+      },
+      storage: {
+        port: 9199,
+      },
+      ui: {
+        enabled: true,
+      },
+    },
+    firestore: {
+      indexes: 'firestore.indexes.json',
+      rules: 'firestore.rules',
+    },
+    functions: {
+      ignore: [
+        'firebase.json',
+        'firbease-debug.log',
+        '**/.*',
+        '**/node_modules/**',
+        'pages/**',
+        'public/**',
+        'firestore.rules',
+        'README.md',
+      ],
+      source: '.',
+    },
+    hosting: [
+      {
+        cleanUrls: true,
+        ignore: [
+          'firebase.json',
+          'firestore.indexes.json',
+          'firestore.rules',
+          'storage.rules',
+          'remoteconfig.template.json',
+          'tsconfig.json',
+          'tsconfig.functions.json',
+          'README.md',
+          '**/node_modules/**',
+          '.github/**',
+          '.firebase/**',
+          'pages/**',
+        ],
+        public: 'public',
+        rewrites: [
+          {
+            function: 'nextjs',
+            source: '**',
+          },
+        ],
+      },
+    ],
+  },
+  jsonFileEntry
+);
+
 /**
  *
  */
-export const generateCmdActions = (config: MasmottConfig): WriteFileDict => {
-  console.log(config);
-  return {
-    // '.babelrc': babelrc,
-    // cypress: {
-    //   plugins: {
-    //     'index.js': cypressPlugins,
-    //   },
-    //   support: {
-    //     'index.js': cypressSupport,
-    //   },
-    //   'tsconfig.json': cypressTsconfig, // },
-    // 'cypress.json': cypress,
-    // 'firebase.json': firebaseJson,
-    // 'firestore.indexes.json': firestoreIndexJson,
-    // 'firestore.rules': firestoreRules,
-    // 'masmott.ts': makeClientStr(config),
-    // 'next-env.d.ts': nextEnv,
-    // 'next.config.js': nextConfig,
-    'package.json': packageJson(config.firebase.projectId),
-    // pages: {
-    //   api: {
-    //     '__coverage__.js': apiCoverage,
-    //   },
-    // },
-    'tsconfig.json': tsconfig,
-  };
-};
+export const generateCmdActions = (config: MasmottConfig): WriteFileDict => ({
+  // '.babelrc': babelrc,
+  //   plugins: {
+  //     'index.js': cypressPlugins,
+  //   },
+  //   support: {
+  //     'index.js': cypressSupport,
+  //   },
+  //   'tsconfig.json': cypressTsconfig,
+  // },
+  // 'cypress.json': cypress,
+  'firebase.json': firebaseJson,
+  // 'firestore.indexes.json': firestoreIndexJson,
+  // 'firestore.rules': firestoreRules,
+  // 'masmott.ts': makeClientStr(config),
+  // 'next-env.d.ts': nextEnv,
+  // 'next.config.js': nextConfig,
+  'package.json': packageJson(config.firebase.projectId),
+  // pages: {
+  //   api: {
+  //     '__coverage__.js': apiCoverage,
+  //   },
+  // },
+  'tsconfig.json': tsconfig,
+});
 
 /**
  *
@@ -226,8 +298,64 @@ export const reportIfLeft = <A>(
 /**
  *
  */
-export const configToAction = flow(
+export const generate = flow(
   E.chain(YAML.load),
   E.chainW(flow(MasmottConfig.decode, reportIfLeft)),
   E.map(flow(generateCmdActions, writeFileDictToActions('.')))
 );
+
+/**
+ *
+ */
+export const functionsIndexTs = (_: MasmottConfig) => ``;
+
+/**
+ *
+ */
+export const serverOutDir = '.functions';
+
+/**
+ *
+ */
+export const serverIndexFileName = 'index.ts';
+
+/**
+ *
+ */
+export const serverScriptTarget = ScriptTarget.ES2017;
+
+/**
+ *
+ */
+export const serverCompileOptions: CompilerOptions = {
+  allowJs: true,
+  esModuleInterop: true,
+  module: ModuleKind.CommonJS,
+  noImplicitReturns: true,
+  noUnusedLocals: true,
+  outDir: serverOutDir,
+  skipLibCheck: true,
+  sourceMap: true,
+  strict: true,
+  target: serverScriptTarget,
+};
+
+/**
+ *
+ */
+export const serverCompilerProgram: CompilerProgram = {
+  getSourceFile: (name) =>
+    pipe(
+      name,
+      O.fromPredicate((fileName) =>
+        STR.Eq.equals(fileName, serverIndexFileName)
+      ),
+      O.map((fileName) => ({
+        content: '',
+        fileName,
+        target: serverScriptTarget,
+      }))
+    ),
+  options: serverCompileOptions,
+  rootNames: [serverIndexFileName],
+};

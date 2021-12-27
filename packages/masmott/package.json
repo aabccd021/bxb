@@ -10,7 +10,8 @@
     "dist/"
   ],
   "scripts": {
-    "cli": "cd ../../examples/user_profiles/ && node ../../packages/masmott/dist/cjs/cli/index.js generate && cd ../../packages/masmott",
+    "cli": "cd ../../examples/user_profiles/ && node ../../packages/masmott/dist/cjs/cli/index.js",
+    "cli:cleanup": "cd ../../packages/masmott",
     "build": "rm -rf dist && tsc --build tsconfig.mjs.json && tsc --build tsconfig.cjs.json",
     "example:init": "node ./dist/cjs/cli/index.js generate",
     "lint": "eslint --ext .ts .",
@@ -171,9 +172,9 @@
       "functional/functional-parameters": "off",
       "import/exports-last": "error",
       "import/first": "error",
-      "import/no-cycle": "error",
       "import/no-named-default": "error",
       "import/no-namespace": "off",
+      "import/namespace": "off",
       "import/no-unresolved": "off",
       "import/no-useless-path-segments": "error",
       "max-len": [
