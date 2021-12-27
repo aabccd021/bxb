@@ -7,6 +7,7 @@ import {
   MakeDirectoryOptions,
   PathLike,
   PathOrFileDescriptor,
+  ReadFileAsStringParams,
   RmOptions,
   WriteFileOptions,
 } from '../type';
@@ -14,18 +15,8 @@ import {
 /**
  *
  */
-export const readFileAsString = ({
-  path,
-  options,
-}: {
-  readonly options:
-    | {
-        readonly encoding: BufferEncoding;
-        readonly flag?: string | undefined;
-      }
-    | BufferEncoding;
-  readonly path: PathOrFileDescriptor;
-}) => IOE.tryCatch(() => fs.readFileSync(path, options), identity);
+export const readFileAsString = ({ path, options }: ReadFileAsStringParams) =>
+  IOE.tryCatch(() => fs.readFileSync(path, options), identity);
 
 /**
  *

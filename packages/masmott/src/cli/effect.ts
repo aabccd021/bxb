@@ -72,25 +72,33 @@ const writeFile = ({ dir, name, content }: WriteFileAction): IO.IO<void> =>
 /**
  *
  */
-const runVoidActions = (action: GenerateCmdAction): IO.IO<void> =>
+const runVoidAction = (action: GenerateCmdAction): IO.IO<void> =>
   pipe(action, match({ logError, writeFile }));
+
+const runVoidActions = E.map(flow(A.map(runVoidAction), IO.sequenceArray));
+
+/**
+ *
+ */
+const getMasmottConfig = pipe(
+  pure.readMasmottConfigFile,
+  fs.readFileAsString,
+  IO.map(pure.decodeMasmottConfig)
+);
+
+/**
+ *
+ */
+const chainElseLogError = <L, P>(chainer: (p: P) => E.Either<L, IO.IO<void>>) =>
+  IO.chain(flow(chainer, E.getOrElse(logError)));
 
 /**
  *
  */
 const generate = (_: GenerateCmdArgs): IO.IO<void> =>
   pipe(
-    fs.readFileAsString({
-      options: { encoding: 'utf-8' },
-      path: './masmott.yaml',
-    }),
-    IO.chain(
-      flow(
-        pure.generate,
-        E.map(flow(A.map(runVoidActions), IO.sequenceArray)),
-        E.getOrElse(logError)
-      )
-    ),
+    getMasmottConfig,
+    chainElseLogError(flow(pure.generate, runVoidActions)),
     // IO.chain(() => CP.exec('yarn lint --fix')),
     IO.chain(() => C.log(`@@@`))
   );

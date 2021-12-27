@@ -18,6 +18,7 @@ import {
   GenerateCmdAction,
   LogErrorAction,
   ModuleKind,
+  ReadFileAsStringParams,
   ScriptTarget,
   WriteFileAction,
   WriteFileDict,
@@ -295,13 +296,24 @@ export const reportIfLeft = <A>(
     E.mapLeft(() => PathReporter.report(validation))
   );
 
+export const readMasmottConfigFile: ReadFileAsStringParams = {
+  options: { encoding: 'utf-8' },
+  path: './masmott.yaml',
+};
+
 /**
  *
  */
-export const generate = flow(
+export const decodeMasmottConfig = flow(
   E.chain(YAML.load),
-  E.chainW(flow(MasmottConfig.decode, reportIfLeft)),
-  E.map(flow(generateCmdActions, writeFileDictToActions('.')))
+  E.chainW(flow(MasmottConfig.decode, reportIfLeft))
+);
+
+/**
+ *
+ */
+export const generate = E.map(
+  flow(generateCmdActions, writeFileDictToActions('.'))
 );
 
 /**

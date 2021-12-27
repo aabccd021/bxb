@@ -123,6 +123,16 @@ export type RmOptions = {
   readonly retryDelay?: number | undefined;
 };
 
+export type ReadFileAsStringParams = {
+  readonly options:
+    | {
+        readonly encoding: BufferEncoding;
+        readonly flag?: string | undefined;
+      }
+    | BufferEncoding;
+  readonly path: PathOrFileDescriptor;
+};
+
 export type SourceFile = {
   readonly content: string;
   readonly fileName: string;
