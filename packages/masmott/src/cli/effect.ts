@@ -10,8 +10,9 @@ import * as A from 'fp-ts/ReadonlyArray';
 import { Validation } from 'io-ts';
 import { match } from 'ts-adt';
 
+import * as cp from './library/child_process';
 import * as fs from './library/fs';
-import { emitProgram } from './library/typescript';
+import * as ts from './library/typescript';
 import * as pure from './pure';
 import {
   Action,
@@ -30,28 +31,22 @@ const runAction = (action: Action): IO.IO<unknown> =>
     match({
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       doNothing: () => () => {},
-
       //
-      emitProgram,
-
+      emitProgram: ts.emitProgram,
+      //
+      exec: cp.exec,
       //
       logError: C.error,
-
       //
       mkDir: fs.mkdir,
-
       // eslint-disable-next-line no-use-before-define
-      mkDirAndWriteFile,
-
+      mkDirAndWriteFile: flow(pure.mkDirAndWriteFile, runActions),
       // eslint-disable-next-line no-use-before-define
       mkDirIfAbsent,
-
       //
       rm: fs.rm,
-
       // eslint-disable-next-line no-use-before-define
       rmDirIfExists,
-
       // eslint-disable-next-line no-use-before-define
       writeFile: fs.writeFile,
     })
@@ -81,11 +76,6 @@ const rmDirIfExists = ({ path }: RmDirIfExists) =>
   pipe(path, fs.exists, chainActions(pure.rmDirIfTrue(path)));
 
 /**
- *
- */
-const mkDirAndWriteFile = flow(pure.mkDirAndWriteFile, runActions);
-
-/**
 /**
  *
  */
@@ -103,19 +93,13 @@ const generate = (_: GenerateCmdArgs): IO.IO<void> =>
     getMasmottConfig,
     chainActions(pure.generate)
     // IO.chain(() => CP.exec('yarn lint --fix')),
-    // IO.chain(() => C.log(`@@@`))
   );
 
 /**
  *
  */
 const compileServer = (_: CompileServerCmdArgs): IO.IO<void> =>
-  pipe(
-    getMasmottConfig,
-    chainActions(pure.compileServer)
-    // IO.chain(() => CP.exec('yarn lint --fix')),
-    // IO.chain(() => C.log(`@@@`))
-  );
+  pipe(getMasmottConfig, chainActions(pure.compileServer));
 
 /**
  *

@@ -5,7 +5,6 @@ import { flow, pipe } from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as R from 'fp-ts/ReadonlyRecord';
-import * as STR from 'fp-ts/string';
 import { Validation } from 'io-ts';
 import { PathReporter } from 'io-ts/PathReporter';
 import { match } from 'ts-adt';
@@ -135,7 +134,8 @@ export const mkDirAndWriteFileDict =
             ),
           })
         )
-      )
+      ),
+      A.append<Action>({ _type: 'exec', command: '' })
     );
 
 /**
@@ -420,6 +420,14 @@ export const serverCompileOptions: CompilerOptions = {
 /**
  *
  */
+export const equals =
+  <A>(a1: A) =>
+  (a2: A) =>
+    a1 === a2;
+
+/**
+ *
+ */
 export const compileServerFromConfig = (
   _: MasmottConfig
 ): readonly Action[] => [
@@ -429,18 +437,14 @@ export const compileServerFromConfig = (
   },
   {
     _type: 'emitProgram',
-    getSourceFile: (name) =>
-      pipe(
-        name,
-        O.fromPredicate((fileName) =>
-          STR.Eq.equals(fileName, serverIndexFileName)
-        ),
-        O.map((fileName) => ({
-          content: '',
-          fileName,
-          target: serverScriptTarget,
-        }))
-      ),
+    getSourceFile: flow(
+      O.fromPredicate(equals(serverIndexFileName)),
+      O.map((fileName) => ({
+        content: '',
+        fileName,
+        target: serverScriptTarget,
+      }))
+    ),
     options: serverCompileOptions,
     rootNames: [serverIndexFileName],
   },

@@ -3,7 +3,7 @@ import * as IO from 'fp-ts/IO';
 import * as IOE from 'fp-ts/IOEither';
 import * as fs from 'fs';
 
-import { MkDir, PathLike, ReadFile, Rm, WriteFile } from '../type';
+import { MkDir, ReadFile, Rm, WriteFile } from '../type';
 
 /**
  *
@@ -23,7 +23,7 @@ export const writeFile =
  *
  */
 export const exists =
-  (path: PathLike): IO.IO<boolean> =>
+  (path: fs.PathLike): IO.IO<boolean> =>
   () =>
     fs.existsSync(path);
 

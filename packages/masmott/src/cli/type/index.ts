@@ -1,6 +1,7 @@
 import { Dict } from '@core/type';
 import { Either } from 'fp-ts/Either';
 import { Option } from 'fp-ts/Option';
+import * as fs from 'fs';
 import * as t from 'io-ts';
 import * as ts from 'typescript';
 
@@ -48,72 +49,6 @@ export type LogError = {
   readonly errorDetail: unknown;
 };
 
-export type PathLike = string | Buffer | URL;
-export type PathOrFileDescriptor = PathLike | number;
-
-export type ObjectEncodingOptions = {
-  readonly encoding?: BufferEncoding | null | undefined;
-};
-export type Abortable = {
-  /**
-   * When provided the corresponding `AbortController` can be used to cancel an
-   * asynchronous action.
-   */
-  readonly signal?: AbortSignal | undefined;
-};
-export type Mode = number | string;
-export type WriteFileOptions =
-  | (ObjectEncodingOptions &
-      Abortable & {
-        readonly flag?: string | undefined;
-        readonly mode?: Mode | undefined;
-      })
-  | BufferEncoding
-  | null;
-
-export type MakeDirectoryOptions = {
-  /**
-   * A file mode. If a string is passed, it is parsed as an octal integer. If
-   * not specified
-   * @default 0o777
-   */
-  readonly mode?: Mode | undefined;
-  /**
-   * Indicates whether parent folders should be created. If a folder was
-   * created, the path to the first created folder will be returned.
-   * @default false
-   */
-  readonly recursive?: boolean | undefined;
-};
-
-export type RmOptions = {
-  /**
-   * When `true`, exceptions will be ignored if `path` does not exist.
-   * @default false
-   */
-  readonly force?: boolean | undefined;
-  /**
-   * If an `EBUSY`, `EMFILE`, `ENFILE`, `ENOTEMPTY`, or `EPERM` error is
-   * encountered, Node.js will retry the operation with a linear backoff wait of
-   * `retryDelay` ms longer on each try. This option represents the number of
-   * retries. This option is ignored if the `recursive` option is not `true`.
-   * @default 0
-   */
-  readonly maxRetries?: number | undefined;
-  /**
-   * If `true`, perform a recursive directory removal. In
-   * recursive mode, operations are retried on failure.
-   * @default false
-   */
-  readonly recursive?: boolean | undefined;
-  /**
-   * The amount of time in milliseconds to wait between retries.
-   * This option is ignored if the `recursive` option is not `true`.
-   * @default 100
-   */
-  readonly retryDelay?: number | undefined;
-};
-
 export type SourceFile = {
   readonly content: string;
   readonly fileName: string;
@@ -144,8 +79,8 @@ export type EmitResult = {
 export type WriteFile = {
   readonly _type: 'writeFile';
   readonly data: string | NodeJS.ArrayBufferView;
-  readonly options?: WriteFileOptions;
-  readonly path: PathOrFileDescriptor;
+  readonly options?: fs.WriteFileOptions;
+  readonly path: fs.PathOrFileDescriptor;
 };
 
 export type MkDirAndWriteFile = {
@@ -171,16 +106,16 @@ export type RmDirIfExists = {
 
 export type Rm = {
   readonly _type: 'rm';
-  readonly options: RmOptions;
-  readonly path: PathLike;
+  readonly options: fs.RmOptions;
+  readonly path: fs.PathLike;
 };
 
 export type MkDir = {
   readonly _type: 'mkDir';
-  readonly options: MakeDirectoryOptions & {
+  readonly options: fs.MakeDirectoryOptions & {
     readonly recursive: true;
   };
-  readonly path: PathLike;
+  readonly path: fs.PathLike;
 };
 
 export type EmitProgram = {
@@ -198,12 +133,18 @@ export type ReadFile = {
         readonly flag?: string | undefined;
       }
     | BufferEncoding;
-  readonly path: PathOrFileDescriptor;
+  readonly path: fs.PathOrFileDescriptor;
+};
+
+export type Exec = {
+  readonly _type: 'exec';
+  readonly command: string;
 };
 
 export type Action =
   | DoNothing
   | EmitProgram
+  | Exec
   | LogError
   | MkDir
   | MkDirIfAbsent
