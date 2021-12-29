@@ -1,13 +1,13 @@
 import { sequenceT } from 'fp-ts/Apply';
-import { pipe } from 'fp-ts/function';
+import { flow, pipe } from 'fp-ts/function';
 import * as IO from 'fp-ts/IO';
 import * as O from 'fp-ts/Option';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as ts from 'typescript';
 
 import {
-  CompilerProgram,
   Diagnostic,
+  EmitProgram,
   EmitResult,
   FileDiagnostic,
   SourceFile,
@@ -22,11 +22,7 @@ const _createProgram =
   (host: ts.CompilerHost) =>
     ts.createProgram(rootNames, options, host);
 
-const createProgram = ({
-  options,
-  getSourceFile,
-  rootNames,
-}: CompilerProgram) =>
+const createProgram = ({ options, getSourceFile, rootNames }: EmitProgram) =>
   pipe(
     options,
     ts.createCompilerHost,
@@ -89,5 +85,4 @@ const wrapEmitResult =
 const emitAndWrapResult = (program: ts.Program): IO.IO<EmitResult> =>
   pipe(program, _emit, IO.map(wrapEmitResult(program)));
 
-export const emitProgram = (program: CompilerProgram): IO.IO<EmitResult> =>
-  pipe(program, createProgram, emitAndWrapResult);
+export const emitProgram = flow(createProgram, emitAndWrapResult);

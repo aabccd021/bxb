@@ -3,32 +3,21 @@ import * as IO from 'fp-ts/IO';
 import * as IOE from 'fp-ts/IOEither';
 import * as fs from 'fs';
 
-import {
-  MakeDirectoryOptions,
-  PathLike,
-  PathOrFileDescriptor,
-  ReadFileAsStringParams,
-  RmOptions,
-  WriteFileOptions,
-} from '../type';
+import { MkDir, PathLike, ReadFile, Rm, WriteFile } from '../type';
 
 /**
  *
  */
-export const readFileAsString = ({ path, options }: ReadFileAsStringParams) =>
+export const readFile = ({ path, options }: ReadFile) =>
   IOE.tryCatch(() => fs.readFileSync(path, options), identity);
 
 /**
  *
  */
 export const writeFile =
-  (
-    file: PathOrFileDescriptor,
-    data: string | NodeJS.ArrayBufferView,
-    options?: WriteFileOptions
-  ): IO.IO<void> =>
+  ({ path, data, options }: WriteFile): IO.IO<void> =>
   () =>
-    fs.writeFileSync(file, data, options);
+    fs.writeFileSync(path, data, options);
 
 /**
  *
@@ -42,15 +31,7 @@ export const exists =
  *
  */
 export const mkdir =
-  ({
-    path,
-    options,
-  }: {
-    readonly options: MakeDirectoryOptions & {
-      readonly recursive: true;
-    };
-    readonly path: PathLike;
-  }): IO.IO<string | undefined> =>
+  ({ path, options }: MkDir): IO.IO<string | undefined> =>
   () =>
     fs.mkdirSync(path, options);
 
@@ -58,12 +39,6 @@ export const mkdir =
  *
  */
 export const rm =
-  ({
-    path,
-    options,
-  }: {
-    readonly options: RmOptions;
-    readonly path: PathLike;
-  }): IO.IO<void> =>
+  ({ path, options }: Rm): IO.IO<void> =>
   () =>
     fs.rmSync(path, options);

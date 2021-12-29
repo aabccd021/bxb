@@ -1,4 +1,5 @@
 import { MasmottConfig } from '@core/type';
+import * as BOOL from 'fp-ts/boolean';
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/function';
 import * as O from 'fp-ts/Option';
@@ -12,25 +13,70 @@ import { match } from 'ts-adt';
 import * as J from './library/json';
 import * as YAML from './library/yaml';
 import {
+  Action,
   CompilerOptions,
-  CompilerProgram,
   EitherWriteFileEntry,
-  GenerateCmdAction,
-  LogErrorAction,
+  LogError,
+  MkDirAndWriteFile,
   ModuleKind,
-  ReadFileAsStringParams,
+  ReadFile,
   ScriptTarget,
-  WriteFileAction,
   WriteFileDict,
 } from './type';
 
 /**
  *
  */
-export const logErrorAction = (errorDetail: unknown): LogErrorAction => ({
+export const logError = (errorDetail: unknown): LogError => ({
   _type: 'logError',
   errorDetail,
 });
+
+/**
+ *
+ */
+export const logErrorUnknownCommand = flow(
+  A.reduce('unknown command: ', (acc, el: string) => `${acc} ${el}`),
+  logError
+);
+
+/**
+ *
+ */
+export const arrayFrom = <A>(a: A) => [a];
+
+/**
+ *
+ */
+export const rmDirIfTrue = (path: string) =>
+  flow(
+    BOOL.match<Action>(
+      () => ({ _type: 'doNothing' }),
+      () => ({ _type: 'rm', options: { recursive: true }, path })
+    ),
+    arrayFrom
+  );
+
+/**
+ *
+ */
+export const mkDirIfFalse = (path: string) =>
+  flow(
+    BOOL.match<Action>(
+      () => ({ _type: 'mkDir', options: { recursive: true }, path }),
+      () => ({ _type: 'doNothing' })
+    ),
+    arrayFrom
+  );
+
+export const mkDirAndWriteFile = ({
+  dir,
+  name,
+  data,
+}: MkDirAndWriteFile): readonly Action[] => [
+  { _type: 'mkDirIfAbsent', path: dir },
+  { _type: 'writeFile', data, path: `${dir}/${name}` },
+];
 
 /**
  *
@@ -50,11 +96,11 @@ export const jsonFileEntry = flow(J.stringify(2), eitherWriteFileEntry);
 /**
  *
  */
-export const writeFileAction =
+export const _mkDirAndWriteFile =
   (dir: string, name: string) =>
-  (content: string): WriteFileAction => ({
-    _type: 'writeFile',
-    content,
+  (content: string): MkDirAndWriteFile => ({
+    _type: 'mkDirAndWriteFile',
+    data: content,
     dir,
     name,
   });
@@ -62,9 +108,9 @@ export const writeFileAction =
 /**
  *
  */
-export const writeFileDictToActions =
+export const mkDirAndWriteFileDict =
   (baseDir: string) =>
-  (dict: WriteFileDict): readonly GenerateCmdAction[] =>
+  (dict: WriteFileDict): readonly Action[] =>
     pipe(
       dict,
       R.toReadonlyArray,
@@ -74,15 +120,19 @@ export const writeFileDictToActions =
           match({
             either: flow(
               (_) => _.content,
-              E.map(writeFileAction(baseDir, key)),
-              E.getOrElseW(logErrorAction),
+              E.map(_mkDirAndWriteFile(baseDir, key)),
+              E.getOrElseW(logError),
               A.of
             ),
             nested: flow(
               (_) => _.content,
-              writeFileDictToActions(`${baseDir}/${key}`)
+              mkDirAndWriteFileDict(`${baseDir}/${key}`)
             ),
-            string: flow((_) => _.content, writeFileAction(baseDir, key), A.of),
+            string: flow(
+              (_) => _.content,
+              _mkDirAndWriteFile(baseDir, key),
+              A.of
+            ),
           })
         )
       )
@@ -296,7 +346,8 @@ export const reportIfLeft = <A>(
     E.mapLeft(() => PathReporter.report(validation))
   );
 
-export const readMasmottConfigFile: ReadFileAsStringParams = {
+export const readMasmottConfigFile: ReadFile = {
+  _type: 'readFile',
   options: { encoding: 'utf-8' },
   path: './masmott.yaml',
 };
@@ -312,9 +363,23 @@ export const decodeMasmottConfig = flow(
 /**
  *
  */
-export const generate = E.map(
-  flow(generateCmdActions, writeFileDictToActions('.'))
+export const logOnParseError = <A>(
+  f: (a: A) => readonly Action[]
+): ((e: E.Either<unknown, A>) => readonly Action[]) =>
+  flow(E.map(f), E.getOrElseW(flow(logError, arrayFrom)));
+
+/**
+ *
+ */
+export const generateFromConfig = flow(
+  generateCmdActions,
+  mkDirAndWriteFileDict('.')
 );
+
+/**
+ *
+ */
+export const generate = pipe(generateFromConfig, logOnParseError);
 
 /**
  *
@@ -355,19 +420,33 @@ export const serverCompileOptions: CompilerOptions = {
 /**
  *
  */
-export const serverCompilerProgram: CompilerProgram = {
-  getSourceFile: (name) =>
-    pipe(
-      name,
-      O.fromPredicate((fileName) =>
-        STR.Eq.equals(fileName, serverIndexFileName)
+export const compileServerFromConfig = (
+  _: MasmottConfig
+): readonly Action[] => [
+  {
+    _type: 'rmDirIfExists',
+    path: serverOutDir,
+  },
+  {
+    _type: 'emitProgram',
+    getSourceFile: (name) =>
+      pipe(
+        name,
+        O.fromPredicate((fileName) =>
+          STR.Eq.equals(fileName, serverIndexFileName)
+        ),
+        O.map((fileName) => ({
+          content: '',
+          fileName,
+          target: serverScriptTarget,
+        }))
       ),
-      O.map((fileName) => ({
-        content: '',
-        fileName,
-        target: serverScriptTarget,
-      }))
-    ),
-  options: serverCompileOptions,
-  rootNames: [serverIndexFileName],
-};
+    options: serverCompileOptions,
+    rootNames: [serverIndexFileName],
+  },
+];
+
+/**
+ *
+ */
+export const compileServer = pipe(compileServerFromConfig, logOnParseError);

@@ -1,96 +1,99 @@
 // const args = process.argv.slice(2);
 
-import * as BOOL from 'fp-ts/boolean';
+import { MasmottConfig } from '@src/core/type';
 import * as C from 'fp-ts/Console';
 import * as E from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/function';
 import * as IO from 'fp-ts/IO';
+import * as IOE from 'fp-ts/IOEither';
 import * as A from 'fp-ts/ReadonlyArray';
 import { Validation } from 'io-ts';
 import { match } from 'ts-adt';
 
 import * as fs from './library/fs';
-import * as ts from './library/typescript';
+import { emitProgram } from './library/typescript';
 import * as pure from './pure';
 import {
+  Action,
   CompileServerCmdArgs,
-  GenerateCmdAction,
   GenerateCmdArgs,
-  WriteFileAction,
+  MkDirIfAbsent,
+  RmDirIfExists,
 } from './type';
 
 /**
  *
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const doNothing: IO.IO<void> = () => {};
-
-/**
- *
- */
-const logError = C.error;
-
-/**
- *
- */
-const mkdirIfAbsent = (path: string) =>
+const runAction = (action: Action): IO.IO<unknown> =>
   pipe(
-    path,
-    fs.exists,
-    IO.chain(
-      BOOL.match(
-        () => fs.mkdir({ options: { recursive: true }, path }),
-        () => doNothing
-      )
-    )
+    action,
+    match({
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      doNothing: () => () => {},
+
+      //
+      emitProgram,
+
+      //
+      logError: C.error,
+
+      //
+      mkDir: fs.mkdir,
+
+      // eslint-disable-next-line no-use-before-define
+      mkDirAndWriteFile,
+
+      // eslint-disable-next-line no-use-before-define
+      mkDirIfAbsent,
+
+      //
+      rm: fs.rm,
+
+      // eslint-disable-next-line no-use-before-define
+      rmDirIfExists,
+
+      // eslint-disable-next-line no-use-before-define
+      writeFile: fs.writeFile,
+    })
   );
 
 /**
  *
  */
-const rmdirIfExists = (path: string) =>
-  pipe(
-    path,
-    fs.exists,
-    IO.chain(
-      BOOL.match(
-        () => doNothing,
-        () => fs.rm({ options: { recursive: true }, path })
-      )
-    )
-  );
+const runActions = flow(A.map(runAction), IO.sequenceArray);
 
 /**
  *
  */
-const writeFile = ({ dir, name, content }: WriteFileAction): IO.IO<void> =>
-  pipe(
-    mkdirIfAbsent(dir),
-    IO.chain(() => fs.writeFile(`${dir}/${name}`, content))
-  );
+const chainActions = <A>(f: (a: A) => readonly Action[]) =>
+  IO.chain(flow(f, runActions));
 
 /**
  *
  */
-const runVoidAction = (action: GenerateCmdAction): IO.IO<void> =>
-  pipe(action, match({ logError, writeFile }));
-
-const runVoidActions = E.map(flow(A.map(runVoidAction), IO.sequenceArray));
+const mkDirIfAbsent = ({ path }: MkDirIfAbsent) =>
+  pipe(path, fs.exists, chainActions(pure.mkDirIfFalse(path)));
 
 /**
  *
  */
-const getMasmottConfig = pipe(
+const rmDirIfExists = ({ path }: RmDirIfExists) =>
+  pipe(path, fs.exists, chainActions(pure.rmDirIfTrue(path)));
+
+/**
+ *
+ */
+const mkDirAndWriteFile = flow(pure.mkDirAndWriteFile, runActions);
+
+/**
+/**
+ *
+ */
+const getMasmottConfig: IOE.IOEither<unknown, MasmottConfig> = pipe(
   pure.readMasmottConfigFile,
-  fs.readFileAsString,
+  fs.readFile,
   IO.map(pure.decodeMasmottConfig)
 );
-
-/**
- *
- */
-const chainElseLogError = <L, P>(chainer: (p: P) => E.Either<L, IO.IO<void>>) =>
-  IO.chain(flow(chainer, E.getOrElse(logError)));
 
 /**
  *
@@ -98,9 +101,9 @@ const chainElseLogError = <L, P>(chainer: (p: P) => E.Either<L, IO.IO<void>>) =>
 const generate = (_: GenerateCmdArgs): IO.IO<void> =>
   pipe(
     getMasmottConfig,
-    chainElseLogError(flow(pure.generate, runVoidActions)),
+    chainActions(pure.generate)
     // IO.chain(() => CP.exec('yarn lint --fix')),
-    IO.chain(() => C.log(`@@@`))
+    // IO.chain(() => C.log(`@@@`))
   );
 
 /**
@@ -108,15 +111,16 @@ const generate = (_: GenerateCmdArgs): IO.IO<void> =>
  */
 const compileServer = (_: CompileServerCmdArgs): IO.IO<void> =>
   pipe(
-    pure.serverOutDir,
-    rmdirIfExists,
-    IO.chain(() => pipe(pure.serverCompilerProgram, ts.emitProgram))
+    getMasmottConfig,
+    chainActions(pure.compileServer)
+    // IO.chain(() => CP.exec('yarn lint --fix')),
+    // IO.chain(() => C.log(`@@@`))
   );
 
 /**
  *
  */
-const decodeAndRun = <A>(
+const runCmd = <A>(
   decode: (args: readonly string[]) => Validation<A>,
   handle: (a: A) => IO.IO<void>
 ) =>
@@ -124,8 +128,8 @@ const decodeAndRun = <A>(
     pipe(
       args,
       decode,
-      E.map(handle),
-      E.mapLeft(() => args)
+      E.mapLeft((_decodeError) => args),
+      E.map(handle)
     )
   );
 
@@ -135,7 +139,7 @@ const decodeAndRun = <A>(
 export const cli: IO.IO<void> = pipe(
   process.argv.slice(2),
   E.left,
-  decodeAndRun(GenerateCmdArgs.decode, generate),
-  decodeAndRun(CompileServerCmdArgs.decode, compileServer),
-  E.getOrElse(() => logError(`unknown command`))
+  runCmd(GenerateCmdArgs.decode, generate),
+  runCmd(CompileServerCmdArgs.decode, compileServer),
+  E.getOrElse(flow(pure.logErrorUnknownCommand, runAction))
 );

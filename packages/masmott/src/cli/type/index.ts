@@ -43,19 +43,10 @@ export type WriteFileEntry =
   | EitherWriteFileEntry
   | NestedWriteFileEntry;
 
-export type LogErrorAction = {
+export type LogError = {
   readonly _type: 'logError';
   readonly errorDetail: unknown;
 };
-
-export type WriteFileAction = {
-  readonly _type: 'writeFile';
-  readonly content: string;
-  readonly dir: string;
-  readonly name: string;
-};
-
-export type GenerateCmdAction = WriteFileAction | LogErrorAction;
 
 export type PathLike = string | Buffer | URL;
 export type PathOrFileDescriptor = PathLike | number;
@@ -123,16 +114,6 @@ export type RmOptions = {
   readonly retryDelay?: number | undefined;
 };
 
-export type ReadFileAsStringParams = {
-  readonly options:
-    | {
-        readonly encoding: BufferEncoding;
-        readonly flag?: string | undefined;
-      }
-    | BufferEncoding;
-  readonly path: PathOrFileDescriptor;
-};
-
 export type SourceFile = {
   readonly content: string;
   readonly fileName: string;
@@ -143,12 +124,6 @@ export type CompilerHostGetSourceFile = (
   name: string,
   languageVersion: ts.ScriptTarget
 ) => Option<SourceFile>;
-
-export type CompilerProgram = {
-  readonly getSourceFile?: CompilerHostGetSourceFile;
-  readonly options: ts.CompilerOptions;
-  readonly rootNames: readonly string[];
-};
 
 export type FileDiagnostic = {
   readonly character: number;
@@ -165,3 +140,74 @@ export type EmitResult = {
   readonly diagnostics: readonly Diagnostic[];
   readonly emitSkipped: boolean;
 };
+
+export type WriteFile = {
+  readonly _type: 'writeFile';
+  readonly data: string | NodeJS.ArrayBufferView;
+  readonly options?: WriteFileOptions;
+  readonly path: PathOrFileDescriptor;
+};
+
+export type MkDirAndWriteFile = {
+  readonly _type: 'mkDirAndWriteFile';
+  readonly data: string;
+  readonly dir: string;
+  readonly name: string;
+};
+
+export type MkDirIfAbsent = {
+  readonly _type: 'mkDirIfAbsent';
+  readonly path: string;
+};
+
+export type DoNothing = {
+  readonly _type: 'doNothing';
+};
+
+export type RmDirIfExists = {
+  readonly _type: 'rmDirIfExists';
+  readonly path: string;
+};
+
+export type Rm = {
+  readonly _type: 'rm';
+  readonly options: RmOptions;
+  readonly path: PathLike;
+};
+
+export type MkDir = {
+  readonly _type: 'mkDir';
+  readonly options: MakeDirectoryOptions & {
+    readonly recursive: true;
+  };
+  readonly path: PathLike;
+};
+
+export type EmitProgram = {
+  readonly _type: 'emitProgram';
+  readonly getSourceFile?: CompilerHostGetSourceFile;
+  readonly options: ts.CompilerOptions;
+  readonly rootNames: readonly string[];
+};
+
+export type ReadFile = {
+  readonly _type: 'readFile';
+  readonly options:
+    | {
+        readonly encoding: BufferEncoding;
+        readonly flag?: string | undefined;
+      }
+    | BufferEncoding;
+  readonly path: PathOrFileDescriptor;
+};
+
+export type Action =
+  | DoNothing
+  | EmitProgram
+  | LogError
+  | MkDir
+  | MkDirIfAbsent
+  | MkDirAndWriteFile
+  | Rm
+  | RmDirIfExists
+  | WriteFile;
