@@ -2,27 +2,20 @@ import { flow, pipe } from 'fp-ts/function';
 import * as A from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
 
-import { createDoc, deleteDoc, getDocs } from './library/firebase-admin';
+import * as FA from './library/firebase-admin';
 import { log } from './library/firebase-functions';
+import * as pure from './pure';
 import {
-  createViews,
-  deleteReferDocs,
-  deleteViewDocs,
-  getReferDocs,
-  logErrors,
-} from './pure';
-import {
-  LogAction,
   OnRefDeletedCtx,
   OnViewSrcCreatedCtx,
   OnViewSrcDeletedCtx,
-  SnapshotTrigger,
+  SnapshotTriggerHandler,
 } from './type';
 
 /**
  *
  */
-export const parallel = <A, B>(mapToTask: (a: A) => T.Task<B>) =>
+export const T_parallel = <A, B>(mapToTask: (a: A) => T.Task<B>) =>
   flow(
     A.map((a: A) =>
       pipe(
@@ -37,61 +30,52 @@ export const parallel = <A, B>(mapToTask: (a: A) => T.Task<B>) =>
 /**
  *
  */
-export const tLog = flow(log, T.fromIO);
+export const logWriteResultErrors = (errorMessage: string) =>
+  T.chain(flow(pure.logErrors(errorMessage), T_parallel(flow(log, T.fromIO))));
 
 /**
  *
  */
-export const bindTriggerCtx = flow(T.of, T.bindTo('triggerCtx'));
-
-/**
- *
- */
-export const k = (a: unknown) => T.bind('ctx', () => T.of(a));
-
-/**
- *
- */
-export const logWriteResultErrors = T.chain(flow(logErrors, parallel(tLog)));
-
-/**
- *
- */
-export const onViewSrcCreated = (
-  ctx: OnViewSrcCreatedCtx
-): SnapshotTrigger<unknown> =>
-  flow(
-    bindTriggerCtx,
-    T.bind('ctx', () => T.of(ctx)),
-    T.bind('writeResults', flow(createViews, parallel(createDoc))),
-    logWriteResultErrors
-  );
+export const onViewSrcCreated =
+  (ctx: OnViewSrcCreatedCtx): SnapshotTriggerHandler<'create'> =>
+  (triggerCtx) =>
+  (runtimeCtx): T.Task<unknown> =>
+    pipe(
+      pure.createViews(ctx)(triggerCtx)(runtimeCtx),
+      T_parallel(FA.createDoc),
+      logWriteResultErrors('onViewSrcCreated')
+    );
 
 /**
  * Trigger handler that run on source doc `srcDoc` deleted. The trigger will
  * delete all view docs with the same id as srcDoc.
  */
-export const onViewSrcDeleted = (
-  ctx: OnViewSrcDeletedCtx
-): SnapshotTrigger<readonly (readonly [LogAction, void])[]> =>
-  flow(
-    bindTriggerCtx,
-    T.bind('ctx', () => T.of(ctx)),
-    T.bind('writeResults', flow(deleteViewDocs, parallel(deleteDoc))),
-    logWriteResultErrors
-  );
+export const onViewSrcDeleted =
+  (ctx: OnViewSrcDeletedCtx): SnapshotTriggerHandler<'delete'> =>
+  (triggerCtx) =>
+  (runtimeCtx): T.Task<unknown> =>
+    pipe(
+      pure.deleteViewDocs(ctx)(triggerCtx)(runtimeCtx),
+      T_parallel(FA.deleteDoc),
+      logWriteResultErrors('onViewSrcDeleted')
+    );
 
 /**
  * Trigger handler that run on referenced doc `refDoc` deleted. The trigger will
  * delete all docs which refers to refDoc.
  */
-export const onRefDeleted = (
-  ctx: OnRefDeletedCtx
-): SnapshotTrigger<readonly (readonly [LogAction, void])[]> =>
-  flow(
-    bindTriggerCtx,
-    T.bind('ctx', () => T.of(ctx)),
-    T.bind('referDocs', flow(getReferDocs, getDocs)),
-    T.bind('writeResults', flow(deleteReferDocs, parallel(deleteDoc))),
-    logWriteResultErrors
-  );
+export const onRefDeleted =
+  (ctx: OnRefDeletedCtx): SnapshotTriggerHandler<'delete'> =>
+  (_triggerCtx) =>
+  (runtimeCtx): T.Task<unknown> =>
+    pipe(
+      pure.getReferDocs(ctx)(runtimeCtx),
+      FA.getDocs,
+      T.chain(
+        flow(
+          pure.deleteReferDocs(ctx),
+          T_parallel(FA.deleteDoc),
+          logWriteResultErrors('onRefDeleted')
+        )
+      )
+    );

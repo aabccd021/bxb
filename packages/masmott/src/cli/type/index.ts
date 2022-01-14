@@ -83,15 +83,15 @@ export type WriteFile = {
   readonly path: fs.PathOrFileDescriptor;
 };
 
-export type MkDirAndWriteFile = {
-  readonly _type: 'mkDirAndWriteFile';
+export type MkdirAndWriteFile = {
+  readonly _type: 'mkdirAndWriteFile';
   readonly data: string;
   readonly dir: string;
   readonly name: string;
 };
 
-export type MkDirIfAbsent = {
-  readonly _type: 'mkDirIfAbsent';
+export type MkdirIfAbsent = {
+  readonly _type: 'mkdirIfAbsent';
   readonly path: string;
 };
 
@@ -99,8 +99,8 @@ export type DoNothing = {
   readonly _type: 'doNothing';
 };
 
-export type RmDirIfExists = {
-  readonly _type: 'rmDirIfExists';
+export type RmdirIfExists = {
+  readonly _type: 'rmdirIfExists';
   readonly path: string;
 };
 
@@ -110,8 +110,8 @@ export type Rm = {
   readonly path: fs.PathLike;
 };
 
-export type MkDir = {
-  readonly _type: 'mkDir';
+export type Mkdir = {
+  readonly _type: 'mkdir';
   readonly options: fs.MakeDirectoryOptions & {
     readonly recursive: true;
   };
@@ -146,9 +146,8 @@ export type Action =
   | EmitProgram
   | Exec
   | LogError
-  | MkDir
-  | MkDirIfAbsent
-  | MkDirAndWriteFile
+  | Mkdir
+  | MkdirIfAbsent
   | Rm
-  | RmDirIfExists
+  | RmdirIfExists
   | WriteFile;

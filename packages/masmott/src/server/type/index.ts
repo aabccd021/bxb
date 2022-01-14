@@ -47,13 +47,15 @@ export type WriteResult = {
   };
 };
 
-export type SnapshotTriggerCtx = {
-  readonly snapshot: DocSnapshot;
-};
+export type SnapshotTriggerType = 'create' | 'delete';
 
-export type SnapshotTrigger<U = unknown> = (
-  params: SnapshotTriggerCtx
-) => T.Task<U>;
+export type SnapshotTriggerCtx<T extends SnapshotTriggerType> = {
+  readonly collection: string;
+  readonly snapshot: DocSnapshot;
+  readonly triggerType: T;
+}j
+
+export type SnapshotTrigger<U = unknown> = rng) (snapshot: DocSnapshot) => T.Task<U>;
 
 export type ChangeHanlder<U = unknown> = (params: {
   readonly change: DocumentChangeSnapshot;

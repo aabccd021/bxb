@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 // const args = process.argv.slice(2);
 
 import * as Console from 'fp-ts/Console';
@@ -6,11 +7,11 @@ import * as IO from 'fp-ts/IO';
 import * as Arr from 'fp-ts/ReadonlyArray';
 import { match } from 'ts-adt';
 
-import * as cp from './library/child_process';
+import * as child_process from './library/child_process';
 import * as fs from './library/fs';
-import * as ts from './library/typescript';
+import * as typescript from './library/typescript';
 import * as pure from './pure';
-import { Action, MkDirIfAbsent, RmDirIfExists } from './type';
+import { Action, MkdirIfAbsent, RmdirIfExists } from './type';
 
 /**
  *
@@ -19,42 +20,15 @@ const runAction = (action: Action): IO.IO<unknown> =>
   pipe(
     action,
     match({
-      //
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      doNothing: () => () => {},
-
-      //
-      emitProgram: ts.emitProgram,
-
-      //
-      exec: cp.exec,
-
-      //
+      ...typescript,
+      ...child_process,
+      ...fs,
+      doNothing: (_) => IO.of(void),
       logError: Console.error,
-
-      //
-      mkDir: fs.mkdir,
-
-      //
-      // eslint-disable-next-line no-use-before-define
-      mkDirAndWriteFile: flow(pure.mkDirAndWriteFile, runActions),
-
-      //
-      mkDirIfAbsent: ({ path }: MkDirIfAbsent) =>
-        // eslint-disable-next-line no-use-before-define
-        pipe(path, fs.exists, chainActions(pure.mkDirIfFalse(path))),
-
-      //
-      rm: fs.rm,
-
-      //
-      rmDirIfExists: ({ path }: RmDirIfExists) =>
-        // eslint-disable-next-line no-use-before-define
-        pipe(path, fs.exists, chainActions(pure.rmDirIfTrue(path))),
-
-      //
-      // eslint-disable-next-line no-use-before-define
-      writeFile: fs.writeFile,
+      mkdirIfAbsent: ({ path }: MkdirIfAbsent) =>
+        pipe(path, fs.exists, chainRunActions(pipe(path, pure.mkdirIfFalse))),
+      rmdirIfExists: ({ path }: RmdirIfExists) =>
+        pipe(path, fs.exists, chainRunActions(pipe(path, pure.rmdirIfTrue))),
     })
   );
 
@@ -66,7 +40,7 @@ const runActions = flow(Arr.map(runAction), IO.sequenceArray);
 /**
  *
  */
-const chainActions = <B>(f: (b: B) => readonly Action[]) =>
+const chainRunActions = <B>(f: (b: B) => readonly Action[]) =>
   IO.chain(flow(f, runActions));
 
 /**
@@ -75,5 +49,5 @@ const chainActions = <B>(f: (b: B) => readonly Action[]) =>
 export const cli: IO.IO<void> = pipe(
   pure.readMasmottConfigFile,
   fs.readFile,
-  chainActions(pure.doCmd(process.argv))
+  chainRunActions(pipe(process.argv, pure.doCmd))
 );

@@ -17,7 +17,6 @@ import {
   EitherWriteFileEntry,
   GenerateCmdArgs,
   LogError,
-  MkDirAndWriteFile,
   ModuleKind,
   ReadFile,
   ScriptTarget,
@@ -43,7 +42,7 @@ export const logErrorUnknownCommand = flow(
 /**
  *
  */
-export const rmDirIfTrue = (path: string) =>
+export const rmdirIfTrue = (path: string) =>
   flow(
     Bool.match<Action>(
       () => ({ _type: 'doNothing' }),
@@ -55,23 +54,14 @@ export const rmDirIfTrue = (path: string) =>
 /**
  *
  */
-export const mkDirIfFalse = (path: string) =>
+export const mkdirIfFalse = (path: string) =>
   flow(
     Bool.match<Action>(
-      () => ({ _type: 'mkDir', options: { recursive: true }, path }),
+      () => ({ _type: 'mkdir', options: { recursive: true }, path }),
       () => ({ _type: 'doNothing' })
     ),
     Arr.of
   );
-
-export const mkDirAndWriteFile = ({
-  dir,
-  name,
-  data,
-}: MkDirAndWriteFile): readonly Action[] => [
-  { _type: 'mkDirIfAbsent', path: dir },
-  { _type: 'writeFile', data, path: `${dir}/${name}` },
-];
 
 /**
  *
@@ -91,19 +81,18 @@ export const jsonFileEntry = flow(J.stringify(2), eitherWriteFileEntry);
 /**
  *
  */
-export const _mkDirAndWriteFile =
+export const _mkdirAndWriteFile =
   (dir: string, name: string) =>
-  (content: string): MkDirAndWriteFile => ({
-    _type: 'mkDirAndWriteFile',
-    data: content,
-    dir,
-    name,
-  });
+  (data: string): readonly Action[] =>
+    [
+      { _type: 'mkdirIfAbsent', path: dir },
+      { _type: 'writeFile', data, path: `${dir}/${name}` },
+    ];
 
 /**
  *
  */
-export const mkDirAndWriteFileDict =
+export const mkdirAndWriteFileDict =
   (baseDir: string) =>
   (dict: WriteFileDict): readonly Action[] =>
     pipe(
@@ -113,21 +102,17 @@ export const mkDirAndWriteFileDict =
         pipe(
           value,
           match({
-            either: flow(
-              (_) => _.content,
-              E.map(_mkDirAndWriteFile(baseDir, key)),
-              E.getOrElseW(logError),
-              Arr.of
-            ),
+            either: ({ content }) =>
+              pipe(
+                content,
+                E.map(_mkdirAndWriteFile(baseDir, key)),
+                E.getOrElseW(flow(logError, Arr.of))
+              ),
             nested: flow(
               (_) => _.content,
-              mkDirAndWriteFileDict(`${baseDir}/${key}`)
+              mkdirAndWriteFileDict(`${baseDir}/${key}`)
             ),
-            string: flow(
-              (_) => _.content,
-              _mkDirAndWriteFile(baseDir, key),
-              Arr.of
-            ),
+            string: flow((_) => _.content, _mkdirAndWriteFile(baseDir, key)),
           })
         )
       ),
@@ -361,7 +346,7 @@ export const logOnParseError = <A>(
  */
 export const generateFromConfig = flow(
   generateCmdActions,
-  mkDirAndWriteFileDict('.')
+  mkdirAndWriteFileDict('.')
 );
 
 /**
@@ -421,7 +406,7 @@ export const compileServerFromConfig = (
   _: MasmottConfig
 ): readonly Action[] => [
   {
-    _type: 'rmDirIfExists',
+    _type: 'rmdirIfExists',
     path: serverOutDir,
   },
   {
@@ -447,8 +432,8 @@ export const compileServer = pipe(compileServerFromConfig, logOnParseError);
 /**
  *
  */
-export const doCmd = (_args: readonly string[]) =>
-  flow(
+export const doCmd = (_: { readonly args: readonly string[] }) =>
+  pipe(
     E.chain(YAML.load),
     E.chainW(flow(MasmottConfig.decode, reportIfLeft)),
     () => []

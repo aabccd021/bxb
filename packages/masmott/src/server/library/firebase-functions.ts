@@ -18,6 +18,7 @@ import {
   DocumentChangeSnapshot,
   LogAction,
   SnapshotTrigger,
+  SnapshotTriggerHandler,
 } from '../type';
 
 /**
@@ -84,15 +85,19 @@ const wrapSnapshot = (snapshot: FunctionDocumentSnapshot): DocSnapshot => ({
 const wrapSnapshotHandler =
   (handler: SnapshotTrigger) =>
   (snapshot: FunctionDocumentSnapshot): Promise<unknown> =>
-    handler({ snapshot: wrapSnapshot(snapshot) })();
+    pipe(snapshot, wrapSnapshot, handler)();
 
 /**
  *
  */
-export const makeOnCreateTrigger = (
-  collection: string,
-  handler: SnapshotTrigger
-) => makeDocTrigger(collection).onCreate(wrapSnapshotHandler(handler));
+export const makeOnCreateTrigger =
+  (collection: string) => (handler: SnapshotTriggerHandler<'create'>) =>
+    pipe(
+      { collection, triggerType: 'create' },
+      handler,
+      wrapSnapshotHandler,
+      makeDocTrigger(collection).onDelete
+    );
 
 /**
  *
@@ -105,8 +110,13 @@ export const makeOnUpdateTrigger =
  *
  */
 export const makeDeleteTrigger =
-  (collection: string) => (handler: SnapshotTrigger) =>
-    makeDocTrigger(collection).onCreate(wrapSnapshotHandler(handler));
+  (collection: string) => (handler: SnapshotTriggerHandler<'delete'>) =>
+    pipe(
+      { collection, triggerType: 'delete' },
+      handler,
+      wrapSnapshotHandler,
+      makeDocTrigger(collection).onDelete
+    );
 
 /**
  *

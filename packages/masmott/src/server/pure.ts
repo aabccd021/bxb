@@ -15,7 +15,8 @@ import {
   OnRefDeletedCtx,
   OnViewSrcCreatedCtx,
   OnViewSrcDeletedCtx,
-  SnapshotTriggerCtx,
+  SnapshotTriggerRuntimeCtx,
+  TriggerCtx,
 } from './type';
 
 /**
@@ -47,110 +48,95 @@ export const materializeView = (
 /**
  *
  */
-export const createViews = ({
-  ctx: { collection, viewSpecs: selectViewSpecs },
-  triggerCtx: { snapshot: srcDoc },
-}: {
-  readonly ctx: OnViewSrcCreatedCtx;
-  readonly triggerCtx: SnapshotTriggerCtx;
-}): readonly CreateDocAction[] =>
-  pipe(
-    selectViewSpecs,
-    R.mapWithIndex(
-      (view, viewSpec) =>
-        ({
-          _task: 'createDoc',
-          collection: makeViewCollectionPath(collection)(view),
-          data: materializeView(viewSpec, srcDoc.data),
-          id: srcDoc.id,
-        } as CreateDocAction)
-    ),
-    R.toReadonlyArray,
-    A.map(TUPLE.snd)
-  );
+export const createViews =
+  ({ viewSpecs }: OnViewSrcCreatedCtx) =>
+  ({ collection }: TriggerCtx<'create'>) =>
+  ({
+    snapshot: srcDoc,
+  }: SnapshotTriggerRuntimeCtx): readonly CreateDocAction[] =>
+    pipe(
+      viewSpecs,
+      R.mapWithIndex(
+        (view, viewSpec) =>
+          ({
+            _task: 'createDoc',
+            collection: makeViewCollectionPath(collection)(view),
+            data: materializeView(viewSpec, srcDoc.data),
+            id: srcDoc.id,
+          } as CreateDocAction)
+      ),
+      R.toReadonlyArray,
+      A.map(TUPLE.snd)
+    );
 
 /**
  *
  */
-export const deleteViewDocs = ({
-  ctx: { collection, viewSpecs },
-  triggerCtx: { snapshot: srcDoc },
-}: {
-  readonly ctx: OnViewSrcDeletedCtx;
-  readonly triggerCtx: SnapshotTriggerCtx;
-}): readonly DeleteDocAction[] =>
-  pipe(
-    viewSpecs,
-    R.keys,
-    A.map((view) => ({
-      _task: 'deleteDoc',
-      collection: makeViewCollectionPath(collection)(view),
-      id: srcDoc.id,
-    }))
-  );
+export const deleteViewDocs =
+  ({ viewSpecs }: OnViewSrcDeletedCtx) =>
+  ({ collection }: TriggerCtx<'delete'>) =>
+  ({
+    snapshot: srcDoc,
+  }: SnapshotTriggerRuntimeCtx): readonly DeleteDocAction[] =>
+    pipe(
+      viewSpecs,
+      R.keys,
+      A.map((view) => ({
+        _task: 'deleteDoc',
+        collection: makeViewCollectionPath(collection)(view),
+        id: srcDoc.id,
+      }))
+    );
 
 /**
  *
  */
-export const logErrors = ({
-  ctx: { errorMessage },
-  writeResults,
-}: {
-  readonly ctx: { readonly errorMessage: string };
-  readonly writeResults: readonly (readonly [
-    unknown,
-    E.Either<unknown, unknown>
-  ])[];
-}): readonly LogAction[] =>
-  pipe(
-    writeResults,
-    A.map(([action, result]) =>
-      pipe(
-        result,
-        E.swap,
-        O.fromEither,
-        O.map((error) => [action, error] as const)
-      )
-    ),
-    A.compact,
-    A.map(([action, error]) => ({
-      _task: 'log',
-      jsonPayload: { action, error },
-      message: errorMessage,
-      severity: 'ERROR',
-    }))
-  );
+export const logErrors =
+  (errorMessage: string) =>
+  (
+    writeResults: readonly (readonly [unknown, E.Either<unknown, unknown>])[]
+  ): readonly LogAction[] =>
+    pipe(
+      writeResults,
+      A.map(([action, result]) =>
+        pipe(
+          result,
+          E.swap,
+          O.fromEither,
+          O.map((error) => [action, error] as const)
+        )
+      ),
+      A.compact,
+      A.map(([action, error]) => ({
+        _task: 'log',
+        jsonPayload: { action, error },
+        message: errorMessage,
+        severity: 'ERROR',
+      }))
+    );
 
 /**
  *
  */
-export const getReferDocs = ({
-  ctx: { referCollection, refIdField },
-  triggerCtx: { snapshot: refDoc },
-}: {
-  readonly ctx: OnRefDeletedCtx;
-  readonly triggerCtx: SnapshotTriggerCtx;
-}): GetDocsAction => ({
-  _task: 'getDocs',
-  collection: referCollection,
-  where: [[refIdField, '==', refDoc.id]],
-});
+export const getReferDocs =
+  ({ referCollection, refIdField }: OnRefDeletedCtx) =>
+  ({ snapshot: refDoc }: SnapshotTriggerRuntimeCtx): GetDocsAction => ({
+    _task: 'getDocs',
+    collection: referCollection,
+    where: [[refIdField, '==', refDoc.id]],
+  });
 
 /**
  *
  */
-export const deleteReferDocs = ({
-  referDocs,
-  ctx: { referCollection },
-}: {
-  readonly ctx: OnRefDeletedCtx;
-  readonly referDocs: readonly DocSnapshot[];
-}): readonly DeleteDocAction[] =>
-  pipe(
-    referDocs,
-    A.map((snapshot) => ({
-      _task: 'deleteDoc',
-      collection: referCollection,
-      id: snapshot.id,
-    }))
-  );
+export const deleteReferDocs =
+  ({ referCollection }: OnRefDeletedCtx) =>
+  (referDocs: readonly DocSnapshot[]): readonly DeleteDocAction[] =>
+    pipe(
+      referDocs,
+      A.map((snapshot) => ({
+        _task: 'deleteDoc',
+        collection: referCollection,
+        id: snapshot.id,
+      }))
+    );
