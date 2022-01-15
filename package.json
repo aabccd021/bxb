@@ -9,6 +9,8 @@
     "prep": "yarn prep:core && yarn prep:eslint"
   },
   "dependencies": {
+    "firebase-admin": "^10.0.1",
+    "firebase-functions": "^3.16.0",
     "fp-ts": "^2.11.5"
   },
   "devDependencies": {

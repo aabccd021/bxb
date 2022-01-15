@@ -1,0 +1,18 @@
+schema:
+  post:
+    data:
+      title:
+        type: string
+      text:
+        type: string
+    view:
+      card:
+        select:
+          title:
+      page:
+        select:
+          title:
+          text:
+
+firebase:
+  projectId: demo-diary
