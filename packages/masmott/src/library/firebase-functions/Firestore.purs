@@ -3,6 +3,7 @@ module Firebase.Functions.Firestore
   , DocumentBuilder
   , EventContext
   , document
+  , mapToList
   , onCreate
   ) where
 
@@ -58,11 +59,11 @@ foreign import _onCreate :: forall a. DocumentBuilder -> OnCreateTriggerHandler_
 wrapDocDataEntry :: Tuple String String -> Tuple DocFieldName String
 wrapDocDataEntry = T.swap >>> map DocFieldName >>> T.swap
 
-wrapDocDataToList :: DocData_ -> List (Tuple DocFieldName String)
-wrapDocDataToList = M.toUnfoldable >>> map wrapDocDataEntry
+toList :: forall k v. Map k v -> List (Tuple k v)
+toList = M.toUnfoldable
 
 wrapDocData :: DocData_ -> DocData
-wrapDocData = wrapDocDataToList >>> M.fromFoldable
+wrapDocData = toList >>> map wrapDocDataEntry >>> M.fromFoldable
 
 wrapTriggerCtx :: TriggerCtx_ -> TriggerCtx
 wrapTriggerCtx { id, docData, event } = { id: DocId id, docData: wrapDocData docData, event }
