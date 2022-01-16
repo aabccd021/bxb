@@ -1,16 +1,19 @@
 import { EventContext, firestore } from 'firebase-functions';
-import {
-  DocumentBuilder,
-  QueryDocumentSnapshot,
-} from 'firebase-functions/v1/firestore';
+import { DocumentBuilder } from 'firebase-functions/v1/firestore';
 
-export const _document = (path: string) => firestore.document(path);
+type DocData = Record<string, string>;
+
+type TriggerCtx = {
+  id: string;
+  docData: DocData;
+  event: EventContext;
+};
+
+export const _document = firestore.document;
 
 export const _onCreate =
-  (
-    handler: (
-      snapshot: QueryDocumentSnapshot
-    ) => (context: EventContext) => Promise<unknown>
-  ) =>
   (builder: DocumentBuilder) =>
-    builder.onCreate((snapshot, context) => handler(snapshot)(context));
+  (handler: (context: TriggerCtx) => Promise<unknown>) =>
+    builder.onCreate(({ id, data }, event) =>
+      handler({ id, docData: data(), event })
+    );

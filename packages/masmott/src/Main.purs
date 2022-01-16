@@ -16,6 +16,7 @@ import Data.Map as M
 import Data.Tuple.Nested (Tuple3, tuple3, uncurry3)
 import Effect.Aff (Aff)
 import Firebase.Admin.Firestore (CollectionPath(..), CreateDocResult, DocData, DocFieldName, DocId, DocSnapshot, createDoc)
+import Firebase.Functions.Firestore (onCreate)
 
 newtype CollectionName
   = CollectionName String
@@ -65,3 +66,5 @@ onViewSrcCreated ctx =
     >>> M.values
     >>> map (uncurry3 createDoc)
     >>> parSequence
+
+zz = onCreate (CollectionPath "")
