@@ -15,8 +15,6 @@ import {
   OnRefDeletedCtx,
   OnViewSrcCreatedCtx,
   OnViewSrcDeletedCtx,
-  SnapshotTriggerRuntimeCtx,
-  TriggerCtx,
 } from './type';
 
 /**

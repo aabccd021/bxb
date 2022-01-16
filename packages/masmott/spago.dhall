@@ -16,6 +16,8 @@ to generate this file without the comments in this block.
   , "aff-promise"
   , "console"
   , "effect"
+  , "lists"
+  , "maybe"
   , "ordered-collections"
   , "prelude"
   , "psci-support"
