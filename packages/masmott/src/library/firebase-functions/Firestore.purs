@@ -1,10 +1,14 @@
 module Firebase.Functions.Firestore
   ( CloudFunction
+  , DocData_
   , DocumentBuilder
   , EventContext
+  , OnCreateTriggerHandler
+  , TriggerCtx
   , document
   , onCreate
-  ) where
+  )
+  where
 
 import Prelude
 import Aviary.Birds ((...))

@@ -7,9 +7,9 @@ module Firebase.Admin.Firestore
   , DocSnapshot
   , FirebaseError(..)
   , Timestamp
-  , _createDoc
   , createDoc
-  ) where
+  )
+  where
 
 import Prelude
 import Control.Promise (Promise, toAff)

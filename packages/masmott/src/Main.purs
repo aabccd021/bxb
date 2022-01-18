@@ -1,28 +1,25 @@
 module Main
-  ( CollectionName(..)
-  , SelectViewSpec
-  , ViewName(..)
-  , ViewSpecs
-  , makeViewCollectionPath
+  ( SelectViewSpec
+  , a
   , onViewSrcCreated
-  ) where
+  , onViewSrcCreated'
+  )
+  where
 
 import Prelude
+
 import Control.Parallel (parSequence)
 import Data.FunctorWithIndex (mapWithIndex)
 import Data.List (List)
 import Data.Map (Map)
 import Data.Map as M
-import Data.Tuple.Nested (Tuple3, tuple3, uncurry3)
+import Data.Maybe (Maybe(..))
+import Data.Tuple (Tuple(..))
 import Effect.Aff (Aff)
-import Firebase.Admin.Firestore (CollectionPath(..), CreateDocResult, DocData, DocFieldName, DocId, DocSnapshot, createDoc)
-import Firebase.Functions.Firestore (onCreate)
-
-newtype CollectionName
-  = CollectionName String
-
-newtype ViewName
-  = ViewName String
+import Firebase.Admin.Firestore (CreateDocResult, DocData, DocFieldName(..))
+import Firebase.Admin.Firestore as FAF
+import Firebase.Functions.Firestore (CloudFunction, TriggerCtx)
+import Trigger (CollectionName(..), ViewName, makeViewCollectionPath, onCreate)
 
 type SelectViewSpec
   = Map DocFieldName Unit
@@ -30,41 +27,29 @@ type SelectViewSpec
 type ViewSpecs
   = Map ViewName SelectViewSpec
 
-derive newtype instance eqViewName :: Eq ViewName
-
-derive newtype instance ordViewName :: Ord ViewName
-
-type CreateDocAction
-  = { collection :: CollectionPath
-    , docData :: DocData
-    , id :: DocId
-    }
-
-type SnapshotTriggerCtx
-  = { collectionName :: CollectionName
-    , docSnapshot :: DocSnapshot
-    }
-
-makeViewCollectionPath :: CollectionName -> ViewName -> CollectionPath
-makeViewCollectionPath (CollectionName collection) (ViewName viewName) = CollectionPath $ collection <> "_" <> viewName
-
 materializeSelectView :: SelectViewSpec -> DocData -> DocData
 materializeSelectView spec = M.filterKeys $ flip M.member spec
 
-createView :: SnapshotTriggerCtx -> ViewName -> SelectViewSpec -> Tuple3 CollectionPath DocId DocData
-createView { collectionName, docSnapshot } viewName viewSpec = tuple3 collectionPath docId docData
+createView :: CollectionName -> TriggerCtx -> ViewName -> SelectViewSpec -> Aff CreateDocResult
+createView collectionName ctx viewName viewSpec = FAF.createDoc collectionPath docId docData
   where
-  collectionPath = (makeViewCollectionPath collectionName viewName)
+  collectionPath = (makeViewCollectionPath collectionName (Just viewName))
+  docId = ctx.id
+  docData = (materializeSelectView viewSpec ctx.docData)
 
-  docId = docSnapshot.id
+onViewSrcCreated :: ViewSpecs -> CollectionName -> Maybe ViewName -> TriggerCtx -> Aff (List CreateDocResult)
+onViewSrcCreated viewSpecs collectionName _ ctx =
+  viewSpecs
+    # mapWithIndex (createView collectionName ctx)
+    # M.values
+    # parSequence
 
-  docData = (materializeSelectView viewSpec docSnapshot.docData)
+onViewSrcCreated' :: ViewSpecs -> CollectionName -> Maybe ViewName -> CloudFunction
+onViewSrcCreated' viewSpecs collectionName viewName = onCreate collectionName viewName handler
+  where handler = onViewSrcCreated viewSpecs collectionName viewName 
 
-onViewSrcCreated :: SnapshotTriggerCtx -> ViewSpecs -> Aff (List CreateDocResult)
-onViewSrcCreated ctx =
-  mapWithIndex (createView ctx)
-    >>> M.values
-    >>> map (uncurry3 createDoc)
-    >>> parSequence
+x :: SelectViewSpec
+x = M.fromFoldable [ Tuple (DocFieldName "a") unit ]
 
-zz = onCreate (CollectionPath "")
+a :: CloudFunction
+a = onViewSrcCreated' M.empty (CollectionName "user") Nothing
