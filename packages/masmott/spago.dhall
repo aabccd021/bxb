@@ -16,11 +16,15 @@ to generate this file without the comments in this block.
   , "aff-promise"
   , "console"
   , "effect"
+  , "either"
+  , "foldable-traversable"
   , "lists"
   , "maybe"
   , "ordered-collections"
+  , "parallel"
   , "prelude"
   , "psci-support"
+  , "tuples"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

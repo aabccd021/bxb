@@ -1,11 +1,10 @@
 import { EventContext, firestore } from 'firebase-functions';
 import { DocumentBuilder } from 'firebase-functions/v1/firestore';
-
-type DocData = Record<string, string>;
+import { DocData_ } from '../firebase-admin/Firestore';
 
 type TriggerCtx = {
   id: string;
-  docData: DocData;
+  docData: DocData_;
   event: EventContext;
 };
 

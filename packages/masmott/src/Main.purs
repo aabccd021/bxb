@@ -2,7 +2,7 @@ module Main
   ( SelectViewSpec
   , a
   , onViewSrcCreated
-  , onViewSrcCreated'
+  , onViewSrcCreatedTrigger
   )
   where
 
@@ -19,7 +19,7 @@ import Effect.Aff (Aff)
 import Firebase.Admin.Firestore (CreateDocResult, DocData, DocFieldName(..))
 import Firebase.Admin.Firestore as FAF
 import Firebase.Functions.Firestore (CloudFunction, TriggerCtx)
-import Trigger (CollectionName(..), ViewName, makeViewCollectionPath, onCreate)
+import Trigger (CollectionName(..), ViewName(..), makeViewCollectionPath, onCreate)
 
 type SelectViewSpec
   = Map DocFieldName Unit
@@ -33,9 +33,9 @@ materializeSelectView spec = M.filterKeys $ flip M.member spec
 createView :: CollectionName -> TriggerCtx -> ViewName -> SelectViewSpec -> Aff CreateDocResult
 createView collectionName ctx viewName viewSpec = FAF.createDoc collectionPath docId docData
   where
-  collectionPath = (makeViewCollectionPath collectionName (Just viewName))
-  docId = ctx.id
-  docData = (materializeSelectView viewSpec ctx.docData)
+    collectionPath = (makeViewCollectionPath collectionName (Just viewName))
+    docId = ctx.id
+    docData = (materializeSelectView viewSpec ctx.docData)
 
 onViewSrcCreated :: ViewSpecs -> CollectionName -> Maybe ViewName -> TriggerCtx -> Aff (List CreateDocResult)
 onViewSrcCreated viewSpecs collectionName _ ctx =
@@ -44,12 +44,21 @@ onViewSrcCreated viewSpecs collectionName _ ctx =
     # M.values
     # parSequence
 
-onViewSrcCreated' :: ViewSpecs -> CollectionName -> Maybe ViewName -> CloudFunction
-onViewSrcCreated' viewSpecs collectionName viewName = onCreate collectionName viewName handler
+onViewSrcCreatedTrigger :: ViewSpecs -> CollectionName -> Maybe ViewName -> CloudFunction
+onViewSrcCreatedTrigger viewSpecs collectionName viewName = onCreate collectionName viewName handler
   where handler = onViewSrcCreated viewSpecs collectionName viewName 
 
-x :: SelectViewSpec
-x = M.fromFoldable [ Tuple (DocFieldName "a") unit ]
+fooViewSpecs :: ViewSpecs
+fooViewSpecs = M.fromFoldable 
+  [ Tuple (ViewName "page") $ M.fromFoldable 
+    [ Tuple (DocFieldName "a") unit 
+    , Tuple (DocFieldName "b") unit 
+    ]
+  , Tuple (ViewName "card") $ M.fromFoldable 
+    [ Tuple (DocFieldName "a") unit 
+    ]
+  ]
 
 a :: CloudFunction
-a = onViewSrcCreated' M.empty (CollectionName "user") Nothing
+a = onViewSrcCreatedTrigger fooViewSpecs (CollectionName "user") Nothing
+

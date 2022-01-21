@@ -1,6 +1,5 @@
 module Firebase.Functions.Firestore
   ( CloudFunction
-  , DocData_
   , DocumentBuilder
   , EventContext
   , OnCreateTriggerHandler
@@ -20,7 +19,7 @@ import Data.Tuple (Tuple)
 import Data.Tuple as T
 import Effect (Effect)
 import Effect.Aff (Aff)
-import Firebase.Admin.Firestore (CollectionPath(..), DocData, DocFieldName(..), DocId(..))
+import Firebase.Admin.Firestore (CollectionPath(..), DocData, DocData_, DocFieldName(..), DocId(..))
 
 newtype DocumentBuilder
   = DocumentBuilder Unit
@@ -42,9 +41,6 @@ type OnCreateTriggerHandler a
 
 type OnCreateTriggerHandler_ a
   = (TriggerCtx_ -> Effect (Promise a))
-
-type DocData_
-  = Map String String
 
 type TriggerCtx_
   = { id :: String
