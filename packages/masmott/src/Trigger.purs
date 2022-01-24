@@ -16,10 +16,10 @@ derive newtype instance eqViewName :: Eq ViewName
 derive newtype instance ordViewName :: Ord ViewName
 
 makeViewCollectionPath :: CollectionName -> Maybe ViewName -> CollectionPath
-makeViewCollectionPath (CollectionName collection) viewName = CollectionPath $ collection <> "_" <> showViewName viewName
+makeViewCollectionPath (CollectionName collection) viewName = CollectionPath $ collection <> showViewName viewName
 
 showViewName :: Maybe ViewName -> String
-showViewName (Just (ViewName viewName)) = viewName
+showViewName (Just (ViewName viewName)) = "_" <> viewName
 showViewName _ = ""
 
 onCreate :: forall c. CollectionName -> Maybe ViewName -> OnCreateTriggerHandler c -> CloudFunction

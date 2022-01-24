@@ -1,9 +1,10 @@
 {
   "dependencies": {
+    "@types/firebase": "^3.2.1",
     "babel-plugin-istanbul": "^6.1.1",
+    "firebase": "^9.6.4",
     "firebase-admin": "^10.0.0",
     "firebase-functions": "^3.15.7",
-    "masmott": "file:./../../packages/masmott",
     "next": "^12.0.1",
     "react": "17.0.2",
     "react-dom": "^17.0.2"
@@ -11,18 +12,18 @@
   "devDependencies": {
     "@cypress/code-coverage": "^3.9.11",
     "@next/bundle-analyzer": "^12.0.1",
+    "@types/jest": "^27.4.0",
     "@types/react": "17.0.32",
     "cross-env": "^7.0.3",
     "cypress": "^8.6.0",
     "eslint": "7",
-    "eslint-config-masmott": "file:./../../packages/eslint-config-masmott",
+    "firebase-tools": "^10.1.2",
+    "jest": "^27.4.7",
+    "ts-jest": "^27.1.3",
     "typescript": "4.4.4"
   },
   "engines": {
     "node": "14"
-  },
-  "eslintConfig": {
-    "extends": "masmott"
   },
   "main": ".functions/index.js",
   "name": "demo-diary",
@@ -40,12 +41,17 @@
     "server:dev:cached": "firebase emulators:start",
     "start": "yarn build && yarn start:cached",
     "start:cached": "firebase emulators:start",
-    "test": "yarn build && yarn test:cached",
-    "test:cached": "yarn clean-coverage && firebase emulators:exec \"cypress run\"",
-    "test:gui": "yarn build && yarn test:gui:cached",
-    "test:gui:cached": "yarn clean-coverage && firebase emulators:exec \"cypress run --headed\"",
-    "test:open": "yarn build && yarn test:open:cached",
-    "test:open:cached": "firebase emulators:exec \"cypress open\""
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/test/**/*.test.ts"
+    ],
+    "coveragePathIgnorePatterns": [
+      "test/"
+    ]
   },
   "version": "0.1.0"
 }

@@ -1,6 +1,7 @@
 module Main
   ( SelectViewSpec
   , a
+  , main
   , onViewSrcCreated
   , onViewSrcCreatedTrigger
   )
@@ -15,8 +16,9 @@ import Data.Map (Map)
 import Data.Map as M
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
-import Effect.Aff (Aff)
-import Firebase.Admin.Firestore (CreateDocResult, DocData, DocFieldName(..))
+import Effect (Effect)
+import Effect.Aff (Aff, launchAff_)
+import Firebase.Admin.Firestore (CollectionPath(..), CreateDocResult, DocData, DocFieldName(..), DocId(..), createDoc)
 import Firebase.Admin.Firestore as FAF
 import Firebase.Functions.Firestore (CloudFunction, TriggerCtx)
 import Trigger (CollectionName(..), ViewName(..), makeViewCollectionPath, onCreate)
@@ -62,3 +64,5 @@ fooViewSpecs = M.fromFoldable
 a :: CloudFunction
 a = onViewSrcCreatedTrigger fooViewSpecs (CollectionName "user") Nothing
 
+main :: Effect Unit
+main = launchAff_ $ createDoc (CollectionPath "a") (DocId "b") (M.fromFoldable [Tuple (DocFieldName "x") "y"])

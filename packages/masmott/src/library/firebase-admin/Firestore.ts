@@ -1,4 +1,5 @@
 import { FirebaseError } from '@firebase/util';
+import { getApp, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 
 export type Timestamp = {
@@ -18,13 +19,15 @@ export type DocSnapshot_ = {
 const wrapError = (left: (a: string) => unknown) => (error: unknown) =>
   left(error instanceof FirebaseError ? error.code : 'Unknown error');
 
+export const _initializeApp = (name: string) => initializeApp(undefined, name);
+
 export const _createDoc =
   (left: (a: string) => unknown) =>
   (right: (a: Timestamp) => unknown) =>
   (collection: string) =>
   (docId: string) =>
   (data: DocData_): Promise<unknown> =>
-    getFirestore()
+    getFirestore(getApp('demo-aab'))
       .collection(collection)
       .doc(docId)
       .create(data)
@@ -38,7 +41,7 @@ export const _getDoc =
   (just: (a: DocSnapshot_) => unknown) =>
   (collection: string) =>
   (docId: string): Promise<unknown> =>
-    getFirestore()
+    getFirestore(getApp('demo-aab'))
       .collection(collection)
       .doc(docId)
       .get()
