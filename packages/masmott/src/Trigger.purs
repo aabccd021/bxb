@@ -1,4 +1,10 @@
-module Trigger where
+module Trigger
+  ( CollectionName(..)
+  , ViewName(..)
+  , onCreate
+  , showViewName
+  )
+  where
 
 import Prelude
 
