@@ -11,23 +11,7 @@ When creating a new Spago project, you can use
 to generate this file without the comments in this block.
 -}
 { name = "my-project"
-, repo = "https://github.com/aabccd021/masmott"
-, version = "v0.1.0"
-, dependencies =
-  [ "aff"
-  , "aff-promise"
-  , "console"
-  , "effect"
-  , "either"
-  , "foldable-traversable"
-  , "lists"
-  , "maybe"
-  , "ordered-collections"
-  , "parallel"
-  , "prelude"
-  , "psci-support"
-  , "tuples"
-  ]
+, dependencies = [ "console", "effect", "prelude", "psci-support", "masmott" ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
 }

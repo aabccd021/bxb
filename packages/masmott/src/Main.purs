@@ -1,14 +1,12 @@
-module Main
+module Masmott
   ( SelectViewSpec
   , a
   , main
   , onViewSrcCreated
   , onViewSrcCreatedTrigger
-  )
-  where
+  ) where
 
 import Prelude
-
 import Control.Parallel (parSequence)
 import Data.FunctorWithIndex (mapWithIndex)
 import Data.List (List)
@@ -35,9 +33,11 @@ materializeSelectView spec = M.filterKeys $ flip M.member spec
 createView :: CollectionName -> TriggerCtx -> ViewName -> SelectViewSpec -> Aff CreateDocResult
 createView collectionName ctx viewName viewSpec = FAF.createDoc collectionPath docId docData
   where
-    collectionPath = (makeViewCollectionPath collectionName (Just viewName))
-    docId = ctx.id
-    docData = (materializeSelectView viewSpec ctx.docData)
+  collectionPath = (makeViewCollectionPath collectionName (Just viewName))
+
+  docId = ctx.id
+
+  docData = (materializeSelectView viewSpec ctx.docData)
 
 onViewSrcCreated :: ViewSpecs -> CollectionName -> Maybe ViewName -> TriggerCtx -> Aff (List CreateDocResult)
 onViewSrcCreated viewSpecs collectionName _ ctx =
@@ -48,21 +48,25 @@ onViewSrcCreated viewSpecs collectionName _ ctx =
 
 onViewSrcCreatedTrigger :: ViewSpecs -> CollectionName -> Maybe ViewName -> CloudFunction
 onViewSrcCreatedTrigger viewSpecs collectionName viewName = onCreate collectionName viewName handler
-  where handler = onViewSrcCreated viewSpecs collectionName viewName 
+  where
+  handler = onViewSrcCreated viewSpecs collectionName viewName
 
 fooViewSpecs :: ViewSpecs
-fooViewSpecs = M.fromFoldable 
-  [ Tuple (ViewName "page") $ M.fromFoldable 
-    [ Tuple (DocFieldName "a") unit 
-    , Tuple (DocFieldName "b") unit 
+fooViewSpecs =
+  M.fromFoldable
+    [ Tuple (ViewName "page")
+        $ M.fromFoldable
+            [ Tuple (DocFieldName "a") unit
+            , Tuple (DocFieldName "b") unit
+            ]
+    , Tuple (ViewName "card")
+        $ M.fromFoldable
+            [ Tuple (DocFieldName "a") unit
+            ]
     ]
-  , Tuple (ViewName "card") $ M.fromFoldable 
-    [ Tuple (DocFieldName "a") unit 
-    ]
-  ]
 
 a :: CloudFunction
 a = onViewSrcCreatedTrigger fooViewSpecs (CollectionName "user") Nothing
 
 main :: Effect Unit
-main = launchAff_ $ createDoc (CollectionPath "a") (DocId "b") (M.fromFoldable [Tuple (DocFieldName "x") "y"])
+main = launchAff_ $ createDoc (CollectionPath "a") (DocId "b") (M.fromFoldable [ Tuple (DocFieldName "x") "y" ])
