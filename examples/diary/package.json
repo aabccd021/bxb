@@ -31,7 +31,7 @@
   "engines": {
     "node": "14"
   },
-  "main": ".functions/index.js",
+  "main": "index.js",
   "name": "demo-diary",
   "private": true,
   "scripts": {
@@ -44,9 +44,9 @@
     "lint": "eslint ./ --ext ts,tsx",
     "server:build": "node compiler.js",
     "server:dev": "yarn server:build && yarn server:dev:cached",
-    "server:dev:cached": "firebase emulators:start",
+    "server:dev:cached": " firebase emulators:start",
     "start": "yarn build && yarn start:cached",
-    "start:cached": "firebase emulators:start",
+    "start:cached": "firebase emulators:start --project demo-diary",
     "test": "firebase emulators:exec --project demo-diary \"yarn jest\""
   },
   "jest": {
@@ -61,6 +61,7 @@
   },
   "version": "0.1.0",
   "eslintConfig": {
+    "ignorePatterns": "**/*.js",
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
       "project": [
