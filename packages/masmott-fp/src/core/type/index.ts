@@ -14,6 +14,9 @@ export const RefIdDFS = t.type({
 });
 export type RefIdDFS = t.TypeOf<typeof RefIdDFS>;
 
+/**
+ * Data Field Spec
+ */
 export const DFS = t.union([StringDFS, RefIdDFS]);
 export type DFS = t.TypeOf<typeof DFS>;
 

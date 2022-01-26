@@ -1,0 +1,157 @@
+{
+  "name": "masmott",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "lint": "eslint --ext .ts ."
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.10.1",
+    "@typescript-eslint/parser": "^5.10.1",
+    "eslint": "^8.7.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-functional": "^4.1.1",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-only-warn": "^1.0.3",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "eslint-plugin-typescript-sort-keys": "^2.1.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "firebase-admin": "^10.0.2",
+    "firebase-functions": "^3.16.0",
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.5"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "es6": true,
+      "node": true,
+      "browser": true,
+      "jest": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": [
+        "**/tsconfig.json"
+      ],
+      "sourceType": "module",
+      "ecmaVersion": 8,
+      "ecmaFeatures": {
+        "impliedStrict": true,
+        "experimentalObjectRestSpread": true
+      },
+      "allowImportExportEverywhere": true
+    },
+    "ignorePatterns": [
+      "**/*.js",
+      "dist/",
+      "node_modules",
+      "scripts",
+      "examples"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/library/*.ts"
+        ],
+        "rules": {
+          "no-restricted-imports": "off"
+        }
+      },
+      {
+        "files": [
+          "test/**/*.ts"
+        ],
+        "rules": {
+          "functional/no-expression-statement": "off"
+        }
+      }
+    ],
+    "plugins": [
+      "@typescript-eslint",
+      "functional",
+      "import",
+      "only-warn",
+      "simple-import-sort",
+      "sort-keys-fix",
+      "typescript-sort-keys",
+      "unused-imports"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:@typescript-eslint/recommended-requiring-type-checking",
+      "plugin:functional/all",
+      "plugin:import/errors",
+      "plugin:import/recommended",
+      "plugin:import/typescript",
+      "plugin:import/warnings",
+      "plugin:prettier/recommended",
+      "plugin:typescript-sort-keys/recommended",
+      "prettier"
+    ],
+    "rules": {
+      "@typescript-eslint/no-shadow": "error",
+      "@typescript-eslint/no-unused-vars": "off",
+      "curly": [
+        "error",
+        "all"
+      ],
+      "@typescript-eslint/unbound-method": "off",
+      "eqeqeq": "error",
+      "functional/functional-parameters": "off",
+      "import/exports-last": "error",
+      "import/first": "error",
+      "import/no-named-default": "error",
+      "import/no-namespace": "off",
+      "import/namespace": "off",
+      "import/no-unresolved": "off",
+      "import/no-useless-path-segments": "error",
+      "max-len": [
+        "error",
+        {
+          "code": 80
+        }
+      ],
+      "no-else-return": "error",
+      "no-undef-init": "error",
+      "no-unsafe-optional-chaining": "error",
+      "no-use-before-define": "error",
+      "no-useless-rename": "error",
+      "no-useless-return": "error",
+      "object-shorthand": "error",
+      "prefer-arrow-callback": "error",
+      "prefer-destructuring": "error",
+      "prefer-template": "error",
+      "prettier/prettier": [
+        "error",
+        {
+          "singleQuote": true,
+          "printWidth": 80
+        }
+      ],
+      "simple-import-sort/exports": "error",
+      "simple-import-sort/imports": "error",
+      "sort-keys-fix/sort-keys-fix": "error",
+      "unused-imports/no-unused-imports-ts": "error",
+      "unused-imports/no-unused-vars": [
+        "error",
+        {
+          "vars": "all",
+          "varsIgnorePattern": "^_",
+          "args": "after-used",
+          "argsIgnorePattern": "^_"
+        }
+      ]
+    },
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
+    }
+  }
+}
