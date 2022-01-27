@@ -1,10 +1,11 @@
-import { CollectionSpec, Masmott, Spec, VS } from '@src/core/schema';
-import { initializeApp } from 'firebase-admin/app';
+import { CollectionSpec, Masmott, SelectVS, Spec, VS } from '@src/core/schema';
+import { initializeApp } from 'firebase-admin';
 import {
   DocumentData,
   Firestore,
   getFirestore,
-  WriteResult
+  QueryDocumentSnapshot,
+  WriteResult,
 } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
 
@@ -17,66 +18,97 @@ export type CreateDoc = (p: {
   readonly id: string;
 }) => Promise<WriteResult>;
 
-export type _CreateDoc = (firestore: Firestore) => CreateDoc;
+export type ProviderCreateDoc = (firestore: Firestore) => CreateDoc;
 
-export type _DocEff = {
-  readonly create: _CreateDoc;
+export type DBProvider = {
+  readonly createDoc: ProviderCreateDoc;
 };
 
-export type DocEff = {
-  readonly create: CreateDoc;
+export type DB = {
+  readonly createDoc: CreateDoc;
 };
 
-export const materializeViewDoc =
-  (colName: string, snapshotId: string, docEff: DocEff) =>
-  ([viewName, _viewSpec]: readonly [string, VS]) => {
-    const viewColPath = makeViewColPath(colName, viewName);
-    const viewDoc = {};
-    const createResult = docEff.create({
-      collection: viewColPath,
-      data: viewDoc,
-      id: snapshotId,
+export const materializeWithSelectVS = (
+  data: DocumentData,
+  select: SelectVS
+): DocumentData =>
+  Object.fromEntries(
+    Object.entries(data).filter(([key]) => Object.keys(select).includes(key))
+  );
+
+export const createViewDoc =
+  (
+    colName: string,
+    snapshot: QueryDocumentSnapshot,
+    db: { readonly createDoc: CreateDoc }
+  ) =>
+  ([viewName, viewSpec]: readonly [string, VS]): Promise<WriteResult> =>
+    db.createDoc({
+      collection: makeViewColPath(colName, viewName),
+      data: materializeWithSelectVS(snapshot.data(), viewSpec),
+      id: snapshot.id,
     });
-    return createResult;
-  };
 
-export const makeKDataCreatedTrigger = (
+export const makeDataCreatedTrigger = (
   [colName, colSpec]: readonly [string, CollectionSpec],
-  docEff: DocEff
+  db: { readonly createDoc: CreateDoc }
 ) =>
-  functions.firestore.document(`${colName}/{docId}`).onCreate((snapshot) => {
-    const viewDocCreationPromises = Object.entries(colSpec.view ?? {}).map(
-      materializeViewDoc(colName, snapshot.id, docEff)
+  functions.firestore
+    .document(`${colName}/{docId}`)
+    .onCreate((snapshot) =>
+      Promise.allSettled(
+        Object.entries(colSpec.view ?? {}).map(
+          createViewDoc(colName, snapshot, db)
+        )
+      )
     );
-    return Promise.allSettled(viewDocCreationPromises);
-  });
 
 export const makeKColTriggers =
-  (docEff: DocEff) => (colEntry: readonly [string, CollectionSpec]) => ({
-    dataCreated: makeKDataCreatedTrigger(colEntry, docEff),
+  (db: DB) => (colEntry: readonly [string, CollectionSpec]) => ({
+    dataCreated: makeDataCreatedTrigger(colEntry, db),
   });
 
-export const makeKTriggers = (spec: Spec, docEff: DocEff) =>
-  Object.entries(spec).map(makeKColTriggers(docEff));
+export const makeKTriggers = (spec: Spec, db: DB) =>
+  Object.entries(spec).map(makeKColTriggers(db));
 
-export const _makeTriggers = (_docEff: _DocEff) => (masmott: Masmott) => {
-  const app = initializeApp();
-  const firestore = getFirestore(app);
-  const docEff: DocEff = {
-    create: _docEff.create(firestore),
-  };
-  return {
-    firestore: {
-      k: makeKTriggers(masmott.spec, docEff),
-    },
-  };
-};
+export const makeTriggers = ({
+  masmott,
+  db,
+}: {
+  readonly db: DB;
+  readonly masmott: Masmott;
+}) => ({
+  firestore: {
+    k: makeKTriggers(masmott.spec, db),
+  },
+});
 
-export const docEff: _DocEff = {
-  create:
+export const makeDb = ({
+  firestore,
+  provider: { createDoc },
+}: {
+  readonly firestore: Firestore;
+  readonly provider: DBProvider;
+}) => ({
+  createDoc: createDoc(firestore),
+});
+
+export const initAndMakeDb = (provider: DBProvider) =>
+  makeDb({ firestore: getFirestore(initializeApp()), provider });
+
+export const initAndMakeTriggers =
+  (dbProvider: DBProvider) => (masmott: Masmott) =>
+    makeTriggers({
+      db: initAndMakeDb(dbProvider),
+      masmott,
+    });
+
+export const firestoreProvider: DBProvider = {
+  createDoc:
     (firestore) =>
-    ({ collection: collectionPath, data, id: docId }) =>
-      firestore.collection(collectionPath).doc(docId).create(data),
+    ({ collection, data, id }) =>
+      firestore.collection(collection).doc(id).create(data),
 };
 
-export const makeTriggers = _makeTriggers(docEff);
+export const initAndMakeFirestoreTriggers =
+  initAndMakeTriggers(firestoreProvider);
