@@ -1,13 +1,16 @@
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import {
-	collection,
-	connectFirestoreEmulator,
-	doc,
-	Firestore,
-	getDoc,
-	getFirestore,
-	setDoc
+  addDoc,
+  collection,
+  connectFirestoreEmulator,
+  doc,
+  Firestore,
+  getDoc,
+  getFirestore,
+  setDoc,
 } from 'firebase/firestore/lite';
+
+const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 describe('Fields', () => {
   let app: FirebaseApp;
@@ -20,10 +23,30 @@ describe('Fields', () => {
   });
 
   it('has type property', async () => {
-    const coll = collection(firestore, 'coll');
-    const docRef = doc(coll, 'idd');
+    const docRef = doc(collection(firestore, 'coll'), 'idd');
     await setDoc(docRef, { a: 'b' });
-    const res = await getDoc(docRef);
-    expect(res.data()).toStrictEqual({ a: 'b' });
+    expect((await getDoc(docRef)).data()).toStrictEqual({ a: 'b' });
+  });
+
+  it('test1', async () => {
+    const docRef = await addDoc(collection(firestore, 'post'), {
+      text: 'textt',
+      title: 'tiltee',
+    });
+
+    await delay(2000);
+
+    expect(
+      (await getDoc(doc(firestore, 'post_card', docRef.id))).data()
+    ).toStrictEqual({
+      title: 'tiltee',
+    });
+
+    expect(
+      (await getDoc(doc(firestore, 'post_page', docRef.id))).data()
+    ).toStrictEqual({
+      text: 'textt',
+      title: 'tiltee',
+    });
   });
 });

@@ -39,7 +39,9 @@ export type SelectVS = Dict<undefined>;
 /**
  *
  */
-export type VS = SelectVS;
+export type VS = {
+  readonly select: SelectVS;
+};
 
 /**
  *

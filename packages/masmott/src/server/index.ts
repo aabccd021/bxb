@@ -1,4 +1,3 @@
-import { CollectionSpec, Masmott, SelectVS, Spec, VS } from '@src/core/schema';
 import { initializeApp } from 'firebase-admin';
 import {
   DocumentData,
@@ -8,6 +7,8 @@ import {
   WriteResult,
 } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
+
+import { CollectionSpec, Masmott, SelectVS, Spec, VS } from '../core/schema';
 
 export const makeViewColPath = (collectionName: string, viewName: string) =>
   `${collectionName}_${viewName}`;
@@ -45,7 +46,7 @@ export const createViewDoc =
   ([viewName, viewSpec]: readonly [string, VS]): Promise<WriteResult> =>
     db.createDoc({
       collection: makeViewColPath(colName, viewName),
-      data: materializeWithSelectVS(snapshot.data(), viewSpec),
+      data: materializeWithSelectVS(snapshot.data(), viewSpec.select),
       id: snapshot.id,
     });
 
@@ -64,7 +65,8 @@ export const makeDataCreatedTrigger = (
     );
 
 export const makeKColTriggers =
-  (db: DB) => (colEntry: readonly [string, CollectionSpec]) => ({
+  (db: { readonly createDoc: CreateDoc }) =>
+  (colEntry: readonly [string, CollectionSpec]) => ({
     dataCreated: makeDataCreatedTrigger(colEntry, db),
   });
 
@@ -75,7 +77,7 @@ export const makeTriggers = ({
   masmott,
   db,
 }: {
-  readonly db: DB;
+  readonly db: { readonly createDoc: CreateDoc };
   readonly masmott: Masmott;
 }) => ({
   firestore: {

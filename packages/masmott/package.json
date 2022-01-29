@@ -4,7 +4,18 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "lint": "eslint --ext .ts ."
+    "lint": "eslint --ext .ts .",
+    "build": "tsc && node scripts/prepare.js"
+  },
+  "files": [
+    "dist/"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "peerDependencies": {
+    "firebase-admin": "^10.0.2",
+    "firebase-functions": "^3.16.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.10.1",
@@ -21,6 +32,7 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.16.0",
+    "fs-extra": "^10.0.0",
     "prettier": "^2.5.1",
     "typescript": "^4.5.5"
   },

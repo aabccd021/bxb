@@ -11,6 +11,15 @@
     }
   },
   "functions": {
-    "source": "functions"
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "functions/",
+      "test/",
+      "**./*.log",
+      "**/.*",
+      "**/node_modules/**",
+      "**/*.json"
+    ]
   }
 }
