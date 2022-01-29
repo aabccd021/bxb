@@ -6,7 +6,7 @@ Cons:
 - May hit 1000 trigger limit per region if the spec has a lot of collections
   and views
 
-# What is `k` and `n`?
+# What are `k` and `n`?
 
 The letter `k` in trigger name stands for O(k), it means number of document
 operated in the trigger can be calculated by looking at the spec. For example,
