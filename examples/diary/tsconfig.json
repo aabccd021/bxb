@@ -4,7 +4,7 @@
 	},
 	"include": [
 		"masmott.ts",
-		"functions",
-		"test"
+		"functions.ts",
+		"test",
 	],
 }

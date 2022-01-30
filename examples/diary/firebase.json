@@ -14,7 +14,6 @@
     "source": ".",
     "ignore": [
       "firebase.json",
-      "functions/",
       "test/",
       "**./*.log",
       "**/.*",

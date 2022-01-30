@@ -7,12 +7,11 @@ import {
   Firestore,
   getDoc,
   getFirestore,
-  setDoc,
 } from 'firebase/firestore/lite';
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-describe('Fields', () => {
+describe('Diary', () => {
   let app: FirebaseApp;
   let firestore: Firestore;
 
@@ -22,14 +21,8 @@ describe('Fields', () => {
     connectFirestoreEmulator(firestore, 'localhost', 8080);
   });
 
-  it('has type property', async () => {
-    const docRef = doc(collection(firestore, 'coll'), 'idd');
-    await setDoc(docRef, { a: 'b' });
-    expect((await getDoc(docRef)).data()).toStrictEqual({ a: 'b' });
-  });
-
-  it('test1', async () => {
-    const docRef = await addDoc(collection(firestore, 'post'), {
+  it('Select view', async () => {
+    const { id } = await addDoc(collection(firestore, 'post'), {
       text: 'textt',
       title: 'tiltee',
     });
@@ -37,13 +30,13 @@ describe('Fields', () => {
     await delay(2000);
 
     expect(
-      (await getDoc(doc(firestore, 'post_card', docRef.id))).data()
+      (await getDoc(doc(firestore, 'post_card', id))).data()
     ).toStrictEqual({
       title: 'tiltee',
     });
 
     expect(
-      (await getDoc(doc(firestore, 'post_page', docRef.id))).data()
+      (await getDoc(doc(firestore, 'post_page', id))).data()
     ).toStrictEqual({
       text: 'textt',
       title: 'tiltee',

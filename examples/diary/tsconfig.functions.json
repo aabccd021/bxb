@@ -1,10 +1,7 @@
 {
 	"extends": "./tsconfig.json",
-	"compilerOptions": {
-		"outDir": ".functions"
-	},
 	"include": [
 		"masmott.ts",
-		"functions",
+		"functions.ts",
 	]
 }
