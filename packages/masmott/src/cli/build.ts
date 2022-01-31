@@ -19,6 +19,7 @@ import {
 } from 'typescript';
 
 export function build(): void {
+  console.log('Start build');
   const indexContent = `
 import { initAndMakeFirestoreTriggers } from 'masmott';
 import { masmott } from './masmott';
@@ -27,7 +28,7 @@ export const triggers = initAndMakeFirestoreTriggers(masmott);
 `;
   const functionsIndexFileName = 'index.ts';
 
-  const outputFolder = 'masmott/functions';
+  const outputFolder = 'build/functions';
 
   if (existsSync(outputFolder)) {
     rmSync(outputFolder, { recursive: true });
@@ -104,7 +105,6 @@ export const triggers = initAndMakeFirestoreTriggers(masmott);
     }
   });
 
-  const exitCode = emitResult.emitSkipped ? 1 : 0;
-  console.log(`Process exiting with code '${exitCode}'.`);
-  process.exit(exitCode);
+  // const exitCode = emitResult.emitSkipped ? 1 : 0;
+  console.log(`Finish build`);
 }

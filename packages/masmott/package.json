@@ -5,11 +5,13 @@
   "private": false,
   "scripts": {
     "lint": "eslint --ext .ts .",
-    "build": "tsc && node scripts/prepare.js"
+    "build": "tsc && node scripts/prepare.js",
+    "test": "yarn build && node scripts/test.js"
   },
   "files": [
     "dist/"
   ],
+  "main": "./dist/index.js",
   "bin": "./dist/cli/index.js",
   "types": "./dist/index.d.ts",
   "peerDependencies": {

@@ -32,9 +32,9 @@
   "engines": {
     "node": "14"
   },
-  "main": "functions.js",
+  "main": "build/functions/index.js",
   "files": [
-    "masmott/functions"
+    "build"
   ],
   "name": "demo-diary",
   "private": true,
@@ -47,8 +47,7 @@
     "client:dev": "next dev",
     "lint": "eslint ./ --ext ts,tsx",
     "start": "yarn build && yarn start:cached",
-    "start:cached": "firebase emulators:start",
-    "test": "yarn masmott build && firebase emulators:exec \"yarn jest\""
+    "start:cached": "firebase emulators:start"
   },
   "jest": {
     "preset": "ts-jest",
