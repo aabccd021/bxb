@@ -14,7 +14,7 @@
   "main": "./dist/cjs/index.js",
   "module": "./dist/mjs/index.mjs.js",
   "bin": "./dist/cjs/cli/index.js",
-  "types": "./dist/cjs/index.d.ts",
+  "types": "./dist/mjs/index.mjs.d.ts",
   "peerDependencies": {
     "firebase": "^9.6.5",
     "firebase-admin": "^10.0.2",

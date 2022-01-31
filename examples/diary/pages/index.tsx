@@ -5,7 +5,10 @@ import { useEffect, useState } from 'react';
 const Home: NextPage = () => {
   const [state, setState] = useState('default');
   useEffect(() => {
-    setDoc({ projectId: 'demo-diary' }, 'post', 'a', { title: 'a', text: 'b' })
+    setDoc({ projectId: 'demo-diary' }, 'post', 'b', {
+      title: 'title',
+      text: 'text',
+    })
       .then(() => setState('set'))
       .catch((e: Error) => setState(e.message));
   }, []);
