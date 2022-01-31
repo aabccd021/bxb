@@ -39,14 +39,15 @@
   "name": "demo-diary",
   "private": true,
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
     "analyze": "cross-env ANALYZE=true next build",
-    "build": "yarn client:build && yarn masmott build",
     "clean-coverage": "rm -rf .nyc_output && rm -rf coverage",
     "cli": "node node_modules/masmott/dist/cjs/cli/index.js",
     "client:build": "rm -rf .next && next build",
     "client:dev": "next dev",
-    "lint": "eslint ./ --ext ts,tsx",
-    "start": "yarn build && yarn start:cached",
     "start:cached": "firebase emulators:start"
   },
   "jest": {

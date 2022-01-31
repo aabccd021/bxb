@@ -14,6 +14,10 @@
     "fp-ts": "^2.11.5"
   },
   "devDependencies": {
+    "@types/react": "^17.0.38",
+    "firebase": "^9.6.5",
+    "react": "^17.0.2",
+    "swr": "^1.2.0",
     "typescript": "^4.5.5"
   }
 }

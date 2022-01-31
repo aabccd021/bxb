@@ -1,7 +1,7 @@
 node_modules
 **/coverage/**
 *.log
-dist
+**/dist/**
 **/lib/**/*.js
 **/lib/**/*.map
 **/lib/**/*.d.ts

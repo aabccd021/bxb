@@ -5,15 +5,16 @@
   "private": false,
   "scripts": {
     "lint": "eslint --ext .ts .",
-    "build": "tsc && node scripts/prepare.js",
+    "build": "tsc && tsc --project tsconfig.mjs.json && node scripts/prepare.js",
     "test": "yarn build && node scripts/test.js"
   },
   "files": [
     "dist/"
   ],
-  "main": "./dist/index.js",
-  "bin": "./dist/cli/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/mjs/index.js",
+  "bin": "./dist/cjs/cli/index.js",
+  "types": "./dist/cjs/index.d.ts",
   "peerDependencies": {
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.16.0"
@@ -117,6 +118,7 @@
       "@typescript-eslint/unbound-method": "off",
       "eqeqeq": "error",
       "functional/functional-parameters": "off",
+      "functional/no-mixed-type": "off",
       "import/exports-last": "error",
       "import/first": "error",
       "import/no-named-default": "error",
