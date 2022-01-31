@@ -53,6 +53,7 @@ export const triggers = initAndMakeFirestoreTriggers(masmott);
     noUnusedLocals: true,
     noUnusedParameters: true,
     outDir: outputFolder,
+    skipLibCheck: true,
     sourceMap: true,
     strict: true,
     strictBindCallApply: true,

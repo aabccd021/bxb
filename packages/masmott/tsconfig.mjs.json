@@ -9,5 +9,6 @@
 	"include": [
 		"src/client",
 		"src/core",
+		"src/index.mjs.ts",
 	]
 }

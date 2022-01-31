@@ -12,12 +12,14 @@
     "dist/"
   ],
   "main": "./dist/cjs/index.js",
-  "module": "./dist/mjs/index.js",
+  "module": "./dist/mjs/index.mjs.js",
   "bin": "./dist/cjs/cli/index.js",
   "types": "./dist/cjs/index.d.ts",
   "peerDependencies": {
+    "firebase": "^9.6.5",
     "firebase-admin": "^10.0.2",
-    "firebase-functions": "^3.16.0"
+    "firebase-functions": "^3.16.0",
+    "typescript": "^4.5.5"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.10.1",
@@ -32,6 +34,7 @@
     "eslint-plugin-sort-keys-fix": "^1.1.2",
     "eslint-plugin-typescript-sort-keys": "^2.1.0",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "firebase": "^9.6.5",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.16.0",
     "fs-extra": "^10.0.0",

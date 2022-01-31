@@ -2,9 +2,9 @@
   "dependencies": {
     "@types/firebase": "^3.2.1",
     "babel-plugin-istanbul": "^6.1.1",
-    "firebase": "^9.6.4",
-    "firebase-admin": "^10.0.0",
-    "firebase-functions": "^3.15.7",
+    "firebase": "^9.6.5",
+    "firebase-admin": "^10.0.2",
+    "firebase-functions": "^3.16.0",
     "masmott": "../../packages/masmott",
     "next": "^12.0.1",
     "react": "17.0.2",
@@ -27,7 +27,7 @@
     "jest": "^27.4.7",
     "prettier": "^2.5.1",
     "ts-jest": "^27.1.3",
-    "typescript": "4.4.4"
+    "typescript": "^4.5.5"
   },
   "engines": {
     "node": "14"
