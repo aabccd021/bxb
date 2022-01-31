@@ -32,7 +32,7 @@
   "engines": {
     "node": "14"
   },
-  "main": "build/functions/index.js",
+  "main": ".masmott/functions/index.js",
   "files": [
     "build"
   ],

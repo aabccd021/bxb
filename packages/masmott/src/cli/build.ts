@@ -28,7 +28,7 @@ export const triggers = initAndMakeFirestoreTriggers(masmott);
 `;
   const functionsIndexFileName = 'index.ts';
 
-  const outputFolder = 'build/functions';
+  const outputFolder = '.masmott/functions';
 
   if (existsSync(outputFolder)) {
     rmSync(outputFolder, { recursive: true });
@@ -54,7 +54,6 @@ export const triggers = initAndMakeFirestoreTriggers(masmott);
     noUnusedParameters: true,
     outDir: outputFolder,
     skipLibCheck: true,
-    // sourceMap: true,
     strict: true,
     strictBindCallApply: true,
     strictFunctionTypes: true,
