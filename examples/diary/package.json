@@ -33,20 +33,22 @@
     "node": "14"
   },
   "main": "functions.js",
+  "files": [
+    "masmott/functions"
+  ],
   "name": "demo-diary",
   "private": true,
   "scripts": {
     "analyze": "cross-env ANALYZE=true next build",
-    "build": "yarn client:build && yarn server:build",
+    "build": "yarn client:build && yarn masmott build",
     "clean-coverage": "rm -rf .nyc_output && rm -rf coverage",
     "cli": "node node_modules/masmott/dist/cjs/cli/index.js",
     "client:build": "rm -rf .next && next build",
     "client:dev": "next dev",
     "lint": "eslint ./ --ext ts,tsx",
-    "server:build": "yarn tsc --project tsconfig.functions.json",
     "start": "yarn build && yarn start:cached",
     "start:cached": "firebase emulators:start",
-    "test": "yarn server:build && firebase emulators:exec \"yarn jest\""
+    "test": "yarn masmott build && firebase emulators:exec \"yarn jest\""
   },
   "jest": {
     "preset": "ts-jest",
