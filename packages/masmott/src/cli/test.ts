@@ -16,7 +16,6 @@ export function test(): void {
   ls.stdout.on('data', (data: Buffer) => process.stdout.write(data.toString()));
   ls.stderr.on('data', (data: Buffer) => process.stderr.write(data.toString()));
   ls.on('exit', (code) => {
-    console.log(`Finish with code${code?.toString() ?? ''}`);
+    console.log(`Done test with exit code: ${code?.toString() ?? ''}`);
   });
-  console.log('Done test');
 }
