@@ -10,8 +10,7 @@
   "files": [
     "dist/"
   ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "bin": "./dist/cli/index.js",
   "types": "./dist/index.d.ts",
   "peerDependencies": {
     "firebase-admin": "^10.0.2",

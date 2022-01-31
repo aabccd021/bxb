@@ -1,4 +1,5 @@
 import { Masmott } from 'masmott';
+
 export const masmott: Masmott = {
   firebase: {
     projectId: 'demo-diary',
