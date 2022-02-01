@@ -13,11 +13,11 @@ const write = (data: Buffer) => process.stdout.write(data.toString());
 export const test = () => {
   console.log('Start test');
   build();
-  const commandStr = 'firebase emulators:exec "jest && cypress run"';
-  const cmd = cp.spawn(commandStr, { shell: true });
-  cmd.stdout.on('data', write);
-  cmd.stderr.on('data', write);
-  cmd.on('exit', (code) => {
+  const command = 'firebase emulators:exec "jest && cypress run"';
+  const proc = cp.spawn(command, { shell: true });
+  proc.stdout.on('data', write);
+  proc.stderr.on('data', write);
+  proc.on('exit', (code) => {
     console.log(`Done test with exit code: ${code?.toString() ?? ''}`);
   });
 };
