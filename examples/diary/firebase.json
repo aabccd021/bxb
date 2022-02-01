@@ -6,6 +6,9 @@
     "functions": {
       "port": 5001
     },
+    "hosting": {
+      "port": 5000
+    },
     "ui": {
       "enabled": true
     }
@@ -19,6 +22,24 @@
       "**/.*",
       "**/node_modules/**",
       "**/*.json"
+    ]
+  },
+  "hosting": {
+    "public": "public",
+    "cleanUrls": true,
+    "ignore": [
+      "firebase.json",
+      "tsconfig.json",
+      "README.md",
+      "**/node_modules/**",
+      ".**",
+      "pages/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "function": "nextjs"
+      }
     ]
   }
 }

@@ -1,13 +1,11 @@
 import { FirebaseOptions, useDocCreation } from 'masmott';
 import { NextPage } from 'next';
-import { useState } from 'react';
 
 const options: FirebaseOptions = {
   projectId: 'demo-diary',
 };
 
 const A = (): JSX.Element => {
-  const [x] = useState();
   const docCreation = useDocCreation(options, 'post');
 
   if (docCreation.state === 'initial') {

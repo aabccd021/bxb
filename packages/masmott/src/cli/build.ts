@@ -23,8 +23,9 @@ export function build(): void {
   const indexContent = `
 import { initAndMakeFirestoreTriggers } from 'masmott';
 import { masmott } from './masmott';
+import conf from './next.config';
 
-export const triggers = initAndMakeFirestoreTriggers(masmott);
+export const {firestore, nextjs} = initAndMakeFirestoreTriggers(masmott, conf);
 `;
   const functionsIndexFileName = 'index.ts';
 
@@ -37,6 +38,7 @@ export const triggers = initAndMakeFirestoreTriggers(masmott);
   const target = ScriptTarget.ES2017;
 
   const options: CompilerOptions = {
+    allowJs: true,
     allowUnreachableCode: true,
     allowUnusedLabels: true,
     alwaysStrict: true,
@@ -54,6 +56,7 @@ export const triggers = initAndMakeFirestoreTriggers(masmott);
     noUnusedParameters: true,
     outDir: outputFolder,
     skipLibCheck: true,
+    sourceMap: true,
     strict: true,
     strictBindCallApply: true,
     strictFunctionTypes: true,

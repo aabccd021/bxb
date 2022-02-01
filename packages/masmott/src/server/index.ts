@@ -4,11 +4,13 @@ import {
   Firestore,
   getFirestore,
   QueryDocumentSnapshot,
-  WriteResult,
+  WriteResult
 } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
-
+import { https, HttpsFunction } from 'firebase-functions';
+import next, { NextConfig } from 'next';
 import { CollectionSpec, Masmott, SelectVS, Spec, VS } from '../core/schema';
+
 
 const makeViewColPath = (collectionName: string, viewName: string) =>
   `${collectionName}_${viewName}`;
@@ -73,16 +75,31 @@ const makeKColTriggers =
 const makeKTriggers = (spec: Spec, db: DB) =>
   Object.entries(spec).map(makeKColTriggers(db));
 
+function makeNextjsFunction(conf: NextConfig): HttpsFunction {
+  const nextjsServer = next({ conf, dev: false });
+
+  const nextjsHandle = nextjsServer.getRequestHandler();
+
+  const nextjsFunc = https.onRequest((request, response) =>
+    nextjsServer.prepare().then(() => nextjsHandle(request, response))
+  );
+
+  return nextjsFunc;
+}
+
 const makeTriggers = ({
   masmott,
   db,
+  nextConfig: conf,
 }: {
   readonly db: { readonly createDoc: CreateDoc };
   readonly masmott: Masmott;
+  readonly nextConfig: NextConfig;
 }) => ({
   firestore: {
     k: makeKTriggers(masmott.spec, db),
   },
+  nextjs: makeNextjsFunction(conf),
 });
 
 const makeDb = ({
@@ -99,10 +116,11 @@ const initAndMakeDb = (provider: DBProvider) =>
   makeDb({ firestore: getFirestore(initializeApp()), provider });
 
 export const initAndMakeTriggers =
-  (dbProvider: DBProvider) => (masmott: Masmott) =>
+  (dbProvider: DBProvider) => (masmott: Masmott, nextConfig: NextConfig) =>
     makeTriggers({
       db: initAndMakeDb(dbProvider),
       masmott,
+      nextConfig,
     });
 
 export const firestoreProvider: DBProvider = {
