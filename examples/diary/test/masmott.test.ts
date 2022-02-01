@@ -1,4 +1,4 @@
-import { FirebaseApp, initializeApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import {
   addDoc,
   collection,
@@ -12,11 +12,10 @@ import {
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 describe('Diary', () => {
-  let app: FirebaseApp;
   let firestore: Firestore;
 
   beforeAll(() => {
-    app = initializeApp({ projectId: 'demo-diary' });
+    const app = initializeApp({ projectId: 'demo-diary' });
     firestore = getFirestore(app);
     connectFirestoreEmulator(firestore, 'localhost', 8080);
   });

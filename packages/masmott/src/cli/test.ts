@@ -11,11 +11,21 @@ import { build } from './build';
 export function test(): void {
   console.log('Start test');
   build();
-  const ls = cp.spawn('firebase', ['emulators:exec', '"jest"']);
+  const cmd = cp.spawn(
+    'firebase',
+    ['emulators:exec', '"jest && cypress run"'],
+    {
+      shell: true,
+    }
+  );
 
-  ls.stdout.on('data', (data: Buffer) => process.stdout.write(data.toString()));
-  ls.stderr.on('data', (data: Buffer) => process.stderr.write(data.toString()));
-  ls.on('exit', (code) => {
+  cmd.stdout.on('data', (data: Buffer) =>
+    process.stdout.write(data.toString())
+  );
+  cmd.stderr.on('data', (data: Buffer) =>
+    process.stderr.write(data.toString())
+  );
+  cmd.on('exit', (code) => {
     console.log(`Done test with exit code: ${code?.toString() ?? ''}`);
   });
 }
