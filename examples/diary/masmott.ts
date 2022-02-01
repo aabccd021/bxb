@@ -8,10 +8,10 @@ export const masmott: Masmott = {
     post: {
       data: {
         title: {
-          _type: 'string',
+          type: 'string',
         },
         text: {
-          _type: 'string',
+          type: 'string',
         },
       },
       view: {

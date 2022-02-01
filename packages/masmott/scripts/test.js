@@ -6,9 +6,10 @@ const package = require('../package.json')
 const examplesDir = '../../examples'
 
 fs.readdirSync(examplesDir).forEach(file => {
-	console.log(file)
-	var ls = cp.spawn('yarn', ['masmott', 'test'], { cwd: `${examplesDir}/${file}` });
+	console.log(`Start script test.js on ${file}`)
+	const proc = cp.spawn('yarn', ['masmott', 'test'], { cwd: `${examplesDir}/${file}` });
 
-  ls.stdout.on('data', (data) => process.stdout.write(data.toString()));
-  ls.stderr.on('data', (data) => process.stderr.write(data.toString()));
+	proc.stdout.on('data', (data) => process.stdout.write(data.toString()));
+	proc.stderr.on('data', (data) => process.stderr.write(data.toString()));
+	proc.on('exit', (code) => console.log(`Finish script test.js on ${file} with exit code: ${code}`))
 });

@@ -9,7 +9,7 @@ export interface Dict<T> {
  *
  */
 export type StringDFS = {
-  readonly _type: 'string';
+  readonly type: 'string';
 };
 
 /**

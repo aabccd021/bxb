@@ -5,11 +5,13 @@
 // eslint-disable-next-line functional/no-return-void
 
 import { build } from './build';
+import { compileAndGenerate } from './generate';
 import { runCmd } from './runCmd';
 
 export const test = async () => {
   console.log('Start test');
-  build();
+  await compileAndGenerate();
+  await build();
   const command = 'firebase emulators:exec "jest && cypress run"';
   const exitCode = await runCmd(command);
   console.log(`Done test with exit code: ${exitCode?.toString() ?? ''}`);

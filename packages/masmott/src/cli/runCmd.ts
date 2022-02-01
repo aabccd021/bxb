@@ -14,5 +14,5 @@ export const runCmd = (cmd: string): Promise<number | null> =>
     proc.stderr.on('data', (data: Buffer) =>
       process.stderr.write(data.toString())
     );
-    process.on('exit', resolve);
+    proc.on('exit', resolve);
   });

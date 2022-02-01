@@ -13,7 +13,7 @@
   ],
   "main": "./dist/cjs/index.js",
   "module": "./dist/mjs/index.mjs.js",
-  "bin": "./dist/cjs/cli/index.js",
+  "bin": "./dist/cjs/cli/cli.js",
   "dependencies": {
     "firebase": "^9.6.5",
     "swr": "^1.2.0"
@@ -25,6 +25,7 @@
     "typescript": "^4.5.5"
   },
   "devDependencies": {
+    "@types/node": "^17.0.14",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
     "eslint": "^8.7.0",

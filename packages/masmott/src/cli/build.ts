@@ -7,9 +7,10 @@
 import { existsSync, rmSync } from 'fs';
 
 import { compile } from './compile';
+import { runCmd } from './runCmd';
 
-export const build = () => {
-  console.log('Start build');
+const buildFunctions = () => {
+  console.log('Start build functions');
   const indexContent = `
 import { initAndMakeFirestoreTriggers } from 'masmott';
 import { masmott } from './masmott';
@@ -25,7 +26,24 @@ export const {firestore, nextjs} = initAndMakeFirestoreTriggers(masmott, conf);
   }
 
   compile(outdir, { 'index.ts': indexContent });
+  console.log('Finish build functions');
+};
 
-  // const exitCode = emitResult.emitSkipped ? 1 : 0;
+const buildNext = async () => {
+  console.log('Start build next');
+  const nextdir = '.next';
+
+  if (existsSync(nextdir)) {
+    rmSync(nextdir, { recursive: true });
+  }
+
+  await runCmd('next build');
+  console.log('Finish build next');
+};
+
+export const build = async () => {
+  console.log('Start build');
+  buildFunctions();
+  await buildNext();
   console.log(`Finish build`);
 };
