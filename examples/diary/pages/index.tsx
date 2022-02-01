@@ -1,18 +1,49 @@
-import { setDoc } from 'masmott';
-import type { NextPage } from 'next';
-import { useEffect, useState } from 'react';
+import { FirebaseOptions, useDocCreation } from 'masmott';
+import { NextPage } from 'next';
+import { useState } from 'react';
+
+const options: FirebaseOptions = {
+  projectId: 'demo-diary',
+};
+
+const A = (): JSX.Element => {
+  const [x] = useState();
+  const docCreation = useDocCreation(options, 'post');
+
+  if (docCreation.state === 'initial') {
+    return <div>Loading</div>;
+  }
+  if (docCreation.state === 'creating') {
+    return <div>creating</div>;
+  }
+  if (docCreation.state === 'error') {
+    return <div>error: {JSON.stringify(docCreation.reason)}</div>;
+  }
+  if (docCreation.state === 'notCreated') {
+    return (
+      <>
+        <div>Not created</div>
+        <button
+          onClick={() =>
+            docCreation.createDoc({
+              text: 'textt',
+              title: 'tiltee',
+            })
+          }
+        >
+          Create
+        </button>
+      </>
+    );
+  }
+  if (docCreation.state === 'created') {
+    return <div>created: {JSON.stringify(docCreation.createdDoc)}</div>;
+  }
+  return <div>Fatal Error</div>;
+};
 
 const Home: NextPage = () => {
-  const [state, setState] = useState('default');
-  useEffect(() => {
-    setDoc({ projectId: 'demo-diary' }, 'post', 'b', {
-      title: 'title',
-      text: 'text',
-    })
-      .then(() => setState('set'))
-      .catch((e: Error) => setState(e.message));
-  }, []);
-  return <div>{state}</div>;
+  return <A />;
 };
 
 export default Home;

@@ -1,4 +1,5 @@
 /* eslint-disable functional/no-return-void */
+import { Dict } from 'core';
 import { FirebaseOptions } from 'firebase/app';
 import { DocumentReference } from 'firebase/firestore/lite';
 import { ChangeEvent } from 'react';
@@ -8,50 +9,6 @@ import * as Doc from './doc';
 import * as DocCreation from './doc-creation';
 
 export type { Doc, DocCreation, DocumentReference, FirebaseOptions };
-
-export type Dict<T> = {
-  readonly [key: string]: T;
-};
-
-export type StringFieldSpec = {
-  readonly type: 'string';
-};
-
-export type RefIdFieldSpec = {
-  readonly refCollection: string;
-  readonly type: 'refId';
-};
-
-export type SrcFieldSpec = StringFieldSpec | RefIdFieldSpec;
-
-export type RefSpec = {
-  readonly collectionName: string;
-  readonly fieldName: string;
-};
-
-export type JoinSpec = {
-  readonly firstRef: RefSpec;
-  readonly refChain: readonly RefSpec[];
-  readonly selectedFieldNames: readonly string[];
-};
-
-export type CountSpec = {
-  readonly countedCollectionName: string;
-  readonly groupBy: string;
-};
-
-export type ViewSpec = {
-  readonly countSpecs: Dict<CountSpec>;
-  readonly joinSpecs: Dict<JoinSpec>;
-  readonly selectedFieldNames: readonly string[];
-};
-
-export type CollectionSpec = {
-  readonly src: Dict<SrcFieldSpec>;
-  readonly views: Dict<ViewSpec>;
-};
-
-export type Spec = Dict<CollectionSpec>;
 
 export type FirestoreDataType = string | number;
 
@@ -150,7 +107,7 @@ export type SetDoc = (
   collection: string,
   id: string,
   data: DocCreationData
-) => Promise<void>;
+) => Promise<Error | undefined>;
 
 export type GetId = (
   options: FirebaseOptions,
@@ -178,3 +135,15 @@ export type MutateDocOfKey = (
     readonly view?: string | undefined;
   }
 ) => Promise<void>;
+
+export type Right<T> = {
+  readonly _tag: 'right';
+  readonly value: T;
+};
+
+export type Left<T> = {
+  readonly _tag: 'left';
+  readonly value: T;
+};
+
+export type Either<L, R> = Left<L> | Right<R>;

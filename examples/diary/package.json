@@ -1,8 +1,6 @@
 {
   "dependencies": {
-    "@types/firebase": "^3.2.1",
     "babel-plugin-istanbul": "^6.1.1",
-    "firebase": "^9.6.5",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.16.0",
     "masmott": "../../packages/masmott",

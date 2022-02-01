@@ -17,5 +17,11 @@ fs.readdirSync(exampleDir).forEach(file => {
 		const dirPath = file.replace('/**', '');
 		fse.copySync(dirPath, `${moduleDir}/${dirPath}`)
 	})
+
+	const mmDir = `${moduleDir}/node_modules`
+	fs.mkdirSync(mmDir)
+	Object.keys(package.dependencies).forEach(dep => {
+		fse.copySync(`node_modules/${dep}`, `${mmDir}/${dep}`)
+	})
 	console.log(`Finish copy files to ${file}`)
 });

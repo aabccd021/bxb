@@ -28,7 +28,9 @@ export const setDoc: SetDoc = async (options, collection, id, data) => {
   const firestore = _.getFirestore();
   const collectionRef = _.collection(firestore, collection);
   const docRef = _.doc(collectionRef, id);
-  await _.setDoc(docRef, data);
+  return await _.setDoc(docRef, data)
+    .then(() => undefined)
+    .catch((e: Error) => e);
 };
 
 export const getId: GetId = async (options, collection) => {
