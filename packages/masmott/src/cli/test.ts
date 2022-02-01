@@ -8,24 +8,16 @@ import * as cp from 'child_process';
 
 import { build } from './build';
 
-export function test(): void {
+const write = (data: Buffer) => process.stdout.write(data.toString());
+
+export const test = () => {
   console.log('Start test');
   build();
-  const cmd = cp.spawn(
-    'firebase',
-    ['emulators:exec', '"jest && cypress run"'],
-    {
-      shell: true,
-    }
-  );
-
-  cmd.stdout.on('data', (data: Buffer) =>
-    process.stdout.write(data.toString())
-  );
-  cmd.stderr.on('data', (data: Buffer) =>
-    process.stderr.write(data.toString())
-  );
+  const commandStr = 'firebase emulators:exec "jest && cypress run"';
+  const cmd = cp.spawn(commandStr, { shell: true });
+  cmd.stdout.on('data', write);
+  cmd.stderr.on('data', write);
   cmd.on('exit', (code) => {
     console.log(`Done test with exit code: ${code?.toString() ?? ''}`);
   });
-}
+};
