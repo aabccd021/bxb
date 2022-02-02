@@ -1,4 +1,4 @@
-import { Doc, ISRPage } from 'masmott';
+import type { Doc, ISRPage } from 'masmott';
 
 const Page: ISRPage = ({
   snapshot,

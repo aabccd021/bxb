@@ -1,22 +1,24 @@
-import { initializeApp } from 'firebase/app';
+import { getApps, initializeApp } from 'firebase/app';
 import {
   addDoc,
   collection,
   connectFirestoreEmulator,
   doc,
-  Firestore,
   getDoc,
-  getFirestore,
+  getFirestore as _getFirestore,
 } from 'firebase/firestore/lite';
 
-const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+const delay = async (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+const getFirebase = () => {
+  const [app] = getApps();
+  return app !== undefined ? app : initializeApp({ projectId: 'demo-diary' });
+};
+
+const firestore = _getFirestore(getFirebase());
 
 describe('Diary', () => {
-  let firestore: Firestore;
-
   beforeAll(() => {
-    const app = initializeApp({ projectId: 'demo-diary' });
-    firestore = getFirestore(app);
     connectFirestoreEmulator(firestore, 'localhost', 8080);
   });
 

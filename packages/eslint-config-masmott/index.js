@@ -70,4 +70,18 @@ module.exports = {
 		"unused-imports/no-unused-imports-ts": "error",
 		"unused-imports/no-unused-vars": ["error", { "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }],
 	},
+	overrides: [
+		{
+			files: [
+				"test/**"
+			],
+			rules: {
+				"@typescript-eslint/explicit-function-return-type": "off",
+				"@typescript-eslint/no-magic-numbers": "off",
+				"functional/functional-parameters": "off",
+				"functional/no-expression-statement": "off",
+				"functional/no-return-void": "off",
+			}
+		}
+	]
 }

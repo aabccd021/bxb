@@ -1,4 +1,4 @@
-import { Masmott } from 'masmott';
+import type { Masmott } from 'masmott';
 
 export const masmott: Masmott = {
   firebase: {
