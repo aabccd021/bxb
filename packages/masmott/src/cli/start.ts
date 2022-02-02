@@ -10,7 +10,7 @@ import { compileAndRunCLI } from './compile';
 import { runCmd } from './runCmd';
 
 export const startCli = async (args: readonly string[]) => {
-  if (args[0] !== 'quick') {
+  if (args[0] !== '--quick') {
     const exit = await buildCli();
     if (exit !== 0) {
       return exit;
