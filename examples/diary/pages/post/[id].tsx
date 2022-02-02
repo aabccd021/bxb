@@ -2,7 +2,7 @@ import { ISRPage, makeISRPage, ViewPath } from 'masmott';
 import { makeGetStaticPaths, makeGetStaticProps } from 'masmott/dist/cjs';
 import { masmott } from '../../masmott';
 import Page from '../../web/post/[id]';
-const viewPath: ViewPath = ['thread', 'page'];
+const viewPath: ViewPath = ['post', 'card'];
 const ISRPage = makeISRPage(masmott.firebase, viewPath, Page);
 export default ISRPage;
 export const getStaticPaths = makeGetStaticPaths();

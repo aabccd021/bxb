@@ -7,16 +7,16 @@
 import { build } from './build';
 import { runCmd } from './runCmd';
 
-export const test = async (isQuick: boolean) => {
-  console.log('Start test');
+export const start = async (isQuick: boolean) => {
+  console.log('Start start');
   if (!isQuick) {
     const exit = await build();
     if (exit !== 0) {
       return exit;
     }
   }
-  const command = 'firebase emulators:exec "jest && cypress run"';
+  const command = 'firebase emulators:start';
   const exitCode = await runCmd(command);
-  console.log(`Done test with exit code: ${exitCode?.toString() ?? ''}`);
+  console.log(`Done start with exit code: ${exitCode?.toString() ?? ''}`);
   return exitCode;
 };

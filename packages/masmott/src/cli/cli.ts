@@ -2,7 +2,7 @@
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/no-conditional-statement */
 import { build } from './build';
-import { compileAndGenerate } from './generate';
+import { start } from './start';
 import { test } from './test';
 
 const cli = async (): Promise<number | undefined> => {
@@ -13,11 +13,11 @@ const cli = async (): Promise<number | undefined> => {
   }
 
   if (args[0] === 'test') {
-    return test();
+    return test(args[1] === 'quick');
   }
 
-  if (args[0] === 'generate') {
-    return compileAndGenerate();
+  if (args[0] === 'start') {
+    return start(args[1] === 'quick');
   }
 
   console.log('unknown command');
