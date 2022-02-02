@@ -1,13 +1,6 @@
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/no-conditional-statement */
-import {
-  DocSnapshot,
-  Fetcher,
-  FirebaseOptions,
-  GetId,
-  InitMasmott,
-  SetDoc,
-} from './types';
+import { DocSnapshot, Fetcher, FirebaseOptions, GetId, InitMasmott, SetDoc } from './types';
 
 const initMasmott: InitMasmott = async (options) => {
   const _ = await import('firebase/app');

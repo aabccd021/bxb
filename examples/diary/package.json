@@ -1,8 +1,13 @@
 {
   "name": "demo-diary",
   "main": ".masmott/functions/index.js",
+  "private": true,
   "engines": {
     "node": "16"
+  },
+  "scripts": {
+    "build": "masmott build",
+    "test": "masmott test"
   },
   "dependencies": {
     "firebase-admin": "^10.0.2",
@@ -23,18 +28,6 @@
     "prettier": "^2.5.1",
     "ts-jest": "^27.1.3",
     "typescript": "^4.5.5"
-  },
-  "private": true,
-  "scripts": {
-    "lint": "yarn eslint ./ --ext ts,tsx",
-    "build": "next build",
-    "start": "next start",
-    "analyze": "cross-env ANALYZE=true next build",
-    "clean-coverage": "rm -rf .nyc_output && rm -rf coverage",
-    "cli": "node node_modules/masmott/dist/cjs/cli/index.js",
-    "client:build": "rm -rf .next && next build",
-    "client:dev": "next dev",
-    "start:cached": "firebase emulators:start"
   },
   "jest": {
     "preset": "ts-jest",

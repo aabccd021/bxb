@@ -4,13 +4,13 @@ import {
   Firestore,
   getFirestore,
   QueryDocumentSnapshot,
-  WriteResult
+  WriteResult,
 } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
 import { https, HttpsFunction } from 'firebase-functions';
 import next, { NextConfig } from 'next';
-import { CollectionSpec, Masmott, SelectVS, Spec, VS } from '../core/schema';
 
+import { CollectionSpec, Masmott, SelectVS, Spec, VS } from '../core/schema';
 
 const makeViewColPath = (collectionName: string, viewName: string) =>
   `${collectionName}_${viewName}`;
@@ -31,20 +31,11 @@ type DB = {
   readonly createDoc: CreateDoc;
 };
 
-const materializeWithSelectVS = (
-  data: DocumentData,
-  select: SelectVS
-): DocumentData =>
-  Object.fromEntries(
-    Object.entries(data).filter(([key]) => Object.keys(select).includes(key))
-  );
+const materializeWithSelectVS = (data: DocumentData, select: SelectVS): DocumentData =>
+  Object.fromEntries(Object.entries(data).filter(([key]) => Object.keys(select).includes(key)));
 
 const createViewDoc =
-  (
-    colName: string,
-    snapshot: QueryDocumentSnapshot,
-    db: { readonly createDoc: CreateDoc }
-  ) =>
+  (colName: string, snapshot: QueryDocumentSnapshot, db: { readonly createDoc: CreateDoc }) =>
   ([viewName, viewSpec]: readonly [string, VS]): Promise<WriteResult> =>
     db.createDoc({
       collection: makeViewColPath(colName, viewName),
@@ -60,20 +51,16 @@ const makeDataCreatedTrigger = (
     .document(`${colName}/{docId}`)
     .onCreate((snapshot) =>
       Promise.allSettled(
-        Object.entries(colSpec.view ?? {}).map(
-          createViewDoc(colName, snapshot, db)
-        )
+        Object.entries(colSpec.view ?? {}).map(createViewDoc(colName, snapshot, db))
       )
     );
 
 const makeKColTriggers =
-  (db: { readonly createDoc: CreateDoc }) =>
-  (colEntry: readonly [string, CollectionSpec]) => ({
+  (db: { readonly createDoc: CreateDoc }) => (colEntry: readonly [string, CollectionSpec]) => ({
     dataCreated: makeDataCreatedTrigger(colEntry, db),
   });
 
-const makeKTriggers = (spec: Spec, db: DB) =>
-  Object.entries(spec).map(makeKColTriggers(db));
+const makeKTriggers = (spec: Spec, db: DB) => Object.entries(spec).map(makeKColTriggers(db));
 
 function makeNextjsFunction(conf: NextConfig): HttpsFunction {
   const nextjsServer = next({ conf, dev: false });
@@ -130,5 +117,4 @@ export const firestoreProvider: DBProvider = {
       firestore.collection(collection).doc(id).create(data),
 };
 
-export const initAndMakeFirestoreTriggers =
-  initAndMakeTriggers(firestoreProvider);
+export const initAndMakeFirestoreTriggers = initAndMakeTriggers(firestoreProvider);

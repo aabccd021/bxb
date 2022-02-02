@@ -8,10 +8,7 @@ import { getId, setDoc } from './firebase';
 import { CreateDoc, DocCreation, FirebaseOptions } from './types';
 import { makeDocPath } from './util';
 
-export function useDocCreation(
-  options: FirebaseOptions,
-  collection: string
-): DocCreation.Type {
+export function useDocCreation(options: FirebaseOptions, collection: string): DocCreation.Type {
   const { mutate } = useSWRConfig();
 
   const [creation, setCreation] = useState<DocCreation.Type>({

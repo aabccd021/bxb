@@ -26,7 +26,9 @@ export type NotCreated<CDD extends DocCreationData = DocCreationData> = {
   readonly state: 'notCreated';
 };
 
-export type Type<
-  DD extends DocData = DocData,
-  CDD extends DocCreationData = DocCreationData
-> = Initial | NotCreated<CDD> | Error | Creating<DD> | Created<DD>;
+export type Type<DD extends DocData = DocData, CDD extends DocCreationData = DocCreationData> =
+  | Initial
+  | NotCreated<CDD>
+  | Error
+  | Creating<DD>
+  | Created<DD>;

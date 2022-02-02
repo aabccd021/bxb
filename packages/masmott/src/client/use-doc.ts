@@ -24,10 +24,7 @@ export function useDoc(
     [collectionName, options?.view, id]
   );
 
-  const fetcher = useMemo(
-    () => makeFetcher(firebaseOptions),
-    [firebaseOptions]
-  );
+  const fetcher = useMemo(() => makeFetcher(firebaseOptions), [firebaseOptions]);
 
   const {
     data: snapshot,

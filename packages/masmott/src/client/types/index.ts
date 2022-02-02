@@ -46,9 +46,7 @@ export type DocSnapshot =
       readonly exists: false;
     };
 
-export type CreateDoc<CDD extends DocCreationData = DocCreationData> = (
-  data: CDD
-) => void;
+export type CreateDoc<CDD extends DocCreationData = DocCreationData> = (data: CDD) => void;
 
 export type Retry = () => void;
 
@@ -109,10 +107,7 @@ export type SetDoc = (
   data: DocCreationData
 ) => Promise<Error | undefined>;
 
-export type GetId = (
-  options: FirebaseOptions,
-  collection: string
-) => Promise<string>;
+export type GetId = (options: FirebaseOptions, collection: string) => Promise<string>;
 
 export type InitMasmott = (options: FirebaseOptions) => Promise<void>;
 

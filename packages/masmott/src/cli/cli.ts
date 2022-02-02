@@ -1,23 +1,28 @@
 #!/usr/bin/env node
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/no-conditional-statement */
-import { build } from './build';
-import { start } from './start';
-import { test } from './test';
+import { buildCli } from './build';
+import { lintCli } from './lint';
+import { startCli } from './start';
+import { testCli } from './test';
 
 const cli = async (): Promise<number | undefined> => {
   const args = process.argv.slice(2);
 
   if (args[0] === 'build') {
-    return build();
+    return buildCli();
   }
 
   if (args[0] === 'test') {
-    return test(args[1] === 'quick');
+    return testCli(args.slice(1));
   }
 
   if (args[0] === 'start') {
-    return start(args[1] === 'quick');
+    return startCli(args.slice(1));
+  }
+
+  if (args[0] === 'lint') {
+    return lintCli(args.slice(1));
   }
 
   console.log('unknown command');
