@@ -7,8 +7,7 @@ const exampleDir = '../../examples'
 
 fs.readdirSync(exampleDir).forEach(file => {
 	console.log(`Start script prepare.ts on ${file}`)
-	const moduleDir = `${exampleDir}/${file}/node_modules/masmott`;
-	cp.execSync('chmod 777 -R dist')
+	const moduleDir = `${exampleDir}/${file}/node_modules/eslint-config-masmott`;
 	fs.rmSync(moduleDir, { recursive: true, force: true })
 	fs.mkdirSync(moduleDir)
 

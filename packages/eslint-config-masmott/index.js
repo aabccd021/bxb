@@ -1,105 +1,73 @@
 module.exports = {
+	parser: "@typescript-eslint/parser",
 	parserOptions: {
 		project: [
 			"**/tsconfig.json"
 		],
 	},
 	plugins: [
-		'@typescript-eslint',
-		'only-warn',
-		'functional',
-		'cypress',
-		'mocha',
-		'unused-imports'
+		"@typescript-eslint",
+		"cypress",
+		"functional",
+		"import",
+		"jest",
+		"only-warn",
+		"simple-import-sort",
+		"sort-keys-fix",
+		"typescript-sort-keys",
+		"unused-imports",
 	],
 	ignorePatterns: [
-		"**/*.js",
-		"generated.ts",
+		".masmott/**",
 		"pages/**/*.tsx",
 	],
-	overrides: [
-		{
-			files: [
-				'masmott.ts',
-				'web/**/*.tsx'
-			],
-			extends: [
-				'eslint:recommended',
-				'plugin:@typescript-eslint/all',
-				'plugin:mocha/recommended',
-				'plugin:prettier/recommended',
-				'plugin:functional/lite',
-				'next',
-				'prettier'
-			],
-			rules: {
-				'no-unsafe-optional-chaining': 'warn',
-				'no-use-before-define': 'warn',
-				'no-else-return': 'warn',
-				'no-useless-return': 'warn',
-				'no-undef-init': 'warn',
-				'no-useless-rename': 'warn',
-				'object-shorthand': 'warn',
-				'prefer-arrow-callback': 'warn',
-				'prefer-destructuring': 'warn',
-				'prefer-template': 'warn',
-				'eqeqeq': 'warn',
-				'max-len': [
-					'warn',
-					{
-						'code': 100,
-						'comments': 100,
-						'ignoreStrings': true,
-						'ignoreTemplateLiterals': true
-					}
-				],
-				'curly': [
-					'warn',
-					'all'
-				],
-				'prettier/prettier': [
-					'warn',
-					{
-						'singleQuote': true,
-						'printWidth': 100
-					}
-				],
-				'functional/no-return-void': 'off',
-				'functional/no-mixed-type': 'off',
-				'@typescript-eslint/no-unused-vars': 'off',
-				'@typescript-eslint/no-magic-numbers': 'off',
-				'@typescript-eslint/no-floating-promises': 'off',
-				'@typescript-eslint/consistent-type-definitions': ['error', 'type'],
-				'@typescript-eslint/prefer-readonly-parameter-types': 'off',
-				'@typescript-eslint/prefer-readonly-parameter-types': 'off',
-				'@typescript-eslint/no-type-alias': [
-					'error',
-					{
-						allowLiterals: "always",
-						allowGenerics: "always",
-					}
-				],
-				'@typescript-eslint/naming-convention': [
-					'error',
-					{
-						selector: 'default',
-						format: ['strictCamelCase', 'PascalCase']
-					}
-				],
-				'unused-imports/no-unused-imports': 'error',
-				'unused-imports/no-unused-vars': [
-					'error',
-					{ 'vars': 'all', 'varsIgnorePattern': '^_', 'args': 'after-used', 'argsIgnorePattern': '^_' }
-				]
-			},
-		},
-		{
-			files: [
-				'cypress/**/*.spec.ts'
-			],
-			extends: [
-				'plugin:cypress/recommended',
-			],
-		}
+	extends: [
+		"eslint:recommended",
+		"next",
+		"next/core-web-vitals",
+		"plugin:@typescript-eslint/all",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:@typescript-eslint/recommended-requiring-type-checking",
+		"plugin:functional/all",
+		"plugin:import/errors",
+		"plugin:import/recommended",
+		"plugin:import/typescript",
+		"plugin:import/warnings",
+		"plugin:jest/recommended",
+		"plugin:jest/style",
+		"plugin:prettier/recommended",
+		"plugin:typescript-sort-keys/recommended",
+		"prettier",
 	],
+	rules: {
+		"@typescript-eslint/consistent-type-definitions": ["error", "type"],
+		"@typescript-eslint/naming-convention": ["error", { selector: "default", format: ["strictCamelCase", "PascalCase"] }],
+		"@typescript-eslint/no-shadow": "error",
+		"@typescript-eslint/no-type-alias": ["error", { allowLiterals: "always", allowGenerics: "always", }],
+		"curly": ["error", "all"],
+		"eqeqeq": "error",
+		"import/exports-last": "error",
+		"import/first": "error",
+		"import/no-named-default": "error",
+		"import/no-useless-path-segments": "error",
+		"max-len": ["error", { "code": 100, "comments": 100, "ignoreStrings": true, "ignoreTemplateLiterals": true }],
+		"no-else-return": "error",
+		"no-undef-init": "error",
+		"no-unsafe-optional-chaining": "error",
+		"no-use-before-define": "error",
+		"no-useless-rename": "error",
+		"no-useless-return": "error",
+		"object-shorthand": "error",
+		"prefer-arrow-callback": "error",
+		"prefer-destructuring": "error",
+		"prefer-template": "error",
+		"prettier/prettier": ["error", { "singleQuote": true, "printWidth": 100 }],
+		"simple-import-sort/exports": "error",
+		"simple-import-sort/imports": "error",
+		"sort-keys-fix/sort-keys-fix": "error",
+		"unused-imports/no-unused-imports": "error",
+		"unused-imports/no-unused-imports-ts": "error",
+		"unused-imports/no-unused-vars": ["error", { "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }],
+	},
 }

@@ -28,15 +28,11 @@ describe('Diary', () => {
 
     await delay(2000);
 
-    expect(
-      (await getDoc(doc(firestore, 'post_card', id))).data()
-    ).toStrictEqual({
+    expect((await getDoc(doc(firestore, 'post_card', id))).data()).toStrictEqual({
       title: 'tiltee',
     });
 
-    expect(
-      (await getDoc(doc(firestore, 'post_page', id))).data()
-    ).toStrictEqual({
+    expect((await getDoc(doc(firestore, 'post_page', id))).data()).toStrictEqual({
       text: 'textt',
       title: 'tiltee',
     });

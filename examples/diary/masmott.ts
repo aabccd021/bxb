@@ -7,10 +7,10 @@ export const masmott: Masmott = {
   spec: {
     post: {
       data: {
-        title: {
+        text: {
           type: 'string',
         },
-        text: {
+        title: {
           type: 'string',
         },
       },
@@ -22,8 +22,8 @@ export const masmott: Masmott = {
         },
         page: {
           select: {
-            title: undefined,
             text: undefined,
+            title: undefined,
           },
         },
       },

@@ -20,9 +20,7 @@ const Page: ISRPage = ({
             </>
           )}
           {snapshot.doc.state === 'fetching' && <p>Fetching gan</p>}
-          {snapshot.doc.state === 'loaded' && !snapshot.doc.exists && (
-            <p>Gaada gan</p>
-          )}
+          {snapshot.doc.state === 'loaded' && !snapshot.doc.exists && <p>Gaada gan</p>}
           {snapshot.doc.state === 'loaded' && snapshot.doc.exists && (
             <div>{JSON.stringify(snapshot)}</div>
           )}

@@ -7,22 +7,28 @@
     "index.js"
   ],
   "scripts": {
-    "prep": "node prepare.js"
+    "prep": "node scripts/prepare.js"
   },
   "peerDependencies": {
     "eslint": ">= 7"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "eslint-config-next": "^11.1.2",
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/parser": "^5.10.2",
+    "eslint-config-cypress": "^0.28.0",
+    "eslint-config-next": "^12.0.10",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-cypress": "^2.12.1",
-    "eslint-plugin-functional": "^4.0.2",
-    "eslint-plugin-mocha": "^9.0.0",
+    "eslint-plugin-functional": "^4.1.1",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jest": "^26.0.0",
     "eslint-plugin-only-warn": "^1.0.3",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-unused-imports": "^1.1.5",
-    "prettier": "^2.4.1"
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "eslint-plugin-typescript-sort-keys": "^2.1.0",
+    "eslint-plugin-unused-imports": "^2.0.0"
+  },
+  "devDependencies": {
+    "fs-extra": "^10.0.0"
   }
 }
