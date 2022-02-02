@@ -37,13 +37,15 @@ const buildNext = async () => {
     rmSync(nextdir, { recursive: true });
   }
 
-  await runCmd('next build');
+  const exitCode = await runCmd('next build');
   console.log('Finish build next');
+  return exitCode;
 };
 
 export const build = async () => {
   console.log('Start build');
   buildFunctions();
-  await buildNext();
+  const exitCode = await buildNext();
   console.log(`Finish build`);
+  return exitCode;
 };

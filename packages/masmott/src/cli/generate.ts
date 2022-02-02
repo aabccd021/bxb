@@ -23,10 +23,13 @@ generate(masmott);
     fs.rmSync(outdir, { recursive: true });
   }
 
+  console.log(`Start compile generator`);
   compile(outdir, { 'index.ts': indexContent });
-  await runCmd('node ./.masmott/cli/index.js');
+  console.log(`Finish compile generator`);
 
+  const exitCode = await runCmd('node ./.masmott/cli/index.js');
   console.log(`Finish compile and generate`);
+  return exitCode;
 };
 
 export const generate = (masmott: Masmott) => {

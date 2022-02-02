@@ -5,20 +5,23 @@ import { build } from './build';
 import { compileAndGenerate } from './generate';
 import { test } from './test';
 
-const main = async () => {
+const cli = async (): Promise<number | undefined> => {
   const args = process.argv.slice(2);
 
   if (args[0] === 'build') {
-    await build();
+    return build();
   }
 
   if (args[0] === 'test') {
-    await test();
+    return test();
   }
 
   if (args[0] === 'generate') {
-    await compileAndGenerate();
+    return compileAndGenerate();
   }
+
+  console.log('unknown command');
+  return 0;
 };
 
-void main();
+void cli().then(process.exit);
