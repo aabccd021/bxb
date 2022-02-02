@@ -18,8 +18,8 @@ module.exports = {
     "unused-imports",
   ],
   ignorePatterns: [
-    ".masmott/**",
-    "pages/**/*.tsx",
+    "**/*.js",
+    "pages/**",
   ],
   extends: [
     "eslint:recommended",
