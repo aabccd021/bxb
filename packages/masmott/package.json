@@ -5,8 +5,10 @@
   "private": false,
   "scripts": {
     "lint": "eslint --ext .ts .",
-    "build": "tsc && tsc --project tsconfig.mjs.json && node scripts/prepare.js",
-    "test": "yarn build && node scripts/test.js"
+    "build": "tsc && tsc --project tsconfig.mjs.json",
+    "prep": "yarn build && node scripts/prepare.js",
+    "propagate:quick": "node scripts/propagate.js",
+    "propagate": "yarn prep && node scripts/propagate.js"
   },
   "files": [
     "dist/"
