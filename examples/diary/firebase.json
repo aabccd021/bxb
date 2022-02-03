@@ -14,31 +14,45 @@
     }
   },
   "functions": {
-    "source": ".",
     "ignore": [
-      "firebase.json",
-      "test/",
-      "**./*.log",
-      "**/.*",
-      "**/node_modules/**",
-      "**/*.json"
-    ]
+      ".gitignore",
+      ".masmott",
+      ".next",
+      "cypress",
+      "firestore-debug.log",
+      "masmott.ts",
+      "node_modules",
+      "package.json",
+      "pages",
+      "test",
+      "tsconfig.json",
+      "web",
+      "yarn.lock"
+    ],
+    "source": "."
   },
   "hosting": {
-    "public": "public",
     "cleanUrls": true,
     "ignore": [
-      "firebase.json",
+      ".gitignore",
+      ".masmott",
+      ".next",
+      "cypress",
+      "firestore-debug.log",
+      "masmott.ts",
+      "node_modules",
+      "package.json",
+      "pages",
+      "test",
       "tsconfig.json",
-      "README.md",
-      "**/node_modules/**",
-      ".**",
-      "pages/**"
+      "web",
+      "yarn.lock"
     ],
+    "public": "public",
     "rewrites": [
       {
-        "source": "**",
-        "function": "nextjs"
+        "function": "nextjs",
+        "source": "**"
       }
     ]
   }
