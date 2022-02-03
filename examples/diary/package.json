@@ -8,7 +8,8 @@
   "scripts": {
     "build": "masmott build",
     "test": "masmott test",
-    "start": "masmott start"
+    "start": "masmott start",
+    "lint": "masmott lint"
   },
   "dependencies": {
     "firebase-admin": "^10.0.2",

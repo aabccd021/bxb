@@ -2,9 +2,9 @@
 /* eslint-disable functional/no-return-void */
 import { Dict, Masmott } from 'core';
 import * as fs from 'fs';
-
-import { cypressJson, nextConfigJs, nextEnvDTs } from './templates';
+import { cypressJson, nextConfigJs, nextEnvDTs, tsConfigJson } from './templates';
 import { firebaseJson } from './templates/firebase-json';
+
 
 type Dir = Dict<string | Dir>;
 
@@ -26,6 +26,7 @@ export const generate = (_masmott: Masmott) => {
     'cypress.json': cypressJson,
     'next-env.d.ts': nextEnvDTs,
     'next.config.js': nextConfigJs,
+    'tsconfig.json': tsConfigJson
   });
   const files = fs.readdirSync('.', { withFileTypes: true });
   write({
