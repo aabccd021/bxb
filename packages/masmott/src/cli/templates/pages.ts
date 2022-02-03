@@ -35,7 +35,7 @@ const readDirRec = (dir: string): readonly string[] =>
 const getPageTsx = (path: string, _masmott: Masmott) => {
   const [collectionName, fileName] = path.replace('web/', '').split('/');
   return collectionName === undefined ||
-    fileName === undefined ||
+    fileName !== '[id]' ||
     !Object.keys(_masmott.spec[collectionName]?.view ?? {}).includes('page')
     ? pageTsx(path)
     : isrTsx(path, collectionName);

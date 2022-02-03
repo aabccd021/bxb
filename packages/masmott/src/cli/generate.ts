@@ -29,6 +29,7 @@ const write = (paths: readonly (readonly [string, string])[]) =>
   });
 
 export const generate = (masmott: Masmott) => {
+  fs.rmSync('./pages', { recursive: true });
   const staticPaths = toPathArray({
     '.gitignore': gitignore,
     'cypress.json': cypressJson,
