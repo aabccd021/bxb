@@ -3,30 +3,31 @@
 /* eslint-disable functional/no-conditional-statement */
 /* eslint-disable functional/no-return-void */
 /* eslint-disable functional/no-expression-statement */
+import { PAGE_VIEW } from 'core/constants';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
 
-import { FirebaseOptions, ISRPage, ISRPageProps, ViewPath } from './types';
+import { FirebaseOptions, ISRPage, ISRPageProps } from './types';
 import { useDoc } from './use-doc';
 
 function PageWithSnapshot({
   options,
   Page,
   id,
-  viewPath: [collection, view],
+  collection,
   useLocalData,
 }: {
   readonly Page: ISRPage;
+  readonly collection: string;
   readonly id: string;
   readonly options: FirebaseOptions;
   readonly useLocalData: boolean;
-  readonly viewPath: ViewPath;
 }): JSX.Element {
   const viewDoc = useDoc(options, [collection, id], {
     revalidateOnMount: !useLocalData,
-    view,
+    view: PAGE_VIEW,
   });
   return <Page snapshot={{ doc: viewDoc, id }} />;
 }
@@ -34,11 +35,11 @@ function PageWithSnapshot({
 function PageWithId({
   options,
   Page,
-  viewPath,
+  collection,
 }: {
   readonly Page: ISRPage;
+  readonly collection: string;
   readonly options: FirebaseOptions;
-  readonly viewPath: ViewPath;
 }): JSX.Element {
   const router = useRouter();
   const [id, setId] = useState<string | undefined>(undefined);
@@ -53,13 +54,9 @@ function PageWithId({
           setUseLocalData(false);
           return;
         }
-        router.push(
-          `${router.pathname.replace('[id]', '')}${queryId}`,
-          undefined,
-          {
-            shallow: true,
-          }
-        );
+        router.push(`${router.pathname.replace('[id]', '')}${queryId}`, undefined, {
+          shallow: true,
+        });
       }
     }
   }, [router]);
@@ -71,7 +68,7 @@ function PageWithId({
         <PageWithSnapshot
           options={options}
           Page={Page}
-          viewPath={viewPath}
+          collection={collection}
           id={id}
           useLocalData={useLocalData}
         />
@@ -84,12 +81,12 @@ function PageWithId({
 
 export function makeISRPage(
   options: FirebaseOptions,
-  viewPath: ViewPath,
+  collection: string,
   Page: ISRPage
 ): NextPage<ISRPageProps> {
   const StaticPage: NextPage<ISRPageProps> = ({ fallback }) => (
     <SWRConfig value={{ fallback }}>
-      <PageWithId options={options} Page={Page} viewPath={viewPath} />
+      <PageWithId options={options} Page={Page} collection={collection} />
     </SWRConfig>
   );
   return StaticPage;

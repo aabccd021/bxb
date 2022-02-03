@@ -1,12 +1,7 @@
 import type { AppProps } from 'next/app';
-import { SWRConfig } from 'swr';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return (
-    <SWRConfig>
-      <Component {...pageProps} />
-    </SWRConfig>
-  );
+  return <Component {...pageProps} />;
 }
 
 export default MyApp;
