@@ -5,10 +5,16 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 import { getId, setDoc } from './firebase';
-import { CreateDoc, DocCreation, FirebaseOptions } from './types';
+import { CreateDoc, DocCreation, DocCreationData, DocData, FirebaseOptions } from './types';
 import { makeDocPath } from './util';
 
-export function useDocCreation(options: FirebaseOptions, collection: string): DocCreation.Type {
+export const useDocCreation = <
+  DD extends DocData = DocData,
+  CDD extends DocCreationData = DocCreationData
+>(
+  options: FirebaseOptions,
+  collection: string
+): DocCreation.Type<DD, CDD> => {
   const { mutate } = useSWRConfig();
 
   const [creation, setCreation] = useState<DocCreation.Type>({
@@ -45,5 +51,5 @@ export function useDocCreation(options: FirebaseOptions, collection: string): Do
     }
   }, [createDoc, creation]);
 
-  return creation;
-}
+  return creation as DocCreation.Type<DD, CDD>;
+};

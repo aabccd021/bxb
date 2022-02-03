@@ -67,6 +67,7 @@ cypress.json
 cypress/screenshots
 cypress/videos
 firebase.json
+masmott.generated
 next-env.d.ts
 next.config.js
 node_modules

@@ -1,13 +1,9 @@
-import type { FirebaseOptions } from 'masmott';
-import { useDocCreation } from 'masmott';
+import { usePostCreation } from '@/masmott.generated';
 import type { NextPage } from 'next';
 
-const options: FirebaseOptions = {
-  projectId: 'demo-diary',
-};
 
 const A = (): JSX.Element => {
-  const docCreation = useDocCreation(options, 'post');
+  const docCreation = usePostCreation();
 
   if (docCreation.state === 'initial') {
     return <div>Loading</div>;
@@ -24,10 +20,7 @@ const A = (): JSX.Element => {
         <div>Not created</div>
         <button
           onClick={() => {
-            docCreation.createDoc({
-              text: 'textt',
-              title: 'tiltee',
-            });
+            docCreation.createDoc({ text: 'textt', title: 'titlee' });
           }}
         >
           Create
@@ -35,7 +28,13 @@ const A = (): JSX.Element => {
       </>
     );
   }
-  return <div>created: {JSON.stringify(docCreation.createdDoc)}</div>;
+  const { createdDoc } = docCreation;
+  return (
+    <>
+      <div>text: {createdDoc.data.text}</div>
+      <div>title: {createdDoc.data.title}</div>
+    </>
+  );
 };
 
 const Home: NextPage = () => {

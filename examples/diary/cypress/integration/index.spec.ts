@@ -4,6 +4,7 @@ describe('Creation', () => {
 
     cy.get('button').contains('Create').click();
 
-    cy.contains('created: {"data":{"text":"textt","title":"tiltee"},"id":"');
+    cy.contains('text: textt');
+    cy.contains('title: titlee');
   });
 });
