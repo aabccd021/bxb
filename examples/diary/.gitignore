@@ -6,3 +6,4 @@ cypress.json
 firebase.json
 next-env.d.ts
 next.config.js
+tsconfig.json
