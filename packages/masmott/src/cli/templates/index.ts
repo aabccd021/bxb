@@ -23,6 +23,7 @@ export const tsConfigJson = jsonStringify({
   compilerOptions: {
     allowJs: true,
     alwaysStrict: true,
+    baseUrl: '.',
     esModuleInterop: true,
     exactOptionalPropertyTypes: true,
     forceConsistentCasingInFileNames: true,
@@ -42,6 +43,9 @@ export const tsConfigJson = jsonStringify({
     noUncheckedIndexedAccess: true,
     noUnusedLocals: true,
     noUnusedParameters: true,
+    paths: {
+      '@/*': ['./*'],
+    },
     resolveJsonModule: true,
     skipLibCheck: true,
     strict: true,

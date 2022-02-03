@@ -5,7 +5,7 @@ import * as fs from 'fs';
 
 import { cypressJson, nextConfigJs, nextEnvDTs, tsConfigJson } from './templates';
 import { firebaseJson } from './templates/firebase-json';
-import { pages } from './templates/pages';
+import { getPagesPaths } from './templates/pages';
 
 type Dir = Dict<string | Dir>;
 
@@ -29,11 +29,10 @@ export const generate = (masmott: Masmott) => {
     'next.config.js': nextConfigJs,
     'tsconfig.json': tsConfigJson,
   });
-  write([...staticPaths, ...pages(masmott)]);
-  const files = fs.readdirSync('.', { withFileTypes: true });
+  write([...staticPaths, ...getPagesPaths(masmott)]);
   write(
     toPathArray({
-      'firebase.json': firebaseJson(files),
+      'firebase.json': firebaseJson(),
     })
   );
 };

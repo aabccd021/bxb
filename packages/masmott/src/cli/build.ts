@@ -11,7 +11,7 @@ import { runCmd } from './runCmd';
 
 const functionsCode = `
 import { initAndMakeFirestoreTriggers } from 'masmott';
-import { masmott } from './masmott';
+import { masmott } from './masmott.config';
 import conf from './next.config';
 
 export const {firestore, nextjs} = initAndMakeFirestoreTriggers(masmott, conf);

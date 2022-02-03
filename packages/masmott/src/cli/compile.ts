@@ -89,7 +89,7 @@ export const compile = (outDir: string, fileName: string, fileContent: string) =
 export const compileAndRunCLI = (name: string) => {
   const content = `
 import { ${name} } from 'masmott';
-import { masmott } from './masmott';
+import { masmott } from './masmott.config';
 
 ${name}(masmott);
 `;

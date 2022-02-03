@@ -2,8 +2,8 @@ import * as fs from 'fs';
 
 import { jsonStringify } from './utils';
 
-export const firebaseJson = (files: readonly fs.Dirent[]) => {
-  const ignoreString = files.map((file) => file.name);
+export const firebaseJson = () => {
+  const ignoreString = fs.readdirSync('.', { withFileTypes: true }).map((file) => file.name);
   return jsonStringify({
     emulators: {
       firestore: {

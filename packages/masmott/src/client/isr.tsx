@@ -3,7 +3,6 @@
 /* eslint-disable functional/no-conditional-statement */
 /* eslint-disable functional/no-return-void */
 /* eslint-disable functional/no-expression-statement */
-import { PAGE_VIEW } from 'core/constants';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -27,7 +26,7 @@ function PageWithSnapshot({
 }): JSX.Element {
   const viewDoc = useDoc(options, [collection, id], {
     revalidateOnMount: !useLocalData,
-    view: PAGE_VIEW,
+    view: 'page',
   });
   return <Page snapshot={{ doc: viewDoc, id }} />;
 }

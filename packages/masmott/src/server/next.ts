@@ -1,5 +1,4 @@
 /* eslint-disable functional/no-conditional-statement */
-import { PAGE_VIEW } from 'core/constants';
 import { getFirestore } from 'firebase-admin/firestore';
 import { GetStaticPaths, GetStaticPathsResult, GetStaticProps, GetStaticPropsResult } from 'next';
 
@@ -25,8 +24,8 @@ export function makeGetStaticProps(collection: string): GetStaticProps<ISRPagePr
         revalidate: 60,
       };
     }
-    const collectionPath = makeCollectionPath(collection, PAGE_VIEW);
-    const docPath = makeDocPath(collection, id, PAGE_VIEW);
+    const collectionPath = makeCollectionPath(collection, 'page');
+    const docPath = makeDocPath(collection, id, 'page');
     const snapshot = await getFirestore().collection(collectionPath).doc(id).get();
     const data = snapshot.data();
     const doc: DocSnapshot = data !== undefined ? { data, exists: true } : { exists: false };
