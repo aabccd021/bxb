@@ -21,9 +21,7 @@ import { runCmd } from './runCmd';
 export const compile = (outDir: string, fileName: string, fileContent: string) => {
   const absoluteOutDir = `.masmott/${outDir}/`;
   const fullFileName = `${fileName}.ts`;
-  if (fs.existsSync(absoluteOutDir)) {
-    fs.rmSync(absoluteOutDir, { recursive: true });
-  }
+  fs.rmSync(absoluteOutDir, { force: true, recursive: true });
 
   const target = ScriptTarget.ES2017;
 

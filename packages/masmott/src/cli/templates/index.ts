@@ -60,3 +60,16 @@ export const tsConfigJson = jsonStringify({
   exclude: ['node_modules'],
   include: ['next-env.d.ts', '**/*.ts', '**/*.tsx'],
 });
+
+export const gitignore = `.masmott
+.next
+cypress.json
+cypress/screenshots
+cypress/videos
+firebase.json
+next-env.d.ts
+next.config.js
+node_modules
+pages
+tsconfig.json
+`;
