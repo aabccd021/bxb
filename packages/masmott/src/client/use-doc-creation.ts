@@ -5,28 +5,36 @@ import { Dict, SelectVS, VS } from 'core';
 import { NextRouter, useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useSWRConfig } from 'swr';
-
 import { getId, setDoc } from './firebase';
 import {
   CreateDoc,
   DocCreation,
   DocCreationData,
   DocData,
+  DocSnapshot,
   DocWithId,
-  FirebaseOptions,
+  FirebaseOptions
 } from './types';
 import { makeDocPath } from './util';
 
-const materializeViewDocSelectVS = (docData: DocData, select: SelectVS) => {
+
+const materializeViewDocSelectVS = (docData: DocData, select: SelectVS): DocData => {
   const materializedFieldNames = Object.keys(select);
-  return Object.entries(docData).filter(([fieldName]) =>
-    materializedFieldNames.includes(fieldName)
+  return Object.fromEntries(
+    Object.entries(docData).filter(([fieldName]) => materializedFieldNames.includes(fieldName))
   );
 };
 
-const materializeViewDoc = (docData: DocData, viewSpec: VS) => ({
+const materializeViewDoc = (docData: DocData, viewSpec: VS): DocData => ({
   ...materializeViewDocSelectVS(docData, viewSpec.select),
 });
+
+const makeMaterializedViewDocSnapshot =
+  (docData: DocData) =>
+  (viewSpec: VS): DocSnapshot => ({
+    data: materializeViewDoc(docData, viewSpec),
+    exists: true,
+  });
 
 const useDocCreation = <
   DD extends DocData,
@@ -47,6 +55,17 @@ const useDocCreation = <
 
   const reset = useCallback(() => setCreation({ state: 'initial' }), []);
 
+  const mutateViews = useCallback(
+    (id: string, makeViewDocSnapshot: (viewSpec: VS) => DocSnapshot) =>
+      Object.entries(viewSpecs).map(([viewName, viewSpec]) => {
+        const viewDocSnapshot = makeViewDocSnapshot(viewSpec);
+        const viewDocpath = makeDocPath(collection, id, viewName);
+        console.log(`path: ${viewDocpath}, data: ${JSON.stringify(viewDocSnapshot)}`);
+        return mutate(viewDocpath, viewDocSnapshot, false);
+      }),
+    []
+  );
+
   const createDoc = useCallback<CreateDoc>(
     async (data) => {
       const id = await getId(options, collection);
@@ -56,19 +75,14 @@ const useDocCreation = <
       setCreation({ createdDoc, state: 'creating' });
 
       const docPath = makeDocPath(collection, id);
+      const docSnapshot: DocSnapshot = { data, exists: true };
 
       const [setDocError] = await Promise.all([
         // send create request
         setDoc(options, collection, id, data),
-        // set swr doc cache
-        mutate(docPath, data, false),
-        // set swr view cache
-        ...Object.entries(viewSpecs).map(([viewName, viewSpec]) => {
-          const viewDocData = materializeViewDoc(data, viewSpec);
-          const viewDocpath = makeDocPath(collection, id, viewName);
-          console.log(`path: ${viewDocpath}, data: ${JSON.stringify(viewDocData)}`);
-          return mutate(viewDocpath, viewDocData, false);
-        }),
+        // set swr cache
+        mutate(docPath, docSnapshot, false),
+        ...mutateViews(id, makeMaterializedViewDocSnapshot(data)),
       ]);
 
       if (setDocError === undefined) {
@@ -84,8 +98,12 @@ const useDocCreation = <
           state: 'error',
         });
 
-        // revert swr cache to undefined
-        await mutate(undefined, data, false);
+        // revert swr caches
+        const absentDocSnapshot: DocSnapshot = { exists: false };
+        await Promise.all([
+          mutate(undefined, absentDocSnapshot, false),
+          ...mutateViews(id, () => absentDocSnapshot),
+        ]);
       }
     },
     [reset, options, collection]
