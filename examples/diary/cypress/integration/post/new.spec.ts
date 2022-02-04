@@ -10,6 +10,7 @@ describe('Creation', () => {
     cy.contains('Title: taitoru');
     cy.contains('Text: tekisuto');
 
+    cy.wait(2000);
     cy.reload();
 
     cy.contains('Title: taitoru');

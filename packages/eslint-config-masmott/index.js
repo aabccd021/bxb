@@ -45,6 +45,7 @@ module.exports = {
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/naming-convention": ["error", { selector: "default", format: ["strictCamelCase", "PascalCase"] }],
+    "@typescript-eslint/no-magic-numbers": "off",
     "@typescript-eslint/no-shadow": "error",
     "@typescript-eslint/no-type-alias": ["error", { allowLiterals: "always", allowGenerics: "always", }],
     "curly": ["error", "all"],
@@ -83,7 +84,6 @@ module.exports = {
       ],
       rules: {
         "@typescript-eslint/explicit-function-return-type": "off",
-        "@typescript-eslint/no-magic-numbers": "off",
         "functional/functional-parameters": "off",
         "functional/no-expression-statement": "off",
         "functional/no-return-void": "off",
