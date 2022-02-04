@@ -1,16 +1,15 @@
 /* eslint-disable functional/no-conditional-statement */
 import { getFirestore } from 'firebase-admin/firestore';
-import { GetStaticPaths, GetStaticPathsResult, GetStaticProps, GetStaticPropsResult } from 'next';
+import { GetStaticPaths, GetStaticProps, GetStaticPropsResult } from 'next';
 
 import { DocSnapshot, ISRPageProps } from '../client/types';
 import { makeCollectionPath, makeDocPath } from '../client/util';
 
-export function makeGetStaticPaths(): GetStaticPaths {
-  return (): GetStaticPathsResult => ({ fallback: true, paths: [] });
-}
+export const makeGetStaticPaths = (): GetStaticPaths => () => ({ fallback: true, paths: [] });
 
-export function makeGetStaticProps(collection: string): GetStaticProps<ISRPageProps> {
-  return async ({ params }): Promise<GetStaticPropsResult<ISRPageProps>> => {
+export const makeGetStaticProps =
+  (collection: string): GetStaticProps<ISRPageProps> =>
+  async ({ params }): Promise<GetStaticPropsResult<ISRPageProps>> => {
     const id = params?.['id'];
     if (typeof id !== 'string') {
       return {
@@ -36,4 +35,3 @@ export function makeGetStaticProps(collection: string): GetStaticProps<ISRPagePr
       revalidate: 60,
     };
   };
-}

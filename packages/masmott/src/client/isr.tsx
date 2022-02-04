@@ -11,7 +11,7 @@ import { SWRConfig } from 'swr';
 import { DocData, FirebaseOptions, ISRPage, ISRPageProps } from './types';
 import { useDoc } from './use-doc';
 
-function PageWithSnapshot<DD extends DocData>({
+const PageWithSnapshot = <DD extends DocData>({
   options,
   Page,
   id,
@@ -23,14 +23,14 @@ function PageWithSnapshot<DD extends DocData>({
   readonly id: string;
   readonly options: FirebaseOptions;
   readonly useLocalData: boolean;
-}): JSX.Element {
+}): JSX.Element => {
   const viewDoc = useDoc<DD>(options, [collection, id], 'page', {
     revalidateOnMount: !useLocalData,
   });
   return <Page snapshot={{ doc: viewDoc, id }} />;
-}
+};
 
-function PageWithId<DD extends DocData>({
+const PageWithId = <DD extends DocData>({
   options,
   Page,
   collection,
@@ -38,7 +38,7 @@ function PageWithId<DD extends DocData>({
   readonly Page: ISRPage<DD>;
   readonly collection: string;
   readonly options: FirebaseOptions;
-}): JSX.Element {
+}): JSX.Element => {
   const router = useRouter();
   const [id, setId] = useState<string | undefined>(undefined);
   const [useLocalData, setUseLocalData] = useState(true);
@@ -75,17 +75,17 @@ function PageWithId<DD extends DocData>({
       )}
     </>
   );
-}
+};
 
-export function makeISRPage<DD extends DocData>(
+export const makeISRPage = <DD extends DocData>(
   options: FirebaseOptions,
   collection: string,
   Page: ISRPage<DD>
-): NextPage<ISRPageProps> {
+): NextPage<ISRPageProps> => {
   const StaticPage: NextPage<ISRPageProps> = ({ fallback }) => (
     <SWRConfig value={{ fallback }}>
       <PageWithId options={options} Page={Page} collection={collection} />
     </SWRConfig>
   );
   return StaticPage;
-}
+};

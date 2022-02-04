@@ -62,7 +62,7 @@ const makeKColTriggers =
 
 const makeKTriggers = (spec: Spec, db: DB) => Object.entries(spec).map(makeKColTriggers(db));
 
-function makeNextjsFunction(conf: NextConfig): HttpsFunction {
+const makeNextjsFunction = (conf: NextConfig): HttpsFunction => {
   const nextjsServer = next({ conf, dev: false });
 
   const nextjsHandle = nextjsServer.getRequestHandler();
@@ -72,7 +72,7 @@ function makeNextjsFunction(conf: NextConfig): HttpsFunction {
   );
 
   return nextjsFunc;
-}
+};
 
 const makeTriggers = ({
   masmott,

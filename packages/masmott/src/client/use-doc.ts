@@ -9,14 +9,14 @@ import { makeFetcher } from './firebase';
 import { Doc, DocData, DocKey, FirebaseOptions } from './types';
 import { makeDocPath } from './util';
 
-export function useDoc<DD extends DocData>(
+export const useDoc = <DD extends DocData>(
   firebaseOptions: FirebaseOptions,
   [collectionName, id]: DocKey,
   view: string | undefined,
   options?: {
     readonly revalidateOnMount?: boolean;
   }
-): Doc.Type<DD> {
+): Doc.Type<DD> => {
   const [doc, setDoc] = useState<Doc.Type>({ state: 'fetching' });
 
   const docPath = useMemo(() => makeDocPath(collectionName, id, view), [collectionName, view, id]);
@@ -63,4 +63,4 @@ export function useDoc<DD extends DocData>(
   }, [snapshot, error, mutate]);
 
   return doc as Doc.Type<DD>;
-}
+};

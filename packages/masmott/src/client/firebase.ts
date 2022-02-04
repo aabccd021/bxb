@@ -35,7 +35,7 @@ export const getId: GetId = async (options, collection) => {
   return docRef.id;
 };
 
-export function makeFetcher(options: FirebaseOptions): Fetcher {
+export const makeFetcher = (options: FirebaseOptions): Fetcher => {
   return async (path): Promise<DocSnapshot> => {
     await initMasmott(options);
     const _ = await import('firebase/firestore/lite');
@@ -43,9 +43,6 @@ export function makeFetcher(options: FirebaseOptions): Fetcher {
     const docRef = _.doc(firestore, path);
     const snapshot = await _.getDoc(docRef);
     const data = snapshot.data();
-    if (data !== undefined) {
-      return { data, exists: true };
-    }
-    return { exists: false };
+    return data !== undefined ? { data, exists: true } : { exists: false };
   };
-}
+};
