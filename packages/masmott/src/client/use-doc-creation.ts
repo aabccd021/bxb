@@ -101,7 +101,7 @@ const useDocCreation = <
         // revert swr caches
         const absentDocSnapshot: DocSnapshot = { exists: false };
         await Promise.all([
-          mutate(undefined, absentDocSnapshot, false),
+          mutate(docPath, absentDocSnapshot, false),
           ...mutateViews(id, () => absentDocSnapshot),
         ]);
       }
