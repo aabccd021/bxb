@@ -6,17 +6,17 @@ import { useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
 import { makeFetcher } from './firebase';
-import { Doc, DocKey, FirebaseOptions } from './types';
+import { Doc, DocData, DocKey, FirebaseOptions } from './types';
 import { makeDocPath } from './util';
 
-export function useDoc(
+export function useDoc<DD extends DocData>(
   firebaseOptions: FirebaseOptions,
   [collectionName, id]: DocKey,
   options?: {
     readonly revalidateOnMount?: boolean;
     readonly view?: string | undefined;
   }
-): Doc.Type {
+): Doc.Type<DD> {
   const [doc, setDoc] = useState<Doc.Type>({ state: 'fetching' });
 
   const docPath = useMemo(
@@ -36,11 +36,13 @@ export function useDoc(
 
   useEffect(() => {
     if (snapshot === undefined) {
+      console.log(`${docPath} A`);
       return;
     }
 
     if (error) {
       setDoc({ reason: error, revalidate: mutate, state: 'error' });
+      console.log(`${docPath} B`);
       return;
     }
 
@@ -51,9 +53,11 @@ export function useDoc(
         revalidate: mutate,
         state: 'loaded',
       });
+      console.log(`${docPath} C`);
       return;
     }
 
+    console.log(`${docPath} D`);
     setDoc({
       exists: false,
       revalidate: mutate,
@@ -61,5 +65,5 @@ export function useDoc(
     });
   }, [snapshot, error, mutate]);
 
-  return doc;
+  return doc as Doc.Type<DD>;
 }

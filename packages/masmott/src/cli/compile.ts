@@ -86,10 +86,10 @@ export const compile = (outDir: string, fileName: string, fileContent: string) =
 
 export const compileAndRunCLI = (name: string) => {
   const content = `
-import { ${name} } from 'masmott';
+import { ${name}, Masmott } from 'masmott';
 import { masmott } from './masmott.config';
 
-${name}(masmott);
+${name}(masmott as Masmott);
 `;
   const exit1 = compile(`cli/${name}`, 'index', content);
   if (exit1 !== 0) {

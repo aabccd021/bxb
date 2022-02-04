@@ -8,7 +8,8 @@
     "build": "tsc && tsc --project tsconfig.mjs.json",
     "prep": "yarn build && node scripts/prepare.js",
     "propagate:quick": "node scripts/propagate.js",
-    "propagate": "yarn prep && node scripts/propagate.js"
+    "propagate": "yarn prep && node scripts/propagate.js",
+    "test": "yarn propagate test"
   },
   "files": [
     "dist/"

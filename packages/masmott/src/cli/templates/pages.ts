@@ -2,6 +2,8 @@
 import { Masmott } from 'core';
 import * as fs from 'fs';
 
+import { capitalize } from './utils';
+
 const appTsx = `import type { AppProps } from 'next/app';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -16,10 +18,13 @@ export default Page;
 `;
 
 const isrTsx = (path: string, collection: string) => `import { masmott } from '@/masmott.config';
+import { ${capitalize(collection)}PageData } from '@/masmott.generated';
 import Page from '@/${path}';
 import { ISRPage, makeISRPage } from 'masmott';
 import { makeGetStaticPaths, makeGetStaticProps } from 'masmott/dist/cjs';
-const ISRPage = makeISRPage(masmott.firebase, '${collection}', Page);
+const ISRPage = makeISRPage<${capitalize(
+  collection
+)}PageData>(masmott.firebase, '${collection}', Page);
 export default ISRPage;
 export const getStaticPaths = makeGetStaticPaths();
 export const getStaticProps = makeGetStaticProps('${collection}');

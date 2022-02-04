@@ -1,4 +1,4 @@
-import { useDocCreation } from 'masmott';
+import { useDocCreationWithPage } from 'masmott';
 
 import { masmott } from './masmott.config';
 
@@ -22,4 +22,8 @@ export type PostCreationData = {
 };
 
 export const usePostCreation = () =>
-  useDocCreation<PostData, PostCreationData>(masmott.firebase, 'post');
+  useDocCreationWithPage<PostData, PostCreationData>(
+    masmott.firebase,
+    'post',
+    masmott.spec.post.view
+  );

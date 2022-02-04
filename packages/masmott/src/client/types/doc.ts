@@ -15,13 +15,17 @@ export type LoadedNotExists = {
   readonly state: 'loaded';
 };
 
-export type LoadedExists = {
-  readonly data: DocData;
+export type LoadedExists<DD extends DocData> = {
+  readonly data: DD;
   readonly exists: true;
   readonly revalidate: () => void;
   readonly state: 'loaded';
 };
 
-export type Loaded = LoadedExists | LoadedNotExists;
+export type Loaded<DD extends DocData> = LoadedExists<DD> | LoadedNotExists;
 
-export type Type = Error | Fetching | LoadedNotExists | LoadedExists;
+export type Type<DD extends DocData = DocData> =
+  | Error
+  | Fetching
+  | LoadedNotExists
+  | LoadedExists<DD>;

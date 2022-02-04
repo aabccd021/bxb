@@ -10,11 +10,11 @@ import { compile, compileAndRunCLI } from './compile';
 import { runCmd } from './runCmd';
 
 const functionsCode = `
-import { initAndMakeFirestoreTriggers } from 'masmott';
+import { initAndMakeFirestoreTriggers, Masmott } from 'masmott';
 import { masmott } from './masmott.config';
 import conf from './next.config';
 
-export const {firestore, nextjs} = initAndMakeFirestoreTriggers(masmott, conf);
+export const {firestore, nextjs} = initAndMakeFirestoreTriggers(masmott as Masmott, conf);
 `;
 
 const buildFunctions = () => compile('functions', 'index', functionsCode);

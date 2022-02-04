@@ -91,7 +91,7 @@ module.exports = {
     },
     {
       files: [
-        "cypress/integration/**.spec.ts"
+        "cypress/integration/**/*.spec.ts"
       ],
       rules: {
         "@typescript-eslint/no-unsafe-call": "off",

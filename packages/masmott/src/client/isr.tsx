@@ -8,35 +8,35 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { SWRConfig } from 'swr';
 
-import { FirebaseOptions, ISRPage, ISRPageProps } from './types';
+import { DocData, FirebaseOptions, ISRPage, ISRPageProps } from './types';
 import { useDoc } from './use-doc';
 
-function PageWithSnapshot({
+function PageWithSnapshot<DD extends DocData>({
   options,
   Page,
   id,
   collection,
   useLocalData,
 }: {
-  readonly Page: ISRPage;
+  readonly Page: ISRPage<DD>;
   readonly collection: string;
   readonly id: string;
   readonly options: FirebaseOptions;
   readonly useLocalData: boolean;
 }): JSX.Element {
-  const viewDoc = useDoc(options, [collection, id], {
+  const viewDoc = useDoc<DD>(options, [collection, id], {
     revalidateOnMount: !useLocalData,
     view: 'page',
   });
   return <Page snapshot={{ doc: viewDoc, id }} />;
 }
 
-function PageWithId({
+function PageWithId<DD extends DocData>({
   options,
   Page,
   collection,
 }: {
-  readonly Page: ISRPage;
+  readonly Page: ISRPage<DD>;
   readonly collection: string;
   readonly options: FirebaseOptions;
 }): JSX.Element {
@@ -78,10 +78,10 @@ function PageWithId({
   );
 }
 
-export function makeISRPage(
+export function makeISRPage<DD extends DocData>(
   options: FirebaseOptions,
   collection: string,
-  Page: ISRPage
+  Page: ISRPage<DD>
 ): NextPage<ISRPageProps> {
   const StaticPage: NextPage<ISRPageProps> = ({ fallback }) => (
     <SWRConfig value={{ fallback }}>

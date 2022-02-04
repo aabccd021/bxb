@@ -37,9 +37,9 @@ export type DocData = {
   readonly [key: string]: Field;
 };
 
-export type DocSnapshot =
+export type DocSnapshot<DD extends DocData = DocData> =
   | {
-      readonly data: DocData;
+      readonly data: DD;
       readonly exists: true;
     }
   | {
@@ -79,8 +79,13 @@ export type ISRPageProps = {
   readonly fallback: Dict<DocSnapshot>;
 };
 
-export type ISRPage = (props: {
-  readonly snapshot?: { readonly doc: Doc.Type; readonly id: string };
+export type ISRDocSnapshot<DD extends DocData> = {
+  readonly doc: Doc.Type<DD>;
+  readonly id: string;
+};
+
+export type ISRPage<DD extends DocData> = (props: {
+  readonly snapshot?: ISRDocSnapshot<DD>;
 }) => JSX.Element;
 
 export type ViewPath = readonly [string] | readonly [string, string];

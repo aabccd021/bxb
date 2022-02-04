@@ -1,13 +1,8 @@
-import type { Doc, ISRPage } from 'masmott';
+import type { ISRPage } from 'masmott';
 
-const Page: ISRPage = ({
-  snapshot,
-}: {
-  readonly snapshot?: {
-    readonly doc: Doc.Type;
-    readonly id: string;
-  };
-}) => {
+import type { PostPageData } from '@/masmott.generated';
+
+const Page: ISRPage<PostPageData> = ({ snapshot }) => {
   return (
     <>
       {snapshot === undefined && <p>Loading</p>}
@@ -22,7 +17,10 @@ const Page: ISRPage = ({
           {snapshot.doc.state === 'fetching' && <p>Fetching gan</p>}
           {snapshot.doc.state === 'loaded' && !snapshot.doc.exists && <p>Gaada gan</p>}
           {snapshot.doc.state === 'loaded' && snapshot.doc.exists && (
-            <div>{JSON.stringify(snapshot)}</div>
+            <>
+              <div>Title: {snapshot.doc.data.title}</div>
+              <div>Text: {snapshot.doc.data.text}</div>
+            </>
           )}
         </>
       )}
