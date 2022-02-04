@@ -1,9 +1,9 @@
-import type { PostData } from '@/masmott.generated';
-import { usePostCreation } from '@/masmott.generated';
 import type { CreatedWithPage } from 'masmott/dist/cjs/client/types/doc-creation';
 import type { NextPage } from 'next';
 import { useEffect } from 'react';
 
+import type { PostData } from '@/masmott.generated';
+import { usePostCreation } from '@/masmott.generated';
 
 const Created = ({ creation }: { readonly creation: CreatedWithPage<PostData> }) => {
   useEffect(() => {

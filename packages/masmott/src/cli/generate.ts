@@ -5,8 +5,10 @@ import { Dict, Masmott } from 'core';
 import * as fs from 'fs';
 import { dirname } from 'path';
 
+import { lintCli } from './lint';
 import { cypressJson, gitignore, nextConfigJs, nextEnvDTs, tsConfigJson } from './templates';
 import { firebaseJson } from './templates/firebase-json';
+import { hooksStr } from './templates/hooks';
 import { getPagesPaths } from './templates/pages';
 
 type Dir = Dict<string | Dir>;
@@ -28,11 +30,12 @@ const write = (paths: readonly (readonly [string, string])[]) =>
     fs.writeFileSync(path, content, {});
   });
 
-export const generate = (masmott: Masmott) => {
+export const generate = async (masmott: Masmott) => {
   fs.rmSync('./pages', { recursive: true });
   const staticPaths = toPathArray({
     '.gitignore': gitignore,
     'cypress.json': cypressJson,
+    'masmott.generated.ts': hooksStr(masmott.spec),
     'next-env.d.ts': nextEnvDTs,
     'next.config.js': nextConfigJs,
     'tsconfig.json': tsConfigJson,
@@ -43,4 +46,6 @@ export const generate = (masmott: Masmott) => {
       'firebase.json': firebaseJson(),
     })
   );
+  const exitCode = await lintCli(['--fix']);
+  process.exit(exitCode);
 };

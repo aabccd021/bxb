@@ -1,8 +1,8 @@
 import type { ISRPage } from 'masmott';
 
-import type { PostPageData } from '@/masmott.generated';
+import type { PostPage } from '@/masmott.generated';
 
-const Page: ISRPage<PostPageData> = ({ snapshot }) => {
+const Page: ISRPage<PostPage> = ({ snapshot }) => {
   return (
     <>
       {snapshot === undefined && <p>Loading</p>}

@@ -77,15 +77,15 @@ const PageWithId = <DD extends DocData>({
   );
 };
 
-export const makeISRPage = <DD extends DocData>(
-  options: FirebaseOptions,
-  collection: string,
-  Page: ISRPage<DD>
-): NextPage<ISRPageProps> => {
-  const StaticPage: NextPage<ISRPageProps> = ({ fallback }) => (
-    <SWRConfig value={{ fallback }}>
-      <PageWithId options={options} Page={Page} collection={collection} />
-    </SWRConfig>
-  );
-  return StaticPage;
-};
+export const makeISRPage =
+  <DD extends DocData>(
+    options: FirebaseOptions,
+    collection: string,
+    Page: ISRPage<DD>
+  ): NextPage<ISRPageProps> =>
+  ({ fallback }) =>
+    (
+      <SWRConfig value={{ fallback }}>
+        <PageWithId options={options} Page={Page} collection={collection} />
+      </SWRConfig>
+    );
