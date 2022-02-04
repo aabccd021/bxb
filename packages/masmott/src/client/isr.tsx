@@ -24,9 +24,8 @@ function PageWithSnapshot<DD extends DocData>({
   readonly options: FirebaseOptions;
   readonly useLocalData: boolean;
 }): JSX.Element {
-  const viewDoc = useDoc<DD>(options, [collection, id], {
+  const viewDoc = useDoc<DD>(options, [collection, id], 'page', {
     revalidateOnMount: !useLocalData,
-    view: 'page',
   });
   return <Page snapshot={{ doc: viewDoc, id }} />;
 }

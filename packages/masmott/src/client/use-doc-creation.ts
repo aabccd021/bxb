@@ -5,6 +5,7 @@ import { Dict, SelectVS, VS } from 'core';
 import { NextRouter, useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useSWRConfig } from 'swr';
+
 import { getId, setDoc } from './firebase';
 import {
   CreateDoc,
@@ -13,10 +14,9 @@ import {
   DocData,
   DocSnapshot,
   DocWithId,
-  FirebaseOptions
+  FirebaseOptions,
 } from './types';
 import { makeDocPath } from './util';
-
 
 const materializeViewDocSelectVS = (docData: DocData, select: SelectVS): DocData => {
   const materializedFieldNames = Object.keys(select);

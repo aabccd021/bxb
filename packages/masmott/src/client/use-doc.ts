@@ -12,17 +12,14 @@ import { makeDocPath } from './util';
 export function useDoc<DD extends DocData>(
   firebaseOptions: FirebaseOptions,
   [collectionName, id]: DocKey,
+  view: string | undefined,
   options?: {
     readonly revalidateOnMount?: boolean;
-    readonly view?: string | undefined;
   }
 ): Doc.Type<DD> {
   const [doc, setDoc] = useState<Doc.Type>({ state: 'fetching' });
 
-  const docPath = useMemo(
-    () => makeDocPath(collectionName, id, options?.view),
-    [collectionName, options?.view, id]
-  );
+  const docPath = useMemo(() => makeDocPath(collectionName, id, view), [collectionName, view, id]);
 
   const fetcher = useMemo(() => makeFetcher(firebaseOptions), [firebaseOptions]);
 
