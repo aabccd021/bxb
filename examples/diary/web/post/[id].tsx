@@ -1,6 +1,5 @@
+import type { PostPageData } from '@masmott';
 import type { ISRPage } from 'masmott';
-
-import type { PostPageData } from '@/masmott.generated';
 
 const Page: ISRPage<PostPageData> = ({ snapshot }) => {
   return (

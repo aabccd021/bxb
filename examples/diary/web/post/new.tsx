@@ -1,11 +1,8 @@
-import type { CreatedWithPage } from 'masmott/dist/cjs/client/types/doc-creation';
-import type { NextPage } from 'next';
+import type { DocCreation, PostData } from '@masmott';
+import { usePostCreation } from '@masmott';
 import { useEffect } from 'react';
 
-import type { PostData } from '@/masmott.generated';
-import { usePostCreation } from '@/masmott.generated';
-
-const Created = ({ creation }: { readonly creation: CreatedWithPage<PostData> }) => {
+const Created = ({ creation }: { readonly creation: DocCreation.CreatedWithPage<PostData> }) => {
   useEffect(() => {
     creation.redirect();
   }, [creation]);
@@ -41,7 +38,7 @@ const A = (): JSX.Element => {
   return <Created creation={docCreation} />;
 };
 
-const Home: NextPage = () => {
+const Home = () => {
   return <A />;
 };
 

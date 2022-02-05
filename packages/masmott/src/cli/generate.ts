@@ -38,7 +38,10 @@ const readDirRec = (dir: string): readonly string[] =>
     );
 
 export const generate = async (masmott: Masmott) => {
-  fs.rmSync('./pages', { recursive: true });
+  const pagesDirName = './pages';
+  if (fs.existsSync(pagesDirName)) {
+    fs.rmSync(pagesDirName, { recursive: true });
+  }
   const webPages = readDirRec('web');
   console.log(webPages);
   const staticPaths = toPathArray({

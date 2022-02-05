@@ -1,21 +1,20 @@
 /* eslint-disable functional/no-conditional-statement */
 import { Masmott } from 'core';
-import { capitalize } from './utils';
 
+import { capitalize } from './utils';
 
 const appTsx = `import type { AppProps } from 'next/app';
 const MyApp = ({ Component, pageProps }: AppProps) => <Component {...pageProps} />;
 export default MyApp;
 `;
 
-const pageTsx = (path: string) => `import Page from '@/${path}';
+const pageTsx = (path: string) => `import Page from '@${path}';
 export default Page;
 `;
 
-const isrTsx = (path: string, collection: string) => `import { masmott } from '@/masmott.config';
-import { ${capitalize(collection)}PageData } from '@/masmott.generated';
-import Page from '@/${path}';
-import { ISRPage, makeISRPage } from 'masmott';
+const isrTsx = (path: string, collection: string) => `import { masmott } from '@masmottConfig';
+import { ${capitalize(collection)}PageData, ISRPage, makeISRPage } from '@masmott';
+import Page from '@${path}';
 import { makeGetStaticPaths, makeGetStaticProps } from 'masmott/dist/cjs';
 const ISRPage = makeISRPage<${capitalize(
   collection

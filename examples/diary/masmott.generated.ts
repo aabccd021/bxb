@@ -1,6 +1,7 @@
 import { useDocCreationWithPage } from 'masmott';
 
 import { masmott } from './masmott.config';
+export * from 'masmott';
 export type PostData = {
   readonly text: string;
   readonly title: string;

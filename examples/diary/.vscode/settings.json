@@ -21,11 +21,14 @@
 		"cypress/support": true,
 		"cypress/plugins": true,
 		"yarn.lock": true,
-		"package.json": true,
+		"package.json": false,
 		"firestore-debug.log": true,
 		".vscode": true,
 		"cypress/screenshots": true,
-		"cypress/videos": true
+		"cypress/videos": true,
+		"tsconfig.tsbuildinfo": true,
+		"masmott.generated.ts": true,
+		"firebase-debug.log": true
 	},
 	"explorerExclude.backup": null
 }

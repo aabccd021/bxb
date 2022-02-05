@@ -1,6 +1,5 @@
+import { usePostCreation } from '@masmott';
 import type { NextPage } from 'next';
-
-import { usePostCreation } from '@/masmott.generated';
 
 const A = (): JSX.Element => {
   const docCreation = usePostCreation();

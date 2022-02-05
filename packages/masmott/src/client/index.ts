@@ -1,3 +1,4 @@
+export * from './generated';
 export * from './isr';
 export * from './types';
 export * from './use-doc';
