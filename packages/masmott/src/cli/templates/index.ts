@@ -76,3 +76,48 @@ node_modules
 pages
 tsconfig.json
 `;
+
+export const packageJson = jsonStringify({
+  dependencies: {
+    'firebase-admin': '^10.0.2',
+    'firebase-functions': '^3.17.1',
+    masmott: '../../packages/masmott',
+    next: '^12.0.1',
+    react: '17.0.2',
+    'react-dom': '^17.0.2',
+  },
+  devDependencies: {
+    '@types/jest': '^27.4.0',
+    '@types/react': '17.0.32',
+    cypress: '^9.4.1',
+    eslint: '^8.8.0',
+    'eslint-config-masmott': '../../packages/eslint-config-masmott',
+    'firebase-tools': '^10.1.2',
+    jest: '^27.4.7',
+    prettier: '^2.5.1',
+    'ts-jest': '^27.1.3',
+    typescript: '^4.5.5',
+  },
+  engines: {
+    node: '16',
+  },
+  eslintConfig: {
+    extends: 'masmott',
+  },
+  jest: {
+    coveragePathIgnorePatterns: ['test/'],
+    preset: 'ts-jest',
+    testEnvironment: 'node',
+    testMatch: ['**/test/**/*.test.ts'],
+  },
+  main: '.masmott/functions/index.js',
+  name: 'demo-diary',
+  private: true,
+  scripts: {
+    build: 'masmott build',
+    lint: 'masmott lint',
+    start: 'masmott start',
+    test: 'masmott test',
+  },
+  version: '0.1.0',
+});

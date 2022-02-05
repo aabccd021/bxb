@@ -2,8 +2,8 @@ import * as fs from 'fs';
 
 import { jsonStringify } from './utils';
 
-export const firebaseJson = () => {
-  const ignoreString = fs.readdirSync('.', { withFileTypes: true }).map((file) => file.name);
+export const firebaseJson = (cwd: readonly fs.Dirent[]) => {
+  const ignore = cwd.map((file) => file.name);
   return jsonStringify({
     emulators: {
       firestore: {
@@ -24,12 +24,12 @@ export const firebaseJson = () => {
       rules: '.masmott/firestore/firestore.rules',
     },
     functions: {
-      ignore: ignoreString,
+      ignore,
       source: '.',
     },
     hosting: {
       cleanUrls: true,
-      ignore: ignoreString,
+      ignore,
       public: 'public',
       rewrites: [
         {
