@@ -4,6 +4,7 @@
 import { Dict, Masmott } from 'core';
 import * as fs from 'fs';
 import { dirname } from 'path';
+
 import { lintCli } from './lint';
 import { runCmd } from './runCmd';
 import { cypressJson, gitignore, nextConfigJs, nextEnvDTs, tsConfigJson } from './templates';
@@ -11,7 +12,6 @@ import { firebaseJson } from './templates/firebase-json';
 import { getPagesPaths } from './templates/pages';
 import { rules } from './templates/rules';
 import { hooksStr } from './templates/ts';
-
 
 type Dir = Dict<string | Dir>;
 
