@@ -30,17 +30,26 @@ const write = (paths: readonly (readonly [string, string])[]) =>
     fs.writeFileSync(path, content, {});
   });
 
+const readDirRec = (dir: string): readonly string[] =>
+  fs
+    .readdirSync(dir, { withFileTypes: true })
+    .flatMap((file) =>
+      file.isDirectory() ? readDirRec(`${dir}/${file.name}`) : [`${dir}/${file.name}`]
+    );
+
 export const generate = async (masmott: Masmott) => {
   fs.rmSync('./pages', { recursive: true });
+  const webPages = readDirRec('web');
+  console.log(webPages);
   const staticPaths = toPathArray({
     '.gitignore': gitignore,
     'cypress.json': cypressJson,
-    'masmott.generated.ts': hooksStr(masmott.spec),
+    'masmott.generated.ts': hooksStr(masmott.spec, webPages),
     'next-env.d.ts': nextEnvDTs,
     'next.config.js': nextConfigJs,
     'tsconfig.json': tsConfigJson,
   });
-  write([...staticPaths, ...getPagesPaths(masmott)]);
+  write([...staticPaths, ...getPagesPaths(masmott, webPages)]);
   write(
     toPathArray({
       'firebase.json': firebaseJson(),

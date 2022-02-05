@@ -1,6 +1,6 @@
 import { CollectionDS, CollectionSpec, Spec, VS } from 'core';
 
-import { capitalize } from './utils';
+import { capitalize as cap } from './utils';
 
 // import { useDocCreationWithPage } from 'masmott';
 // import { masmott } from './masmott.config';
@@ -40,7 +40,7 @@ const docDataFieldsStr = (collectionDs: CollectionDS | undefined) =>
     .join('\n');
 
 const docDataStr = (collectionName: string, colDs: CollectionDS | undefined) =>
-  `export type ${capitalize(collectionName)} = {
+  `export type ${cap(collectionName)}Data = {
 ${docDataFieldsStr(colDs)}
 }`;
 
@@ -53,7 +53,7 @@ const viewDataFieldsStr = (colDs: CollectionDS | undefined, vs: VS) =>
 const viewDataStr =
   (colName: string, colDs: CollectionDS | undefined) =>
   ([viewName, vs]: readonly [string, VS]) =>
-    `export type ${capitalize(colName)}${capitalize(viewName)} = {
+    `export type ${cap(colName)}${cap(viewName)}Data = {
 ${viewDataFieldsStr(colDs, vs)}
   }`;
 
@@ -62,13 +62,49 @@ const colViewsDataStr = (colName: string, colSpec: CollectionSpec | undefined) =
     .map(viewDataStr(colName, colSpec?.data))
     .join('\n\n');
 
-const collectionStr = ([colName, colSpec]: readonly [string, CollectionSpec | undefined]) =>
-  `${docDataStr(colName, colSpec?.data)}
-${colViewsDataStr(colName, colSpec)}`;
+const docCreationDataStr = (collectionName: string, colDs: CollectionDS | undefined) =>
+  `export type ${cap(collectionName)}CreationData = {
+${docDataFieldsStr(colDs)}
+}`;
 
-const collectionsStr = (spec: Spec) => Object.entries(spec).map(collectionStr).join('\n\n');
+const withIsr = (
+  colName: string,
+  webPages: readonly string[],
+  colSpec: CollectionSpec | undefined
+) =>
+  Object.keys(colSpec?.view ?? {}).includes('page') && webPages.includes(`web/${colName}/[id].tsx`);
 
-export const hooksStr = (spec: Spec) => `import { useDocCreationWithPage } from 'masmott';
+const useCreationStr = (
+  colName: string,
+  colSpec: CollectionSpec | undefined,
+  webPages: readonly string[]
+) => `export const use${cap(colName)}Creation = () =>
+   useDocCreation${withIsr(colName, webPages, colSpec) ? 'With' : 'Without'}Page<${cap(
+  colName
+)}Data, ${cap(colName)}CreationData>(
+     masmott.firebase,
+     '${colName}',
+     masmott.spec.${colName}.view
+   );`;
+
+const collectionStr =
+  (webPages: readonly string[]) =>
+  ([colName, colSpec]: readonly [string, CollectionSpec | undefined]) =>
+    `${docDataStr(colName, colSpec?.data)}
+
+${colViewsDataStr(colName, colSpec)}
+
+${docCreationDataStr(colName, colSpec?.data)}
+
+${useCreationStr(colName, colSpec, webPages)}
+`;
+const collectionsStr = (spec: Spec, webPages: readonly string[]) =>
+  Object.entries(spec).map(collectionStr(webPages)).join('\n\n');
+
+export const hooksStr = (
+  spec: Spec,
+  webPages: readonly string[]
+) => `import { useDocCreationWithPage, useDocCreationWithoutPage } from 'masmott';
 import { masmott } from './masmott.config';
-${collectionsStr(spec)}
+${collectionsStr(spec, webPages)}
 `;

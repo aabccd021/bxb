@@ -1,8 +1,7 @@
 /* eslint-disable functional/no-conditional-statement */
 import { Masmott } from 'core';
-import * as fs from 'fs';
-
 import { capitalize } from './utils';
+
 
 const appTsx = `import type { AppProps } from 'next/app';
 const MyApp = ({ Component, pageProps }: AppProps) => <Component {...pageProps} />;
@@ -26,13 +25,6 @@ export const getStaticPaths = makeGetStaticPaths();
 export const getStaticProps = makeGetStaticProps('${collection}');
 `;
 
-const readDirRec = (dir: string): readonly string[] =>
-  fs
-    .readdirSync(dir, { withFileTypes: true })
-    .flatMap((file) =>
-      file.isDirectory() ? readDirRec(`${dir}/${file.name}`) : [`${dir}/${file.name}`]
-    );
-
 const getPageTsx = (path: string, _masmott: Masmott) => {
   const [collectionName, fileName] = path.replace('web/', '').split('/');
   return collectionName === undefined ||
@@ -42,9 +34,12 @@ const getPageTsx = (path: string, _masmott: Masmott) => {
     : isrTsx(path, collectionName);
 };
 
-export const getPagesPaths = (masmott: Masmott): readonly (readonly [string, string])[] => [
+export const getPagesPaths = (
+  masmott: Masmott,
+  webPages: readonly string[]
+): readonly (readonly [string, string])[] => [
   ['pages/_app.tsx', appTsx],
-  ...readDirRec('web').map(
+  ...webPages.map(
     (path) =>
       [
         `pages/${path.replace('web/', '')}`,

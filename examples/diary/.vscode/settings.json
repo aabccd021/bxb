@@ -1,0 +1,31 @@
+{
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/CVS": true,
+		"**/.DS_Store": true,
+		"**/Thumbs.db": true,
+		"jspm_packages": true,
+		"**/node_modules": true,
+		".masmott": true,
+		".next": true,
+		"pages": true,
+		"tsconfig.json": true,
+		"cypress.json": true,
+		"cypress/tsconfig.json": true,
+		"firebase.json": true,
+		"next-env.d.ts": true,
+		"next.config.js": true,
+		".gitignore": true,
+		"cypress/support": true,
+		"cypress/plugins": true,
+		"yarn.lock": true,
+		"package.json": true,
+		"firestore-debug.log": true,
+		".vscode": true,
+		"cypress/screenshots": true,
+		"cypress/videos": true
+	},
+	"explorerExclude.backup": null
+}
