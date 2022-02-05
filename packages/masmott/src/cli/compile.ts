@@ -89,7 +89,7 @@ export const compileAndRunCLI = (name: string) => {
 import { ${name}, Masmott } from 'masmott';
 import { masmott } from './masmott.config';
 
-${name}(masmott as Masmott);
+${name}(masmott as Masmott).then(process.exit);
 `;
   const exit1 = compile(`cli/${name}`, 'index', content);
   if (exit1 !== 0) {

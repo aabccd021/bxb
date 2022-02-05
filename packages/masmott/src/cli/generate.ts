@@ -6,10 +6,12 @@ import * as fs from 'fs';
 import { dirname } from 'path';
 
 import { lintCli } from './lint';
+import { runCmd } from './runCmd';
 import { cypressJson, gitignore, nextConfigJs, nextEnvDTs, tsConfigJson } from './templates';
 import { firebaseJson } from './templates/firebase-json';
-import { hooksStr } from './templates/hooks';
 import { getPagesPaths } from './templates/pages';
+import { rules } from './templates/rules';
+import { hooksStr } from './templates/ts';
 
 type Dir = Dict<string | Dir>;
 
@@ -43,11 +45,17 @@ export const generate = async (masmott: Masmott) => {
     fs.rmSync(pagesDirName, { recursive: true });
   }
   const webPages = readDirRec('web');
-  console.log(webPages);
   const staticPaths = toPathArray({
     '.gitignore': gitignore,
+    '.masmott': {
+      firestore: {
+        'firestore.rules': rules(),
+      },
+      ts: {
+        'index.ts': hooksStr(masmott.spec, webPages),
+      },
+    },
     'cypress.json': cypressJson,
-    'masmott.generated.ts': hooksStr(masmott.spec, webPages),
     'next-env.d.ts': nextEnvDTs,
     'next.config.js': nextConfigJs,
     'tsconfig.json': tsConfigJson,
@@ -58,6 +66,9 @@ export const generate = async (masmott: Masmott) => {
       'firebase.json': firebaseJson(),
     })
   );
-  const exitCode = await lintCli(['--fix']);
-  process.exit(exitCode);
+  const exitCode1 = await runCmd('yarn eslint ./.masmott/ts --fix');
+  if (exitCode1 !== 0) {
+    return exitCode1;
+  }
+  return lintCli(['--fix']);
 };

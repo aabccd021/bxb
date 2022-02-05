@@ -19,6 +19,10 @@ export const firebaseJson = () => {
         enabled: true,
       },
     },
+    firestore: {
+      // indexes: '.masmott/firestore/firestore.indexes.json',
+      rules: '.masmott/firestore/firestore.rules',
+    },
     functions: {
       ignore: ignoreString,
       source: '.',

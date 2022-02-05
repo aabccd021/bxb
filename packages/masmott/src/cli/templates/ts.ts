@@ -75,7 +75,7 @@ export const hooksStr = (
   spec: Spec,
   webPages: readonly string[]
 ) => `import { useDocCreationWithPage, useDocCreationWithoutPage } from 'masmott';
-import { masmott } from './masmott.config';
+import { masmott } from '@masmottConfig';
 export * from 'masmott';
 ${collectionsStr(spec, webPages)}
 `;
