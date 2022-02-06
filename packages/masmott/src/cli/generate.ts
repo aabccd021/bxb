@@ -12,6 +12,7 @@ import { firebaseJson } from './templates/firebase-json';
 import { getPagesPaths } from './templates/pages';
 import { rules } from './templates/rules';
 import { hooksStr } from './templates/ts';
+import { validate } from './validate';
 
 type Dir = Dict<string | Dir>;
 
@@ -40,6 +41,7 @@ const readDirRec = (dir: string): readonly string[] =>
     );
 
 export const generate = async (masmott: Masmott) => {
+  validate(masmott);
   const pagesDirName = './pages';
   if (fs.existsSync(pagesDirName)) {
     fs.rmSync(pagesDirName, { recursive: true });
