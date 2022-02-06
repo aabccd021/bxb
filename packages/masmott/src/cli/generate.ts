@@ -50,7 +50,7 @@ export const generate = async (masmott: Masmott) => {
     '.gitignore': gitignore,
     '.masmott': {
       firestore: {
-        'firestore.rules': rules(),
+        'firestore.rules': rules(masmott),
       },
       ts: {
         'index.ts': hooksStr(masmott.spec, webPagesRec),
