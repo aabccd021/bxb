@@ -18,6 +18,7 @@ const A = (): JSX.Element => {
       <>
         <div>Not created</div>
         <button
+          className="text-3xl"
           onClick={() => {
             docCreation.createDoc({ text: 'textt', title: 'titlee' });
           }}
