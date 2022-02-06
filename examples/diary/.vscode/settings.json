@@ -29,7 +29,8 @@
 		"tsconfig.tsbuildinfo": true,
 		"masmott.generated.ts": true,
 		"firebase-debug.log": true,
-		"yarn-error.log": true
+		"yarn-error.log": true,
+		"postcss.config.js": true
 	},
 	"explorerExclude.backup": null
 }
