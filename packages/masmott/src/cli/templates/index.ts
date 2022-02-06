@@ -105,10 +105,8 @@ export const packageJson = jsonStringify({
     extends: 'masmott',
   },
   jest: {
-    coveragePathIgnorePatterns: ['test/'],
     preset: 'ts-jest',
-    testEnvironment: 'node',
-    testMatch: ['**/test/**/*.test.ts'],
+    testMatch: ['test/**/*.test.ts'],
   },
   main: '.masmott/functions/index.js',
   name: 'demo-diary',
