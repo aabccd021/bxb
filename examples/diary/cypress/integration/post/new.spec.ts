@@ -1,5 +1,5 @@
 describe('Creation', () => {
-  it('should be able to create a thread', () => {
+  it('can create a post then redirecta and show the result immediately', () => {
     cy.visit('/post/new');
 
     cy.get('button').contains('Create').click();
@@ -7,6 +7,7 @@ describe('Creation', () => {
     cy.url().should('include', '/post/');
     cy.url().should('not.include', '?');
 
+    // show from cache
     cy.contains('Title: taitoru');
     cy.contains('Text: tekisuto');
 
