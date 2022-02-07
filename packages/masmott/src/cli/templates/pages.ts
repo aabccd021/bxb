@@ -8,17 +8,20 @@ const MyApp = ({ Component, pageProps }: AppProps) => <Component {...pageProps} 
 export default MyApp;
 `;
 
-const pageTsx = (path: string) => `import Page from '@${path}';
+const pageTsx = (path: string) => `import { Page } from '@${path}';
 export default Page;
 `;
 
-const isrTsx = (path: string, collection: string) => `import { masmott } from '@masmottConfig';
+const isrTsx = (
+  path: string,
+  collection: string
+) => `import { migration as migration_0_1 } from '@migration/0.1';
 import { ${capitalize(collection)}PageData, ISRPage, makeISRPage } from '@masmott';
-import Page from '@${path}';
+import { Page } from '@${path}';
 import { makeGetStaticPaths, makeGetStaticProps } from 'masmott/dist/cjs';
 const ISRPage = makeISRPage<${capitalize(
   collection
-)}PageData>(masmott.firebase, '${collection}', Page);
+)}PageData>(migration_0_1.firebase, '${collection}', Page);
 export default ISRPage;
 export const getStaticPaths = makeGetStaticPaths();
 export const getStaticProps = makeGetStaticProps('${collection}');

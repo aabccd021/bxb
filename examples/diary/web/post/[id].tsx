@@ -1,7 +1,7 @@
 import type { PostPageData } from '@masmott';
 import type { ISRPage } from 'masmott';
 
-const Page: ISRPage<PostPageData> = ({ snapshot }) => {
+export const Page: ISRPage<PostPageData> = ({ snapshot }) => {
   return (
     <>
       {snapshot === undefined && <p>Loading</p>}
@@ -17,6 +17,7 @@ const Page: ISRPage<PostPageData> = ({ snapshot }) => {
           {snapshot.doc.state === 'loaded' && !snapshot.doc.exists && <p>Gaada gan</p>}
           {snapshot.doc.state === 'loaded' && snapshot.doc.exists && (
             <>
+              {' '}
               <div>Title: {snapshot.doc.data.title}</div>
               <div>Text: {snapshot.doc.data.text}</div>
             </>
@@ -26,5 +27,3 @@ const Page: ISRPage<PostPageData> = ({ snapshot }) => {
     </>
   );
 };
-
-export default Page;

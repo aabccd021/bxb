@@ -38,8 +38,6 @@ const A = (): JSX.Element => {
   return <Created creation={docCreation} />;
 };
 
-const Home = () => {
+export const Page = () => {
   return <A />;
 };
-
-export default Home;

@@ -1,4 +1,4 @@
-export const masmott = {
+export const migration = {
   firebase: {
     projectId: 'demo-diary',
   },

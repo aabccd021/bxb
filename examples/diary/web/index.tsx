@@ -37,8 +37,6 @@ const A = (): JSX.Element => {
   );
 };
 
-const Home: NextPage = () => {
+export const Page: NextPage = () => {
   return <A />;
 };
-
-export default Home;

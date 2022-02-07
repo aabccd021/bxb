@@ -52,9 +52,9 @@ const useCreationStr = (
    useDocCreation${withIsr(colName, webPages, colSpec) ? 'With' : 'Without'}Page<${cap(
   colName
 )}Data, ${cap(colName)}CreationData>(
-     masmott.firebase,
+     migration_0_1.firebase,
      '${colName}',
-     masmott.spec.${colName}.view
+     migration_0_1.spec.${colName}.view
    );`;
 
 const collectionStr =
@@ -75,7 +75,7 @@ export const hooksStr = (
   spec: Spec,
   webPages: readonly string[]
 ) => `import { useDocCreationWithPage, useDocCreationWithoutPage } from 'masmott';
-import { masmott } from '@masmottConfig';
+import { migration as migration_0_1 } from '@migration/0.1';
 export * from 'masmott';
 ${collectionsStr(spec, webPages)}
 `;

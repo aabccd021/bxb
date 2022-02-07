@@ -87,9 +87,9 @@ export const compile = (outDir: string, fileName: string, fileContent: string) =
 export const compileAndRunCLI = (name: string) => {
   const content = `
 import { ${name}, Masmott } from 'masmott';
-import { masmott } from './masmott.config';
+import { migration as migration_0_1 } from './migration/0.1';
 
-${name}(masmott as Masmott).then(process.exit);
+${name}(migration_0_1 as Masmott).then(process.exit);
 `;
   const exit1 = compile(`cli/${name}`, 'index', content);
   if (exit1 !== 0) {

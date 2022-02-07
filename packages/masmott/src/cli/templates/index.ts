@@ -45,7 +45,7 @@ export const tsConfigJson = jsonStringify({
     noUnusedParameters: true,
     paths: {
       '@masmott': ['.masmott/ts/index.ts'],
-      '@masmottConfig': ['masmott.config.ts'],
+      '@migration/*': ['migration/*'],
       '@web/*': ['web/*'],
     },
     resolveJsonModule: true,
