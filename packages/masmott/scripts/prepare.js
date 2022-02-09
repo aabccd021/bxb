@@ -27,7 +27,7 @@ const exampleDir = '../../examples';
 
 const main = async () => {
 	for (const projectId of fs.readdirSync(exampleDir)) {
-		const log = (x) => console.log(`${projectId} |> PREPARE |> ${x}`)
+		const log = (x) => console.log(`${projectId} |> prepare |> ${x}`)
 		log("Start");
 
 		const projectDir = `${exampleDir}/${projectId}`
@@ -37,7 +37,7 @@ const main = async () => {
 			? JSON.parse(fs.readFileSync(projectPackageJson, { encoding: 'utf-8' }))
 			: overwritePackageJson({});
 		write({ paths: [[`${projectDir}/migration/0.1.ts`, migration]] });
-		write({ paths: [[projectPackageJson, overwriteDevPackageJson(oldPackageJson)]], force: true });
+		write({ paths: [[projectPackageJson, overwriteDevPackageJson(oldPackageJson)]], replace: true });
 
 		if (!fs.existsSync(`${projectDir}/node_modules/.bin`)) {
 			log("yarn");
