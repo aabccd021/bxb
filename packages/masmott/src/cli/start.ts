@@ -20,4 +20,4 @@ export const startCli = async (args: readonly string[]) => {
 };
 
 export const start = (masmott: Masmott) =>
-  runCmd(`firebase emulators:start --project ${masmott.firebase.projectId}`);
+  runCmd(`firebase emulators:start --project ${masmott.firebase.projectId}`, 'START');

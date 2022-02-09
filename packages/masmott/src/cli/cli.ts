@@ -7,22 +7,22 @@ import { startCli } from './start';
 import { testCli } from './test';
 
 const cli = async (): Promise<number | undefined> => {
-  const args = process.argv.slice(2);
+  const [command, ...rest] = process.argv.slice(2);
 
-  if (args[0] === 'build') {
+  if (command === 'build') {
     return buildCli();
   }
 
-  if (args[0] === 'test') {
-    return testCli(args.slice(1));
+  if (command === 'test') {
+    return testCli(rest);
   }
 
-  if (args[0] === 'start') {
-    return startCli(args.slice(1));
+  if (command === 'start') {
+    return startCli(rest);
   }
 
-  if (args[0] === 'lint') {
-    return lintCli(args.slice(1));
+  if (command === 'lint') {
+    return lintCli(rest);
   }
 
   console.log('unknown command');

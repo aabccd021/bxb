@@ -75,4 +75,5 @@ next.config.js
 node_modules
 pages
 tsconfig.json
+tsconfig.tsbuildinfo
 `;

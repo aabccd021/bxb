@@ -95,5 +95,5 @@ ${name}(migration_0_1 as Masmott).then(process.exit);
   if (exit1 !== 0) {
     return exit1;
   }
-  return runCmd(`node ./.masmott/cli/${name}/index.js`);
+  return runCmd(`node ./.masmott/cli/${name}/index.js`, ' ');
 };

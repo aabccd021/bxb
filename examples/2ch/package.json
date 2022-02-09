@@ -1,5 +1,5 @@
 {
-	"name": "demo-diary",
+	"name": "demo-2ch",
 	"main": ".masmott/functions/index.js",
 	"private": true,
 	"engines": {

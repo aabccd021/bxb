@@ -5,11 +5,22 @@
 /* eslint-disable functional/no-return-void */
 import * as cp from 'child_process';
 
-export const runCmd = (cmd: string): Promise<number | undefined> =>
+const prefixBuffer = (prefix: string, buffer: Buffer) =>
+  `${buffer
+    .toString()
+    .split('\n')
+    .map((line) => `${prefix}$${line}`)
+    .join('\n')}\n`;
+
+export const runCmd = (
+  cmd: string,
+  prefix: string,
+  options?: cp.SpawnOptionsWithoutStdio
+): Promise<number | undefined> =>
   new Promise((resolve, reject) => {
-    const proc = cp.spawn(cmd, { shell: true });
-    proc.stdout.on('data', (data: Buffer) => process.stdout.write(data.toString()));
-    proc.stderr.on('data', (data: Buffer) => process.stderr.write(data.toString()));
+    const proc = cp.spawn(cmd, { ...options, shell: true });
+    proc.stdout.on('data', (buffer: Buffer) => process.stdout.write(prefixBuffer(prefix, buffer)));
+    proc.stderr.on('data', (buffer: Buffer) => process.stderr.write(prefixBuffer(prefix, buffer)));
     proc.on('exit', resolve);
     proc.on('error', reject);
   });

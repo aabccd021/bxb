@@ -1,0 +1,1 @@
+exports.prefixProjectId = (projectId) => projectId.toUpperCase().padEnd(12, " ");
