@@ -69,9 +69,6 @@ export const generate = async (masmott: Masmott) => {
       'firebase.json': firebaseJson(cwd),
     })
   );
-  const exitCode1 = await runCmd('yarn eslint ./.masmott/ts --fix', 'LINT GENERATED');
-  if (exitCode1 !== 0) {
-    return exitCode1;
-  }
+  await runCmd('yarn eslint ./.masmott/ts --fix', { prefix: 'lint generated files' });
   return lintCli(['--fix']);
 };

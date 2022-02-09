@@ -21,6 +21,7 @@ export const testCli = async (args: readonly string[]) => {
 
 export const test = (masmott: Masmott) =>
   runCmd(
-    `firebase emulators:exec "jest && cypress run" ` + `--project ${masmott.firebase.projectId}`,
-    'TEST'
+    `firebase emulators:exec --project ${masmott.firebase.projectId}` +
+      ` "jest --passWithNoTests && cypress run"`,
+    { prefix: 'test' }
   );

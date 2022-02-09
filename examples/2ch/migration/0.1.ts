@@ -1,6 +1,6 @@
 export const migration = {
   firebase: {
-    projectId: 'demo-../../examples/2ch',
+    projectId: 'demo-2ch',
   },
   spec: {
     someCollection: {},

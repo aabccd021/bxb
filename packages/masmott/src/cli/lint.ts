@@ -6,4 +6,4 @@
 import { runCmd } from './runCmd';
 
 export const lintCli = async (args: readonly string[]) =>
-  runCmd(`yarn eslint ./ --ext ts,tsx ${args.join(' ')}`, 'LINT');
+  runCmd(`yarn eslint ./ --ext ts,tsx ${args.join(' ')}`, { prefix: 'lint' });

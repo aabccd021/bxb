@@ -43,8 +43,8 @@ const useDocCreation = <
 >(
   options: FirebaseOptions,
   collection: string,
-  viewSpecs: Dict<VS>,
-  makeDoc: (createdDoc: DocWithId<DD>, reset: () => void, router: NextRouter) => T
+  makeDoc: (createdDoc: DocWithId<DD>, reset: () => void, router: NextRouter) => T,
+  viewSpecs?: Dict<VS>
 ): T => {
   const router = useRouter();
   const { mutate } = useSWRConfig();
@@ -57,7 +57,7 @@ const useDocCreation = <
 
   const mutateViews = useCallback(
     (id: string, makeViewDocSnapshot: (viewSpec: VS) => DocSnapshot) =>
-      Object.entries(viewSpecs).map(([viewName, viewSpec]) => {
+      Object.entries(viewSpecs ?? {}).map(([viewName, viewSpec]) => {
         const viewDocSnapshot = makeViewDocSnapshot(viewSpec);
         const viewDocpath = makeDocPath(collection, id, viewName);
         console.log(`path: ${viewDocpath}, data: ${JSON.stringify(viewDocSnapshot)}`);
@@ -121,33 +121,33 @@ const useDocCreation = <
 export const useDocCreationWithoutPage = <DD extends DocData, CDD extends DocCreationData>(
   options: FirebaseOptions,
   collection: string,
-  viewSpecs: Dict<VS>
+  viewSpecs?: Dict<VS>
 ): DocCreation.TypeWithoutPage<DD, CDD> =>
   useDocCreation<DD, CDD, DocCreation.TypeWithoutPage<DD, CDD>>(
     options,
     collection,
-    viewSpecs,
     (createdDoc, reset) => ({
       createdDoc,
       reset,
       state: 'created',
-    })
+    }),
+    viewSpecs
   );
 
 export const useDocCreationWithPage = <DD extends DocData, CDD extends DocCreationData>(
   options: FirebaseOptions,
   collection: string,
-  viewSpecs: Dict<VS>
+  viewSpecs?: Dict<VS>
 ): DocCreation.TypeWithPage<DD, CDD> =>
   useDocCreation<DD, CDD, DocCreation.TypeWithPage<DD, CDD>>(
     options,
     collection,
-    viewSpecs,
     (createdDoc, reset, router) => ({
       createdDoc,
       redirect: () =>
         router.push(`/${collection}/${encodeURIComponent(createdDoc.id)}?useLocalData=true`),
       reset,
       state: 'created',
-    })
+    }),
+    viewSpecs
   );

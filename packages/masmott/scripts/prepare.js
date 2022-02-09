@@ -3,7 +3,6 @@ const fse = require('fs-extra')
 const cp = require("child_process");
 const package = require('../package.json');
 const { runCmd } = require('../dist/cjs/cli/runCmd');
-const { prefixProjectId } = require('./util');
 
 
 const examplePackageJson = (projectId) => `{
@@ -74,18 +73,16 @@ const main = async () => {
 
 		const projectDir = `${exampleDir}/${projectId}`
 
-		const prefix = prefixProjectId(projectId);
-
 		fs.writeFileSync(`${projectDir}/package.json`, examplePackageJson(projectId))
 		if (!fs.existsSync(`${projectDir}/node_modules/.bin`)) {
-			await runCmd('yarn', { cwd: `${projectDir}`, prefix });
+			await runCmd('yarn', { cwd: `${projectDir}`, prefix: projectId });
 		}
 
 		const projectMigrationDir = `${projectDir}/migration`;
 		const initialMigrationFile = `${projectMigrationDir}/0.1.ts`;
 		if (!fs.existsSync(initialMigrationFile)) {
 			fs.mkdirSync(projectMigrationDir, { recursive: true })
-			fs.writeFileSync(initialMigrationFile, migration(projectDir), { recursive: true })
+			fs.writeFileSync(initialMigrationFile, migration(projectId), { recursive: true })
 		}
 
 		const webDir = `${projectDir}/web`;
@@ -95,7 +92,7 @@ const main = async () => {
 		}
 
 		const moduleDir = `${projectDir}/node_modules/masmott`;
-		await runCmd('chmod 777 -R dist', { prefix })
+		await runCmd('chmod 777 -R dist', { prefix: projectId })
 		fs.rmSync(moduleDir, { recursive: true, force: true })
 		fs.mkdirSync(moduleDir, { recursive: true })
 

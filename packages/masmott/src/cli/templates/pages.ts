@@ -9,7 +9,8 @@ export default MyApp;
 `;
 
 const pageTsx = (path: string) => `import { Page } from '@${path}';
-export default Page;
+import { NextPage } from 'next';
+export default Page as NextPage;
 `;
 
 const isrTsx = (

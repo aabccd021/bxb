@@ -44,6 +44,9 @@ const withIsr = (
 ) =>
   Object.keys(colSpec?.view ?? {}).includes('page') && webPages.includes(`web/${colName}/[id].tsx`);
 
+const colViewStr = (colName: string, colSpec: CollectionSpec | undefined) =>
+  colSpec?.view === undefined ? '' : `migration_0_1.spec.${colName}.view`;
+
 const useCreationStr = (
   colName: string,
   colSpec: CollectionSpec | undefined,
@@ -54,7 +57,7 @@ const useCreationStr = (
 )}Data, ${cap(colName)}CreationData>(
      migration_0_1.firebase,
      '${colName}',
-     migration_0_1.spec.${colName}.view
+     ${colViewStr(colName, colSpec)}
    );`;
 
 const collectionStr =
@@ -68,6 +71,7 @@ ${docCreationDataStr(colName, colSpec?.data)}
 
 ${useCreationStr(colName, colSpec, webPages)}
 `;
+
 const collectionsStr = (spec: Spec, webPages: readonly string[]) =>
   Object.entries(spec).map(collectionStr(webPages)).join('\n\n');
 

@@ -21,7 +21,7 @@ const buildFunctions = () => compile('functions', 'index', functionsCode);
 
 const buildNext = () => {
   fs.rmSync('.next', { force: true, recursive: true });
-  return runCmd('next build', 'NEXT BUILD');
+  return runCmd('next build', { prefix: 'next build' });
 };
 
 export const buildCli = async () => {
