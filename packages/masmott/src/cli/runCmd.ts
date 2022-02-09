@@ -18,16 +18,18 @@ const prefixBuffer = (prefix: string | undefined, buffer: Buffer) =>
 
 export const runCmd = (
   cmd: string,
-  options?: cp.SpawnOptionsWithoutStdio & { readonly prefix?: string }
+  options?: cp.SpawnOptionsWithoutStdio & { readonly log?: false; readonly prefix?: string }
 ): Promise<number | undefined> =>
   new Promise((resolve, reject) => {
     const proc = cp.spawn(cmd, { ...options, shell: true });
-    proc.stdout.on('data', (buffer: Buffer) =>
-      process.stdout.write(prefixBuffer(options?.prefix, buffer))
-    );
-    proc.stderr.on('data', (buffer: Buffer) =>
-      process.stderr.write(prefixBuffer(options?.prefix, buffer))
-    );
+    if (options?.log ?? true) {
+      proc.stdout.on('data', (buffer: Buffer) =>
+        process.stdout.write(prefixBuffer(options?.prefix, buffer))
+      );
+      proc.stderr.on('data', (buffer: Buffer) =>
+        process.stderr.write(prefixBuffer(options?.prefix, buffer))
+      );
+    }
     proc.on('exit', resolve);
     proc.on('error', reject);
   });

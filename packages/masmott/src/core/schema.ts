@@ -72,6 +72,6 @@ export type FirebaseConfig = {
  *
  */
 export type Masmott = {
-  readonly firebase: FirebaseConfig;
+  readonly firebase?: FirebaseConfig;
   readonly spec: Spec;
 };

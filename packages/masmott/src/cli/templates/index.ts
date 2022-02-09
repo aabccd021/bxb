@@ -93,3 +93,11 @@ export const integrationIndexSpec = `describe('hello', () => {
   });
 });
 `;
+
+export const webHelloWorld = `export const Page = () => <div>Hello World</div>;`;
+
+export const migration = `export const migration = {
+  spec: {
+	}
+}
+`;
