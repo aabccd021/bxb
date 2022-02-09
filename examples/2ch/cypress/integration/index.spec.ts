@@ -1,5 +1,5 @@
-describe('a', () => {
-  it('b', () => {
+describe('hello', () => {
+  it('world', () => {
     cy.visit('/');
   });
 });

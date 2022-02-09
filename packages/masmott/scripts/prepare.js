@@ -62,8 +62,7 @@ const migration = (projectId) => `export const migration = {
 }
 `
 
-const webHelloWorld = `export const Page = <div>Hello World</div>;`;
-
+const webHelloWorld = `export const Page = () => <div>Hello World</div>;`;
 
 const exampleDir = '../../examples';
 

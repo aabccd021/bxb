@@ -63,6 +63,15 @@ export const tsConfigJson = jsonStringify({
   include: ['next-env.d.ts', '**/*.ts', '**/*.tsx'],
 });
 
+export const cypressTsConfigJson = jsonStringify({
+  compilerOptions: {
+    lib: ['es5', 'dom'],
+    target: 'es5',
+    types: ['cypress'],
+  },
+  include: ['**/*.ts'],
+});
+
 export const gitignore = `.masmott
 .next
 cypress.json
@@ -76,4 +85,11 @@ node_modules
 pages
 tsconfig.json
 tsconfig.tsbuildinfo
+`;
+
+export const integrationIndexSpec = `describe('hello', () => {
+  it('world', () => {
+    cy.visit('/');
+  });
+});
 `;

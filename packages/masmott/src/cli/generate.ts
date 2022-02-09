@@ -7,7 +7,14 @@ import { dirname } from 'path';
 
 import { lintCli } from './lint';
 import { runCmd } from './runCmd';
-import { cypressJson, gitignore, nextConfigJs, nextEnvDTs, tsConfigJson } from './templates';
+import {
+  cypressJson,
+  gitignore,
+  integrationIndexSpec,
+  nextConfigJs,
+  nextEnvDTs,
+  tsConfigJson,
+} from './templates';
 import { firebaseJson } from './templates/firebase-json';
 import { getPagesPaths } from './templates/pages';
 import { rules } from './templates/rules';
@@ -57,6 +64,12 @@ export const generate = async (masmott: Masmott) => {
       ts: {
         'index.ts': hooksStr(masmott.spec, webPagesRec),
       },
+    },
+    cypress: {
+      integration: {
+        'index.spec.ts': integrationIndexSpec,
+      },
+      'tsconfig.json': tsConfigJson,
     },
     'cypress.json': cypressJson,
     'next-env.d.ts': nextEnvDTs,
