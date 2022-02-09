@@ -59,7 +59,6 @@ export const generate = async (masmott: Masmott) => {
       firestore: {
         'firestore.rules': rules(masmott),
       },
-      'package.json': jsonStringify(overwritePackageJson(packageJson)),
       ts: {
         'index.ts': hooksStr(masmott.spec, webPagesRec),
       },
@@ -70,15 +69,16 @@ export const generate = async (masmott: Masmott) => {
     'cypress.json': cypressJson,
     'next-env.d.ts': nextEnvDTs,
     'next.config.js': nextConfigJs,
+    'package.json': jsonStringify(overwritePackageJson(packageJson)),
     'tsconfig.json': tsConfigJson,
   });
-  write({ replace: true, paths: [...staticPaths, ...getPagesPaths(masmott, webPagesRec)] });
+  write({ paths: [...staticPaths, ...getPagesPaths(masmott, webPagesRec)], replace: true });
   const cwd = fs.readdirSync('.', { withFileTypes: true });
   write({
-    replace: true,
     paths: toPathArray({
       'firebase.json': firebaseJson(cwd),
     }),
+    replace: true,
   });
   await runCmd('yarn eslint ./.masmott/ts --fix', { log: false });
   return lintCli(['--fix']);

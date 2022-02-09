@@ -6,10 +6,10 @@ import { dirname } from 'path';
 
 export const write = ({
   paths,
-  replace,
+  replace: _replace,
 }: {
   readonly paths: readonly (readonly [string, string])[];
-  readonly replace?: boolean;
+  readonly replace?: true;
 }) =>
   paths.forEach(([path, content]) => {
     console.log(`Generating ${path}`);
@@ -17,9 +17,9 @@ export const write = ({
     if (!fs.existsSync(pathDirname)) {
       fs.mkdirSync(pathDirname, { recursive: true });
     }
-    const finalReplace = replace ?? false;
-    if (finalReplace && fs.existsSync(path)) {
-      fs.rmSync(path, { force: true });
+    const replace = _replace ?? false;
+    const isExists = fs.existsSync(path);
+    if ((isExists && replace) || !isExists) {
+      fs.writeFileSync(path, content, {});
     }
-    fs.writeFileSync(path, content, {});
   });

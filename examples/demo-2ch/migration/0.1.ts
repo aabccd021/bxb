@@ -1,4 +1,3 @@
 export const migration = {
-  spec: {
-	}
-}
+  spec: {},
+};
