@@ -22,8 +22,8 @@ import { getPagesPaths } from './templates/pages';
 import { rules } from './templates/rules';
 import { hooksStr } from './templates/ts';
 import { jsonStringify } from './templates/utils';
-import { validate } from './validate';
 import { write } from './utils';
+import { validate } from './validate';
 
 type Dir = Dict<string | Dir>;
 

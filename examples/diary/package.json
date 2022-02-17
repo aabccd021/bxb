@@ -39,12 +39,10 @@
   "private": true,
   "scripts": {
     "build": "masmott build",
+    "dev": "masmott dev",
     "lint": "masmott lint",
     "start": "masmott start",
-    "test": "masmott test",
-    "dev:server": "firebase emulators:start --project demo-diary",
-    "dev:client": "next dev",
-    "dev": "start-server-and-test dev:server dev:client"
+    "test": "masmott test"
   },
   "version": "0.1.0"
 }
