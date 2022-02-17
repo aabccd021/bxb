@@ -8,6 +8,7 @@ import { Masmott } from 'core';
 import { buildCli } from './build';
 import { compileAndRunCLI } from './compile';
 import { runCmd } from './runCmd';
+import { defaultProjectId } from './utils';
 
 export const testCli = async (args: readonly string[]) => {
   if (args[0] !== '--quick') {
@@ -22,7 +23,7 @@ export const testCli = async (args: readonly string[]) => {
 export const test = (masmott: Masmott) =>
   runCmd(
     `firebase emulators:exec --project ${
-      masmott?.firebase?.projectId ?? process.cwd().split('/').at(-1) ?? ''
+      masmott?.firebase?.projectId ?? defaultProjectId
     } "jest --passWithNoTests && cypress run"`,
     { prefix: 'test' }
   );

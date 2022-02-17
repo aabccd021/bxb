@@ -23,7 +23,7 @@ import { rules } from './templates/rules';
 import { hooksStr } from './templates/ts';
 import { jsonStringify } from './templates/utils';
 import { validate } from './validate';
-import { write } from './write';
+import { write } from './utils';
 
 type Dir = Dict<string | Dir>;
 

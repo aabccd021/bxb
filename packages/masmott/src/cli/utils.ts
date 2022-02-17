@@ -23,3 +23,5 @@ export const write = ({
       fs.writeFileSync(path, content, {});
     }
   });
+
+export const defaultProjectId = process.cwd().split('/').at(-1) ?? '';

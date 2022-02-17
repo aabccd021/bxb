@@ -2,6 +2,7 @@
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/no-conditional-statement */
 import { buildCli } from './build';
+import { devCli } from './dev';
 import { lintCli } from './lint';
 import { startCli } from './start';
 import { testCli } from './test';
@@ -23,6 +24,10 @@ const cli = async (): Promise<number | undefined> => {
 
   if (command === 'lint') {
     return lintCli(rest);
+  }
+
+  if (command === 'dev') {
+    return devCli();
   }
 
   console.log('unknown command');

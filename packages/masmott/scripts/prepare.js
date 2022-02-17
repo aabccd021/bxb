@@ -6,7 +6,7 @@ const { runCmd } = require('../dist/cjs/cli/runCmd');
 const { jsonStringify } = require('../dist/cjs/cli/templates/utils')
 const { migration } = require('../dist/cjs/cli/templates')
 const { overwritePackageJson } = require('../dist/cjs/cli/templates/package-json')
-const { write } = require('../dist/cjs/cli/write')
+const { write } = require('../dist/cjs/cli/utils')
 
 
 const overwriteDevPackageJson = (packageJson) => jsonStringify({

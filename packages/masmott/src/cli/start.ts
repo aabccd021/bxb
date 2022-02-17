@@ -8,6 +8,7 @@ import { Masmott } from 'core';
 import { buildCli } from './build';
 import { compileAndRunCLI } from './compile';
 import { runCmd } from './runCmd';
+import { defaultProjectId } from './utils';
 
 export const startCli = async (args: readonly string[]) => {
   if (args[0] !== '--quick') {
@@ -20,6 +21,6 @@ export const startCli = async (args: readonly string[]) => {
 };
 
 export const start = (masmott: Masmott) =>
-  runCmd(`firebase emulators:start --project ${masmott?.firebase?.projectId ?? __dirname}`, {
+  runCmd(`firebase emulators:start --project ${masmott?.firebase?.projectId ?? defaultProjectId}`, {
     prefix: 'start',
   });
