@@ -1,5 +1,6 @@
 import { pipe } from 'fp-ts/lib/function';
 import * as Record from 'fp-ts/Record';
+import * as TE from 'fp-ts/TaskEither';
 
 export type Field = { readonly relation: 'self' };
 export type View = {
@@ -17,11 +18,22 @@ export type Doc = {
   readonly data: DocData;
 };
 
-export type DB = {
-  readonly setDoc: (doc: Doc) => void;
+type DBGenerics = {
+  readonly SetDocRight: unknown;
+  readonly SetDocLeft: unknown;
 };
 
-export const makeTriggers = ({ views, db }: { readonly views: AppViews; readonly db: DB }) =>
+export type DB<U extends DBGenerics> = {
+  readonly setDoc: (doc: Doc) => TE.TaskEither<U['SetDocLeft'], U['SetDocRight']>;
+};
+
+export const makeTriggers = <U extends DBGenerics>({
+  views,
+  db,
+}: {
+  readonly views: AppViews;
+  readonly db: DB<U>;
+}) =>
   pipe(
     views,
     Record.mapWithIndex((tableName, tableViews) => ({
