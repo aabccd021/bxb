@@ -2,24 +2,23 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { describe, expect, it, vi } from 'vitest';
+import * as E from 'fp-ts/Either';
+import * as TE from 'fp-ts/TaskEither';
+import { describe, expect, it } from 'vitest';
 
 import { makeTriggers } from '../src';
 
-describe.concurrent('masmott', () => {
-  it('on create materialize view', () => {
-    const setDoc = vi
-      .fn()
-      .mockImplementation(
-        (_: {
-          readonly table: string;
-          readonly view: string;
-          readonly id: string;
-          readonly data: Record<string, unknown>;
-        }) => {}
-      );
+type TestDB = {
+  readonly SetDocRight: string;
+  readonly SetDocLeft: string;
+};
 
-    const triggers = makeTriggers({
+describe.concurrent('masmott', () => {
+  it('on create materialize view', async () => {
+    const triggers = makeTriggers<TestDB>({
+      db: {
+        setDoc: (_) => TE.of('write result'),
+      },
       views: {
         lawak: {
           card: {
@@ -31,22 +30,13 @@ describe.concurrent('masmott', () => {
           },
         },
       },
-      db: {
-        setDoc,
-      },
     });
 
-    triggers.lawak.onCreate({
+    const result = triggers.lawak.onCreate({
       id: 'fooLawak',
       data: { text: 'lawak text' },
     });
 
-    expect(setDoc).toHaveBeenCalledOnce();
-    expect(setDoc).toHaveBeenCalledWith({
-      table: 'lawak',
-      view: 'card',
-      id: 'fooLawak',
-      data: { text: 'lawak text' },
-    });
+    expect(await result.card()).toStrictEqual(E.right('write result'));
   });
 });
