@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import * as E from 'fp-ts/Either';
 import * as TE from 'fp-ts/TaskEither';
 import { describe, expect, it } from 'vitest';
