@@ -24,14 +24,19 @@ export type DocSnapshot = {
   readonly key: DocKey;
 };
 
-type DBGenerics = {
+export type Doc = {
+  readonly id: string;
+  readonly data: DocData;
+};
+
+type DBG = {
   readonly SetDocRight: unknown;
   readonly SetDocLeft: unknown;
   readonly GetDocRight: unknown;
   readonly GetDocLeft: unknown;
 };
 
-export type DB<U extends DBGenerics> = {
+export type DB<U extends DBG> = {
   readonly setDoc: (doc: DocSnapshot) => TE.TaskEither<U['SetDocLeft'], U['SetDocRight']>;
   readonly getDoc: (
     doc: DocKey
@@ -41,7 +46,39 @@ export type DB<U extends DBGenerics> = {
   >;
 };
 
-export const makeTriggers = <U extends DBGenerics>({
+type SetDocReturn<U extends DBG> = E.Either<U['SetDocLeft'], U['SetDocRight']>;
+
+const onCreateView =
+  <U extends DBG>({
+    doc: { id, data },
+    tableName,
+    db,
+  }: {
+    readonly doc: Doc;
+    readonly tableName: string;
+    readonly db: DB<U>;
+  }) =>
+  (viewName: string, _view: View): T.Task<SetDocReturn<U>> =>
+    pipe({ key: { id, table: tableName, view: viewName }, data }, db.setDoc);
+
+const onCreate =
+  <U extends DBG>({
+    tableName,
+    tableViews,
+    db,
+  }: {
+    readonly tableName: string;
+    readonly tableViews: TableViews;
+    readonly db: DB<U>;
+  }) =>
+  (doc: Doc): T.Task<Record<string, SetDocReturn<U>>> =>
+    pipe(
+      tableViews,
+      Record.mapWithIndex(onCreateView({ doc, tableName, db })),
+      Record.sequence(T.ApplicativePar)
+    );
+
+export const makeTriggers = <U extends DBG>({
   views,
   db,
 }: {
@@ -51,19 +88,6 @@ export const makeTriggers = <U extends DBGenerics>({
   pipe(
     views,
     Record.mapWithIndex((tableName, tableViews) => ({
-      onCreate: ({
-        id,
-        data,
-      }: {
-        readonly id: string;
-        readonly data: DocData;
-      }): T.Task<Record<string, E.Either<U['SetDocLeft'], U['SetDocRight']>>> =>
-        pipe(
-          tableViews,
-          Record.mapWithIndex((viewName, _view) =>
-            db.setDoc({ key: { id, table: tableName, view: viewName }, data })
-          ),
-          Record.sequence(T.ApplicativePar)
-        ),
+      onCreate: onCreate({ tableName, tableViews, db }),
     }))
   );
