@@ -1,5 +1,6 @@
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
+import { Magma } from 'fp-ts/lib/Magma';
 import * as Record from 'fp-ts/Record';
 import * as T from 'fp-ts/Task';
 import * as TE from 'fp-ts/TaskEither';
@@ -11,7 +12,9 @@ export type View = {
 export type TableViews = Record<string, View>;
 export type AppViews = Record<string, TableViews>;
 
-export type DocData = Record<string, unknown>;
+export type DocField = unknown;
+
+export type DocData = Record<string, DocField>;
 
 export type DocKey = {
   readonly view: string;
@@ -48,6 +51,8 @@ export type DB<U extends DBG> = {
 
 type SetDocReturn<U extends DBG> = E.Either<U['SetDocLeft'], U['SetDocRight']>;
 
+const chooseLeft: Magma<DocField> = { concat: (x) => x };
+
 const filterData =
   (view: View) =>
   (data: DocData): DocData => {
@@ -55,7 +60,7 @@ const filterData =
       view.fields,
       Record.filter((field) => field.relation === 'self')
     );
-    return pipe(data, Record.intersection({ concat: (x) => x })(selfFieldNames));
+    return pipe(data, Record.intersection(chooseLeft)(selfFieldNames));
   };
 
 const onCreateView =
