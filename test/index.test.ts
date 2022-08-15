@@ -51,6 +51,26 @@ describe.concurrent('masmott', () => {
           })
         );
       });
+
+      it('only copies specified fields to view doc', async () => {
+        const db = createMockDB();
+        const triggers = makeTriggers({ db, views });
+        const trigger = triggers.lawak.onCreate({
+          id: 'fooLawak',
+          data: { text: 'lawak text', anotherText: 'anotherText' },
+        });
+
+        await trigger();
+
+        const getViewDoc = db.getDoc({ table: 'lawak', view: 'card', id: 'fooLawak' });
+        const result = await getViewDoc();
+        expect(result).toStrictEqual(
+          E.right({
+            data: { text: 'lawak text' },
+            context: 'doc found',
+          })
+        );
+      });
     });
   });
 });
