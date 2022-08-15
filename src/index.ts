@@ -48,6 +48,16 @@ export type DB<U extends DBG> = {
 
 type SetDocReturn<U extends DBG> = E.Either<U['SetDocLeft'], U['SetDocRight']>;
 
+const filterData =
+  (view: View) =>
+  (data: DocData): DocData => {
+    const selfFieldNames = pipe(
+      view.fields,
+      Record.filter((field) => field.relation === 'self')
+    );
+    return pipe(data, Record.intersection({ concat: (x) => x })(selfFieldNames));
+  };
+
 const onCreateView =
   <U extends DBG>({
     doc: { id, data },
@@ -58,8 +68,13 @@ const onCreateView =
     readonly tableName: string;
     readonly db: DB<U>;
   }) =>
-  (viewName: string, _view: View): T.Task<SetDocReturn<U>> =>
-    pipe({ key: { id, table: tableName, view: viewName }, data }, db.setDoc);
+  (viewName: string, view: View): T.Task<SetDocReturn<U>> =>
+    pipe(
+      data,
+      filterData(view),
+      (filteredData) => ({ key: { id, table: tableName, view: viewName }, data: filteredData }),
+      db.setDoc
+    );
 
 const onCreate =
   <U extends DBG>({
