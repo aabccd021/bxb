@@ -63,6 +63,10 @@ const filterData =
     return pipe(data, Record.intersection(chooseLeft)(selfFieldNames));
   };
 
+const docSnapshotWithKey =
+  (key: DocKey) =>
+  (data: DocData): DocSnapshot => ({ key, data });
+
 const onCreateView =
   <U extends DBG>({
     doc: { id, data },
@@ -77,7 +81,7 @@ const onCreateView =
     pipe(
       data,
       filterData(view),
-      (filteredData) => ({ key: { id, table: tableName, view: viewName }, data: filteredData }),
+      docSnapshotWithKey({ id, table: tableName, view: viewName }),
       db.setDoc
     );
 
