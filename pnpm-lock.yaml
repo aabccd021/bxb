@@ -1,7 +1,6 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@practical-fp/union-types': ^1.5.1
   '@types/node': ^18.0.5
   '@typescript-eslint/eslint-plugin': ^5.30.6
   '@typescript-eslint/parser': ^5.30.6
@@ -24,7 +23,6 @@ specifiers:
   vue-tsc: ^0.39.0
 
 dependencies:
-  '@practical-fp/union-types': 1.5.1
   fp-ts: 2.12.2
   io-ts: 2.2.17_fp-ts@2.12.2
 
@@ -199,10 +197,6 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.13.0
     dev: true
-
-  /@practical-fp/union-types/1.5.1:
-    resolution: {integrity: sha512-JAyEdF0KYoAZ3I0rWNTgYZxW+W9zytZc7d0OWKyywsM3G2kPInTO2OWPUTscys0N9mTbjIBGkSfo2opIBG7s1A==}
-    dev: false
 
   /@types/chai-subset/1.3.3:
     resolution: {integrity: sha512-frBecisrNGz+F4T6bcc+NLeolfiojh5FxW2klu669+8BARtyQv2C/GkNW6FUodVe4BroGMP/wER/YDGc7rEllw==}

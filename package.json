@@ -122,7 +122,6 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@practical-fp/union-types": "^1.5.1",
     "fp-ts": "^2.12.1",
     "io-ts": "^2.2.17"
   },
