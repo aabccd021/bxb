@@ -1,7 +1,9 @@
+import { impl, Variant } from '@practical-fp/union-types';
+import * as Array from 'fp-ts/Array';
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
-import { Magma } from 'fp-ts/lib/Magma';
 import * as Record from 'fp-ts/Record';
+import * as String from 'fp-ts/string';
 import * as T from 'fp-ts/Task';
 import * as TE from 'fp-ts/TaskEither';
 
@@ -12,7 +14,9 @@ export type View = {
 export type TableViews = Record<string, View>;
 export type AppViews = Record<string, TableViews>;
 
-export type DocField = unknown;
+export type DocField = Variant<'String', string>;
+
+export const DocField = impl<DocField>();
 
 export type DocData = Record<string, DocField>;
 
@@ -51,16 +55,19 @@ export type DB<U extends DBG> = {
 
 type SetDocReturn<U extends DBG> = E.Either<U['SetDocLeft'], U['SetDocRight']>;
 
-const chooseLeft: Magma<DocField> = { concat: (x) => x };
+const stringArrayElem = Array.elem(String.Eq);
 
 const filterData =
   (view: View) =>
   (data: DocData): DocData => {
-    const selfFieldNames = pipe(
+    const shouldBeCopied = pipe(
       view.fields,
-      Record.filter((field) => field.relation === 'self')
+      Record.filter((field) => field.relation === 'self'),
+      Record.keys,
+      (selfFieldNames) => (fieldName: string, _fieldValue: DocField) =>
+        stringArrayElem(fieldName)(selfFieldNames)
     );
-    return pipe(data, Record.intersection(chooseLeft)(selfFieldNames));
+    return pipe(data, Record.filterWithIndex(shouldBeCopied));
   };
 
 const docSnapshotWithKey =
