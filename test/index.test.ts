@@ -22,14 +22,14 @@ describe.concurrent('masmott', () => {
       it('returns success messages', async () => {
         const db = createMockDB();
         const triggers = makeTriggers({ db, views });
-        const onLawakCreateTrigger = triggers.lawak.onCreate({
+        const trigger = triggers.lawak.onCreate({
           id: 'fooLawak',
           data: { text: 'lawak text' },
         });
 
-        const triggerResult = await onLawakCreateTrigger();
+        const result = await trigger();
 
-        expect(triggerResult).toStrictEqual({ card: E.right('setDoc success') });
+        expect(result).toStrictEqual({ card: E.right('setDoc success') });
       });
 
       it('creates materialized view', async () => {
