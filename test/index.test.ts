@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/Either';
 import { describe, expect, it } from 'vitest';
 
-import { AppViews, makeTriggers } from '../src';
+import { AppViews, DocField, makeTriggers } from '../src';
 import { createMockDB } from './util';
 
 describe.concurrent('masmott', () => {
@@ -24,7 +24,7 @@ describe.concurrent('masmott', () => {
         const triggers = makeTriggers({ db, views });
         const onLawakCreateTrigger = triggers.lawak.onCreate({
           id: 'fooLawak',
-          data: { text: 'lawak text' },
+          data: { text: DocField.String('lawak text') },
         });
 
         const triggerResult = await onLawakCreateTrigger();
@@ -37,7 +37,7 @@ describe.concurrent('masmott', () => {
         const triggers = makeTriggers({ db, views });
         const trigger = triggers.lawak.onCreate({
           id: 'fooLawak',
-          data: { text: 'lawak text' },
+          data: { text: DocField.String('lawak text') },
         });
 
         await trigger();
@@ -46,7 +46,7 @@ describe.concurrent('masmott', () => {
         const result = await getViewDoc();
         expect(result).toStrictEqual(
           E.right({
-            data: { text: 'lawak text' },
+            data: { text: DocField.String('lawak text') },
             context: 'doc found',
           })
         );
@@ -57,7 +57,10 @@ describe.concurrent('masmott', () => {
         const triggers = makeTriggers({ db, views });
         const trigger = triggers.lawak.onCreate({
           id: 'fooLawak',
-          data: { text: 'lawak text', anotherText: 'anotherText' },
+          data: {
+            text: DocField.String('lawak text'),
+            anotherText: DocField.String('anotherText'),
+          },
         });
 
         await trigger();
@@ -66,7 +69,7 @@ describe.concurrent('masmott', () => {
         const result = await getViewDoc();
         expect(result).toStrictEqual(
           E.right({
-            data: { text: 'lawak text' },
+            data: { text: DocField.String('lawak text') },
             context: 'doc found',
           })
         );
