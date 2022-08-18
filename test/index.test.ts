@@ -22,7 +22,7 @@ describe.concurrent('masmott', () => {
       it('returns success messages', async () => {
         const db = createMockDB();
         const triggers = makeTriggers({ db, views });
-        const trigger = triggers.lawak.onCreate({
+        const trigger = triggers.db.lawak.onCreate({
           id: 'fooLawak',
           data: { text: 'lawak text' },
         });
@@ -35,7 +35,7 @@ describe.concurrent('masmott', () => {
       it('creates materialized view', async () => {
         const db = createMockDB();
         const triggers = makeTriggers({ db, views });
-        const trigger = triggers.lawak.onCreate({
+        const trigger = triggers.db.lawak.onCreate({
           id: 'fooLawak',
           data: { text: 'lawak text' },
         });
@@ -55,7 +55,7 @@ describe.concurrent('masmott', () => {
       it('only copies specified fields to view doc', async () => {
         const db = createMockDB();
         const triggers = makeTriggers({ db, views });
-        const trigger = triggers.lawak.onCreate({
+        const trigger = triggers.db.lawak.onCreate({
           id: 'fooLawak',
           data: { text: 'lawak text', anotherText: 'anotherText' },
         });
