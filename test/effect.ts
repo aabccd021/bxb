@@ -6,6 +6,7 @@ export type State<T> = {
 };
 
 export const makeState = <T>(initialState: T): State<T> => {
+  // eslint-disable-next-line functional/no-let
   let state: T = initialState;
 
   return {
