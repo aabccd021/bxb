@@ -108,10 +108,11 @@ export const makeTriggers = <U extends DBG>({
 }: {
   readonly views: AppViews;
   readonly db: DB<U>;
-}) =>
-  pipe(
+}) => ({
+  db: pipe(
     views,
     Record.mapWithIndex((tableName, tableViews) => ({
       onCreate: onCreate({ tableName, tableViews, db }),
     }))
-  );
+  ),
+});
