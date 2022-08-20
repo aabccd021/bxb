@@ -3,6 +3,7 @@ import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
 import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
+import * as Record from 'fp-ts/Record';
 import * as T from 'fp-ts/Task';
 import * as TE from 'fp-ts/TaskEither';
 
@@ -55,8 +56,10 @@ export const createMockDB: IO.IO<DB<TestDB>> = pipe(
         db.read,
         IO.map((res) =>
           pipe(
-            res[table]?.[view]?.[id],
-            O.fromNullable,
+            res,
+            Record.lookup(table),
+            O.chain(Record.lookup(view)),
+            O.chain(Record.lookup(id)),
             O.map((data) => ({ data, context: 'doc found' })),
             E.fromOption(() => 'doc not found')
           )
