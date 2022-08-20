@@ -1,10 +1,12 @@
+import * as E from 'fp-ts/Either';
 import * as IO from 'fp-ts/IO';
+import * as IORef from 'fp-ts/IORef';
 import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
+import * as T from 'fp-ts/Task';
 import * as TE from 'fp-ts/TaskEither';
 
 import { DB, DocData, DocSnapshot } from '../src';
-import { makeState } from './effect';
 
 type TestDB = {
   readonly SetDocRight: string;
@@ -34,23 +36,32 @@ const updateDB =
     };
   };
 
-export const createMockDB = (): DB<TestDB> => {
-  const state = makeState<MockDB>({});
-  return {
+const emptyDB: MockDB = {};
+
+export const createMockDB: IO.IO<DB<TestDB>> = pipe(
+  emptyDB,
+  IORef.newIORef,
+  IO.map((db) => ({
     setDoc: (snapshot) =>
       pipe(
-        state.get,
+        db.read,
         IO.map(updateDB(snapshot)),
-        IO.chain(state.set),
+        IO.chain(db.write),
         TE.fromIO,
         TE.chain(() => TE.right<string, string>('setDoc success'))
       ),
     getDoc: ({ table, view, id }) =>
       pipe(
-        state.get()[table]?.[view]?.[id],
-        O.fromNullable,
-        O.map((data) => ({ data, context: 'doc found' })),
-        TE.fromOption(() => 'doc not found')
+        db.read,
+        IO.map((res) =>
+          pipe(
+            res[table]?.[view]?.[id],
+            O.fromNullable,
+            O.map((data) => ({ data, context: 'doc found' })),
+            E.fromOption(() => 'doc not found')
+          )
+        ),
+        T.fromIO
       ),
-  };
-};
+  }))
+);
