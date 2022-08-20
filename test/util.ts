@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/Either';
 import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
-import { pipe } from 'fp-ts/lib/function';
+import { flow, pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import * as Record from 'fp-ts/Record';
 import * as T from 'fp-ts/Task';
@@ -54,9 +54,8 @@ export const createMockDB: IO.IO<DB<TestDB>> = pipe(
     getDoc: ({ table, view, id }) =>
       pipe(
         db.read,
-        IO.map((res) =>
-          pipe(
-            res,
+        IO.map(
+          flow(
             Record.lookup(table),
             O.chain(Record.lookup(view)),
             O.chain(Record.lookup(id)),
