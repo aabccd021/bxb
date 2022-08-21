@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/Either';
 import { describe, expect, it } from 'vitest';
 
-import { createTableDB } from '../src/server';
+import { createTableDB } from '../src/table_db';
 
 describe.concurrent('Table DB', () => {
   it('can set doc and get doc', async () => {
