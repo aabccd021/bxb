@@ -9,6 +9,15 @@ import { describe, expect, it } from 'vitest';
 
 import { createStorage } from '../src/storage';
 
+const getText = async (downloadResult: O.Option<Blob>) => {
+  const donwloadResultBlob: Blob | undefined = pipe(
+    downloadResult,
+    O.getOrElse<undefined>(() => undefined)
+  );
+  const downloadResultText = await donwloadResultBlob?.text();
+  return downloadResultText;
+};
+
 describe.concurrent('Storage', () => {
   it('can upload and download', async () => {
     const createNoTriggerStorage = createStorage(() => ({}));
@@ -16,14 +25,14 @@ describe.concurrent('Storage', () => {
 
     const id = 'sakurazaka/kira';
 
-    const file = new Blob(['masumoto'], { type: 'text/plain' });
+    const file = new Blob(['masumoto']);
     const upload = storage.upload({ id, file });
     await upload();
 
     const download = storage.download(id);
-    const result = await download();
+    const result = await download().then(getText);
 
-    expect(result).toStrictEqual(O.of(file));
+    expect(result).toStrictEqual('masumoto');
   });
 
   it('can run trigger when object uploaded', async () => {
@@ -40,5 +49,31 @@ describe.concurrent('Storage', () => {
     await upload();
 
     expect(logs.read()).toStrictEqual(['sakurazaka/kira']);
+  });
+
+  it.skip('can use storage inside trigger', async () => {
+    const nazunaFile = new Blob(['nanakusa'], { type: 'text/plain;charset=UTF-8' });
+    const kiraFile = new Blob(['masumoto'], { type: 'text/plain;charset=UTF-8' });
+
+    const createStorageWithTrigger = createStorage((storage) => ({
+      onUploaded: (id) =>
+        id === 'sakurazaka/kira'
+          ? storage.upload({ id: 'yofukashi/nazuna', file: nazunaFile })
+          : T.of(undefined),
+    }));
+    const storage = createStorageWithTrigger();
+
+    const upload = storage.upload({ id: 'sakurazaka/kira', file: kiraFile });
+    await upload();
+
+    const downloadKira = storage.download('sakurazaka/kira');
+    const kiraResult = await downloadKira();
+    const getKiraResultText: T.Task<string> | undefined = pipe(
+      kiraResult,
+      O.map((result) => result.text as T.Task<string>),
+      O.getOrElse<undefined>(() => undefined)
+    );
+    const kiraResultText = await getKiraResultText?.();
+    expect(kiraResultText).toStrictEqual('masumoto');
   });
 });

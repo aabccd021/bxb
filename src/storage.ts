@@ -12,7 +12,7 @@ type StorageTriggers = {
 
 type StorageState = Record<string, Blob>;
 
-type Storage = {
+export type Storage = {
   readonly upload: (p: { readonly id: string; readonly file: Blob }) => T.Task<unknown>;
   readonly download: (id: string) => T.Task<O.Option<Blob>>;
 };
