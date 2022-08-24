@@ -1,7 +1,7 @@
 import { Blob } from 'buffer';
 import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
-import { flow, pipe } from 'fp-ts/lib/function';
+import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import * as Record from 'fp-ts/Record';
 import * as T from 'fp-ts/Task';
@@ -23,27 +23,34 @@ const emptyTriggers: StorageTriggers = {
 
 const fillTriggersDefaults = (triggers: Partial<StorageTriggers>): StorageTriggers => ({
   ...emptyTriggers,
-  ...triggers
+  ...triggers,
 });
 
 const initialState: StorageState = {};
 
-const createStorageWithTriggers = (triggers: StorageTriggers): IO.IO<Storage> => {
-  return pipe(
-    initialState,
-    IORef.newIORef,
-    IO.map((storage) => ({
-      upload: ({ id, file }) =>
-        pipe(
-          storage.read,
-          IO.map(Record.upsertAt(id, file)),
-          IO.chain(storage.write),
-          T.fromIO,
-          T.chain(() => triggers.onUploaded(id))
-        ),
-      download: (id) => pipe(storage.read, IO.map(Record.lookup(id)), T.fromIO),
-    }))
-  );
-};
-
-export const createStorage = flow(fillTriggersDefaults, createStorageWithTriggers);
+export const createStorage =
+  (makeTriggers: (storage: Storage) => Partial<StorageTriggers>): IO.IO<Storage> =>
+  () => {
+    const storage = makeStorage();
+    const triggers = pipe(storage, makeTriggers, fillTriggersDefaults);
+    function makeStorage() {
+      return pipe(
+        initialState,
+        IORef.newIORef,
+        IO.map(
+          (storageState): Storage => ({
+            upload: ({ id, file }) =>
+              pipe(
+                storageState.read,
+                IO.map(Record.upsertAt(id, file)),
+                IO.chain(storageState.write),
+                T.fromIO,
+                T.chain(() => triggers.onUploaded(id))
+              ),
+            download: (id) => pipe(storageState.read, IO.map(Record.lookup(id)), T.fromIO),
+          })
+        )
+      )();
+    }
+    return storage;
+  };

@@ -11,7 +11,7 @@ import { createStorage } from '../src/storage';
 
 describe.concurrent('Storage', () => {
   it('can upload and download', async () => {
-    const createNoTriggerStorage = createStorage({});
+    const createNoTriggerStorage = createStorage(() => ({}));
     const storage = createNoTriggerStorage();
 
     const id = 'sakurazaka/kira';
@@ -28,9 +28,9 @@ describe.concurrent('Storage', () => {
 
   it('can run trigger when object uploaded', async () => {
     const logs = IORef.newIORef([])();
-    const createStorageWithTrigger = createStorage({
+    const createStorageWithTrigger = createStorage(() => ({
       onUploaded: (id) => pipe(logs.read, IO.map(Array.append(id)), IO.chain(logs.write), T.fromIO),
-    });
+    }));
     const storage = createStorageWithTrigger();
 
     const id = 'sakurazaka/kira';
