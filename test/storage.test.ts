@@ -46,29 +46,24 @@ describe.concurrent('Storage', () => {
     expect(logs.read()).toStrictEqual(['sakurazaka/kira']);
   });
 
-  it.skip('can use storage inside trigger', async () => {
-    const nazunaFile = new Blob(['nanakusa'], { type: 'text/plain;charset=UTF-8' });
-    const kiraFile = new Blob(['masumoto'], { type: 'text/plain;charset=UTF-8' });
-
+  it('can use storage inside trigger', async () => {
     const createStorageWithTrigger = createStorage((storage) => ({
       onUploaded: (id) =>
         id === 'sakurazaka/kira'
-          ? storage.upload({ id: 'yofukashi/nazuna', file: nazunaFile })
+          ? pipe('nanakusa', stringBlob, fileSnapshot.id('yofukashi/nazuna'), storage.upload)
           : T.of(undefined),
     }));
     const storage = createStorageWithTrigger();
 
-    const upload = storage.upload({ id: 'sakurazaka/kira', file: kiraFile });
+    const upload = pipe('masumoto', stringBlob, fileSnapshot.id('sakurazaka/kira'), storage.upload);
     await upload();
 
     const downloadKira = storage.download('sakurazaka/kira');
-    const kiraResult = await downloadKira();
-    const getKiraResultText: T.Task<string> | undefined = pipe(
-      kiraResult,
-      O.map((result) => result.text as T.Task<string>),
-      O.getOrElse<undefined>(() => undefined)
-    );
-    const kiraResultText = await getKiraResultText?.();
-    expect(kiraResultText).toStrictEqual('masumoto');
+    const kiraResult = await downloadKira().then(getText);
+    expect(kiraResult).toStrictEqual('masumoto');
+
+    const downloadNazuna = storage.download('yofukashi/nazuna');
+    const nazunaResult = await downloadNazuna().then(getText);
+    expect(nazunaResult).toStrictEqual('nanakusa');
   });
 });
