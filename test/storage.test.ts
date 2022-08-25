@@ -7,7 +7,7 @@ import * as O from 'fp-ts/Option';
 import * as T from 'fp-ts/Task';
 import { describe, expect, it } from 'vitest';
 
-import { createStorage } from '../src/storage';
+import { createStorage, fileSnapshot } from '../src/storage';
 
 const getText = async (downloadResult: O.Option<Blob>) => {
   const donwloadResultBlob: Blob | undefined = pipe(
@@ -18,20 +18,18 @@ const getText = async (downloadResult: O.Option<Blob>) => {
   return downloadResultText;
 };
 
+const stringBlob = (text: string) => new Blob([text]);
+
 describe.concurrent('Storage', () => {
   it('can upload and download', async () => {
     const createNoTriggerStorage = createStorage(() => ({}));
     const storage = createNoTriggerStorage();
 
-    const id = 'sakurazaka/kira';
-
-    const file = new Blob(['masumoto']);
-    const upload = storage.upload({ id, file });
+    const upload = pipe('masumoto', stringBlob, fileSnapshot.id('sakurazaka/kira'), storage.upload);
     await upload();
 
-    const download = storage.download(id);
+    const download = storage.download('sakurazaka/kira');
     const result = await download().then(getText);
-
     expect(result).toStrictEqual('masumoto');
   });
 
@@ -42,10 +40,7 @@ describe.concurrent('Storage', () => {
     }));
     const storage = createStorageWithTrigger();
 
-    const id = 'sakurazaka/kira';
-
-    const file = new Blob(['masumoto'], { type: 'text/plain' });
-    const upload = storage.upload({ id, file });
+    const upload = pipe('masumoto', stringBlob, fileSnapshot.id('sakurazaka/kira'), storage.upload);
     await upload();
 
     expect(logs.read()).toStrictEqual(['sakurazaka/kira']);

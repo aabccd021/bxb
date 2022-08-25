@@ -12,8 +12,16 @@ type StorageTriggers = {
 
 type StorageState = Record<string, Blob>;
 
+type FileSnapshot = { readonly id: string; readonly file: Blob };
+
+export const fileSnapshot = {
+  id:
+    (id: string) =>
+    (file: Blob): FileSnapshot => ({ id, file }),
+};
+
 export type Storage = {
-  readonly upload: (p: { readonly id: string; readonly file: Blob }) => T.Task<unknown>;
+  readonly upload: (p: FileSnapshot) => T.Task<unknown>;
   readonly download: (id: string) => T.Task<O.Option<Blob>>;
 };
 
