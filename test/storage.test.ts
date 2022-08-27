@@ -34,6 +34,22 @@ describe.concurrent('Storage', () => {
     expect(logs.read()).toStrictEqual(['sakurazaka/kira']);
   });
 
+  it('still upload when having trigger', async () => {
+    const logs = IORef.newIORef([])();
+    const createStorageWithTrigger = createStorage(() => ({
+      onUploaded: (id) => pipe(logs.read, IO.map(Array.append(id)), IO.chain(logs.write), T.fromIO),
+    }));
+    const storage = createStorageWithTrigger();
+
+    const upload = pipe('masumoto', stringBlob, fileSnapshot.id('sakurazaka/kira'), storage.upload);
+    await upload();
+
+    const download = storage.download('sakurazaka/kira');
+    const result = await download().then(getTextFromBlob);
+    expect(result).toStrictEqual('masumoto');
+  });
+
+
   it('can use storage inside trigger', async () => {
     const createStorageWithTrigger = createStorage((storage) => ({
       onUploaded: (id) =>
@@ -45,10 +61,6 @@ describe.concurrent('Storage', () => {
 
     const upload = pipe('masumoto', stringBlob, fileSnapshot.id('sakurazaka/kira'), storage.upload);
     await upload();
-
-    const downloadKira = storage.download('sakurazaka/kira');
-    const kiraResult = await downloadKira().then(getTextFromBlob);
-    expect(kiraResult).toStrictEqual('masumoto');
 
     const downloadNazuna = storage.download('yofukashi/nazuna');
     const nazunaResult = await downloadNazuna().then(getTextFromBlob);
