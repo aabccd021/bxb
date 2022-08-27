@@ -7,25 +7,24 @@ describe.concurrent('Table DB', () => {
   it('can set doc and get doc', async () => {
     const createNoTriggerTableDB = createTableDB({});
     const db = createNoTriggerTableDB();
-    const key = { table: 'sakurazaka', id: 'kira' };
 
-    const setDoc = db.setDoc({ key, data: { birthYear: 2002 } });
+    const setDoc = db.setDoc({
+      key: { table: 'sakurazaka', id: 'kira' },
+      data: { birthYear: 2002 },
+    });
     await setDoc();
 
-    const getDoc = db.getDoc(key);
+    const getDoc = db.getDoc({ table: 'sakurazaka', id: 'kira' });
     const result = await getDoc();
-
     expect(result).toStrictEqual(O.of({ birthYear: 2002 }));
   });
 
   it('returns empty option when getDoc non existing ', async () => {
     const createNoTriggerTableDB = createTableDB({});
     const db = createNoTriggerTableDB();
-    const key = { table: 'sakurazaka', id: 'kira' };
 
-    const getDoc = db.getDoc(key);
+    const getDoc = db.getDoc({ table: 'sakurazaka', id: 'kira' });
     const result = await getDoc();
-
     expect(result).toStrictEqual(O.none);
   });
 });
