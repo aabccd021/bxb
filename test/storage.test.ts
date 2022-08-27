@@ -1,24 +1,12 @@
-import { Blob } from 'buffer';
 import * as Array from 'fp-ts/Array';
 import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
 import { pipe } from 'fp-ts/lib/function';
-import * as O from 'fp-ts/Option';
 import * as T from 'fp-ts/Task';
 import { describe, expect, it } from 'vitest';
 
 import { createStorage, fileSnapshot } from '../src/storage';
-
-const getText = async (downloadResult: O.Option<Blob>) => {
-  const donwloadResultBlob: Blob | undefined = pipe(
-    downloadResult,
-    O.getOrElse<undefined>(() => undefined)
-  );
-  const downloadResultText = await donwloadResultBlob?.text();
-  return downloadResultText;
-};
-
-const stringBlob = (text: string) => new Blob([text]);
+import { getTextFromBlob, stringBlob } from './util.test';
 
 describe.concurrent('Storage', () => {
   it('can upload and download', async () => {
@@ -29,7 +17,7 @@ describe.concurrent('Storage', () => {
     await upload();
 
     const download = storage.download('sakurazaka/kira');
-    const result = await download().then(getText);
+    const result = await download().then(getTextFromBlob);
     expect(result).toStrictEqual('masumoto');
   });
 
@@ -59,11 +47,11 @@ describe.concurrent('Storage', () => {
     await upload();
 
     const downloadKira = storage.download('sakurazaka/kira');
-    const kiraResult = await downloadKira().then(getText);
+    const kiraResult = await downloadKira().then(getTextFromBlob);
     expect(kiraResult).toStrictEqual('masumoto');
 
     const downloadNazuna = storage.download('yofukashi/nazuna');
-    const nazunaResult = await downloadNazuna().then(getText);
+    const nazunaResult = await downloadNazuna().then(getTextFromBlob);
     expect(nazunaResult).toStrictEqual('nanakusa');
   });
 });
