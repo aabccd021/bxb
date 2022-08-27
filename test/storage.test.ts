@@ -49,7 +49,6 @@ describe.concurrent('Storage', () => {
     expect(result).toStrictEqual('masumoto');
   });
 
-
   it('can use storage inside trigger', async () => {
     const createStorageWithTrigger = createStorage((storage) => ({
       onUploaded: (id) =>
