@@ -1,4 +1,3 @@
-import * as E from 'fp-ts/Either';
 import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
 import { flow, pipe } from 'fp-ts/lib/function';
@@ -19,7 +18,7 @@ type DocSnapshot = { readonly key: DocKey; readonly data: DocData };
 
 type TableDB = {
   readonly setDoc: (snapshot: DocSnapshot) => T.Task<unknown>;
-  readonly getDoc: (key: DocKey) => T.Task<unknown>;
+  readonly getDoc: (key: DocKey) => T.Task<O.Option<DocData>>;
 };
 
 type TableState = Record<string, DocData>;
@@ -46,16 +45,6 @@ export const createTableDB = (_triggers: TableDBTriggers): IO.IO<TableDB> =>
     IO.map((db) => ({
       setDoc: (snapshot) => pipe(db.read, IO.map(setDoc(snapshot)), IO.chain(db.write), T.fromIO),
       getDoc: ({ table, id }) =>
-        pipe(
-          db.read,
-          IO.map(
-            flow(
-              Record.lookup(table),
-              O.chain(Record.lookup(id)),
-              E.fromOption(() => 'doc not found')
-            )
-          ),
-          T.fromIO
-        ),
+        pipe(db.read, IO.map(flow(Record.lookup(table), O.chain(Record.lookup(id)))), T.fromIO),
     }))
   );

@@ -1,4 +1,4 @@
-import * as E from 'fp-ts/Either';
+import * as O from 'fp-ts/Option';
 import { describe, expect, it } from 'vitest';
 
 import { createTableDB } from '../src/table_db';
@@ -15,6 +15,6 @@ describe.concurrent('Table DB', () => {
     const getDoc = db.getDoc(key);
     const result = await getDoc();
 
-    expect(result).toStrictEqual(E.right({ birthYear: 2002 }));
+    expect(result).toStrictEqual(O.of({ birthYear: 2002 }));
   });
 });
