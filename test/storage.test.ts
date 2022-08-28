@@ -7,7 +7,7 @@ import { make } from 'make-struct-ts';
 import { describe, expect, it } from 'vitest';
 
 import { createStorage, FileSnapshot } from '../src/storage';
-import { getTextFromBlob, stringBlob } from './util.test';
+import { getTextFromBlob, stringToBlob } from './util.test';
 
 describe.concurrent('Storage', () => {
   it('can upload and download', async () => {
@@ -16,8 +16,8 @@ describe.concurrent('Storage', () => {
 
     const upload = pipe(
       'masumoto',
-      stringBlob,
-      make(FileSnapshot).file({ id: 'sakurazaka/kira' }),
+      stringToBlob,
+      make(FileSnapshot).blob({ id: 'sakurazaka/kira' }),
       storage.upload
     );
     await upload();
@@ -36,8 +36,8 @@ describe.concurrent('Storage', () => {
 
     const upload = pipe(
       'masumoto',
-      stringBlob,
-      make(FileSnapshot).file({ id: 'sakurazaka/kira' }),
+      stringToBlob,
+      make(FileSnapshot).blob({ id: 'sakurazaka/kira' }),
       storage.upload
     );
     await upload();
@@ -54,8 +54,8 @@ describe.concurrent('Storage', () => {
 
     const upload = pipe(
       'masumoto',
-      stringBlob,
-      make(FileSnapshot).file({ id: 'sakurazaka/kira' }),
+      stringToBlob,
+      make(FileSnapshot).blob({ id: 'sakurazaka/kira' }),
       storage.upload
     );
     await upload();
@@ -71,8 +71,8 @@ describe.concurrent('Storage', () => {
         id === 'sakurazaka/kira'
           ? pipe(
               'nanakusa',
-              stringBlob,
-              make(FileSnapshot).file({ id: 'yofukashi/nazuna' }),
+              stringToBlob,
+              make(FileSnapshot).blob({ id: 'yofukashi/nazuna' }),
               storage.upload
             )
           : T.of(undefined),
@@ -81,8 +81,8 @@ describe.concurrent('Storage', () => {
 
     const upload = pipe(
       'masumoto',
-      stringBlob,
-      make(FileSnapshot).file({ id: 'sakurazaka/kira' }),
+      stringToBlob,
+      make(FileSnapshot).blob({ id: 'sakurazaka/kira' }),
       storage.upload
     );
     await upload();

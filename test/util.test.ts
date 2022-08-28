@@ -11,18 +11,18 @@ export const getTextFromBlob = async (downloadResult: O.Option<Blob>) => {
   return downloadResultText;
 };
 
-export const stringBlob = (text: string) => new Blob([text]);
+export const stringToBlob = (text: string) => new Blob([text]);
 
 describe.concurrent('util', () => {
   describe.concurrent('stringBlob & getTextFromBlob', () => {
     it('blob content is its wrapped text', async () => {
-      const blob = stringBlob('masumoto');
+      const blob = stringToBlob('masumoto');
       const result = await getTextFromBlob(O.of(blob));
       expect(result).toStrictEqual('masumoto');
     });
 
     it('blob content is not equal to other than its wrapped text', async () => {
-      const blob = stringBlob('masumoto');
+      const blob = stringToBlob('masumoto');
       const result = await getTextFromBlob(O.of(blob));
       expect(result).not.toStrictEqual('nazuna');
     });

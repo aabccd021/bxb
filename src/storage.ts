@@ -21,7 +21,7 @@ const BlobFromUnknown = new t.Type<Blob, unknown, unknown>(
 
 export const FileSnapshot = t.type({
   id: t.string,
-  file: BlobFromUnknown,
+  blob: BlobFromUnknown,
 });
 
 export type FileSnapshot = t.TypeOf<typeof FileSnapshot>;
@@ -53,10 +53,10 @@ export const createStorage =
         IORef.newIORef,
         IO.map(
           (storageState): Storage => ({
-            upload: ({ id, file }) =>
+            upload: ({ id, blob }) =>
               pipe(
                 storageState.read,
-                IO.map(Record.upsertAt(id, file)),
+                IO.map(Record.upsertAt(id, blob)),
                 IO.chain(storageState.write),
                 T.fromIO,
                 T.chain(() => triggers.onUploaded(id))
