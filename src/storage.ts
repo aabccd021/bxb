@@ -1,4 +1,3 @@
-import { Blob } from 'buffer';
 import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
 import { pipe } from 'fp-ts/lib/function';

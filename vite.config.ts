@@ -5,6 +5,7 @@ export const config = {
   test: {
     maxConcurrency: 1000,
     testTimeout: 10000,
+    environment: 'happy-dom' as const,
   },
   build: {
     lib: {
