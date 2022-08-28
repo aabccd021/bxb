@@ -4,6 +4,7 @@ import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import * as Record from 'fp-ts/Record';
 import * as T from 'fp-ts/Task';
+import * as t from 'io-ts';
 
 type StorageTriggers = {
   readonly onUploaded: (id: string) => T.Task<unknown>;
@@ -11,13 +12,19 @@ type StorageTriggers = {
 
 type StorageState = Record<string, Blob>;
 
-type FileSnapshot = { readonly id: string; readonly file: Blob };
+const BlobFromUnknown = new t.Type<Blob, unknown, unknown>(
+  'BlobFromUnknown',
+  (u): u is Blob => u instanceof Blob,
+  (u, c) => (u instanceof Blob ? t.success(u) : t.failure(u, c)),
+  (a) => a
+);
 
-export const fileSnapshot = {
-  id:
-    (id: string) =>
-    (file: Blob): FileSnapshot => ({ id, file }),
-};
+export const FileSnapshot = t.type({
+  id: t.string,
+  file: BlobFromUnknown,
+});
+
+export type FileSnapshot = t.TypeOf<typeof FileSnapshot>;
 
 export type Storage = {
   readonly upload: (p: FileSnapshot) => T.Task<unknown>;

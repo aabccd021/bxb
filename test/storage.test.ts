@@ -3,9 +3,10 @@ import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
 import { pipe } from 'fp-ts/lib/function';
 import * as T from 'fp-ts/Task';
+import { make } from 'make-struct-ts';
 import { describe, expect, it } from 'vitest';
 
-import { createStorage, fileSnapshot } from '../src/storage';
+import { createStorage, FileSnapshot } from '../src/storage';
 import { getTextFromBlob, stringBlob } from './util.test';
 
 describe.concurrent('Storage', () => {
@@ -13,7 +14,12 @@ describe.concurrent('Storage', () => {
     const createNoTriggerStorage = createStorage(() => ({}));
     const storage = createNoTriggerStorage();
 
-    const upload = pipe('masumoto', stringBlob, fileSnapshot.id('sakurazaka/kira'), storage.upload);
+    const upload = pipe(
+      'masumoto',
+      stringBlob,
+      make(FileSnapshot).file({ id: 'sakurazaka/kira' }),
+      storage.upload
+    );
     await upload();
 
     const download = storage.download('sakurazaka/kira');
@@ -28,7 +34,12 @@ describe.concurrent('Storage', () => {
     }));
     const storage = createStorageWithTrigger();
 
-    const upload = pipe('masumoto', stringBlob, fileSnapshot.id('sakurazaka/kira'), storage.upload);
+    const upload = pipe(
+      'masumoto',
+      stringBlob,
+      make(FileSnapshot).file({ id: 'sakurazaka/kira' }),
+      storage.upload
+    );
     await upload();
 
     expect(logs.read()).toStrictEqual(['sakurazaka/kira']);
@@ -41,7 +52,12 @@ describe.concurrent('Storage', () => {
     }));
     const storage = createStorageWithTrigger();
 
-    const upload = pipe('masumoto', stringBlob, fileSnapshot.id('sakurazaka/kira'), storage.upload);
+    const upload = pipe(
+      'masumoto',
+      stringBlob,
+      make(FileSnapshot).file({ id: 'sakurazaka/kira' }),
+      storage.upload
+    );
     await upload();
 
     const download = storage.download('sakurazaka/kira');
@@ -53,12 +69,22 @@ describe.concurrent('Storage', () => {
     const createStorageWithTrigger = createStorage((storage) => ({
       onUploaded: (id) =>
         id === 'sakurazaka/kira'
-          ? pipe('nanakusa', stringBlob, fileSnapshot.id('yofukashi/nazuna'), storage.upload)
+          ? pipe(
+              'nanakusa',
+              stringBlob,
+              make(FileSnapshot).file({ id: 'yofukashi/nazuna' }),
+              storage.upload
+            )
           : T.of(undefined),
     }));
     const storage = createStorageWithTrigger();
 
-    const upload = pipe('masumoto', stringBlob, fileSnapshot.id('sakurazaka/kira'), storage.upload);
+    const upload = pipe(
+      'masumoto',
+      stringBlob,
+      make(FileSnapshot).file({ id: 'sakurazaka/kira' }),
+      storage.upload
+    );
     await upload();
 
     const downloadNazuna = storage.download('yofukashi/nazuna');
