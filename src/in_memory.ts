@@ -1,35 +1,14 @@
 import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
+import { sequenceS } from 'fp-ts/lib/Apply';
 import { pipe } from 'fp-ts/lib/function';
-import * as O from 'fp-ts/Option';
 import * as Record from 'fp-ts/Record';
 import * as T from 'fp-ts/Task';
-import * as t from 'io-ts';
 
-type StorageTriggers = {
-  readonly onUploaded: (id: string) => T.Task<unknown>;
-};
+import { MakeClientWithTrigger } from '.';
+import { Storage, StorageAdmin, StorageClient, StorageTriggers } from '.';
 
 type StorageState = Record<string, Blob>;
-
-const BlobFromUnknown = new t.Type<Blob, unknown, unknown>(
-  'BlobFromUnknown',
-  (u): u is Blob => u instanceof Blob,
-  (u, c) => (u instanceof Blob ? t.success(u) : t.failure(u, c)),
-  (a) => a
-);
-
-export const FileSnapshot = t.type({
-  id: t.string,
-  blob: BlobFromUnknown,
-});
-
-export type FileSnapshot = t.TypeOf<typeof FileSnapshot>;
-
-export type Storage = {
-  readonly upload: (p: FileSnapshot) => T.Task<unknown>;
-  readonly download: (id: string) => T.Task<O.Option<Blob>>;
-};
 
 const emptyTriggers: StorageTriggers = {
   onUploaded: (_) => T.of(undefined),
@@ -42,8 +21,8 @@ const fillTriggersDefaults = (triggers: Partial<StorageTriggers>): StorageTrigge
 
 const initialState: StorageState = {};
 
-export const createStorage =
-  (makeTriggers: (storage: Storage) => Partial<StorageTriggers>): IO.IO<Storage> =>
+export const makeStorageClient =
+  (makeTriggers: (storage: StorageAdmin) => Partial<StorageTriggers>): IO.IO<StorageClient> =>
   () => {
     const storage = makeStorage();
     const triggers = pipe(storage, makeTriggers, fillTriggersDefaults);
@@ -68,3 +47,6 @@ export const createStorage =
     }
     return storage;
   };
+
+export const makeClientWithTrigger: MakeClientWithTrigger = ({ storage }) =>
+  pipe({ storage: makeStorageClient(storage) }, sequenceS(IO.Apply));

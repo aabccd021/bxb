@@ -16,7 +16,7 @@ specifiers:
   fp-ts: ^2.12.1
   happy-dom: ^6.0.4
   io-ts: ^2.2.17
-  make-struct-ts: ^1.0.0
+  make-struct-ts: ^1.0.1
   prettier: ^2.7.1
   typescript: ^4.6.4
   typescript-language-server: ^0.11.2
@@ -27,7 +27,7 @@ specifiers:
 dependencies:
   fp-ts: 2.12.2
   io-ts: 2.2.17_fp-ts@2.12.2
-  make-struct-ts: 1.0.0
+  make-struct-ts: 1.0.1
 
 devDependencies:
   '@types/node': 18.6.4
@@ -1749,8 +1749,8 @@ packages:
       semver: 6.3.0
     dev: true
 
-  /make-struct-ts/1.0.0:
-    resolution: {integrity: sha512-8C2IIdFrV1qxiUScb01LoAOIwC+xUHcqy4DEtkngGA6+44bkK4eb2ztECZvqjnD1HE5nTkigVt/f4HhDdZiSWw==}
+  /make-struct-ts/1.0.1:
+    resolution: {integrity: sha512-2qEReMI7QZOiYzfcjkSwzwUmxiiYt7g6YipM3y33VnzZdVmMUxe6OXtWKEOydUxLJEQVNXRiXcFI+rS5ILVeOg==}
     dependencies:
       fp-ts: 2.12.2
       io-ts: 2.2.17_fp-ts@2.12.2

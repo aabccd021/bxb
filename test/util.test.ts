@@ -1,17 +1,7 @@
-import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import { describe, expect, it } from 'vitest';
 
-export const getTextFromBlob = async (downloadResult: O.Option<Blob>) => {
-  const donwloadResultBlob: Blob | undefined = pipe(
-    downloadResult,
-    O.getOrElse<undefined>(() => undefined)
-  );
-  const downloadResultText = await donwloadResultBlob?.text();
-  return downloadResultText;
-};
-
-export const stringToBlob = (text: string) => new Blob([text]);
+import { getTextFromBlob, stringToBlob } from '../src/test';
 
 describe.concurrent('util', () => {
   describe.concurrent('stringBlob & getTextFromBlob', () => {
