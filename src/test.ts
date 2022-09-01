@@ -95,7 +95,7 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
                   make(FileSnapshot).blob({ id: 'yofukashi/nazuna' }),
                   storageAdmin.upload
                 )
-              : T.never,
+              : T.Do,
         }),
       });
       const client = makeClient();
