@@ -58,10 +58,7 @@ export type Client = {
 };
 
 export type MakeTriggers = {
-  readonly storage?: (admin: {
-    readonly storage: StorageAdmin;
-    readonly db: TableDBAdmin;
-  }) => StorageTriggers;
+  readonly storage?: (storage: StorageAdmin) => StorageTriggers;
   readonly db?: (storage: TableDBAdmin) => TableDBTriggers;
 };
 
