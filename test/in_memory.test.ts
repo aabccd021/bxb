@@ -1,4 +1,4 @@
-import {test} from '../src/test'
-import {makeClientWithTrigger} from '../src/in_memory'
+import { makeClientWithTrigger } from '../src/in_memory';
+import { test } from '../src/test';
 
-test(makeClientWithTrigger)
+test(makeClientWithTrigger);
