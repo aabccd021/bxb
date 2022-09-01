@@ -84,18 +84,15 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
       expect(result).toStrictEqual('masumoto');
     });
 
-    it('can use storage inside trigger', async () => {
+    it('can download inside trigger', async () => {
+      const logs = IORef.newIORef<readonly string[]>([])();
       const makeClient = makeClientWithTrigger({
         storage: (storageAdmin) => ({
-          onUploaded: (id) =>
-            id === 'sakurazaka/kira'
-              ? pipe(
-                  'nanakusa',
-                  stringToBlob,
-                  make(FileSnapshot).blob({ id: 'yofukashi/nazuna' }),
-                  storageAdmin.upload
-                )
-              : T.Do,
+          onUploaded: (id) => async () => {
+            const download = storageAdmin.download(id);
+            const result = (await download().then(getTextFromBlob)) ?? '';
+            return pipe(logs.read, IO.map(Array.append(result)), IO.chain(logs.write), T.fromIO)();
+          },
         }),
       });
       const client = makeClient();
@@ -108,9 +105,7 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
       );
       await upload();
 
-      const downloadNazuna = client.storage.download('yofukashi/nazuna');
-      const nazunaResult = await downloadNazuna().then(getTextFromBlob);
-      expect(nazunaResult).toStrictEqual('nanakusa');
+      expect(logs.read()).toStrictEqual(['masumoto']);
     });
   });
 

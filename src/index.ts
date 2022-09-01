@@ -33,6 +33,8 @@ export type StorageAdmin = {
   readonly download: (id: string) => T.Task<O.Option<Blob>>;
 };
 
+export type ReadonlyStorageAdmin = Pick<StorageAdmin, 'download'>;
+
 export type StorageTriggers = {
   readonly onUploaded?: (id: string) => T.Task<unknown>;
 };
@@ -58,7 +60,7 @@ export type Client = {
 };
 
 export type MakeTriggers = {
-  readonly storage?: (storage: StorageAdmin) => StorageTriggers;
+  readonly storage?: (storage: ReadonlyStorageAdmin) => StorageTriggers;
   readonly db?: (storage: TableDBAdmin) => TableDBTriggers;
 };
 
