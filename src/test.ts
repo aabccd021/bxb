@@ -86,14 +86,14 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
 
     it('can use storage inside trigger', async () => {
       const makeClient = makeClientWithTrigger({
-        storage: (storageAdmin) => ({
+        storage: (admin) => ({
           onUploaded: (id) =>
             id === 'sakurazaka/kira'
               ? pipe(
                   'nanakusa',
                   stringToBlob,
                   make(FileSnapshot).blob({ id: 'yofukashi/nazuna' }),
-                  storageAdmin.upload
+                  admin.storage.upload
                 )
               : T.Do,
         }),
@@ -137,6 +137,33 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
       const getDoc = client.db.getDoc({ table: 'sakurazaka', id: 'kira' });
       const result = await getDoc();
       expect(result).toStrictEqual(O.none);
+    });
+  });
+
+  describe.concurrent('Combination', () => {
+    it('can set doc on upload', async () => {
+      const makeClient = makeClientWithTrigger({
+        storage: (admin) => ({
+          onUploaded: (id) =>
+            admin.db.setDoc({
+              key: { table: 'imageUploaded', id: '1' },
+              data: { id },
+            }),
+        }),
+      });
+      const client = makeClient();
+
+      const upload = pipe(
+        'masumoto',
+        stringToBlob,
+        make(FileSnapshot).blob({ id: 'sakurazaka/kira' }),
+        client.storage.upload
+      );
+      await upload();
+
+      const getDoc = client.db.getDoc({ table: 'imageUploaded', id: '1' });
+      const result = await getDoc();
+      expect(result).toStrictEqual(O.of({ id: 'sakurazaka/kira' }));
     });
   });
 };
