@@ -24,7 +24,7 @@ export const stringToBlob = (text: string) => new Blob([text]);
 export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
   describe.concurrent('Storage', () => {
     it('can upload and download', async () => {
-      const makeClient = makeClientWithTrigger({ storage: () => ({}) });
+      const makeClient = makeClientWithTrigger({});
       const client = makeClient();
 
       const upload = pipe(
@@ -111,6 +111,32 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
       const downloadNazuna = client.storage.download('yofukashi/nazuna');
       const nazunaResult = await downloadNazuna().then(getTextFromBlob);
       expect(nazunaResult).toStrictEqual('nanakusa');
+    });
+  });
+
+  describe.concurrent('Table DB', () => {
+    it('can set doc and get doc', async () => {
+      const makeClient = makeClientWithTrigger({});
+      const client = makeClient();
+
+      const setDoc = client.db.setDoc({
+        key: { table: 'sakurazaka', id: 'kira' },
+        data: { birthYear: 2002 },
+      });
+      await setDoc();
+
+      const getDoc = client.db.getDoc({ table: 'sakurazaka', id: 'kira' });
+      const result = await getDoc();
+      expect(result).toStrictEqual(O.of({ birthYear: 2002 }));
+    });
+
+    it('returns empty option when getDoc non existing ', async () => {
+      const makeClient = makeClientWithTrigger({});
+      const client = makeClient();
+
+      const getDoc = client.db.getDoc({ table: 'sakurazaka', id: 'kira' });
+      const result = await getDoc();
+      expect(result).toStrictEqual(O.none);
     });
   });
 };

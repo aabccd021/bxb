@@ -15,6 +15,17 @@ export const FileSnapshot = t.type({
   blob: BlobFromUnknown,
 });
 
+export type TableDBTriggers = unknown;
+
+export type DocKey = {
+  readonly table: string;
+  readonly id: string;
+};
+
+export type DocData = Record<string, unknown>;
+
+export type DocSnapshot = { readonly key: DocKey; readonly data: DocData };
+
 export type FileSnapshot = t.TypeOf<typeof FileSnapshot>;
 
 export type StorageAdmin = {
@@ -23,7 +34,7 @@ export type StorageAdmin = {
 };
 
 export type StorageTriggers = {
-  readonly onUploaded: (id: string) => T.Task<unknown>;
+  readonly onUploaded?: (id: string) => T.Task<unknown>;
 };
 
 export type StorageClient = {
@@ -31,13 +42,27 @@ export type StorageClient = {
   readonly download: (id: string) => T.Task<O.Option<Blob>>;
 };
 
-export type Client = {
-  readonly storage: StorageClient;
+export type DBClient = {
+  readonly setDoc: (snapshot: DocSnapshot) => T.Task<unknown>;
+  readonly getDoc: (key: DocKey) => T.Task<O.Option<DocData>>;
 };
 
-export type MakeClientWithTrigger = (triggers: {
-  readonly storage: (storage: StorageAdmin) => Partial<StorageTriggers>;
-}) => IO.IO<Client>;
+export type TableDBAdmin = {
+  readonly setDoc: (snapshot: DocSnapshot) => T.Task<unknown>;
+  readonly getDoc: (key: DocKey) => T.Task<O.Option<DocData>>;
+};
+
+export type Client = {
+  readonly storage: StorageClient;
+  readonly db: DBClient;
+};
+
+export type MakeTriggers = {
+  readonly storage?: (storage: StorageAdmin) => StorageTriggers;
+  readonly db?: (storage: TableDBAdmin) => TableDBTriggers;
+};
+
+export type MakeClientWithTrigger = (makeTriggers: MakeTriggers) => IO.IO<Client>;
 
 export type Storage = {
   readonly upload: (p: FileSnapshot) => T.Task<unknown>;
