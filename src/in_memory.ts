@@ -21,7 +21,7 @@ import { DocData } from './materialize';
 type StorageState = Record<string, Blob>;
 
 const fillStorageTriggersDefaults = (triggers: StorageTriggers): Required<StorageTriggers> => ({
-  onUploaded: (_) => T.of(undefined),
+  onUploaded: (_) => T.never,
   ...triggers,
 });
 
