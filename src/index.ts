@@ -44,6 +44,8 @@ export type StorageAdmin = {
 
 export type ReadonlyStorageAdmin = Pick<StorageAdmin, 'download'>;
 
+export type WriteonlyStorageAdmin = Omit<StorageAdmin, keyof ReadonlyStorageAdmin>;
+
 export type StorageTriggers = {
   readonly onUploaded?: (id: string) => T.Task<unknown>;
 };
