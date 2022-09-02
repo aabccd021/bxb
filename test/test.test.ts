@@ -1,3 +1,4 @@
+import { pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import { describe, expect, it } from 'vitest';
 
@@ -6,15 +7,15 @@ import { getTextFromBlob, stringToBlob } from '../src/test';
 describe.concurrent('util', () => {
   describe.concurrent('stringBlob & getTextFromBlob', () => {
     it('blob content is its wrapped text', async () => {
-      const blob = stringToBlob('masumoto');
-      const result = await getTextFromBlob(O.of(blob));
-      expect(result).toStrictEqual('masumoto');
+      const stringToBlobToText = pipe('masumoto', stringToBlob, O.of, getTextFromBlob);
+      const result = await stringToBlobToText();
+      expect(result).toStrictEqual(O.some('masumoto'));
     });
 
     it('blob content is not equal to other than its wrapped text', async () => {
-      const blob = stringToBlob('masumoto');
-      const result = await getTextFromBlob(O.of(blob));
-      expect(result).not.toStrictEqual('nazuna');
+      const stringToBlobToText = pipe('masumoto', stringToBlob, O.of, getTextFromBlob);
+      const result = await stringToBlobToText();
+      expect(result).not.toStrictEqual(O.some('nazuna'));
     });
   });
 });

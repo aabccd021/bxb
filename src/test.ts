@@ -1,7 +1,7 @@
 /* eslint-disable functional/no-expression-statement */
 import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
-import { pipe } from 'fp-ts/lib/function';
+import { flow, pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import * as Array from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
@@ -10,14 +10,16 @@ import { describe, expect, it } from 'vitest';
 
 import { FileSnapshot, MakeClientWithTrigger } from '../src';
 
-export const getTextFromBlob = async (downloadResult: O.Option<Blob>) => {
-  const donwloadResultBlob: Blob | undefined = pipe(
-    downloadResult,
-    O.getOrElse<Blob | undefined>(() => undefined)
-  );
-  const downloadResultText = await donwloadResultBlob?.text();
-  return downloadResultText;
-};
+export const getTextFromBlob =
+  (downloadResult: O.Option<Blob>): T.Task<O.Option<string>> =>
+  async () => {
+    const donwloadResultBlob: Blob | undefined = pipe(
+      downloadResult,
+      O.getOrElse<Blob | undefined>(() => undefined)
+    );
+    const downloadResultText = await donwloadResultBlob?.text();
+    return O.fromNullable(downloadResultText);
+  };
 
 export const stringToBlob = (text: string) => new Blob([text]);
 
@@ -35,9 +37,9 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
       );
       await upload();
 
-      const download = client.storage.download('sakurazaka/kira');
-      const result = await download().then(getTextFromBlob);
-      expect(result).toStrictEqual('masumoto');
+      const download = pipe('sakurazaka/kira', client.storage.download, T.chain(getTextFromBlob));
+      const result = await download();
+      expect(result).toStrictEqual(O.some('masumoto'));
     });
 
     it('can run trigger when object uploaded', async () => {
@@ -63,10 +65,11 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
 
     it('still upload when having trigger', async () => {
       const logs = IORef.newIORef<readonly string[]>([])();
+      const appendLog = (id: string) =>
+        pipe(logs.read, IO.map(Array.append(id)), IO.chain(logs.write), T.fromIO);
       const makeClient = makeClientWithTrigger({
         storage: () => ({
-          onUploaded: (id) =>
-            pipe(logs.read, IO.map(Array.append(id)), IO.chain(logs.write), T.fromIO),
+          onUploaded: appendLog,
         }),
       });
       const client = makeClient();
@@ -79,20 +82,18 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
       );
       await upload();
 
-      const download = client.storage.download('sakurazaka/kira');
-      const result = await download().then(getTextFromBlob);
-      expect(result).toStrictEqual('masumoto');
+      const download = pipe('sakurazaka/kira', client.storage.download, T.chain(getTextFromBlob));
+      const result = await download();
+      expect(result).toStrictEqual(O.some('masumoto'));
     });
 
     it('can download inside trigger', async () => {
-      const logs = IORef.newIORef<readonly string[]>([])();
+      const logs = IORef.newIORef<readonly O.Option<string>[]>([])();
+      const appendLog = (id: O.Option<string>) =>
+        pipe(logs.read, IO.map(Array.append(id)), IO.chain(logs.write), T.fromIO);
       const makeClient = makeClientWithTrigger({
         storage: (storageAdmin) => ({
-          onUploaded: (id) => async () => {
-            const download = storageAdmin.download(id);
-            const result = (await download().then(getTextFromBlob)) ?? '';
-            return pipe(logs.read, IO.map(Array.append(result)), IO.chain(logs.write), T.fromIO)();
-          },
+          onUploaded: flow(storageAdmin.download, T.chain(getTextFromBlob), T.chain(appendLog)),
         }),
       });
       const client = makeClient();
@@ -105,7 +106,7 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
       );
       await upload();
 
-      expect(logs.read()).toStrictEqual(['masumoto']);
+      expect(logs.read()).toStrictEqual([O.some('masumoto')]);
     });
   });
 
