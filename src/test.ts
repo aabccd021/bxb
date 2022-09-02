@@ -8,7 +8,7 @@ import * as T from 'fp-ts/Task';
 import { make } from 'make-struct-ts';
 import { describe, expect, it } from 'vitest';
 
-import { FileSnapshot, MakeClientWithTrigger } from '../src';
+import { DocKey, DocSnapshot, FileSnapshot, MakeClientWithTrigger } from '../src';
 
 export const getTextFromBlob =
   (downloadResult: O.Option<Blob>): T.Task<O.Option<string>> =>
@@ -115,13 +115,15 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
       const makeClient = makeClientWithTrigger({});
       const client = makeClient();
 
-      const setDoc = client.db.setDoc({
-        key: { table: 'sakurazaka', id: 'kira' },
-        data: { birthYear: 2002 },
-      });
+      const setDoc = pipe(
+        'kira',
+        make(DocKey).id({ table: 'sakurazaka' }),
+        make(DocSnapshot).key({ data: { birthYear: 2002 } }),
+        client.db.setDoc
+      );
       await setDoc();
 
-      const getDoc = client.db.getDoc({ table: 'sakurazaka', id: 'kira' });
+      const getDoc = pipe('kira', make(DocKey).id({ table: 'sakurazaka' }), client.db.getDoc);
       const result = await getDoc();
       expect(result).toStrictEqual(O.of({ birthYear: 2002 }));
     });
@@ -130,7 +132,7 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
       const makeClient = makeClientWithTrigger({});
       const client = makeClient();
 
-      const getDoc = client.db.getDoc({ table: 'sakurazaka', id: 'kira' });
+      const getDoc = pipe('kira', make(DocKey).id({ table: 'sakurazaka' }), client.db.getDoc);
       const result = await getDoc();
       expect(result).toStrictEqual(O.none);
     });

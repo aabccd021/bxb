@@ -15,18 +15,27 @@ export const FileSnapshot = t.type({
   blob: BlobFromUnknown,
 });
 
+export type FileSnapshot = t.TypeOf<typeof FileSnapshot>;
+
 export type TableDBTriggers = unknown;
 
-export type DocKey = {
-  readonly table: string;
-  readonly id: string;
-};
+export const DocKey = t.type({
+  table: t.string,
+  id: t.string,
+});
 
-export type DocData = Record<string, unknown>;
+export type DocKey = t.TypeOf<typeof DocKey>;
 
-export type DocSnapshot = { readonly key: DocKey; readonly data: DocData };
+export const DocData = t.UnknownRecord;
 
-export type FileSnapshot = t.TypeOf<typeof FileSnapshot>;
+export type DocData = t.TypeOf<typeof DocData>;
+
+export const DocSnapshot = t.type({
+  key: DocKey,
+  data: DocData,
+});
+
+export type DocSnapshot = t.TypeOf<typeof DocSnapshot>;
 
 export type StorageAdmin = {
   readonly upload: (p: FileSnapshot) => T.Task<unknown>;
