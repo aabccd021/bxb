@@ -8,71 +8,18 @@ import * as T from 'fp-ts/Task';
 
 import {
   DBClient,
+  DocData,
   DocSnapshot,
   MakeClientWithTrigger,
   MakeTriggers,
-  ReadonlyStorageAdmin,
-  StorageAdmin,
   StorageClient,
-  StorageTriggers,
   TableDBTriggers,
-  WriteonlyStorageAdmin,
 } from '.';
-import { DocData } from './materialize';
-
-type StorageState = Record<string, Blob>;
-
-const fillStorageTriggersDefaults = (triggers: StorageTriggers): Required<StorageTriggers> => ({
-  onUploaded: (_) => T.Do,
-  ...triggers,
-});
-
-const storageInitialState: StorageState = {};
-
-const makeWriteOnlyStorageAdmin =
-  (storageState: IORef.IORef<StorageState>) =>
-  (triggers: Required<StorageTriggers>): WriteonlyStorageAdmin => ({
-    upload: ({ id, blob }) =>
-      pipe(
-        storageState.read,
-        IO.map(Record.upsertAt(id, blob)),
-        IO.chain(storageState.write),
-        T.fromIO,
-        T.chain(() => triggers.onUploaded(id))
-      ),
-  });
-
-const storageAdminOf2 =
-  (readonlyStorageAdmin: ReadonlyStorageAdmin) =>
-  (writeonlyStorageAdmin: WriteonlyStorageAdmin): StorageAdmin => ({
-    ...readonlyStorageAdmin,
-    ...writeonlyStorageAdmin,
-  });
-
-const storageAdminOf =
-  (storageState: IORef.IORef<StorageState>, makeTriggers: Required<MakeTriggers>) =>
-  (readonlyStorageAdmin: ReadonlyStorageAdmin): StorageAdmin =>
-    pipe(
-      readonlyStorageAdmin,
-      makeTriggers.storage,
-      fillStorageTriggersDefaults,
-      makeWriteOnlyStorageAdmin(storageState),
-      storageAdminOf2(readonlyStorageAdmin)
-    );
-
-const makeReadonlyStorageAdmin = (
-  storageState: IORef.IORef<StorageState>
-): ReadonlyStorageAdmin => ({
-  download: (id) => pipe(storageState.read, IO.map(Record.lookup(id)), T.fromIO),
-});
-
-const storageAdminOf3 =
-  (makeTriggers: Required<MakeTriggers>) =>
-  (storageState: IORef.IORef<StorageState>): StorageAdmin =>
-    pipe(makeReadonlyStorageAdmin(storageState), storageAdminOf(storageState, makeTriggers));
+import * as StorageState from './StorageState';
+import * as StorageAdmin from './StorageAdmin';
 
 export const makeStorageClient = (makeTriggers: Required<MakeTriggers>): IO.IO<StorageClient> =>
-  pipe(storageInitialState, IORef.newIORef, IO.map(storageAdminOf3(makeTriggers)));
+  pipe(StorageState.empty, IORef.newIORef, IO.map(StorageAdmin.of(makeTriggers)));
 
 type TableState = Record<string, DocData>;
 
