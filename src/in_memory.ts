@@ -54,5 +54,6 @@ const makeClients = (config: Required<Config_>) => ({
 export const makeClientWithConfig: MakeClientWithConfig = flow(
   Config.toRequired,
   makeClients,
-  sequenceS(Io.Apply)
+  sequenceS(Io.Apply),
+  T.fromIO
 );
