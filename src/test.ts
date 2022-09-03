@@ -7,10 +7,9 @@ import { Option } from 'fp-ts/Option';
 import * as Array from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
 import { Task } from 'fp-ts/Task';
-import { make } from 'make-struct-ts';
 import { describe, expect, it } from 'vitest';
 
-import { DocKey, DocSnapshot, FileSnapshot, MakeClientWithConfig } from '../src';
+import { MakeClientWithConfig } from '../src';
 
 export const getTextFromBlob =
   (downloadResult: Option<Blob>): Task<Option<string>> =>
@@ -98,54 +97,62 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
       O.some('masumoto')
     );
 
-    it('can download inside trigger', async () => {
-      const logs = IORef.newIORef<readonly Option<string>[]>([])();
-      const appendLog = (id: Option<string>) =>
-        pipe(logs.read, IO.map(Array.append(id)), IO.chain(logs.write), T.fromIO);
-      const makeClient = makeClientWithTrigger({
-        storage: (storageAdmin) => ({
-          onUploaded: flow(storageAdmin.download, T.chain(getTextFromBlob), T.chain(appendLog)),
-        }),
-      });
-      const client = await makeClient();
-
-      const upload = pipe(
-        'masumoto',
-        stringToBlob,
-        make(FileSnapshot).blob({ id: 'sakurazaka/kira' }),
-        client.storage.upload
-      );
-      await upload();
-
-      expect(logs.read()).toStrictEqual([O.some('masumoto')]);
-    });
+    taskStrictEqual(
+      'can download inside trigger',
+      pipe(
+        IORef.newIORef<readonly Option<string>[]>([]),
+        T.fromIO,
+        T.bindTo('logs'),
+        T.bind('client', ({ logs }) =>
+          makeClientWithTrigger({
+            storage: (storageAdmin) => ({
+              onUploaded: flow(
+                storageAdmin.download,
+                T.chain(getTextFromBlob),
+                T.chain((text) =>
+                  pipe(logs.read, IO.map(Array.append(text)), IO.chain(logs.write), T.fromIO)
+                )
+              ),
+            }),
+          })
+        ),
+        T.chainFirst(({ client }) =>
+          client.storage.upload({
+            id: 'sakurazaka/kira',
+            blob: stringToBlob('masumoto'),
+          })
+        ),
+        T.chain(({ logs }) => T.fromIO(logs.read))
+      ),
+      [O.some('masumoto')]
+    );
   });
 
   describe.concurrent('Table DB', () => {
-    it('can set doc and get doc', async () => {
-      const makeClient = makeClientWithTrigger({});
-      const client = await makeClient();
+    taskStrictEqual(
+      'can set doc and get doc',
+      pipe(
+        makeClientWithTrigger({}),
+        T.bindTo('client'),
+        T.chainFirst(({ client }) =>
+          client.db.setDoc({
+            key: { table: 'sakurazaka', id: 'kira' },
+            data: { birthYear: 2002 },
+          })
+        ),
+        T.chain(({ client }) => client.db.getDoc({ id: 'kira', table: 'sakurazaka' }))
+      ),
+      O.of({ birthYear: 2002 })
+    );
 
-      const setDoc = pipe(
-        'kira',
-        make(DocKey).id({ table: 'sakurazaka' }),
-        make(DocSnapshot).key({ data: { birthYear: 2002 } }),
-        client.db.setDoc
-      );
-      await setDoc();
-
-      const getDoc = pipe('kira', make(DocKey).id({ table: 'sakurazaka' }), client.db.getDoc);
-      const result = await getDoc();
-      expect(result).toStrictEqual(O.of({ birthYear: 2002 }));
-    });
-
-    it('returns empty option when getDoc non existing ', async () => {
-      const makeClient = makeClientWithTrigger({});
-      const client = await makeClient();
-
-      const getDoc = pipe('kira', make(DocKey).id({ table: 'sakurazaka' }), client.db.getDoc);
-      const result = await getDoc();
-      expect(result).toStrictEqual(O.none);
-    });
+    taskStrictEqual(
+      'returns empty option when getDoc non existing',
+      pipe(
+        makeClientWithTrigger({}),
+        T.bindTo('client'),
+        T.chain(({ client }) => client.db.getDoc({ id: 'kira', table: 'sakurazaka' }))
+      ),
+      O.none
+    );
   });
 };
