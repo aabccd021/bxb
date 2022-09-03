@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "build": "vite build && tsc --emitDeclarationOnly",
-    "lint": "format-package --check --verbose && eslint --max-warnings=0 --ext .ts .",
+    "lint": "format-package --check && eslint --max-warnings=0 --ext .ts .",
     "test": "vitest --coverage"
   },
   "eslintConfig": {
