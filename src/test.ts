@@ -10,7 +10,7 @@ import { Task } from 'fp-ts/Task';
 import { make } from 'make-struct-ts';
 import { describe, expect, it } from 'vitest';
 
-import { DocKey, DocSnapshot, FileSnapshot, MakeClientWithTrigger } from '../src';
+import { DocKey, DocSnapshot, FileSnapshot, MakeClientWithConfig } from '../src';
 
 export const getTextFromBlob =
   (downloadResult: Option<Blob>): Task<Option<string>> =>
@@ -25,7 +25,7 @@ export const getTextFromBlob =
 
 export const stringToBlob = (text: string) => new Blob([text]);
 
-export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
+export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
   describe.concurrent('Storage', () => {
     it('can upload and download', async () => {
       const makeClient = makeClientWithTrigger({});

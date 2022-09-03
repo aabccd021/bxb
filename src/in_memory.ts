@@ -8,14 +8,14 @@ import * as Record from 'fp-ts/Record';
 import * as T from 'fp-ts/Task';
 
 import {
+  Config as Config_,
   DBClient,
   DocData,
   DocSnapshot,
-  MakeClientWithTrigger,
-  MakeTriggers as MakeTriggers_,
+  MakeClientWithConfig,
   TableDBTriggers,
 } from '.';
-import * as MakeTriggers from './MakeTriggers';
+import * as Config from './Config';
 import * as StorageClient from './StorageClient';
 
 type TableState = Record<string, DocData>;
@@ -46,13 +46,13 @@ export const makeDBClient = (_triggers: TableDBTriggers): IO<DBClient> =>
     }))
   );
 
-const makeClients = (makeTriggers: Required<MakeTriggers_>) => ({
-  storage: StorageClient.of(makeTriggers),
-  db: makeDBClient(makeTriggers),
+const makeClients = (config: Required<Config_>) => ({
+  storage: StorageClient.of(config),
+  db: makeDBClient(config),
 });
 
-export const makeClientWithTrigger: MakeClientWithTrigger = flow(
-  MakeTriggers.toRequired,
+export const makeClientWithConfig: MakeClientWithConfig = flow(
+  Config.toRequired,
   makeClients,
   sequenceS(Io.Apply)
 );

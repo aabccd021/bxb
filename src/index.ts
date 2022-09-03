@@ -70,12 +70,12 @@ export type Client = {
   readonly db: DBClient;
 };
 
-export type MakeTriggers = {
+export type Config = {
   readonly storage?: (storage: ReadonlyStorageAdmin) => StorageTriggers;
   readonly db?: (storage: TableDBAdmin) => TableDBTriggers;
 };
 
-export type MakeClientWithTrigger = (makeTriggers: MakeTriggers) => IO<Client>;
+export type MakeClientWithConfig = (config: Config) => IO<Client>;
 
 export type Storage = {
   readonly upload: (p: FileSnapshot) => Task<unknown>;
