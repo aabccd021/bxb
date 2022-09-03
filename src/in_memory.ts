@@ -11,15 +11,11 @@ import {
   DocData,
   DocSnapshot,
   MakeClientWithTrigger,
-  MakeTriggers,
-  StorageClient,
+  MakeTriggers as MakeTriggers_,
   TableDBTriggers,
 } from '.';
-import * as StorageAdmin from './StorageAdmin';
-import * as StorageState from './StorageState';
-
-export const makeStorageClient = (makeTriggers: Required<MakeTriggers>): IO.IO<StorageClient> =>
-  pipe(StorageState.empty, IORef.newIORef, IO.map(StorageAdmin.of(makeTriggers)));
+import * as MakeTriggers from './MakeTriggers';
+import * as StorageClient from './StorageClient';
 
 type TableState = Record<string, DocData>;
 
@@ -49,19 +45,13 @@ export const makeDBClient = (_triggers: TableDBTriggers): IO.IO<DBClient> =>
     }))
   );
 
-const fillTriggersDefaults = (triggers: MakeTriggers): Required<MakeTriggers> => ({
-  storage: () => ({}),
-  db: () => ({}),
-  ...triggers,
-});
-
-const makeClients = (makeTriggers: Required<MakeTriggers>) => ({
-  storage: makeStorageClient(makeTriggers),
+const makeClients = (makeTriggers: Required<MakeTriggers_>) => ({
+  storage: StorageClient.of(makeTriggers),
   db: makeDBClient(makeTriggers),
 });
 
 export const makeClientWithTrigger: MakeClientWithTrigger = flow(
-  fillTriggersDefaults,
+  MakeTriggers.toRequired,
   makeClients,
   sequenceS(IO.Apply)
 );
