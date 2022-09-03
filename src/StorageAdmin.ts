@@ -1,5 +1,5 @@
+import { pipe } from 'fp-ts/function';
 import { IORef } from 'fp-ts/IORef';
-import { pipe } from 'fp-ts/lib/function';
 
 import {
   MakeTriggers,
@@ -8,7 +8,7 @@ import {
   WriteonlyStorageAdmin as WriteonlyStorageAdmin_,
 } from '.';
 import * as ReadonlyStorageAdmin from './ReadonlyStorageAdmin';
-import { StorageState as StorageState_ } from './StorageState';
+import { StorageState } from './StorageState';
 import * as StorageTriggers from './StorageTriggers';
 import * as WriteonlyStorageAdmin from './WriteonlyStorageAdmin';
 
@@ -20,7 +20,7 @@ const of3 =
   });
 
 const of2 =
-  (storageState: IORef<StorageState_>, makeTriggers: Required<MakeTriggers>) =>
+  (storageState: IORef<StorageState>, makeTriggers: Required<MakeTriggers>) =>
   (readonlyStorageAdmin: ReadonlyStorageAdmin_): StorageAdmin =>
     pipe(
       readonlyStorageAdmin,
@@ -32,5 +32,5 @@ const of2 =
 
 export const of =
   (makeTriggers: Required<MakeTriggers>) =>
-  (storageState: IORef<StorageState_>): StorageAdmin =>
-    pipe(ReadonlyStorageAdmin.of(storageState), of2(storageState, makeTriggers));
+  (storageState: IORef<StorageState>): StorageAdmin =>
+    pipe(storageState, ReadonlyStorageAdmin.of, of2(storageState, makeTriggers));

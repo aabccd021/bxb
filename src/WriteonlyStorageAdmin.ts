@@ -4,12 +4,12 @@ import { IORef as IORef_ } from 'fp-ts/IORef';
 import * as Record from 'fp-ts/Record';
 import * as T from 'fp-ts/Task';
 
-import { StorageTriggers as StorageTriggers_, WriteonlyStorageAdmin } from '.';
-import { StorageState as StorageState_ } from './StorageState';
+import { StorageTriggers, WriteonlyStorageAdmin } from '.';
+import { StorageState } from './StorageState';
 
 export const of =
-  (storageState: IORef_<StorageState_>) =>
-  (triggers: Required<StorageTriggers_>): WriteonlyStorageAdmin => ({
+  (storageState: IORef_<StorageState>) =>
+  (triggers: Required<StorageTriggers>): WriteonlyStorageAdmin => ({
     upload: ({ id, blob }) =>
       pipe(
         storageState.read,

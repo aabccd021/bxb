@@ -1,6 +1,6 @@
+import { pipe } from 'fp-ts/function';
 import * as IO from 'fp-ts/IO';
-import { pipe } from 'fp-ts/lib/function';
-import { IORef } from 'fp-ts/lib/IORef';
+import { IORef } from 'fp-ts/IORef';
 import * as Record from 'fp-ts/Record';
 import * as Task from 'fp-ts/Task';
 

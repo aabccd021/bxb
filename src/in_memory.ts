@@ -1,7 +1,7 @@
+import { sequenceS } from 'fp-ts/Apply';
+import { flow, pipe } from 'fp-ts/function';
 import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
-import { sequenceS } from 'fp-ts/lib/Apply';
-import { flow, pipe } from 'fp-ts/lib/function';
 import * as O from 'fp-ts/Option';
 import * as Record from 'fp-ts/Record';
 import * as T from 'fp-ts/Task';
@@ -15,8 +15,8 @@ import {
   StorageClient,
   TableDBTriggers,
 } from '.';
-import * as StorageState from './StorageState';
 import * as StorageAdmin from './StorageAdmin';
+import * as StorageState from './StorageState';
 
 export const makeStorageClient = (makeTriggers: Required<MakeTriggers>): IO.IO<StorageClient> =>
   pipe(StorageState.empty, IORef.newIORef, IO.map(StorageAdmin.of(makeTriggers)));

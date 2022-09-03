@@ -1,6 +1,6 @@
 import * as E from 'fp-ts/Either';
-import { pipe } from 'fp-ts/lib/function';
-import { Magma } from 'fp-ts/lib/Magma';
+import { pipe } from 'fp-ts/function';
+import { Magma } from 'fp-ts/Magma';
 import * as Record from 'fp-ts/Record';
 import * as T from 'fp-ts/Task';
 import * as TE from 'fp-ts/TaskEither';
