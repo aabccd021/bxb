@@ -25,24 +25,28 @@ export const getTextFromBlob =
 
 export const stringToBlob = (text: string) => new Blob([text]);
 
+const taskStrictEqual = <Result>(name: string, actual: Task<Result>, expected: Result) =>
+  it(name, () => expect(actual()).resolves.toStrictEqual(expected));
+
 export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
   describe.concurrent('Storage', () => {
-    it('can upload and download', async () => {
-      const makeClient = makeClientWithTrigger({});
-      const client = makeClient();
-
-      const upload = pipe(
-        'masumoto',
-        stringToBlob,
-        make(FileSnapshot).blob({ id: 'sakurazaka/kira' }),
-        client.storage.upload
-      );
-      await upload();
-
-      const download = pipe('sakurazaka/kira', client.storage.download, T.chain(getTextFromBlob));
-      const result = await download();
-      expect(result).toStrictEqual(O.some('masumoto'));
-    });
+    taskStrictEqual(
+      'can upload and download',
+      pipe(
+        makeClientWithTrigger({}),
+        T.fromIO,
+        T.bindTo('client'),
+        T.chainFirst(({ client }) =>
+          client.storage.upload({
+            id: 'sakurazaka/kira',
+            blob: stringToBlob('masumoto'),
+          })
+        ),
+        T.chain(({ client }) => client.storage.download('sakurazaka/kira')),
+        T.chain(getTextFromBlob)
+      ),
+      O.some('masumoto')
+    );
 
     it('can run trigger when object uploaded', async () => {
       const logs = IORef.newIORef<readonly string[]>([])();
