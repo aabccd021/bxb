@@ -3,6 +3,7 @@ import { pipe } from 'fp-ts/function';
 import { Magma } from 'fp-ts/Magma';
 import * as Record from 'fp-ts/Record';
 import * as T from 'fp-ts/Task';
+import { Task } from 'fp-ts/Task';
 import * as TE from 'fp-ts/TaskEither';
 
 export type Field = { readonly relation: 'self' };
@@ -77,7 +78,7 @@ const onCreateView =
     readonly tableName: string;
     readonly db: DB<U>;
   }) =>
-  (viewName: string, view: View): T.Task<SetDocReturn<U>> =>
+  (viewName: string, view: View): Task<SetDocReturn<U>> =>
     pipe(
       data,
       filterData(view),
@@ -95,7 +96,7 @@ const onCreate =
     readonly tableViews: TableViews;
     readonly db: DB<U>;
   }) =>
-  (doc: Doc): T.Task<Record<string, SetDocReturn<U>>> =>
+  (doc: Doc): Task<Record<string, SetDocReturn<U>>> =>
     pipe(
       tableViews,
       Record.mapWithIndex(onCreateView({ doc, tableName, db })),

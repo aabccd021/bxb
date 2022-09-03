@@ -1,6 +1,7 @@
 import { sequenceS } from 'fp-ts/Apply';
 import { flow, pipe } from 'fp-ts/function';
-import * as IO from 'fp-ts/IO';
+import * as Io from 'fp-ts/IO';
+import { IO } from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
 import * as O from 'fp-ts/Option';
 import * as Record from 'fp-ts/Record';
@@ -34,14 +35,14 @@ const setTableDoc = (prevState: DBState, { key: { table, id }, data }: DocSnapsh
 const setDoc = (snapshot: DocSnapshot) => (prevState: DBState) =>
   pipe(prevState, Record.upsertAt(snapshot.key.table, setTableDoc(prevState, snapshot)));
 
-export const makeDBClient = (_triggers: TableDBTriggers): IO.IO<DBClient> =>
+export const makeDBClient = (_triggers: TableDBTriggers): IO<DBClient> =>
   pipe(
     tableDBInitialState,
     IORef.newIORef,
-    IO.map((db) => ({
-      setDoc: (snapshot) => pipe(db.read, IO.map(setDoc(snapshot)), IO.chain(db.write), T.fromIO),
+    Io.map((db) => ({
+      setDoc: (snapshot) => pipe(db.read, Io.map(setDoc(snapshot)), Io.chain(db.write), T.fromIO),
       getDoc: ({ table, id }) =>
-        pipe(db.read, IO.map(flow(Record.lookup(table), O.chain(Record.lookup(id)))), T.fromIO),
+        pipe(db.read, Io.map(flow(Record.lookup(table), O.chain(Record.lookup(id)))), T.fromIO),
     }))
   );
 
@@ -53,5 +54,5 @@ const makeClients = (makeTriggers: Required<MakeTriggers_>) => ({
 export const makeClientWithTrigger: MakeClientWithTrigger = flow(
   MakeTriggers.toRequired,
   makeClients,
-  sequenceS(IO.Apply)
+  sequenceS(Io.Apply)
 );

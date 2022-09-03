@@ -1,6 +1,6 @@
-import * as IO from 'fp-ts/IO';
-import * as O from 'fp-ts/Option';
-import * as T from 'fp-ts/Task';
+import { IO } from 'fp-ts/IO';
+import { Option } from 'fp-ts/Option';
+import { Task } from 'fp-ts/Task';
 import * as t from 'io-ts';
 
 const BlobFromUnknown = new t.Type<Blob, unknown, unknown>(
@@ -38,8 +38,8 @@ export const DocSnapshot = t.type({
 export type DocSnapshot = t.TypeOf<typeof DocSnapshot>;
 
 export type StorageAdmin = {
-  readonly upload: (p: FileSnapshot) => T.Task<unknown>;
-  readonly download: (id: string) => T.Task<O.Option<Blob>>;
+  readonly upload: (p: FileSnapshot) => Task<unknown>;
+  readonly download: (id: string) => Task<Option<Blob>>;
 };
 
 export type ReadonlyStorageAdmin = Pick<StorageAdmin, 'download'>;
@@ -47,22 +47,22 @@ export type ReadonlyStorageAdmin = Pick<StorageAdmin, 'download'>;
 export type WriteonlyStorageAdmin = Omit<StorageAdmin, keyof ReadonlyStorageAdmin>;
 
 export type StorageTriggers = {
-  readonly onUploaded?: (id: string) => T.Task<unknown>;
+  readonly onUploaded?: (id: string) => Task<unknown>;
 };
 
 export type StorageClient = {
-  readonly upload: (p: FileSnapshot) => T.Task<unknown>;
-  readonly download: (id: string) => T.Task<O.Option<Blob>>;
+  readonly upload: (p: FileSnapshot) => Task<unknown>;
+  readonly download: (id: string) => Task<Option<Blob>>;
 };
 
 export type DBClient = {
-  readonly setDoc: (snapshot: DocSnapshot) => T.Task<unknown>;
-  readonly getDoc: (key: DocKey) => T.Task<O.Option<DocData>>;
+  readonly setDoc: (snapshot: DocSnapshot) => Task<unknown>;
+  readonly getDoc: (key: DocKey) => Task<Option<DocData>>;
 };
 
 export type TableDBAdmin = {
-  readonly setDoc: (snapshot: DocSnapshot) => T.Task<unknown>;
-  readonly getDoc: (key: DocKey) => T.Task<O.Option<DocData>>;
+  readonly setDoc: (snapshot: DocSnapshot) => Task<unknown>;
+  readonly getDoc: (key: DocKey) => Task<Option<DocData>>;
 };
 
 export type Client = {
@@ -75,9 +75,9 @@ export type MakeTriggers = {
   readonly db?: (storage: TableDBAdmin) => TableDBTriggers;
 };
 
-export type MakeClientWithTrigger = (makeTriggers: MakeTriggers) => IO.IO<Client>;
+export type MakeClientWithTrigger = (makeTriggers: MakeTriggers) => IO<Client>;
 
 export type Storage = {
-  readonly upload: (p: FileSnapshot) => T.Task<unknown>;
-  readonly download: (id: string) => T.Task<O.Option<Blob>>;
+  readonly upload: (p: FileSnapshot) => Task<unknown>;
+  readonly download: (id: string) => Task<Option<Blob>>;
 };

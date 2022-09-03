@@ -3,15 +3,17 @@ import { flow, pipe } from 'fp-ts/function';
 import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
 import * as O from 'fp-ts/Option';
+import { Option } from 'fp-ts/Option';
 import * as Array from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
+import { Task } from 'fp-ts/Task';
 import { make } from 'make-struct-ts';
 import { describe, expect, it } from 'vitest';
 
 import { DocKey, DocSnapshot, FileSnapshot, MakeClientWithTrigger } from '../src';
 
 export const getTextFromBlob =
-  (downloadResult: O.Option<Blob>): T.Task<O.Option<string>> =>
+  (downloadResult: Option<Blob>): Task<Option<string>> =>
   async () => {
     const donwloadResultBlob: Blob | undefined = pipe(
       downloadResult,
@@ -88,8 +90,8 @@ export const test = (makeClientWithTrigger: MakeClientWithTrigger) => {
     });
 
     it('can download inside trigger', async () => {
-      const logs = IORef.newIORef<readonly O.Option<string>[]>([])();
-      const appendLog = (id: O.Option<string>) =>
+      const logs = IORef.newIORef<readonly Option<string>[]>([])();
+      const appendLog = (id: Option<string>) =>
         pipe(logs.read, IO.map(Array.append(id)), IO.chain(logs.write), T.fromIO);
       const makeClient = makeClientWithTrigger({
         storage: (storageAdmin) => ({
