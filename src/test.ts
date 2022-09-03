@@ -34,7 +34,6 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
       'can upload and download',
       pipe(
         makeClientWithTrigger({}),
-        T.fromIO,
         T.bindTo('client'),
         T.chainFirst(({ client }) =>
           client.storage.upload({
@@ -48,50 +47,56 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
       O.some('masumoto')
     );
 
-    it('can run trigger when object uploaded', async () => {
-      const logs = IORef.newIORef<readonly string[]>([])();
-      const makeClient = makeClientWithTrigger({
-        storage: () => ({
-          onUploaded: (id) =>
-            pipe(logs.read, IO.map(Array.append(id)), IO.chain(logs.write), T.fromIO),
-        }),
-      });
-      const client = makeClient();
+    taskStrictEqual(
+      'can run trigger when object uploaded',
+      pipe(
+        IORef.newIORef<readonly string[]>([]),
+        T.fromIO,
+        T.bindTo('logs'),
+        T.bind('client', ({ logs }) =>
+          makeClientWithTrigger({
+            storage: () => ({
+              onUploaded: (id) =>
+                pipe(logs.read, IO.map(Array.append(id)), IO.chain(logs.write), T.fromIO),
+            }),
+          })
+        ),
+        T.chainFirst(({ client }) =>
+          client.storage.upload({
+            id: 'sakurazaka/kira',
+            blob: stringToBlob('masumoto'),
+          })
+        ),
+        T.chain(({ logs }) => T.fromIO(logs.read))
+      ),
+      ['sakurazaka/kira']
+    );
 
-      const upload = pipe(
-        'masumoto',
-        stringToBlob,
-        make(FileSnapshot).blob({ id: 'sakurazaka/kira' }),
-        client.storage.upload
-      );
-      await upload();
-
-      expect(logs.read()).toStrictEqual(['sakurazaka/kira']);
-    });
-
-    it('still upload when having trigger', async () => {
-      const logs = IORef.newIORef<readonly string[]>([])();
-      const appendLog = (id: string) =>
-        pipe(logs.read, IO.map(Array.append(id)), IO.chain(logs.write), T.fromIO);
-      const makeClient = makeClientWithTrigger({
-        storage: () => ({
-          onUploaded: appendLog,
-        }),
-      });
-      const client = makeClient();
-
-      const upload = pipe(
-        'masumoto',
-        stringToBlob,
-        make(FileSnapshot).blob({ id: 'sakurazaka/kira' }),
-        client.storage.upload
-      );
-      await upload();
-
-      const download = pipe('sakurazaka/kira', client.storage.download, T.chain(getTextFromBlob));
-      const result = await download();
-      expect(result).toStrictEqual(O.some('masumoto'));
-    });
+    taskStrictEqual(
+      'still upload when having trigger',
+      pipe(
+        IORef.newIORef<readonly string[]>([]),
+        T.fromIO,
+        T.bindTo('logs'),
+        T.bind('client', ({ logs }) =>
+          makeClientWithTrigger({
+            storage: () => ({
+              onUploaded: (id) =>
+                pipe(logs.read, IO.map(Array.append(id)), IO.chain(logs.write), T.fromIO),
+            }),
+          })
+        ),
+        T.chainFirst(({ client }) =>
+          client.storage.upload({
+            id: 'sakurazaka/kira',
+            blob: stringToBlob('masumoto'),
+          })
+        ),
+        T.chain(({ client }) => client.storage.download('sakurazaka/kira')),
+        T.chain(getTextFromBlob)
+      ),
+      O.some('masumoto')
+    );
 
     it('can download inside trigger', async () => {
       const logs = IORef.newIORef<readonly Option<string>[]>([])();
@@ -102,7 +107,7 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
           onUploaded: flow(storageAdmin.download, T.chain(getTextFromBlob), T.chain(appendLog)),
         }),
       });
-      const client = makeClient();
+      const client = await makeClient();
 
       const upload = pipe(
         'masumoto',
@@ -119,7 +124,7 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
   describe.concurrent('Table DB', () => {
     it('can set doc and get doc', async () => {
       const makeClient = makeClientWithTrigger({});
-      const client = makeClient();
+      const client = await makeClient();
 
       const setDoc = pipe(
         'kira',
@@ -136,7 +141,7 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
 
     it('returns empty option when getDoc non existing ', async () => {
       const makeClient = makeClientWithTrigger({});
-      const client = makeClient();
+      const client = await makeClient();
 
       const getDoc = pipe('kira', make(DocKey).id({ table: 'sakurazaka' }), client.db.getDoc);
       const result = await getDoc();

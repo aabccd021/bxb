@@ -1,4 +1,3 @@
-import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 import { Task } from 'fp-ts/Task';
 import * as t from 'io-ts';
