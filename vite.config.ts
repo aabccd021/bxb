@@ -1,11 +1,9 @@
 import path from 'path';
-import { defineConfig } from 'vitest/config';
+import { defineConfig, UserConfigExport } from 'vitest/config';
 
-export const config = {
+export const config: UserConfigExport = {
   test: {
-    maxConcurrency: 1000,
-    testTimeout: 10000,
-    environment: 'happy-dom' as const,
+    environment: 'happy-dom',
   },
   build: {
     lib: {
