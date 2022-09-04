@@ -1,5 +1,4 @@
-import { Option } from 'fp-ts/Option';
-import { Task } from 'fp-ts/Task';
+import { option, task } from 'fp-ts';
 import * as t from 'io-ts';
 
 const BlobFromUnknown = new t.Type<Blob, unknown, unknown>(
@@ -37,8 +36,8 @@ export const DocSnapshot = t.type({
 export type DocSnapshot = t.TypeOf<typeof DocSnapshot>;
 
 export type StorageAdmin = {
-  readonly upload: (p: FileSnapshot) => Task<unknown>;
-  readonly download: (id: string) => Task<Option<Blob>>;
+  readonly upload: (p: FileSnapshot) => task.Task<unknown>;
+  readonly download: (id: string) => task.Task<option.Option<Blob>>;
 };
 
 export type ReadonlyStorageAdmin = Pick<StorageAdmin, 'download'>;
@@ -46,22 +45,22 @@ export type ReadonlyStorageAdmin = Pick<StorageAdmin, 'download'>;
 export type WriteonlyStorageAdmin = Omit<StorageAdmin, keyof ReadonlyStorageAdmin>;
 
 export type StorageTriggers = {
-  readonly onUploaded?: (id: string) => Task<unknown>;
+  readonly onUploaded?: (id: string) => task.Task<unknown>;
 };
 
 export type StorageClient = {
-  readonly upload: (p: FileSnapshot) => Task<unknown>;
-  readonly download: (id: string) => Task<Option<Blob>>;
+  readonly upload: (p: FileSnapshot) => task.Task<unknown>;
+  readonly download: (id: string) => task.Task<option.Option<Blob>>;
 };
 
 export type DBClient = {
-  readonly setDoc: (snapshot: DocSnapshot) => Task<unknown>;
-  readonly getDoc: (key: DocKey) => Task<Option<DocData>>;
+  readonly setDoc: (snapshot: DocSnapshot) => task.Task<unknown>;
+  readonly getDoc: (key: DocKey) => task.Task<option.Option<DocData>>;
 };
 
 export type TableDBAdmin = {
-  readonly setDoc: (snapshot: DocSnapshot) => Task<unknown>;
-  readonly getDoc: (key: DocKey) => Task<Option<DocData>>;
+  readonly setDoc: (snapshot: DocSnapshot) => task.Task<unknown>;
+  readonly getDoc: (key: DocKey) => task.Task<option.Option<DocData>>;
 };
 
 export type Client = {
@@ -74,9 +73,9 @@ export type Config = {
   readonly db?: (storage: TableDBAdmin) => TableDBTriggers;
 };
 
-export type MakeClientWithConfig = (config: Config) => Task<Client>;
+export type MakeClientWithConfig = (config: Config) => task.Task<Client>;
 
 export type Storage = {
-  readonly upload: (p: FileSnapshot) => Task<unknown>;
-  readonly download: (id: string) => Task<Option<Blob>>;
+  readonly upload: (p: FileSnapshot) => task.Task<unknown>;
+  readonly download: (id: string) => task.Task<option.Option<Blob>>;
 };

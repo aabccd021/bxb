@@ -1,9 +1,9 @@
-import * as T from 'fp-ts/Task';
+import { task } from 'fp-ts';
 
 import { StorageTriggers } from '.';
 
 const empty: Required<StorageTriggers> = {
-  onUploaded: (_) => T.Do,
+  onUploaded: (_) => task.Do,
 };
 
 export const toRequired = (triggers: StorageTriggers): Required<StorageTriggers> => ({

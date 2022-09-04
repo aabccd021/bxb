@@ -1,18 +1,17 @@
 /* eslint-disable functional/no-expression-statement */
+import { option, task } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 import * as IO from 'fp-ts/IO';
 import * as IORef from 'fp-ts/IORef';
 import * as O from 'fp-ts/Option';
-import { Option } from 'fp-ts/Option';
 import * as Array from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
-import { Task } from 'fp-ts/Task';
 import { describe, expect, it } from 'vitest';
 
 import { MakeClientWithConfig } from '../src';
 
 export const getTextFromBlob =
-  (downloadResult: Option<Blob>): Task<Option<string>> =>
+  (downloadResult: option.Option<Blob>): task.Task<option.Option<string>> =>
   async () => {
     const donwloadResultBlob: Blob | undefined = pipe(
       downloadResult,
@@ -24,7 +23,7 @@ export const getTextFromBlob =
 
 export const stringToBlob = (text: string) => new Blob([text]);
 
-const taskStrictEqual = <Result>(name: string, actual: Task<Result>, expected: Result) =>
+const taskStrictEqual = <Result>(name: string, actual: task.Task<Result>, expected: Result) =>
   it(name, () => expect(actual()).resolves.toStrictEqual(expected));
 
 export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
@@ -100,7 +99,7 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
     taskStrictEqual(
       'can download inside trigger',
       pipe(
-        IORef.newIORef<readonly Option<string>[]>([]),
+        IORef.newIORef<readonly option.Option<string>[]>([]),
         T.fromIO,
         T.bindTo('logs'),
         T.bind('client', ({ logs }) =>

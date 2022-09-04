@@ -1,5 +1,5 @@
+import { ioRef } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
-import { IORef } from 'fp-ts/IORef';
 
 import {
   Config,
@@ -20,7 +20,7 @@ const of3 =
   });
 
 const of2 =
-  (storageState: IORef<StorageState>, config: Required<Config>) =>
+  (storageState: ioRef.IORef<StorageState>, config: Required<Config>) =>
   (readonlyStorageAdmin: ReadonlyStorageAdmin_): StorageAdmin =>
     pipe(
       readonlyStorageAdmin,
@@ -32,5 +32,5 @@ const of2 =
 
 export const of =
   (config: Required<Config>) =>
-  (storageState: IORef<StorageState>): StorageAdmin =>
+  (storageState: ioRef.IORef<StorageState>): StorageAdmin =>
     pipe(storageState, ReadonlyStorageAdmin.of, of2(storageState, config));

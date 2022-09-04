@@ -1,10 +1,5 @@
-import * as E from 'fp-ts/Either';
+import { either, magma, record, task, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
-import { Magma } from 'fp-ts/Magma';
-import * as Record from 'fp-ts/Record';
-import * as T from 'fp-ts/Task';
-import { Task } from 'fp-ts/Task';
-import * as TE from 'fp-ts/TaskEither';
 
 export type Field = { readonly relation: 'self' };
 export type View = {
@@ -41,27 +36,27 @@ type DBG = {
 };
 
 export type DB<U extends DBG> = {
-  readonly setDoc: (doc: DocSnapshot) => TE.TaskEither<U['SetDocLeft'], U['SetDocRight']>;
+  readonly setDoc: (doc: DocSnapshot) => taskEither.TaskEither<U['SetDocLeft'], U['SetDocRight']>;
   readonly getDoc: (
     doc: DocKey
-  ) => TE.TaskEither<
+  ) => taskEither.TaskEither<
     U['GetDocLeft'],
     { readonly data: DocData; readonly context: U['GetDocRight'] }
   >;
 };
 
-type SetDocReturn<U extends DBG> = E.Either<U['SetDocLeft'], U['SetDocRight']>;
+type SetDocReturn<U extends DBG> = either.Either<U['SetDocLeft'], U['SetDocRight']>;
 
-const chooseLeft: Magma<DocField> = { concat: (x) => x };
+const chooseLeft: magma.Magma<DocField> = { concat: (x) => x };
 
 const filterData =
   (view: View) =>
   (data: DocData): DocData => {
     const selfFieldNames = pipe(
       view.fields,
-      Record.filter((field) => field.relation === 'self')
+      record.filter((field) => field.relation === 'self')
     );
-    return pipe(data, Record.intersection(chooseLeft)(selfFieldNames));
+    return pipe(data, record.intersection(chooseLeft)(selfFieldNames));
   };
 
 const docSnapshotWithKey =
@@ -78,7 +73,7 @@ const onCreateView =
     readonly tableName: string;
     readonly db: DB<U>;
   }) =>
-  (viewName: string, view: View): Task<SetDocReturn<U>> =>
+  (viewName: string, view: View): task.Task<SetDocReturn<U>> =>
     pipe(
       data,
       filterData(view),
@@ -96,11 +91,10 @@ const onCreate =
     readonly tableViews: TableViews;
     readonly db: DB<U>;
   }) =>
-  (doc: Doc): Task<Record<string, SetDocReturn<U>>> =>
+  (doc: Doc): task.Task<Record<string, SetDocReturn<U>>> =>
     pipe(
       tableViews,
-      Record.mapWithIndex(onCreateView({ doc, tableName, db })),
-      Record.sequence(T.ApplicativePar)
+      record.traverseWithIndex(task.ApplicativePar)(onCreateView({ doc, tableName, db }))
     );
 
 export const makeTriggers = <U extends DBG>({
@@ -112,7 +106,7 @@ export const makeTriggers = <U extends DBG>({
 }) => ({
   db: pipe(
     views,
-    Record.mapWithIndex((tableName, tableViews) => ({
+    record.mapWithIndex((tableName, tableViews) => ({
       onCreate: onCreate({ tableName, tableViews, db }),
     }))
   ),
