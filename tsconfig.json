@@ -1,6 +1,7 @@
 {
   "extends": "aabccd021-tsconfig",
   "compilerOptions": {
+    "outDir": "dist",
     "lib": [ "ESNext", "dom" ]
   },
   "include": ["src"]
