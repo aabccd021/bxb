@@ -1,6 +1,6 @@
 import { io, ioRef, option, readonlyArray, task, taskOption } from 'fp-ts';
-import { constant, flow, pipe } from 'fp-ts/function';
-import { expect as expect_, it as it__ } from 'vitest';
+import { flow, pipe } from 'fp-ts/function';
+import { pass, Tests } from 'unit-test-ts';
 
 import { MakeClient } from '../src';
 
@@ -10,46 +10,6 @@ export const getTextFromBlob =
     downloadResult.text().then(option.fromNullable);
 
 export const stringToBlob = (text: string) => new Blob([text]);
-
-export type Test<T = unknown> = {
-  readonly expect: task.Task<T>;
-  readonly toEqual: T;
-};
-
-export type TestType = 'pass' | 'fail' | 'skip';
-
-export type WrappedTest<T = unknown> = {
-  readonly type: TestType;
-  readonly test: Test<T>;
-};
-
-export const pass = <T>(test: Test<T>): WrappedTest<T> => ({ type: 'pass', test });
-
-export const fail = <T>(test: Test<T>): WrappedTest<T> => ({ type: 'fail', test });
-
-export const skip = <T>(test: Test<T>): WrappedTest<T> => ({ type: 'skip', test });
-
-export type Tests = Record<string, WrappedTest>;
-
-const it_ = (name: string, t: task.Task<void>) => constant(it__(name, t));
-
-const fails_ = (name: string, t: task.Task<void>) => constant(it__.fails(name, t));
-
-const skip_ = (name: string, t: task.Task<void>) => constant(it__.skip(name, t));
-
-const getTesterByType = (type: TestType) =>
-  type === 'pass' ? it_ : type === 'fail' ? fails_ : skip_;
-
-export const runTests = (tests: Tests) =>
-  Object.entries(tests).map(
-    ([
-      testName,
-      {
-        type,
-        test: { expect: actual, toEqual: expected },
-      },
-    ]) => getTesterByType(type)(testName, () => expect_(actual()).resolves.toStrictEqual(expected))
-  );
 
 export const makeTest = (makeClient: MakeClient): Tests => ({
   'can upload and download': pass({

@@ -1,7 +1,9 @@
 import { option } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import { fail, pass, runTests, Tests } from 'unit-test-ts';
+import { expect, it } from 'vitest';
 
-import { fail, getTextFromBlob, pass, runTests, stringToBlob, Tests } from '../src/test';
+import { getTextFromBlob, stringToBlob } from '../src/test';
 
 const tests: Tests = {
   'wrap and extract returns original string': pass({
@@ -18,4 +20,4 @@ const tests: Tests = {
   }),
 };
 
-runTests(tests);
+runTests(tests, expect, it);
