@@ -39,7 +39,7 @@
     "fp-ts": "^2.12.3",
     "io-ts": "^2.2.18",
     "make-struct-ts": "^1.0.1",
-    "unit-test-ts": "^1.0.0"
+    "unit-test-ts": "^1.1.2"
   },
   "devDependencies": {
     "@types/node": "^18.7.14",
@@ -62,7 +62,6 @@
     "typescript": "^4.8.2",
     "typescript-language-server": "^1.1.2",
     "vite": "^3.0.9",
-    "vitest": "^0.22.1",
-    "vue-tsc": "^0.40.6"
+    "vitest": "^0.22.1"
   }
 }
