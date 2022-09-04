@@ -19,6 +19,7 @@ specifiers:
   format-package: ^7.0.0
   fp-ts: ^2.12.3
   happy-dom: ^6.0.4
+  ioref-utils-ts: ^1.1.0
   prettier: ^2.7.1
   typescript: ^4.8.2
   typescript-language-server: ^1.1.2
@@ -29,6 +30,7 @@ specifiers:
 dependencies:
   dom-utils-ts: 1.0.0
   fp-ts: 2.12.3
+  ioref-utils-ts: 1.1.0
   unit-test-ts: 1.1.2
 
 devDependencies:
@@ -1514,6 +1516,12 @@ packages:
   /inherits/2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
     dev: true
+
+  /ioref-utils-ts/1.1.0:
+    resolution: {integrity: sha512-fvjDpCe4Pyj/RUnn+hOAo5vRXxL+v3SbjBTPX8CkxxXsL2yv5UEafnicKIBerSxELYl7Bsy0qgssXDXqU3MPgA==}
+    dependencies:
+      fp-ts: 2.12.3
+    dev: false
 
   /is-arrayish/0.2.1:
     resolution: {integrity: sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==}

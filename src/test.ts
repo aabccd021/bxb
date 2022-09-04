@@ -1,28 +1,10 @@
 import { blob } from 'dom-utils-ts';
-import { io, ioRef, option, readonlyArray, task, taskOption } from 'fp-ts';
+import { option, task, taskOption } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
+import { taskRefUtil } from 'ioref-utils-ts';
 import { pass, Tests } from 'unit-test-ts';
 
 import { MakeClient } from '../src';
-
-const newAppendonlyArray = <T>() =>
-  pipe(
-    ioRef.newIORef<readonly T[]>([]),
-    io.map((ioref) => ({
-      append: (el: T) => pipe(ioref.read, io.map(readonlyArray.append(el)), io.chain(ioref.write)),
-      read: ioref.read,
-    }))
-  );
-
-const newAppendonlyArrayTask = <T>() =>
-  pipe(
-    newAppendonlyArray<T>(),
-    io.map((ioref) => ({
-      append: flow(ioref.append, task.fromIO),
-      read: pipe(ioref.read, task.fromIO),
-    })),
-    task.fromIO
-  );
 
 export const makeTests = (makeClient: MakeClient): Tests => ({
   'can upload and download': pass({
@@ -44,7 +26,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
   'can run trigger when object uploaded': pass({
     expect: pipe(
       task.Do,
-      task.bind('logs', newAppendonlyArrayTask),
+      task.bind('logs', taskRefUtil.appendonlyArray),
       task.bind('client', ({ logs }) =>
         makeClient({
           storage: () => ({ onUploaded: logs.append }),
@@ -64,7 +46,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
   'still upload when having trigger': pass({
     expect: pipe(
       task.Do,
-      task.bind('logs', newAppendonlyArrayTask),
+      task.bind('logs', taskRefUtil.appendonlyArray),
       task.bind('client', ({ logs }) =>
         makeClient({
           storage: () => ({ onUploaded: logs.append }),
@@ -85,7 +67,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
   'can download inside trigger': pass({
     expect: pipe(
       task.Do,
-      task.bind('logs', newAppendonlyArrayTask),
+      task.bind('logs', taskRefUtil.appendonlyArray),
       task.bind('client', ({ logs }) =>
         makeClient({
           storage: (storageAdmin) => ({
