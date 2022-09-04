@@ -5,6 +5,25 @@ import { pass, Tests } from 'unit-test-ts';
 
 import { MakeClient } from '../src';
 
+const newAppendonlyArray = <T>() =>
+  pipe(
+    ioRef.newIORef<readonly T[]>([]),
+    io.map((ioref) => ({
+      append: (el: T) => pipe(ioref.read, io.map(readonlyArray.append(el)), io.chain(ioref.write)),
+      read: ioref.read,
+    }))
+  );
+
+const newAppendonlyArrayTask = <T>() =>
+  pipe(
+    newAppendonlyArray<T>(),
+    io.map((ioref) => ({
+      append: flow(ioref.append, task.fromIO),
+      read: pipe(ioref.read, task.fromIO),
+    })),
+    task.fromIO
+  );
+
 export const makeTests = (makeClient: MakeClient): Tests => ({
   'can upload and download': pass({
     expect: pipe(
@@ -25,13 +44,10 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
   'can run trigger when object uploaded': pass({
     expect: pipe(
       task.Do,
-      task.bind('logs', () => task.fromIO(ioRef.newIORef<readonly string[]>([]))),
+      task.bind('logs', newAppendonlyArrayTask),
       task.bind('client', ({ logs }) =>
         makeClient({
-          storage: () => ({
-            onUploaded: (id) =>
-              pipe(logs.read, io.map(readonlyArray.append(id)), io.chain(logs.write), task.fromIO),
-          }),
+          storage: () => ({ onUploaded: logs.append }),
         })
       ),
       task.chainFirst(({ client }) =>
@@ -40,7 +56,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
           blob: blob.fromString('masumoto'),
         })
       ),
-      task.chain(({ logs }) => task.fromIO(logs.read))
+      task.chain(({ logs }) => logs.read)
     ),
     toEqual: ['sakurazaka/kira'],
   }),
@@ -48,13 +64,10 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
   'still upload when having trigger': pass({
     expect: pipe(
       task.Do,
-      task.bind('logs', () => task.fromIO(ioRef.newIORef<readonly string[]>([]))),
+      task.bind('logs', newAppendonlyArrayTask),
       task.bind('client', ({ logs }) =>
         makeClient({
-          storage: () => ({
-            onUploaded: (id) =>
-              pipe(logs.read, io.map(readonlyArray.append(id)), io.chain(logs.write), task.fromIO),
-          }),
+          storage: () => ({ onUploaded: logs.append }),
         })
       ),
       task.chainFirst(({ client }) =>
@@ -72,21 +85,14 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
   'can download inside trigger': pass({
     expect: pipe(
       task.Do,
-      task.bind('logs', () => task.fromIO(ioRef.newIORef<readonly option.Option<string>[]>([]))),
+      task.bind('logs', newAppendonlyArrayTask),
       task.bind('client', ({ logs }) =>
         makeClient({
           storage: (storageAdmin) => ({
             onUploaded: flow(
               storageAdmin.download,
               taskOption.chain(flow(blob.text, taskOption.fromTask)),
-              task.chain((text) =>
-                pipe(
-                  logs.read,
-                  io.map(readonlyArray.append(text)),
-                  io.chain(logs.write),
-                  task.fromIO
-                )
-              )
+              task.chain(logs.append)
             ),
           }),
         })
@@ -97,7 +103,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
           blob: blob.fromString('masumoto'),
         })
       ),
-      task.chain(({ logs }) => task.fromIO(logs.read))
+      task.chain(({ logs }) => logs.read)
     ),
     toEqual: [option.some('masumoto')],
   }),
