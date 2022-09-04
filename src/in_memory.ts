@@ -1,14 +1,7 @@
 import { apply, io, ioRef, option, record, task } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 
-import type {
-  Config,
-  DBClient,
-  DocData,
-  DocSnapshot,
-  MakeClientWithConfig,
-  TableDBTriggers,
-} from '.';
+import type { Config, DBClient, DocData, DocSnapshot, MakeClient, TableDBTriggers } from '.';
 import * as config from './Config';
 import * as storageClient from './StorageClient';
 
@@ -50,7 +43,7 @@ const makeClients = (requiredConfig: Required<Config>) => ({
   db: makeDBClient(requiredConfig),
 });
 
-export const makeClientWithConfig: MakeClientWithConfig = flow(
+export const makeClient: MakeClient = flow(
   config.toRequired,
   makeClients,
   apply.sequenceS(io.Apply),

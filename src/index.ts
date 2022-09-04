@@ -73,7 +73,7 @@ export type Config = {
   readonly db?: (storage: TableDBAdmin) => TableDBTriggers;
 };
 
-export type MakeClientWithConfig = (config: Config) => task.Task<Client>;
+export type MakeClient = (config: Config) => task.Task<Client>;
 
 export type Storage = {
   readonly upload: (p: FileSnapshot) => task.Task<unknown>;

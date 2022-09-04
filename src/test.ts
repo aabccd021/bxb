@@ -2,7 +2,7 @@
 import { io, ioRef, option, readonlyArray, task } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 
-import { MakeClientWithConfig } from '../src';
+import { MakeClient } from '../src';
 
 export const getTextFromBlob =
   (downloadResult: option.Option<Blob>): task.Task<option.Option<string>> =>
@@ -26,11 +26,11 @@ export type Tests = Record<string, Record<string, Test<unknown>>>;
 
 const test = <Result>(x: Test<Result>) => x;
 
-export const makeTest = (makeClientWithTrigger: MakeClientWithConfig): Tests => ({
+export const makeTest = (makeClient: MakeClient): Tests => ({
   Storage: {
     'can upload and download': test({
       expect: pipe(
-        makeClientWithTrigger({}),
+        makeClient({}),
         task.bindTo('client'),
         task.chainFirst(({ client }) =>
           client.storage.upload({
@@ -50,7 +50,7 @@ export const makeTest = (makeClientWithTrigger: MakeClientWithConfig): Tests => 
         task.fromIO,
         task.bindTo('logs'),
         task.bind('client', ({ logs }) =>
-          makeClientWithTrigger({
+          makeClient({
             storage: () => ({
               onUploaded: (id) =>
                 pipe(
@@ -79,7 +79,7 @@ export const makeTest = (makeClientWithTrigger: MakeClientWithConfig): Tests => 
         task.fromIO,
         task.bindTo('logs'),
         task.bind('client', ({ logs }) =>
-          makeClientWithTrigger({
+          makeClient({
             storage: () => ({
               onUploaded: (id) =>
                 pipe(
@@ -109,7 +109,7 @@ export const makeTest = (makeClientWithTrigger: MakeClientWithConfig): Tests => 
         task.fromIO,
         task.bindTo('logs'),
         task.bind('client', ({ logs }) =>
-          makeClientWithTrigger({
+          makeClient({
             storage: (storageAdmin) => ({
               onUploaded: flow(
                 storageAdmin.download,
@@ -141,7 +141,7 @@ export const makeTest = (makeClientWithTrigger: MakeClientWithConfig): Tests => 
   'Table DB': {
     'can set doc and get doc': test({
       expect: pipe(
-        makeClientWithTrigger({}),
+        makeClient({}),
         task.bindTo('client'),
         task.chainFirst(({ client }) =>
           client.db.setDoc({
@@ -156,7 +156,7 @@ export const makeTest = (makeClientWithTrigger: MakeClientWithConfig): Tests => 
 
     'returns empty option when getDoc non existing': test({
       expect: pipe(
-        makeClientWithTrigger({}),
+        makeClient({}),
         task.bindTo('client'),
         task.chain(({ client }) => client.db.getDoc({ id: 'kira', table: 'sakurazaka' }))
       ),
