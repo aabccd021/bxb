@@ -11,9 +11,8 @@ export const of =
   (config: Required<Config>) =>
   (storageState: ioRef.IORef<StorageState>): StorageAdmin =>
     pipe(
-      storageState,
-      ReadonlyStorageAdmin.of,
-      identity.bindTo('readonlyStorageAdmin'),
+      identity.Do,
+      identity.bind('readonlyStorageAdmin', () => ReadonlyStorageAdmin.of(storageState)),
       identity.bind('writeonlyStorageAdmin', ({ readonlyStorageAdmin }) =>
         pipe(
           readonlyStorageAdmin,

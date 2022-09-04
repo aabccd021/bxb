@@ -30,8 +30,8 @@ export const makeTest = (makeClient: MakeClient): Tests => ({
   Storage: {
     'can upload and download': test({
       expect: pipe(
-        makeClient({}),
-        task.bindTo('client'),
+        task.Do,
+        task.bind('client', () => makeClient({})),
         task.chainFirst(({ client }) =>
           client.storage.upload({
             id: 'sakurazaka/kira',
@@ -46,9 +46,8 @@ export const makeTest = (makeClient: MakeClient): Tests => ({
 
     'can run trigger when object uploaded': test({
       expect: pipe(
-        ioRef.newIORef<readonly string[]>([]),
-        task.fromIO,
-        task.bindTo('logs'),
+        task.Do,
+        task.bind('logs', () => task.fromIO(ioRef.newIORef<readonly string[]>([]))),
         task.bind('client', ({ logs }) =>
           makeClient({
             storage: () => ({
@@ -75,9 +74,8 @@ export const makeTest = (makeClient: MakeClient): Tests => ({
 
     'still upload when having trigger': test({
       expect: pipe(
-        ioRef.newIORef<readonly string[]>([]),
-        task.fromIO,
-        task.bindTo('logs'),
+        task.Do,
+        task.bind('logs', () => task.fromIO(ioRef.newIORef<readonly string[]>([]))),
         task.bind('client', ({ logs }) =>
           makeClient({
             storage: () => ({
@@ -105,9 +103,8 @@ export const makeTest = (makeClient: MakeClient): Tests => ({
 
     'can download inside trigger': test({
       expect: pipe(
-        ioRef.newIORef<readonly option.Option<string>[]>([]),
-        task.fromIO,
-        task.bindTo('logs'),
+        task.Do,
+        task.bind('logs', () => task.fromIO(ioRef.newIORef<readonly option.Option<string>[]>([]))),
         task.bind('client', ({ logs }) =>
           makeClient({
             storage: (storageAdmin) => ({
@@ -141,8 +138,8 @@ export const makeTest = (makeClient: MakeClient): Tests => ({
   'Table DB': {
     'can set doc and get doc': test({
       expect: pipe(
-        makeClient({}),
-        task.bindTo('client'),
+        task.Do,
+        task.bind('client', () => makeClient({})),
         task.chainFirst(({ client }) =>
           client.db.setDoc({
             key: { table: 'sakurazaka', id: 'kira' },
@@ -156,8 +153,8 @@ export const makeTest = (makeClient: MakeClient): Tests => ({
 
     'returns empty option when getDoc non existing': test({
       expect: pipe(
-        makeClient({}),
-        task.bindTo('client'),
+        task.Do,
+        task.bind('client', () => makeClient({})),
         task.chain(({ client }) => client.db.getDoc({ id: 'kira', table: 'sakurazaka' }))
       ),
       toStrictEqual: option.none,
