@@ -3,6 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@types/node': ^18.7.14
   '@typescript-eslint/eslint-plugin': ^5.36.1
+  '@vitest/coverage-c8': ^0.22.1
   c8: ^7.12.0
   eslint: ^8.23.0
   eslint-config-aabccd021: ^1.1.0
@@ -32,6 +33,7 @@ dependencies:
 devDependencies:
   '@types/node': 18.7.14
   '@typescript-eslint/eslint-plugin': 5.36.1_yqf6kl63nyoq5megxukfnom5rm
+  '@vitest/coverage-c8': 0.22.1_happy-dom@6.0.4
   c8: 7.12.0
   eslint: 8.23.0
   eslint-config-aabccd021: 1.1.0_yqf6kl63nyoq5megxukfnom5rm
@@ -417,6 +419,24 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.36.1
       eslint-visitor-keys: 3.3.0
+    dev: true
+
+  /@vitest/coverage-c8/0.22.1_happy-dom@6.0.4:
+    resolution: {integrity: sha512-KOOYpO7EGpaF+nD8GD+Y05D0JtZp12NUu6DdLXvBPqSOPo2HkZ7KNBtfR0rb6gOy3NLtGiWTYTzCwhajgb2HlA==}
+    dependencies:
+      c8: 7.12.0
+      vitest: 0.22.1_happy-dom@6.0.4
+    transitivePeerDependencies:
+      - '@edge-runtime/vm'
+      - '@vitest/browser'
+      - '@vitest/ui'
+      - happy-dom
+      - jsdom
+      - less
+      - sass
+      - stylus
+      - supports-color
+      - terser
     dev: true
 
   /@volar/code-gen/0.40.6:

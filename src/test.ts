@@ -6,7 +6,6 @@ import * as IORef from 'fp-ts/IORef';
 import * as O from 'fp-ts/Option';
 import * as Array from 'fp-ts/ReadonlyArray';
 import * as T from 'fp-ts/Task';
-import { describe, expect, it } from 'vitest';
 
 import { MakeClientWithConfig } from '../src';
 
@@ -23,14 +22,19 @@ export const getTextFromBlob =
 
 export const stringToBlob = (text: string) => new Blob([text]);
 
-const taskStrictEqual = <Result>(name: string, actual: task.Task<Result>, expected: Result) =>
-  it(name, () => expect(actual()).resolves.toStrictEqual(expected));
+export type Test<Result> = {
+  readonly expect: T.Task<Result>;
+  readonly toStrictEqual: Result;
+};
 
-export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
-  describe.concurrent('Storage', () => {
-    taskStrictEqual(
-      'can upload and download',
-      pipe(
+export type Tests = Record<string, Record<string, Test<unknown>>>;
+
+const test = <Result>(x: Test<Result>) => x;
+
+export const makeTest = (makeClientWithTrigger: MakeClientWithConfig): Tests => ({
+  Storage: {
+    'can upload and download': test({
+      expect: pipe(
         makeClientWithTrigger({}),
         T.bindTo('client'),
         T.chainFirst(({ client }) =>
@@ -42,12 +46,11 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
         T.chain(({ client }) => client.storage.download('sakurazaka/kira')),
         T.chain(getTextFromBlob)
       ),
-      O.some('masumoto')
-    );
+      toStrictEqual: O.some('masumoto'),
+    }),
 
-    taskStrictEqual(
-      'can run trigger when object uploaded',
-      pipe(
+    'can run trigger when object uploaded': test({
+      expect: pipe(
         IORef.newIORef<readonly string[]>([]),
         T.fromIO,
         T.bindTo('logs'),
@@ -67,12 +70,11 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
         ),
         T.chain(({ logs }) => T.fromIO(logs.read))
       ),
-      ['sakurazaka/kira']
-    );
+      toStrictEqual: ['sakurazaka/kira'],
+    }),
 
-    taskStrictEqual(
-      'still upload when having trigger',
-      pipe(
+    'still upload when having trigger': test({
+      expect: pipe(
         IORef.newIORef<readonly string[]>([]),
         T.fromIO,
         T.bindTo('logs'),
@@ -93,12 +95,11 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
         T.chain(({ client }) => client.storage.download('sakurazaka/kira')),
         T.chain(getTextFromBlob)
       ),
-      O.some('masumoto')
-    );
+      toStrictEqual: O.some('masumoto'),
+    }),
 
-    taskStrictEqual(
-      'can download inside trigger',
-      pipe(
+    'can download inside trigger': test({
+      expect: pipe(
         IORef.newIORef<readonly option.Option<string>[]>([]),
         T.fromIO,
         T.bindTo('logs'),
@@ -123,14 +124,13 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
         ),
         T.chain(({ logs }) => T.fromIO(logs.read))
       ),
-      [O.some('masumoto')]
-    );
-  });
+      toStrictEqual: [O.some('masumoto')],
+    }),
+  },
 
-  describe.concurrent('Table DB', () => {
-    taskStrictEqual(
-      'can set doc and get doc',
-      pipe(
+  'Table DB': {
+    'can set doc and get doc': test({
+      expect: pipe(
         makeClientWithTrigger({}),
         T.bindTo('client'),
         T.chainFirst(({ client }) =>
@@ -141,17 +141,16 @@ export const test = (makeClientWithTrigger: MakeClientWithConfig) => {
         ),
         T.chain(({ client }) => client.db.getDoc({ id: 'kira', table: 'sakurazaka' }))
       ),
-      O.of({ birthYear: 2002 })
-    );
+      toStrictEqual: O.of({ birthYear: 2002 }),
+    }),
 
-    taskStrictEqual(
-      'returns empty option when getDoc non existing',
-      pipe(
+    'returns empty option when getDoc non existing': test({
+      expect: pipe(
         makeClientWithTrigger({}),
         T.bindTo('client'),
         T.chain(({ client }) => client.db.getDoc({ id: 'kira', table: 'sakurazaka' }))
       ),
-      O.none
-    );
-  });
-};
+      toStrictEqual: O.none,
+    }),
+  },
+});
