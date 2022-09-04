@@ -1,21 +1,21 @@
 import { option } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
-import { describe, expect, it } from 'vitest';
 
-import { getTextFromBlob, stringToBlob } from '../src/test';
+import { fail, getTextFromBlob, pass, runTests, stringToBlob, Tests } from '../src/test';
 
-describe.concurrent('util', () => {
-  describe.concurrent('stringBlob & getTextFromBlob', () => {
-    it('blob content is its wrapped text', async () => {
-      const stringToBlobToText = pipe('masumoto', stringToBlob, option.of, getTextFromBlob);
-      const result = await stringToBlobToText();
-      expect(result).toStrictEqual(option.some('masumoto'));
-    });
+const tests: Tests = {
+  'wrap and extract returns original string': pass({
+    expect: pipe('masumoto', stringToBlob, getTextFromBlob),
+    toEqual: option.some('masumoto'),
+  }),
+  'wrap and extract does not return another string': fail({
+    expect: pipe('masumoto', stringToBlob, getTextFromBlob),
+    toEqual: option.some('nazuna'),
+  }),
+  'wrap and extract does not return none': fail({
+    expect: pipe('masumoto', stringToBlob, getTextFromBlob),
+    toEqual: option.none,
+  }),
+};
 
-    it('blob content is not equal to other than its wrapped text', async () => {
-      const stringToBlobToText = pipe('masumoto', stringToBlob, option.of, getTextFromBlob);
-      const result = await stringToBlobToText();
-      expect(result).not.toStrictEqual(option.some('nazuna'));
-    });
-  });
-});
+runTests(tests);
