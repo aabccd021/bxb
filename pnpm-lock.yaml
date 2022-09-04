@@ -18,8 +18,6 @@ specifiers:
   format-package: ^7.0.0
   fp-ts: ^2.12.3
   happy-dom: ^6.0.4
-  io-ts: ^2.2.18
-  make-struct-ts: ^1.0.1
   prettier: ^2.7.1
   typescript: ^4.8.2
   typescript-language-server: ^1.1.2
@@ -29,8 +27,6 @@ specifiers:
 
 dependencies:
   fp-ts: 2.12.3
-  io-ts: 2.2.18_fp-ts@2.12.3
-  make-struct-ts: 1.0.1
   unit-test-ts: 1.1.2
 
 devDependencies:
@@ -1511,14 +1507,6 @@ packages:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
     dev: true
 
-  /io-ts/2.2.18_fp-ts@2.12.3:
-    resolution: {integrity: sha512-3JxUUzRtPQPs5sOwB7pW0+Xb54nOzqA6M1sRB1hwgsRmkWMeGTjtOrCynGTJhIj+mBLUj2S37DAq2+BrPh9kTQ==}
-    peerDependencies:
-      fp-ts: ^2.5.0
-    dependencies:
-      fp-ts: 2.12.3
-    dev: false
-
   /is-arrayish/0.2.1:
     resolution: {integrity: sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==}
     dev: true
@@ -1682,13 +1670,6 @@ packages:
     dependencies:
       semver: 6.3.0
     dev: true
-
-  /make-struct-ts/1.0.1:
-    resolution: {integrity: sha512-2qEReMI7QZOiYzfcjkSwzwUmxiiYt7g6YipM3y33VnzZdVmMUxe6OXtWKEOydUxLJEQVNXRiXcFI+rS5ILVeOg==}
-    dependencies:
-      fp-ts: 2.12.3
-      io-ts: 2.2.18_fp-ts@2.12.3
-    dev: false
 
   /merge2/1.4.1:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}

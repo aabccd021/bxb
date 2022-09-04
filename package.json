@@ -37,8 +37,6 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "fp-ts": "^2.12.3",
-    "io-ts": "^2.2.18",
-    "make-struct-ts": "^1.0.1",
     "unit-test-ts": "^1.1.2"
   },
   "devDependencies": {
