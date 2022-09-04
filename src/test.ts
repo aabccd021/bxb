@@ -1,15 +1,9 @@
+import { blob } from 'dom-utils-ts';
 import { io, ioRef, option, readonlyArray, task, taskOption } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 import { pass, Tests } from 'unit-test-ts';
 
 import { MakeClient } from '../src';
-
-export const getTextFromBlob =
-  (downloadResult: Blob): task.Task<option.Option<string>> =>
-  () =>
-    downloadResult.text().then(option.fromNullable);
-
-export const stringToBlob = (text: string) => new Blob([text]);
 
 export const makeTests = (makeClient: MakeClient): Tests => ({
   'can upload and download': pass({
@@ -19,11 +13,11 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
       task.chainFirst(({ client }) =>
         client.storage.upload({
           id: 'sakurazaka/kira',
-          blob: stringToBlob('masumoto'),
+          blob: blob.fromString('masumoto'),
         })
       ),
       task.chain(({ client }) => client.storage.download('sakurazaka/kira')),
-      taskOption.chain(getTextFromBlob)
+      taskOption.chain(flow(blob.text, taskOption.fromTask))
     ),
     toEqual: option.some('masumoto'),
   }),
@@ -43,7 +37,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
       task.chainFirst(({ client }) =>
         client.storage.upload({
           id: 'sakurazaka/kira',
-          blob: stringToBlob('masumoto'),
+          blob: blob.fromString('masumoto'),
         })
       ),
       task.chain(({ logs }) => task.fromIO(logs.read))
@@ -66,11 +60,11 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
       task.chainFirst(({ client }) =>
         client.storage.upload({
           id: 'sakurazaka/kira',
-          blob: stringToBlob('masumoto'),
+          blob: blob.fromString('masumoto'),
         })
       ),
       task.chain(({ client }) => client.storage.download('sakurazaka/kira')),
-      taskOption.chain(getTextFromBlob)
+      taskOption.chain(flow(blob.text, taskOption.fromTask))
     ),
     toEqual: option.some('masumoto'),
   }),
@@ -84,7 +78,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
           storage: (storageAdmin) => ({
             onUploaded: flow(
               storageAdmin.download,
-              taskOption.chain(getTextFromBlob),
+              taskOption.chain(flow(blob.text, taskOption.fromTask)),
               task.chain((text) =>
                 pipe(
                   logs.read,
@@ -100,7 +94,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
       task.chainFirst(({ client }) =>
         client.storage.upload({
           id: 'sakurazaka/kira',
-          blob: stringToBlob('masumoto'),
+          blob: blob.fromString('masumoto'),
         })
       ),
       task.chain(({ logs }) => task.fromIO(logs.read))

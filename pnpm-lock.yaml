@@ -7,6 +7,7 @@ specifiers:
   '@vitest/coverage-c8': ^0.22.1
   aabccd021-tsconfig: ^1.0.2
   c8: ^7.12.0
+  dom-utils-ts: ^1.0.0
   eslint: ^8.23.0
   eslint-config-aabccd021: ^1.1.0
   eslint-plugin-fp-ts: ^0.3.2
@@ -26,6 +27,7 @@ specifiers:
   vitest: ^0.22.1
 
 dependencies:
+  dom-utils-ts: 1.0.0
   fp-ts: 2.12.3
   unit-test-ts: 1.1.2
 
@@ -696,6 +698,12 @@ packages:
     dependencies:
       esutils: 2.0.3
     dev: true
+
+  /dom-utils-ts/1.0.0:
+    resolution: {integrity: sha512-CITCB/v759L+ZdskaYrJurHf7HaS9P6oOM3SMO4SxVgjPiFm2gv1EKMMWU/FbW/CAgZwhbtC5P74qfh0+6HHwA==}
+    dependencies:
+      fp-ts: 2.12.3
+    dev: false
 
   /emoji-regex/8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}

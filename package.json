@@ -36,6 +36,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "dom-utils-ts": "^1.0.0",
     "fp-ts": "^2.12.3",
     "unit-test-ts": "^1.1.2"
   },
