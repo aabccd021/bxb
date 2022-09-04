@@ -2,6 +2,5 @@
   "extends": "aabccd021-tsconfig",
   "compilerOptions": {
     "lib": [ "ESNext", "dom" ]
-  },
-  "include": ["src"]
+  }
 }
