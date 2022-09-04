@@ -11,7 +11,7 @@ export const getTextFromBlob =
 
 export const stringToBlob = (text: string) => new Blob([text]);
 
-export const makeTest = (makeClient: MakeClient): Tests => ({
+export const makeTests = (makeClient: MakeClient): Tests => ({
   'can upload and download': pass({
     expect: pipe(
       task.Do,
