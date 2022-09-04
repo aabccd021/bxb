@@ -24,90 +24,20 @@
         "**/tsconfig.**"
       ]
     },
-    "ignorePatterns": [
-      "**/*.js",
-      "dist/",
-      "node_modules"
-    ],
     "overrides": [
       {
         "files": [
-          "test/**/*.ts"
+          "test/**/*.test.ts"
         ],
         "rules": {
-          "functional/no-expression-statement": "off"
+          "functional/no-expression-statement": "off",
+          "functional/no-return-void": "off"
         }
       }
     ],
-    "plugins": [
-      "@typescript-eslint",
-      "functional",
-      "only-warn",
-      "simple-import-sort",
-      "unused-imports"
-    ],
     "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:@typescript-eslint/recommended-requiring-type-checking",
-      "plugin:functional/all",
-      "plugin:prettier/recommended",
-      "prettier"
-    ],
-    "rules": {
-      "@typescript-eslint/no-shadow": "error",
-      "@typescript-eslint/no-unused-vars": "off",
-      "curly": [
-        "error",
-        "all"
-      ],
-      "@typescript-eslint/unbound-method": "off",
-      "eqeqeq": "error",
-      "functional/no-return-void": "off",
-      "functional/functional-parameters": "off",
-      "functional/no-mixed-type": "off",
-      "max-len": [
-        "error",
-        {
-          "code": 100
-        }
-      ],
-      "no-else-return": "error",
-      "no-undef-init": "error",
-      "no-unsafe-optional-chaining": "error",
-      "no-use-before-define": [
-        "error",
-        {
-          "functions": false
-        }
-      ],
-      "no-useless-rename": "error",
-      "no-useless-return": "error",
-      "object-shorthand": "error",
-      "prefer-arrow-callback": "error",
-      "prefer-destructuring": "error",
-      "prefer-template": "error",
-      "prettier/prettier": [
-        "error",
-        {
-          "singleQuote": true,
-          "printWidth": 100
-        }
-      ],
-      "simple-import-sort/exports": "error",
-      "simple-import-sort/imports": "error",
-      "unused-imports/no-unused-imports-ts": "error",
-      "unused-imports/no-unused-vars": [
-        "error",
-        {
-          "vars": "all",
-          "varsIgnorePattern": "^_",
-          "args": "after-used",
-          "argsIgnorePattern": "^_"
-        }
-      ]
-    }
+      "aabccd021"
+    ]
   },
   "release": {
     "branches": [
@@ -132,7 +62,8 @@
     "@typescript-eslint/parser": "^5.30.6",
     "c8": "^7.12.0",
     "eslint": "^8.19.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-aabccd021": "^1.0.4",
+    "eslint-plugin-fp-ts": "^0.3.2",
     "eslint-plugin-functional": "^4.2.1",
     "eslint-plugin-only-warn": "^1.0.3",
     "eslint-plugin-prettier": "^4.2.1",
