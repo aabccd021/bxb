@@ -2,13 +2,13 @@ import { blob } from 'dom-utils-ts';
 import { option, task, taskOption } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 import { taskRefUtil } from 'ioref-utils-ts';
-import { pass, Tests } from 'unit-test-ts';
+import { itExpect, Tests } from 'unit-test-ts';
 
 import { MakeClient } from '../src';
 
 export const makeTests = (makeClient: MakeClient): Tests => ({
-  'can upload and download': pass({
-    expect: pipe(
+  'can upload and download': itExpect({
+    task: pipe(
       task.Do,
       task.bind('client', () => makeClient({})),
       task.chainFirst(({ client }) =>
@@ -23,8 +23,8 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
     toEqual: option.some('masumoto'),
   }),
 
-  'can run trigger when object uploaded': pass({
-    expect: pipe(
+  'can run trigger when object uploaded': itExpect({
+    task: pipe(
       task.Do,
       task.bind('logs', taskRefUtil.appendonlyArray),
       task.bind('client', ({ logs }) =>
@@ -43,8 +43,8 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
     toEqual: ['sakurazaka/kira'],
   }),
 
-  'still upload when having trigger': pass({
-    expect: pipe(
+  'still upload when having trigger': itExpect({
+    task: pipe(
       task.Do,
       task.bind('logs', taskRefUtil.appendonlyArray),
       task.bind('client', ({ logs }) =>
@@ -64,8 +64,8 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
     toEqual: option.some('masumoto'),
   }),
 
-  'can download inside trigger': pass({
-    expect: pipe(
+  'can download inside trigger': itExpect({
+    task: pipe(
       task.Do,
       task.bind('logs', taskRefUtil.appendonlyArray),
       task.bind('client', ({ logs }) =>
@@ -90,8 +90,8 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
     toEqual: [option.some('masumoto')],
   }),
 
-  'can set doc and get doc': pass({
-    expect: pipe(
+  'can set doc and get doc': itExpect({
+    task: pipe(
       task.Do,
       task.bind('client', () => makeClient({})),
       task.chainFirst(({ client }) =>
@@ -105,8 +105,8 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
     toEqual: option.of({ birthYear: 2002 }),
   }),
 
-  'returns empty option when getDoc non existing': pass({
-    expect: pipe(
+  'returns empty option when getDoc non existing': itExpect({
+    task: pipe(
       task.Do,
       task.bind('client', () => makeClient({})),
       task.chain(({ client }) => client.db.getDoc({ id: 'kira', table: 'sakurazaka' }))
