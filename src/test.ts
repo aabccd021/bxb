@@ -2,12 +2,12 @@ import { blob } from 'dom-utils-ts';
 import { option, task, taskOption } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 import { taskRefUtil } from 'ioref-utils-ts';
-import { itExpect, Tests } from 'unit-test-ts';
+import { expect, Tests } from 'unit-test-ts';
 
 import { MakeClient } from '../src';
 
 export const makeTests = (makeClient: MakeClient): Tests => ({
-  'can upload and download': itExpect({
+  'can upload and download': expect({
     task: pipe(
       task.Do,
       task.bind('client', () => makeClient({})),
@@ -23,7 +23,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
     toEqual: option.some('masumoto'),
   }),
 
-  'can run trigger when object uploaded': itExpect({
+  'can run trigger when object uploaded': expect({
     task: pipe(
       task.Do,
       task.bind('logs', taskRefUtil.appendonlyArray),
@@ -43,7 +43,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
     toEqual: ['sakurazaka/kira'],
   }),
 
-  'still upload when having trigger': itExpect({
+  'still upload when having trigger': expect({
     task: pipe(
       task.Do,
       task.bind('logs', taskRefUtil.appendonlyArray),
@@ -64,7 +64,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
     toEqual: option.some('masumoto'),
   }),
 
-  'can download inside trigger': itExpect({
+  'can download inside trigger': expect({
     task: pipe(
       task.Do,
       task.bind('logs', taskRefUtil.appendonlyArray),
@@ -90,7 +90,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
     toEqual: [option.some('masumoto')],
   }),
 
-  'can set doc and get doc': itExpect({
+  'can set doc and get doc': expect({
     task: pipe(
       task.Do,
       task.bind('client', () => makeClient({})),
@@ -105,7 +105,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
     toEqual: option.of({ birthYear: 2002 }),
   }),
 
-  'returns empty option when getDoc non existing': itExpect({
+  'returns empty option when getDoc non existing': expect({
     task: pipe(
       task.Do,
       task.bind('client', () => makeClient({})),
