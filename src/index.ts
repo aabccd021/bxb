@@ -1,4 +1,4 @@
-import { option, task } from 'fp-ts';
+import { task, taskOption } from 'fp-ts';
 
 export type FileSnapshot = {
   readonly id: string;
@@ -21,7 +21,7 @@ export type DocSnapshot = {
 
 export type StorageAdmin = {
   readonly upload: (p: FileSnapshot) => task.Task<unknown>;
-  readonly download: (id: string) => task.Task<option.Option<Blob>>;
+  readonly download: (id: string) => taskOption.TaskOption<Blob>;
 };
 
 export type ReadonlyStorageAdmin = Pick<StorageAdmin, 'download'>;
@@ -34,17 +34,17 @@ export type StorageTriggers = {
 
 export type StorageClient = {
   readonly upload: (p: FileSnapshot) => task.Task<unknown>;
-  readonly download: (id: string) => task.Task<option.Option<Blob>>;
+  readonly download: (id: string) => taskOption.TaskOption<Blob>;
 };
 
 export type DBClient = {
   readonly setDoc: (snapshot: DocSnapshot) => task.Task<unknown>;
-  readonly getDoc: (key: DocKey) => task.Task<option.Option<DocData>>;
+  readonly getDoc: (key: DocKey) => taskOption.TaskOption<DocData>;
 };
 
 export type TableDBAdmin = {
   readonly setDoc: (snapshot: DocSnapshot) => task.Task<unknown>;
-  readonly getDoc: (key: DocKey) => task.Task<option.Option<DocData>>;
+  readonly getDoc: (key: DocKey) => taskOption.TaskOption<DocData>;
 };
 
 export type Client = {
@@ -61,5 +61,5 @@ export type MakeClient = (config: Config) => task.Task<Client>;
 
 export type Storage = {
   readonly upload: (p: FileSnapshot) => task.Task<unknown>;
-  readonly download: (id: string) => task.Task<option.Option<Blob>>;
+  readonly download: (id: string) => taskOption.TaskOption<Blob>;
 };
