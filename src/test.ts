@@ -17,8 +17,9 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
           blob: blob.fromString('masumoto'),
         })
       ),
-      task.chain(({ client }) => client.storage.download('sakurazaka/kira')),
-      taskOption.chain(flow(blob.text, taskOption.fromTask))
+      task.chain(({ client }) =>
+        pipe(client.storage.download('sakurazaka/kira'), taskOption.chainTaskK(blob.text))
+      )
     ),
     toEqual: option.some('masumoto'),
   }),
@@ -58,8 +59,9 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
           blob: blob.fromString('masumoto'),
         })
       ),
-      task.chain(({ client }) => client.storage.download('sakurazaka/kira')),
-      taskOption.chain(flow(blob.text, taskOption.fromTask))
+      task.chain(({ client }) =>
+        pipe(client.storage.download('sakurazaka/kira'), taskOption.chainTaskK(blob.text))
+      )
     ),
     toEqual: option.some('masumoto'),
   }),
@@ -73,7 +75,7 @@ export const makeTests = (makeClient: MakeClient): Tests => ({
           storage: (storageAdmin) => ({
             onUploaded: flow(
               storageAdmin.download,
-              taskOption.chain(flow(blob.text, taskOption.fromTask)),
+              taskOption.chainTaskK(blob.text),
               task.chain(logs.append)
             ),
           }),
