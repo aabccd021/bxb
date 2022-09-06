@@ -23,7 +23,7 @@ specifiers:
   prettier: ^2.7.1
   typescript: ^4.8.2
   typescript-language-server: ^1.1.2
-  unit-test-ts: ^1.5.0
+  unit-test-ts: ^1.5.3
   vite: ^3.1.0
   vitest: ^0.22.1
 
@@ -31,7 +31,7 @@ dependencies:
   dom-utils-ts: 1.0.0
   fp-ts: 2.12.3
   ioref-utils-ts: 1.1.0
-  unit-test-ts: 1.5.0
+  unit-test-ts: 1.5.3
 
 devDependencies:
   '@types/node': 18.7.15
@@ -2303,8 +2303,8 @@ packages:
       crypto-random-string: 4.0.0
     dev: true
 
-  /unit-test-ts/1.5.0:
-    resolution: {integrity: sha512-ADiXNlcHDqjdSEOnymyuhLy8DP1XLpbvKPNhtcA3kwGuLWFrT3eA/n5LrBZQnYzRI4WPxBY98pNbTFa0i1IUDQ==}
+  /unit-test-ts/1.5.3:
+    resolution: {integrity: sha512-gP4wxUVCvbSBfBpAirdskrhN63WaWKJvqA+iAi5gB0nfSEyTun/f69HMCdIB4oxFOxQOqFx2n7XY7h7TyKubVQ==}
     dependencies:
       fp-ts: 2.12.3
       fp-ts-std: 0.14.2_3rwmfr4cgglgwketcdxvriy3mq
