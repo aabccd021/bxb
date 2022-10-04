@@ -1,238 +1,90 @@
-import { either, task, taskEither, taskOption } from 'fp-ts';
+import { ConstructorWithExtra, Impl, impl, Variant } from '@practical-fp/union-types';
+import { either, task as T, taskEither as TE } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
-import { expect } from 'unit-test-ts';
+import { behavior, expect, sequentially } from 'unit-test-ts';
 
-export type TableDBTriggers = unknown;
-
-export type DocKey = {
-  readonly table: string;
-  readonly id: string;
+const CreateUserAndSignIn = {
+  Error: impl<
+    | Variant<'Provider', { readonly value: string }>
+    | Variant<'UserAlreadyExists', { readonly wahaha: string }>
+  >(),
+  Method: impl<
+    | Variant<'EmailAndPassword', { readonly email: string; readonly password: string }>
+    | Variant<'Google'>
+  >(),
 };
 
-export type DocData = Record<string, unknown>;
+type TypeOf<A> = A extends Record<string, ConstructorWithExtra<string, unknown>>
+  ? { readonly [Z in keyof A]: TypeOf<A[Z]> }
+  : A extends ConstructorWithExtra<string, infer P>
+  ? P
+  : A extends Impl<infer P>
+  ? P
+  : never;
 
-export type DocSnapshot = {
-  readonly key: DocKey;
-  readonly data: DocData;
-};
+type CreateUserAndSignInError = TypeOf<typeof CreateUserAndSignIn.Error>;
 
-export type StorageAdmin = {
-  readonly upload: () => task.Task<unknown>;
-  readonly download: (id: string) => taskOption.TaskOption<Blob>;
-};
+type Prov = CreateUserAndSignInError['Provider'];
 
-export type ReadonlyStorageAdmin = Pick<StorageAdmin, 'download'>;
-
-export type WriteonlyStorageAdmin = Omit<StorageAdmin, keyof ReadonlyStorageAdmin>;
-
-export type StorageTriggers = {
-  readonly onUploaded?: (id: string) => task.Task<unknown>;
-};
-
-export type StorageClientUpload = (p: {
-  readonly key: string;
-  readonly value: ArrayBuffer;
-}) => task.Task<unknown>;
-
-export type ProviderGetDownloadUrlError = {
-  readonly type: 'provider';
-  readonly value: unknown;
-};
-
-export type ObjectDoesNotExistsGetDownloadUrlError = {
-  readonly type: 'object_does_not_exists';
-};
-
-export type GetDownloadUrlError =
-  | ObjectDoesNotExistsGetDownloadUrlError
-  | ProviderGetDownloadUrlError;
-
-export type StorageClient = {
-  readonly getDownloadURL: (p: { readonly key: string }) => taskEither.TaskEither<unknown, string>;
-  readonly upload: StorageClientUpload;
-};
-
-export type DBClient = {
-  readonly setDoc: (snapshot: DocSnapshot) => task.Task<unknown>;
-  readonly getDoc: (key: DocKey) => taskOption.TaskOption<DocData>;
-};
-
-export type TableDBAdmin = {
-  readonly setDoc: (snapshot: DocSnapshot) => task.Task<unknown>;
-  readonly getDoc: (key: DocKey) => taskOption.TaskOption<DocData>;
-};
-
-export type Config = {
-  readonly storage?: (storage: ReadonlyStorageAdmin) => StorageTriggers;
-  readonly db?: (storage: TableDBAdmin) => TableDBTriggers;
-};
-
-export type Storage = {
-  readonly upload: () => task.Task<unknown>;
-  readonly download: (id: string) => taskOption.TaskOption<unknown>;
-};
-
-export type SignInP = {
-  readonly type: 'email_and_password';
-  readonly email: string;
-  readonly password: string;
-};
-
-export type CreateAndSignInP = {
-  readonly type: 'email_and_password';
-  readonly email: string;
-  readonly password: string;
-};
-
-export type ProviderCreateUserAndSignInError = {
-  readonly type: 'provider';
-  readonly value: unknown;
-};
-
-export type UserAlreadyExistsCreateUserAndSignInError = {
-  readonly type: 'user_already_exists';
-};
-
-export type CreateUserAndSignInError =
-  | UserAlreadyExistsCreateUserAndSignInError
-  | ProviderCreateUserAndSignInError;
-
-export type ProviderSignInError = {
-  readonly type: 'provider';
-  readonly value: unknown;
-};
-
-export type UserDoesNotExistSignInError = {
-  readonly type: 'user_does_not_exist';
-};
-
-export type SignInError = UserDoesNotExistSignInError | ProviderSignInError;
-
-export type AuthClient = {
-  readonly signIn: (p: SignInP) => taskEither.TaskEither<SignInError, unknown>;
-  readonly signOut: task.Task<unknown>;
+type AuthClient = {
+  readonly signOut: T.Task<unknown>;
   readonly createUserAndSignIn: (
-    p: CreateAndSignInP
-  ) => taskEither.TaskEither<CreateUserAndSignInError, unknown>;
+    mehod: TypeOf<typeof CreateUserAndSignIn.Method>
+  ) => TE.TaskEither<TypeOf<typeof CreateUserAndSignIn.Error>, unknown>;
 };
 
-export type Client = {
-  readonly storage: StorageClient;
+type Client = {
   readonly auth: AuthClient;
 };
 
-export type Server = {
+type Server = {
   readonly client: Client;
 };
 
-export type MkServer = task.Task<Server>;
+type MkServer = T.Task<Server>;
 
-export const serial = <T>(t: readonly T[]) => t;
-
-export const mkTests = (mkServer: MkServer) => ({
-  'auth users is independent between tests': {
-    'can create user with same email on different tests': [
+export const mkTests = (mkServer: MkServer) => [
+  behavior(
+    'Server auth is indenendent between tests, different tests can create the same user',
+    sequentially([
       expect({
         task: pipe(
-          task.Do,
-          task.bind('server', (_) => mkServer),
-          task.chainFirst(({ server }) =>
-            server.client.auth.createUserAndSignIn({
-              type: 'email_and_password',
+          mkServer,
+          T.map((server) => server.client.auth),
+          T.chainFirst((auth) =>
+            auth.createUserAndSignIn(
+              CreateUserAndSignIn.Method.EmailAndPassword({
+                email: 'a',
+                password: 'k',
+              })
+            )
+          ),
+          T.chainFirst((auth) => auth.signOut),
+          T.chain((auth) =>
+            auth.createUserAndSignIn({
+              method: 'email_and_password',
               email: 'kira@sakura.com',
               password: 'masmott',
             })
           ),
-          task.chainFirst(({ server }) => server.client.auth.signOut),
-          task.chain(({ server }) =>
-            server.client.auth.createUserAndSignIn({
-              type: 'email_and_password',
-              email: 'kira@sakura.com',
-              password: 'masmott',
-            })
-          ),
-          taskEither.mapLeft((error) => error.type)
+          TE.mapLeft((error) => error.tag)
         ),
-        toEqual: either.left('user_already_exists' as const),
+        resolvesTo: either.left('UserAlreadyExists' as const),
       }),
       expect({
         task: pipe(
-          task.Do,
-          task.bind('server', (_) => mkServer),
-          task.chain(({ server }) =>
+          mkServer,
+          T.chain((server) =>
             server.client.auth.createUserAndSignIn({
-              type: 'email_and_password',
+              method: 'email_and_password',
               email: 'kira@sakura.com',
               password: 'masmott',
             })
           ),
-          task.map(either.isRight)
+          T.map(either.isRight)
         ),
-        toEqual: true,
+        resolvesTo: true,
       }),
-    ],
-    'can not signIn with account created on another test': [
-      expect({
-        task: pipe(
-          task.Do,
-          task.bind('server', (_) => mkServer),
-          task.chainFirst(({ server }) =>
-            server.client.auth.createUserAndSignIn({
-              type: 'email_and_password',
-              email: 'nazuna@yofukashi.com',
-              password: 'nanaxa',
-            })
-          ),
-          task.chainFirst(({ server }) => server.client.auth.signOut),
-          task.chain(({ server }) =>
-            server.client.auth.signIn({
-              type: 'email_and_password',
-              email: 'kira@sakura.com',
-              password: 'masmott',
-            })
-          ),
-          task.map(either.isRight)
-        ),
-        toEqual: true,
-      }),
-      expect({
-        task: pipe(
-          task.Do,
-          task.bind('server', (_) => mkServer),
-          task.chain(({ server }) =>
-            server.client.auth.signIn({
-              type: 'email_and_password',
-              email: 'kira@sakura.com',
-              password: 'masmott',
-            })
-          ),
-          taskEither.mapLeft((error) => error.type)
-        ),
-        toEqual: either.left('user_does_not_exist' as const),
-      }),
-    ],
-  },
-  'storage is independent between tests': [
-    expect({
-      task: pipe(
-        task.Do,
-        task.bind('server', (_) => mkServer),
-        task.chainFirst(({ server }) =>
-          server.client.storage.upload({ key: 'kira', value: new ArrayBuffer(46) })
-        ),
-        task.chain(({ server }) => server.client.storage.getDownloadURL({ key: 'kira' })),
-        task.map(either.isRight)
-      ),
-      toEqual: true,
-    }),
-    expect({
-      task: pipe(
-        task.Do,
-        task.bind('server', (_) => mkServer),
-        task.chain(({ server }) => server.client.storage.getDownloadURL({ key: 'kira' })),
-        task.map(either.isLeft)
-      ),
-      toEqual: true,
-    }),
-  ],
-});
+    ])
+  ),
+];
