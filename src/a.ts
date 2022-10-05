@@ -72,9 +72,8 @@ const constructor = <
   tagKey: TagKey,
   tagName: Tag
 ): ConstructorWithExtra<TagKey, Var, Tag, Values<TagKey, Narrow<TagKey, Var, Tag>>> => {
-  function _constructor(value: Values<TagKey, Narrow<TagKey, Var, Tag>>) {
-    return tag(tagKey, tagName, value);
-  }
+  const _constructor = (value: Values<TagKey, Narrow<TagKey, Var, Tag>>) =>
+    tag(tagKey, tagName, value);
 
   // eslint-disable-next-line functional/immutable-data, functional/no-expression-statement
   _constructor.tag = tagName;
