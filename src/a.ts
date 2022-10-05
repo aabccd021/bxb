@@ -235,24 +235,14 @@ type TypeOf<I> = I extends Impl<infer TagKey, infer V>
     }
   : never;
 
-type SignInErrorUnion =
-  | InVariant<'Provider', { readonly value: number }>
+type SignInErrorUnion<K> =
+  | InVariant<'Provider', { readonly value: K }>
   | InVariant<'UserAlreadyExists', { readonly wahaha: string }>;
 
-type SignInErrorUnionZ = Z<'a', SignInErrorUnion>;
+// eslint-disable-next-line functional/prefer-tacit
+export const SignInError = <K>() => impl2('type')<SignInErrorUnion<K>>();
 
-type SignInErrorUnionV = ValueOf<SignInErrorUnionZ>;
-
-export const rrr: SignInErrorUnionV = {
-  a: 'UserAlreadyExists',
-  wahaha: 'bbb',
-};
-
-export const kkk: Variant<'a', 'UserAlreadyExists', { readonly wahaha: string }> = rrr;
-
-export const SignInError = impl2('type')<SignInErrorUnion>();
-
-export type SignInError = TypeOf<typeof SignInError>;
+export type SignInError<K> = TypeOf<ReturnType<typeof SignInError<K>>>;
 
 // type CreateUserAndSignInErrorUnion<K> =
 //   | Variant<'type', 'Provider', { readonly value: K }>

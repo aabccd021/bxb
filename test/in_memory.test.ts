@@ -5,22 +5,27 @@ import * as vitest from 'vitest';
 
 import { SignInError } from '../src/a';
 
-const yaaProvider: SignInError['Provider'] = SignInError.Provider({
+const NumberSignInError = SignInError<number>();
+
+type NumberSignInError = SignInError<number>;
+
+const yaaProvider: NumberSignInError['Provider'] = NumberSignInError.Provider({
   value: 76,
 });
 
-export const kkkProvider = SignInError.Provider({
+export const kkkProvider = NumberSignInError.Provider({
   value: 99,
 });
 
-export const yooProvider: SignInError['Provider'] = {
+export const yooProvider: NumberSignInError['Provider'] = {
   type: 'Provider',
   value: 99,
 };
 
-const barUserAlreadyExists: SignInError['UserAlreadyExists'] = SignInError.UserAlreadyExists({
-  wahaha: 'ggg',
-});
+const barUserAlreadyExists: NumberSignInError['UserAlreadyExists'] =
+  NumberSignInError.UserAlreadyExists({
+    wahaha: 'ggg',
+  });
 
 const behaviors = [
   behavior(
