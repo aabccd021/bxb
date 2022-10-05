@@ -142,6 +142,12 @@ export function constructor<
   return _constructor as any;
 }
 
+// type TypeOf<TagKey extends string, Var extends AnyVariant<TagKey>> = {
+//   readonly Union: Var;
+// } & {
+//   readonly [Tag in Tags<TagKey, Var>]: Narrow<TagKey, Var, Tag>;
+// };
+
 export type Impl<TagKey extends string, Var extends AnyVariant<TagKey>> = {
   readonly [Tag in Tags<TagKey, Var>]: ConstructorWithExtra<
     TagKey,
@@ -150,6 +156,16 @@ export type Impl<TagKey extends string, Var extends AnyVariant<TagKey>> = {
     Values<TagKey, Narrow<TagKey, Var, Tag>>
   >;
 };
+
+export interface InVariant<
+  Tag extends string = string,
+  Value extends Record<string, unknown> = Record<string, unknown>
+> {
+  readonly tag: Tag;
+  readonly value: Value;
+}
+
+export type AnyInVariant = InVariant;
 
 export function impl<TagKey extends string, Var extends AnyVariant<TagKey>>(
   tagKey: TagKey
@@ -161,17 +177,88 @@ export function impl<TagKey extends string, Var extends AnyVariant<TagKey>>(
   });
 }
 
-type TypeOf<TagKey extends string, Var extends AnyVariant<TagKey>> = {
-  readonly Union: Var;
-} & {
-  readonly [Tag in Tags<TagKey, Var>]: Narrow<TagKey, Var, Tag>;
+export type ITags<IVar extends AnyInVariant> = IVar['tag'];
+
+export type INarrow<Var extends AnyInVariant, Tag extends ITags<Var>> = Extract<
+  Var,
+  InVariant<Tag>
+>;
+
+type ToVar<TagKey extends string, IVar extends AnyInVariant> = Variant<
+  TagKey,
+  IVar['tag'],
+  IVar['value']
+>;
+
+type Z<TagKey extends string, IVar extends AnyInVariant> = {
+  readonly [Tag in ITags<IVar>]: ToVar<TagKey, INarrow<IVar, Tag>>;
 };
 
-type CreateUserAndSignInErrorUnion<K> =
-  | Variant<'type', 'Provider', { readonly value: K }>
-  | Variant<'type', 'UserAlreadyExists', { readonly wahaha: string }>;
+type ValueOf<K> = K[keyof K];
 
-export const CreateUserAndSignInError = <K>() =>
-  impl<'type', CreateUserAndSignInErrorUnion<K>>('type');
+export type Impl3<TagKey extends string, Var extends AnyVariant<TagKey>> = {
+  readonly [Tag in Tags<TagKey, Var>]: ConstructorWithExtra<
+    TagKey,
+    Var,
+    Tag,
+    Values<TagKey, Narrow<TagKey, Var, Tag>>
+  >;
+};
 
-export type CreateUserAndSignInError<K> = TypeOf<'type', CreateUserAndSignInErrorUnion<K>>;
+export type Impl2<TagKey extends string, Var extends AnyVariant<TagKey>> = {
+  readonly [Tag in Tags<TagKey, Var>]: ConstructorWithExtra<
+    TagKey,
+    Var,
+    Tag,
+    Values<TagKey, Narrow<TagKey, Var, Tag>>
+  >;
+};
+
+export const impl2 =
+  <TagKey extends string>(tagKey: TagKey) =>
+  <
+    IVar extends AnyInVariant,
+    Var extends ValueOf<Z<TagKey, IVar>> = ValueOf<Z<TagKey, IVar>>
+  >(): Impl<TagKey, Var> => {
+    return new Proxy({} as Impl<TagKey, Var>, {
+      get: <Tag extends keyof Impl<TagKey, Var>>(_: Impl<TagKey, Var>, tagName: any) => {
+        return constructor<TagKey, Var, Tag>(tagKey, tagName);
+      },
+    });
+  };
+
+type TypeOf<I> = I extends Impl<infer TagKey, infer V>
+  ? {
+      readonly Union: V;
+    } & {
+      readonly [Tag in Tags<TagKey, V>]: Narrow<TagKey, V, Tag>;
+    }
+  : never;
+
+type SignInErrorUnion =
+  | InVariant<'Provider', { readonly value: number }>
+  | InVariant<'UserAlreadyExists', { readonly wahaha: string }>;
+
+type SignInErrorUnionZ = Z<'a', SignInErrorUnion>;
+
+type SignInErrorUnionV = ValueOf<SignInErrorUnionZ>;
+
+export const rrr: SignInErrorUnionV = {
+  a: 'UserAlreadyExists',
+  wahaha: 'bbb',
+};
+
+export const kkk: Variant<'a', 'UserAlreadyExists', { readonly wahaha: string }> = rrr;
+
+export const SignInError = impl2('type')<SignInErrorUnion>();
+
+export type SignInError = TypeOf<typeof SignInError>;
+
+// type CreateUserAndSignInErrorUnion<K> =
+//   | Variant<'type', 'Provider', { readonly value: K }>
+//   | Variant<'type', 'UserAlreadyExists', { readonly wahaha: string }>;
+//
+// export const CreateUserAndSignInError = <K>() =>
+//   impl<'type', CreateUserAndSignInErrorUnion<K>>('type');
+//
+// export type CreateUserAndSignInError<K> = TypeOf<'type', CreateUserAndSignInErrorUnion<K>>;

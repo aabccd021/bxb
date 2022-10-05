@@ -3,17 +3,24 @@ import { pipe } from 'fp-ts/function';
 import { behavior, expect, mkTest, runVitest } from 'unit-test-ts';
 import * as vitest from 'vitest';
 
-import { CreateUserAndSignInError } from '../src/a';
+import { SignInError } from '../src/a';
 
-const yaaProvider: CreateUserAndSignInError<string>['Provider'] =
-  CreateUserAndSignInError<string>().Provider({
-    value: 'yaa',
-  });
+const yaaProvider: SignInError['Provider'] = SignInError.Provider({
+  value: 76,
+});
 
-const barUserAlreadyExists: CreateUserAndSignInError<string>['UserAlreadyExists'] =
-  CreateUserAndSignInError().UserAlreadyExists({
-    wahaha: 'ggg',
-  });
+export const kkkProvider = SignInError.Provider({
+  value: 99,
+});
+
+export const yooProvider: SignInError['Provider'] = {
+  type: 'Provider',
+  value: 99,
+};
+
+const barUserAlreadyExists: SignInError['UserAlreadyExists'] = SignInError.UserAlreadyExists({
+  wahaha: 'ggg',
+});
 
 const behaviors = [
   behavior(
@@ -22,7 +29,7 @@ const behaviors = [
       task: task.of(yaaProvider),
       resolvesTo: {
         type: 'Provider',
-        value: 'yaa',
+        value: 76,
       },
     })
   ),
