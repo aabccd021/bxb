@@ -21,12 +21,9 @@ interface AuthClient<G extends ServerG> {
   ) => TE.TaskEither<CreateUserAndSignInError['Union'], unknown>;
 }
 
-export const provider: CreateUserAndSignInError['Provider'] = {
-  tag: 'Provider',
-  value: {
-    value: 'a',
-  },
-};
+export const provider: CreateUserAndSignInError['Provider'] = CreateUserAndSignInError.Provider({
+  value: 'g',
+});
 
 interface Client<G extends ServerG> {
   readonly auth: AuthClient<G>;
@@ -42,7 +39,7 @@ interface TestMeta<G extends ServerG> {
   readonly usernameToSignInMethod: (username: string) => G['client']['auth']['signIn']['method'];
 }
 
-export const mkTests = <G extends ServerG>(mkServer: MkServer<G>, testMeta: TestMeta<G>) => [
+export const mkTests = <G extends ServerG>(mkServer: MkServer<G>, meta: TestMeta<G>) => [
   behavior(
     'Server auth is indenendent between tests, different tests can create the same user',
     sequentially([
@@ -50,9 +47,9 @@ export const mkTests = <G extends ServerG>(mkServer: MkServer<G>, testMeta: Test
         task: pipe(
           mkServer,
           T.map((server) => server.client.auth),
-          T.chainFirst((auth) => pipe('kira', testMeta.usernameToSignInMethod, auth.signIn)),
+          T.chainFirst((auth) => pipe('kira', meta.usernameToSignInMethod, auth.signIn)),
           T.chainFirst((auth) => auth.signOut),
-          T.chain((auth) => auth.signIn(testMeta.usernameToSignInMethod('kira'))),
+          T.chain((auth) => pipe('kira', meta.usernameToSignInMethod, auth.signIn)),
           TE.mapLeft((error) => error.tag)
         ),
         resolvesTo: either.left('UserAlreadyExists' as const),

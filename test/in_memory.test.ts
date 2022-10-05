@@ -1,9 +1,47 @@
-import { executeTests } from 'unit-test-ts';
+import { task } from 'fp-ts';
+import { pipe } from 'fp-ts/function';
+import { behavior, expect, mkTest, runVitest } from 'unit-test-ts';
 import * as vitest from 'vitest';
 
-import { makeClient } from '../src/in_memory';
-import { makeTests } from '../src/test';
+import { CreateUserAndSignInError } from '../src/a';
 
-const inMemoryTests = makeTests(makeClient);
+const yaaProvider: CreateUserAndSignInError['Provider'] = CreateUserAndSignInError.Provider({
+  value: 'yaa',
+});
 
-executeTests(inMemoryTests, vitest);
+const barUserAlreadyExists: CreateUserAndSignInError['UserAlreadyExists'] =
+  CreateUserAndSignInError.UserAlreadyExists({
+    wahaha: 'ggg',
+  });
+
+const behaviors = [
+  behavior(
+    'yyy',
+    expect({
+      task: task.of(yaaProvider),
+      resolvesTo: {
+        type: 'Provider',
+        value: 'yaa',
+      },
+    })
+  ),
+
+  behavior(
+    'zzz',
+    expect({
+      task: task.of(barUserAlreadyExists),
+      resolvesTo: {
+        type: 'UserAlreadyExists',
+        wahaha: 'ggg',
+      },
+    })
+  ),
+];
+
+const main = pipe(
+  behaviors,
+  mkTest({ hook: { beforeEach: task.of(task.of(42)) } }),
+  runVitest(vitest)
+);
+
+main();
