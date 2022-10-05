@@ -102,7 +102,7 @@ export interface Variant<
   readonly value: Value;
 }
 
-type ToTagged<TagKey extends string, Var> = Var extends Variant
+type ToTagged<TagKey extends string, Var extends Variant> = Var extends Variant
   ? TaggedVariant<TagKey, Var['tag'], Var['value']>
   : never;
 
