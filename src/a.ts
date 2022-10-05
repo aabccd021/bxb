@@ -4,9 +4,7 @@ type TaggedVariant<
   Value extends Record<string, unknown> = Record<string, unknown>
 > = {
   readonly [TK in TagKey]: Tag;
-} & {
-  readonly [VK in Exclude<keyof Value, TagKey>]: Value[VK];
-};
+} & Value;
 
 type AnyTaggedVariant<TagKey extends string> = TaggedVariant<TagKey>;
 
