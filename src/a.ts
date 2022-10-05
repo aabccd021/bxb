@@ -94,13 +94,13 @@ type Impl<TagKey extends string, Var extends TaggedVariant<TagKey>> = {
   >;
 };
 
-export interface Variant<
+export type Variant<
   Tag extends string = string,
   Value extends Record<string, unknown> = Record<string, unknown>
-> {
+> = {
   readonly tag: Tag;
   readonly value: Value;
-}
+};
 
 type ToTagged<TagKey extends string, Var extends Variant> = Var extends Variant
   ? TaggedVariant<TagKey, Var['tag'], Var['value']>
