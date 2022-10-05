@@ -4,7 +4,7 @@ import { behavior, expect, sequentially } from 'unit-test-ts';
 
 import { CreateUserAndSignInError } from './a';
 
-interface ServerG {
+type ServerG = {
   readonly client: {
     readonly auth: {
       readonly signIn: {
@@ -12,32 +12,32 @@ interface ServerG {
       };
     };
   };
-}
+};
 
-interface AuthClient<G extends ServerG> {
+type AuthClient<G extends ServerG> = {
   readonly signOut: T.Task<unknown>;
   readonly signIn: (
     mehod: G['client']['auth']['signIn']['method']
   ) => TE.TaskEither<CreateUserAndSignInError['Union'], unknown>;
-}
+};
 
 export const provider: CreateUserAndSignInError['Provider'] = CreateUserAndSignInError.Provider({
   value: 'g',
 });
 
-interface Client<G extends ServerG> {
+type Client<G extends ServerG> = {
   readonly auth: AuthClient<G>;
-}
+};
 
-interface Server<G extends ServerG> {
+type Server<G extends ServerG> = {
   readonly client: Client<G>;
-}
+};
 
 type MkServer<G extends ServerG> = T.Task<Server<G>>;
 
-interface TestMeta<G extends ServerG> {
+type TestMeta<G extends ServerG> = {
   readonly usernameToSignInMethod: (username: string) => G['client']['auth']['signIn']['method'];
-}
+};
 
 export const mkTests = <G extends ServerG>(mkServer: MkServer<G>, meta: TestMeta<G>) => [
   behavior(

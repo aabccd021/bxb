@@ -92,39 +92,29 @@ type Impl<TagKey extends string, Var extends AnyTaggedVariant<TagKey>> = {
   >;
 };
 
-export interface Variant<
+export type Variant<
   Tag extends string = string,
   Value extends Record<string, unknown> = Record<string, unknown>
-> {
+> = {
   readonly tag: Tag;
   readonly value: Value;
-}
+};
 
 type AnyVariant = Variant;
 
-type ToTaggedVariant<TagKey extends string, Var extends AnyVariant> = TaggedVariant<
-  TagKey,
-  Var['tag'],
-  Var['value']
->;
-
 type MkTagged<TagKey extends string, Var> = Var extends AnyVariant
-  ? ToTaggedVariant<TagKey, Var>
+  ? TaggedVariant<TagKey, Var['tag'], Var['value']>
   : never;
 
 export const impl =
   <TagKey extends string>(tagKey: TagKey) =>
-  <Var extends AnyVariant, TaggedVar extends MkTagged<TagKey, Var> = MkTagged<TagKey, Var>>(): Impl<
-    TagKey,
-    TaggedVar
-  > => {
+  <
+    UntaggedVar extends AnyVariant,
+    TaggedVar extends MkTagged<TagKey, UntaggedVar> = MkTagged<TagKey, UntaggedVar>
+  >(): Impl<TagKey, TaggedVar> => {
     return new Proxy({} as Impl<TagKey, TaggedVar>, {
-      get: <Tag extends keyof Impl<TagKey, TaggedVar>>(
-        _: Impl<TagKey, TaggedVar>,
-        tagName: Tag
-      ) => {
-        return constructor<TagKey, TaggedVar, Tag>(tagKey, tagName);
-      },
+      get: <Tag extends keyof Impl<TagKey, TaggedVar>>(_: Impl<TagKey, TaggedVar>, tagName: Tag) =>
+        constructor<TagKey, TaggedVar, Tag>(tagKey, tagName),
     });
   };
 

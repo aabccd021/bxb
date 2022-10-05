@@ -10,7 +10,7 @@ specifiers:
   c8: ^7.12.0
   dom-utils-ts: ^1.0.0
   eslint: ^8.24.0
-  eslint-config-aabccd021: ^1.2.1
+  eslint-config-aabccd021: ^1.2.2
   eslint-plugin-fp-ts: ^0.3.2
   eslint-plugin-functional: ^4.4.1
   eslint-plugin-only-warn: ^1.0.3
@@ -43,7 +43,7 @@ devDependencies:
   aabccd021-tsconfig: 1.0.2
   c8: 7.12.0
   eslint: 8.24.0
-  eslint-config-aabccd021: 1.2.1_eslint@8.24.0+typescript@4.8.4
+  eslint-config-aabccd021: 1.2.2_eslint@8.24.0+typescript@4.8.4
   eslint-plugin-fp-ts: 0.3.2_eslint@8.24.0+typescript@4.8.4
   eslint-plugin-functional: 4.4.1_eslint@8.24.0+typescript@4.8.4
   eslint-plugin-only-warn: 1.0.3
@@ -960,8 +960,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /eslint-config-aabccd021/1.2.1_eslint@8.24.0+typescript@4.8.4:
-    resolution: {integrity: sha512-Rvo9KRuPdkoejVK0r5RRrZ/1VPVeOFo7VFILlz9yP2reuBI7S1CGUHD5QFOfMUaQSiv71+F+vUSneViMJoG+3w==}
+  /eslint-config-aabccd021/1.2.2_eslint@8.24.0+typescript@4.8.4:
+    resolution: {integrity: sha512-8XX3ES6bJPYLWxNoet1APtxpHWTTV9PM+zUWPTvXZAlS7/W7yFNiEdW1dJkYU6kUyUTzMzyZTBl+1/4jaYS3eg==}
     peerDependencies:
       eslint: '>= 7'
     dependencies:
