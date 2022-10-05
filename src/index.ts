@@ -1,49 +1,48 @@
-import { ConstructorWithExtra, Impl, impl, Variant } from '@practical-fp/union-types';
 import { either, task as T, taskEither as TE } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 import { behavior, expect, sequentially } from 'unit-test-ts';
 
-const CreateUserAndSignIn = {
-  Error: impl<
-    | Variant<'Provider', { readonly value: string }>
-    | Variant<'UserAlreadyExists', { readonly wahaha: string }>
-  >(),
-  Method: impl<
-    | Variant<'EmailAndPassword', { readonly email: string; readonly password: string }>
-    | Variant<'Google'>
-  >(),
-};
+import { CreateUserAndSignInError } from './a';
 
-type TypeOf<A> = A extends Record<string, ConstructorWithExtra<string, unknown>>
-  ? { readonly [Z in keyof A]: TypeOf<A[Z]> }
-  : A extends ConstructorWithExtra<string, infer P>
-  ? P
-  : A extends Impl<infer P>
-  ? P
-  : never;
+interface ServerG {
+  readonly client: {
+    readonly auth: {
+      readonly signIn: {
+        readonly method: unknown;
+      };
+    };
+  };
+}
 
-type CreateUserAndSignInError = TypeOf<typeof CreateUserAndSignIn.Error>;
-
-type Prov = CreateUserAndSignInError['Provider'];
-
-type AuthClient = {
+interface AuthClient<G extends ServerG> {
   readonly signOut: T.Task<unknown>;
-  readonly createUserAndSignIn: (
-    mehod: TypeOf<typeof CreateUserAndSignIn.Method>
-  ) => TE.TaskEither<TypeOf<typeof CreateUserAndSignIn.Error>, unknown>;
+  readonly signIn: (
+    mehod: G['client']['auth']['signIn']['method']
+  ) => TE.TaskEither<CreateUserAndSignInError['Union'], unknown>;
+}
+
+export const provider: CreateUserAndSignInError['Provider'] = {
+  tag: 'Provider',
+  value: {
+    value: 'a',
+  },
 };
 
-type Client = {
-  readonly auth: AuthClient;
-};
+interface Client<G extends ServerG> {
+  readonly auth: AuthClient<G>;
+}
 
-type Server = {
-  readonly client: Client;
-};
+interface Server<G extends ServerG> {
+  readonly client: Client<G>;
+}
 
-type MkServer = T.Task<Server>;
+type MkServer<G extends ServerG> = T.Task<Server<G>>;
 
-export const mkTests = (mkServer: MkServer) => [
+interface TestMeta<G extends ServerG> {
+  readonly usernameToSignInMethod: (username: string) => G['client']['auth']['signIn']['method'];
+}
+
+export const mkTests = <G extends ServerG>(mkServer: MkServer<G>, testMeta: TestMeta<G>) => [
   behavior(
     'Server auth is indenendent between tests, different tests can create the same user',
     sequentially([
@@ -51,22 +50,9 @@ export const mkTests = (mkServer: MkServer) => [
         task: pipe(
           mkServer,
           T.map((server) => server.client.auth),
-          T.chainFirst((auth) =>
-            auth.createUserAndSignIn(
-              CreateUserAndSignIn.Method.EmailAndPassword({
-                email: 'a',
-                password: 'k',
-              })
-            )
-          ),
+          T.chainFirst((auth) => pipe('kira', testMeta.usernameToSignInMethod, auth.signIn)),
           T.chainFirst((auth) => auth.signOut),
-          T.chain((auth) =>
-            auth.createUserAndSignIn({
-              method: 'email_and_password',
-              email: 'kira@sakura.com',
-              password: 'masmott',
-            })
-          ),
+          T.chain((auth) => auth.signIn(testMeta.usernameToSignInMethod('kira'))),
           TE.mapLeft((error) => error.tag)
         ),
         resolvesTo: either.left('UserAlreadyExists' as const),
