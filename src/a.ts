@@ -167,10 +167,11 @@ type TypeOf<TagKey extends string, Var extends AnyVariant<TagKey>> = {
   readonly [Tag in Tags<TagKey, Var>]: Narrow<TagKey, Var, Tag>;
 };
 
-type CreateUserAndSignInErrorUnion =
-  | Variant<'type', 'Provider', { readonly value: string }>
+type CreateUserAndSignInErrorUnion<K> =
+  | Variant<'type', 'Provider', { readonly value: K }>
   | Variant<'type', 'UserAlreadyExists', { readonly wahaha: string }>;
 
-export const CreateUserAndSignInError = impl<'type', CreateUserAndSignInErrorUnion>('type');
+export const CreateUserAndSignInError = <K>() =>
+  impl<'type', CreateUserAndSignInErrorUnion<K>>('type');
 
-export type CreateUserAndSignInError = TypeOf<'type', CreateUserAndSignInErrorUnion>;
+export type CreateUserAndSignInError<K> = TypeOf<'type', CreateUserAndSignInErrorUnion<K>>;

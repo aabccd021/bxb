@@ -5,12 +5,13 @@ import * as vitest from 'vitest';
 
 import { CreateUserAndSignInError } from '../src/a';
 
-const yaaProvider: CreateUserAndSignInError['Provider'] = CreateUserAndSignInError.Provider({
-  value: 'yaa',
-});
+const yaaProvider: CreateUserAndSignInError<string>['Provider'] =
+  CreateUserAndSignInError<string>().Provider({
+    value: 'yaa',
+  });
 
-const barUserAlreadyExists: CreateUserAndSignInError['UserAlreadyExists'] =
-  CreateUserAndSignInError.UserAlreadyExists({
+const barUserAlreadyExists: CreateUserAndSignInError<string>['UserAlreadyExists'] =
+  CreateUserAndSignInError().UserAlreadyExists({
     wahaha: 'ggg',
   });
 
