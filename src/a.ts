@@ -110,12 +110,11 @@ export const impl =
   <
     UntaggedVar extends Variant,
     TaggedVar extends ToTagged<TagKey, UntaggedVar> = ToTagged<TagKey, UntaggedVar>
-  >(): Impl<TagKey, TaggedVar> => {
-    return new Proxy({} as Impl<TagKey, TaggedVar>, {
+  >(): Impl<TagKey, TaggedVar> =>
+    new Proxy({} as Impl<TagKey, TaggedVar>, {
       get: <Tag extends keyof Impl<TagKey, TaggedVar>>(_: Impl<TagKey, TaggedVar>, tagName: Tag) =>
         constructor<TagKey, TaggedVar, Tag>(tagKey, tagName),
     });
-  };
 
 export type TypeOf<I> = I extends Impl<infer TagKey, infer Var>
   ? {
