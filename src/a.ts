@@ -24,7 +24,7 @@ function tag<
   };
 }
 
-type NarrowTagged<
+type Narrow<
   TagKey extends string,
   Var extends AnyTaggedVariant<TagKey>,
   Tag extends TagsTagged<TagKey, Var>
@@ -34,7 +34,7 @@ function hasTag<
   TagKey extends string,
   Var extends AnyTaggedVariant<TagKey>,
   Tag extends TagsTagged<TagKey, Var>
->(tagKey: TagKey, variant: Var, _tag: Tag): variant is NarrowTagged<TagKey, Var, Tag> {
+>(tagKey: TagKey, variant: Var, _tag: Tag): variant is Narrow<TagKey, Var, Tag> {
   return variant[tagKey] === _tag;
 }
 
@@ -42,14 +42,14 @@ type Predicate<
   TagKey extends string,
   Var extends AnyTaggedVariant<TagKey>,
   Tag extends TagsTagged<TagKey, Var>
-> = (variant: Var) => variant is NarrowTagged<TagKey, Var, Tag>;
+> = (variant: Var) => variant is Narrow<TagKey, Var, Tag>;
 
 export function predicate<
   TagKey extends string,
   Var extends AnyTaggedVariant<TagKey>,
   Tag extends TagsTagged<TagKey, Var>
 >(tagKey: TagKey, _tag: Tag): Predicate<TagKey, Var, Tag> {
-  return (variant: Var): variant is NarrowTagged<TagKey, Var, Tag> => hasTag(tagKey, variant, _tag);
+  return (variant: Var): variant is Narrow<TagKey, Var, Tag> => hasTag(tagKey, variant, _tag);
 }
 
 type Values<TagKey extends string, Var extends AnyTaggedVariant<TagKey>> = Omit<Var, TagKey>;
@@ -71,8 +71,8 @@ function constructor<
 >(
   tagKey: TagKey,
   tagName: Tag
-): ConstructorWithExtra<TagKey, Var, Tag, Values<TagKey, NarrowTagged<TagKey, Var, Tag>>> {
-  function _constructor(value: Values<TagKey, NarrowTagged<TagKey, Var, Tag>>) {
+): ConstructorWithExtra<TagKey, Var, Tag, Values<TagKey, Narrow<TagKey, Var, Tag>>> {
+  function _constructor(value: Values<TagKey, Narrow<TagKey, Var, Tag>>) {
     return tag(tagKey, tagName, value);
   }
 
@@ -90,7 +90,7 @@ type Impl<TagKey extends string, Var extends AnyTaggedVariant<TagKey>> = {
     TagKey,
     Var,
     Tag,
-    Values<TagKey, NarrowTagged<TagKey, Var, Tag>>
+    Values<TagKey, Narrow<TagKey, Var, Tag>>
   >;
 };
 
@@ -104,19 +104,15 @@ export interface Variant<
 
 type AnyVariant = Variant;
 
-type Narrow<Var extends AnyVariant, Tag extends Var['tag']> = Extract<Var, Variant<Tag>>;
-
 type ToTaggedVariant<TagKey extends string, Var extends AnyVariant> = TaggedVariant<
   TagKey,
   Var['tag'],
   Var['value']
 >;
 
-type ValueOf<K> = K[keyof K];
-
-type MkTagged<TagKey extends string, Var extends AnyVariant> = ValueOf<{
-  readonly [Tag in Var['tag']]: ToTaggedVariant<TagKey, Narrow<Var, Tag>>;
-}>;
+type MkTagged<TagKey extends string, Var> = Var extends AnyVariant
+  ? ToTaggedVariant<TagKey, Var>
+  : never;
 
 export const impl =
   <TagKey extends string>(tagKey: TagKey) =>
@@ -138,8 +134,6 @@ export type TypeOf<I> = I extends Impl<infer TagKey, infer Var>
   ? {
       readonly Union: Var;
     } & {
-      readonly [Tag in TagsTagged<TagKey, Var>]: NarrowTagged<TagKey, Var, Tag>;
+      readonly [Tag in TagsTagged<TagKey, Var>]: Narrow<TagKey, Var, Tag>;
     }
   : never;
-
-
