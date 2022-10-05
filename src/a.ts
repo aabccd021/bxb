@@ -6,70 +6,72 @@ type TaggedVariant<
   readonly [TK in TagKey]: Tag;
 } & Value;
 
-type AnyTaggedVariant<TagKey extends string> = TaggedVariant<TagKey>;
+type Tags<TagKey extends string, Var extends TaggedVariant<TagKey>> = Var[TagKey];
 
-type TagsTagged<TagKey extends string, Var extends AnyTaggedVariant<TagKey>> = Var[TagKey];
-
-function tag<
+const tag = <
   TagKey extends string,
-  Var extends AnyTaggedVariant<TagKey>,
-  Tag extends TagsTagged<TagKey, Var>,
+  Var extends TaggedVariant<TagKey>,
+  Tag extends Tags<TagKey, Var>,
   Value extends Record<string, unknown>
->(tagKey: TagKey, _tag: Tag, value: Value): TaggedVariant<TagKey, Tag, Value> {
-  return {
-    ...value,
-    [tagKey]: _tag,
-  };
-}
+>(
+  tagKey: TagKey,
+  _tag: Tag,
+  value: Value
+): TaggedVariant<TagKey, Tag, Value> => ({
+  ...value,
+  [tagKey]: _tag,
+});
 
 type Narrow<
   TagKey extends string,
-  Var extends AnyTaggedVariant<TagKey>,
-  Tag extends TagsTagged<TagKey, Var>
+  Var extends TaggedVariant<TagKey>,
+  Tag extends Tags<TagKey, Var>
 > = Extract<Var, TaggedVariant<TagKey, Tag>>;
 
-function hasTag<
+const hasTag = <
   TagKey extends string,
-  Var extends AnyTaggedVariant<TagKey>,
-  Tag extends TagsTagged<TagKey, Var>
->(tagKey: TagKey, variant: Var, _tag: Tag): variant is Narrow<TagKey, Var, Tag> {
-  return variant[tagKey] === _tag;
-}
+  Var extends TaggedVariant<TagKey>,
+  Tag extends Tags<TagKey, Var>
+>(
+  tagKey: TagKey,
+  variant: Var,
+  _tag: Tag
+): variant is Narrow<TagKey, Var, Tag> => variant[tagKey] === _tag;
 
 type Predicate<
   TagKey extends string,
-  Var extends AnyTaggedVariant<TagKey>,
-  Tag extends TagsTagged<TagKey, Var>
+  Var extends TaggedVariant<TagKey>,
+  Tag extends Tags<TagKey, Var>
 > = (variant: Var) => variant is Narrow<TagKey, Var, Tag>;
 
-export function predicate<
-  TagKey extends string,
-  Var extends AnyTaggedVariant<TagKey>,
-  Tag extends TagsTagged<TagKey, Var>
->(tagKey: TagKey, _tag: Tag): Predicate<TagKey, Var, Tag> {
-  return (variant: Var): variant is Narrow<TagKey, Var, Tag> => hasTag(tagKey, variant, _tag);
-}
+export const predicate =
+  <TagKey extends string, Var extends TaggedVariant<TagKey>, Tag extends Tags<TagKey, Var>>(
+    tagKey: TagKey,
+    _tag: Tag
+  ): Predicate<TagKey, Var, Tag> =>
+  (variant: Var): variant is Narrow<TagKey, Var, Tag> =>
+    hasTag(tagKey, variant, _tag);
 
-type Values<TagKey extends string, Var extends AnyTaggedVariant<TagKey>> = Omit<Var, TagKey>;
+type Values<TagKey extends string, Var extends TaggedVariant<TagKey>> = Omit<Var, TagKey>;
 
 type ConstructorWithExtra<
   TagKey extends string,
-  Var extends AnyTaggedVariant<TagKey>,
-  Tag extends TagsTagged<TagKey, Var>,
+  Var extends TaggedVariant<TagKey>,
+  Tag extends Tags<TagKey, Var>,
   Value extends Record<string, unknown>
 > = (value: Value) => TaggedVariant<TagKey, Tag, Value> & {
   readonly tag: Tag;
   readonly is: Predicate<TagKey, Var, Tag>;
 };
 
-function constructor<
+const constructor = <
   TagKey extends string,
-  Var extends AnyTaggedVariant<TagKey>,
-  Tag extends TagsTagged<TagKey, Var>
+  Var extends TaggedVariant<TagKey>,
+  Tag extends Tags<TagKey, Var>
 >(
   tagKey: TagKey,
   tagName: Tag
-): ConstructorWithExtra<TagKey, Var, Tag, Values<TagKey, Narrow<TagKey, Var, Tag>>> {
+): ConstructorWithExtra<TagKey, Var, Tag, Values<TagKey, Narrow<TagKey, Var, Tag>>> => {
   function _constructor(value: Values<TagKey, Narrow<TagKey, Var, Tag>>) {
     return tag(tagKey, tagName, value);
   }
@@ -81,10 +83,10 @@ function constructor<
   _constructor.is = predicate(tagKey, tagName);
 
   return _constructor as any;
-}
+};
 
-type Impl<TagKey extends string, Var extends AnyTaggedVariant<TagKey>> = {
-  readonly [Tag in TagsTagged<TagKey, Var>]: ConstructorWithExtra<
+type Impl<TagKey extends string, Var extends TaggedVariant<TagKey>> = {
+  readonly [Tag in Tags<TagKey, Var>]: ConstructorWithExtra<
     TagKey,
     Var,
     Tag,
@@ -92,25 +94,23 @@ type Impl<TagKey extends string, Var extends AnyTaggedVariant<TagKey>> = {
   >;
 };
 
-export type Variant<
+export interface Variant<
   Tag extends string = string,
   Value extends Record<string, unknown> = Record<string, unknown>
-> = {
+> {
   readonly tag: Tag;
   readonly value: Value;
-};
+}
 
-type AnyVariant = Variant;
-
-type MkTagged<TagKey extends string, Var> = Var extends AnyVariant
+type ToTagged<TagKey extends string, Var> = Var extends Variant
   ? TaggedVariant<TagKey, Var['tag'], Var['value']>
   : never;
 
 export const impl =
   <TagKey extends string>(tagKey: TagKey) =>
   <
-    UntaggedVar extends AnyVariant,
-    TaggedVar extends MkTagged<TagKey, UntaggedVar> = MkTagged<TagKey, UntaggedVar>
+    UntaggedVar extends Variant,
+    TaggedVar extends ToTagged<TagKey, UntaggedVar> = ToTagged<TagKey, UntaggedVar>
   >(): Impl<TagKey, TaggedVar> => {
     return new Proxy({} as Impl<TagKey, TaggedVar>, {
       get: <Tag extends keyof Impl<TagKey, TaggedVar>>(_: Impl<TagKey, TaggedVar>, tagName: Tag) =>
@@ -122,6 +122,6 @@ export type TypeOf<I> = I extends Impl<infer TagKey, infer Var>
   ? {
       readonly Union: Var;
     } & {
-      readonly [Tag in TagsTagged<TagKey, Var>]: Narrow<TagKey, Var, Tag>;
+      readonly [Tag in Tags<TagKey, Var>]: Narrow<TagKey, Var, Tag>;
     }
   : never;
