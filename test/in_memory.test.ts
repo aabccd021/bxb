@@ -3,7 +3,16 @@ import { pipe } from 'fp-ts/function';
 import { behavior, expect, mkTest, runVitest } from 'unit-test-ts';
 import * as vitest from 'vitest';
 
-import { SignInError } from '../src/a';
+import { impl, predicate, TypeOf, Variant } from '../src/a';
+
+type SignInErrorUnion<K> =
+  | Variant<'Provider', { readonly value: K }>
+  | Variant<'UserAlreadyExists', { readonly wahaha: string }>;
+
+// eslint-disable-next-line functional/prefer-tacit
+const SignInError = <K>() => impl('type')<SignInErrorUnion<K>>();
+
+type SignInError<K> = TypeOf<ReturnType<typeof SignInError<K>>>;
 
 const NumberSignInError = SignInError<number>();
 
@@ -47,6 +56,24 @@ const behaviors = [
         type: 'UserAlreadyExists',
         wahaha: 'ggg',
       },
+    })
+  ),
+
+  behavior(
+    'zzz',
+    expect({
+      task: task.of(
+        [
+          NumberSignInError.Provider({ value: 99 }),
+          NumberSignInError.UserAlreadyExists({ wahaha: 'zzz' }),
+          NumberSignInError.Provider({ value: 42 }),
+          NumberSignInError.UserAlreadyExists({ wahaha: 'kkk' }),
+        ].filter(predicate('type', 'Provider'))
+      ),
+      resolvesTo: [
+        NumberSignInError.Provider({ value: 99 }),
+        NumberSignInError.Provider({ value: 42 }),
+      ],
     })
   ),
 ];
