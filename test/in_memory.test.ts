@@ -36,6 +36,13 @@ const barUserAlreadyExists: NumberSignInError['UserAlreadyExists'] =
     wahaha: 'ggg',
   });
 
+export const k: readonly NumberSignInError['Provider'][] = [
+  NumberSignInError.Provider({ value: 99 }),
+  NumberSignInError.UserAlreadyExists({ wahaha: 'zzz' }),
+  NumberSignInError.Provider({ value: 42 }),
+  NumberSignInError.UserAlreadyExists({ wahaha: 'kkk' }),
+].filter(predicate('type', 'Provider'));
+
 const behaviors = [
   behavior(
     'yyy',
