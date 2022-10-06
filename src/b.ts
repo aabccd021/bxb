@@ -1,7 +1,6 @@
 import { summonFor } from '@morphic-ts/batteries/lib/summoner-ESBST';
-import { AType, EType, makeTagged } from '@morphic-ts/summoners';
-import { InhabitedTypes } from '@morphic-ts/summoners/lib/utils';
 
+import { makeTagged, TypeOf } from './union';
 // Necessary to Specify the config environment (see Config Environment)
 const { summon } = summonFor({});
 
@@ -27,60 +26,28 @@ export const Humanoid = makeTagged(summon)('type')({
   ),
 });
 
-export type Z = typeof Humanoid;
+export type Humanoid = TypeOf<typeof Humanoid>;
 
-export type H = typeof Humanoid;
+export const x = Humanoid.Union.of.Robot({ manufacturer: '' });
+export const b = Humanoid.Person.eq;
+export const c = Humanoid.Robot.eq;
 
-export type Tags<X extends InhabitedTypes<any, any, any> & { readonly tag: string }> =
-  AType<X>[X['tag']];
+export type PersonH = Humanoid['Person'];
+export type RobotH = Humanoid['Robot'];
+export type UnionH = Humanoid['Union'];
 
-export type HTags = Tags<H>;
+export const r: Humanoid['Union'] = {
+  type: 'Robot',
+  manufacturer: 'k',
+};
 
-export type Humanoid<T extends Tags<H> = Tags<H>> = Extract<AType<H>, { readonly type: T }>;
+export const g: Humanoid['Robot'] = {
+  type: 'Robot',
+  manufacturer: 'k',
+};
 
-export type HPerson = Humanoid<'Person'>;
-
-export type HRobot = Humanoid<'Robot'>;
-
-export type HHumanoid = Humanoid;
-
-export type ZZ = Z['tag'];
-
-export type Humanoid2 = EType<typeof Humanoid>;
-
-const person = Humanoid.of.Person({ name: 'a', birthDate: 90 });
-
-export const robot = Humanoid.as.Robot({ manufacturer: 'nvidia' });
-
-const matchHumanoid = Humanoid.match(
-  {
-    Person: ({ name }) => name,
-  },
-  (_) => 'dunno'
-);
-
-export const personName: string = matchHumanoid(person);
-
-// type Bicycle = {
-//   readonly type: 'Bicycle';
-//   readonly color: string;
-// };
-//
-// type Motorbike = {
-//   readonly type: 'Motorbike';
-//   readonly seats: number;
-// };
-//
-// type Car = {
-//   readonly type: 'Car';
-//   readonly kind: 'electric' | 'fuel' | 'gaz';
-//   readonly power: number;
-//   readonly seats: number;
-// };
-//
-// // ADT<Car | Motorbike | Bicycle, "type">
-// const Vehicle = summon('type')({
-//   Car: ofType<Car>(),
-//   Motorbike: ofType<Motorbike>(),
-//   Bicycle: ofType<Bicycle>(),
-// });
+export const h: Humanoid['Person'] = {
+  type: 'Person',
+  name: 'k',
+  birthDate: 10,
+};
