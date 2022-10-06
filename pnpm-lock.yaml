@@ -20,6 +20,7 @@ specifiers:
   format-package: ^7.0.0
   fp-ts: ^2.12.3
   happy-dom: ^6.0.4
+  io-ts: ^2.2.18
   ioref-utils-ts: ^1.1.0
   pnpm: ^7.13.2
   prettier: ^2.7.1
@@ -33,6 +34,7 @@ dependencies:
   '@practical-fp/union-types': 1.5.1
   dom-utils-ts: 1.0.0
   fp-ts: 2.12.3
+  io-ts: 2.2.18_fp-ts@2.12.3
   ioref-utils-ts: 1.1.0
   unit-test-ts: 1.10.1
 
@@ -1528,6 +1530,14 @@ packages:
   /inherits/2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
     dev: true
+
+  /io-ts/2.2.18_fp-ts@2.12.3:
+    resolution: {integrity: sha512-3JxUUzRtPQPs5sOwB7pW0+Xb54nOzqA6M1sRB1hwgsRmkWMeGTjtOrCynGTJhIj+mBLUj2S37DAq2+BrPh9kTQ==}
+    peerDependencies:
+      fp-ts: ^2.5.0
+    dependencies:
+      fp-ts: 2.12.3
+    dev: false
 
   /ioref-utils-ts/1.1.0:
     resolution: {integrity: sha512-fvjDpCe4Pyj/RUnn+hOAo5vRXxL+v3SbjBTPX8CkxxXsL2yv5UEafnicKIBerSxELYl7Bsy0qgssXDXqU3MPgA==}

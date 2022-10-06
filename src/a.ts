@@ -1,3 +1,5 @@
+import * as t from 'io-ts';
+
 type TaggedVariant<
   TagKey extends string = string,
   Tag extends string = string,
@@ -123,3 +125,6 @@ export type TypeOf<I> = I extends Impl<infer TagKey, infer Var>
       readonly [Tag in Tags<TagKey, Var>]: Narrow<TagKey, Var, Tag>;
     }
   : never;
+
+
+

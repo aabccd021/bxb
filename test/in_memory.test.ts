@@ -1,9 +1,81 @@
-import { task } from 'fp-ts';
+import { json, readonlyRecord, task } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import * as t from 'io-ts';
 import { behavior, expect, mkTest, runVitest } from 'unit-test-ts';
 import * as vitest from 'vitest';
 
 import { impl, predicate, TypeOf, Variant } from '../src/a';
+
+type TagC<TagKey extends string, Tag extends string> = {
+  readonly [TK in TagKey]: t.LiteralC<Tag>;
+};
+
+type TaggedC<
+  TagKey extends string,
+  Tag extends string,
+  V extends t.TypeC<t.Props>
+  // eslint-disable-next-line functional/prefer-readonly-type
+> = t.IntersectionC<[t.TypeC<{ readonly [TK in TagKey]: t.LiteralC<Tag> }>, V]>;
+
+const AddTag = <TagKey extends string, Tag extends string, V extends t.TypeC<t.Props>>(
+  tagKey: TagKey,
+  tag: Tag,
+  v: V
+): TaggedC<TagKey, Tag, V> =>
+  t.intersection([
+    t.type({
+      [tagKey]: t.literal(tag),
+    } as TagC<TagKey, Tag>),
+    v,
+  ]);
+
+type TaggedRecordC<TagKey extends string, V extends Record<string, t.TypeC<t.Props>>> = {
+  readonly [K in keyof V]: K extends string ? TaggedC<TagKey, K, V[K]> : never;
+};
+
+const MapTag = <TagKey extends string, V extends Record<string, t.TypeC<t.Props>>>(
+  tagKey: TagKey,
+  vRec: V
+): TaggedRecordC<TagKey, V> =>
+  pipe(
+    vRec,
+    readonlyRecord.mapWithIndex((tag, v) => AddTag(tagKey, tag, v))
+  ) as TaggedRecordC<TagKey, V>;
+
+const VKCodec = MapTag('method', {
+  VV: t.type({
+    value: t.number,
+    yaa: t.string,
+  }),
+  KK: t.type({
+    bo: t.boolean,
+  }),
+});
+
+type BTypeOf<K extends Record<string, TaggedC<string, string, t.TypeC<t.Props>>>> = {
+  readonly [KK in keyof K]: t.TypeOf<K[KK]>;
+};
+
+export const vv: BTypeOf<typeof VKCodec>['VV'] = {
+  method: 'VV',
+  value: 12,
+  yaa: 'g',
+};
+
+const SignOutError = json.stringify({
+  Unknown: t.type({
+    value: t.number,
+    yaa: t.string,
+  }),
+  Provider: t.type({
+    value: t.string,
+  }),
+});
+
+export const a: t.TypeOf<typeof SignOutError> = {
+  type: 'Unknown',
+  value: 10,
+};
 
 type SignInErrorUnion<K> =
   | Variant<'Provider', { readonly value: K }>
