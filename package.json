@@ -55,6 +55,7 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "format-package": "^7.0.0",
     "happy-dom": "^6.0.4",
+    "pnpm": "^7.13.2",
     "prettier": "^2.7.1",
     "typescript": "^4.8.4",
     "typescript-language-server": "^1.2.0",
