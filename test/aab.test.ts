@@ -32,9 +32,3 @@ test('a', () =>
     type: 'Robot',
     manufacturer: 'a',
   }));
-
-test('b', () =>
-  expect(Humanoid.Union.as.Robot({ manufacturer: 'a' })).toStrictEqual({
-    type: 'Robot',
-    manufacturer: 'a',
-  }));
