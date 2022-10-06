@@ -1,6 +1,8 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@morphic-ts/batteries': ^3.0.0
+  '@morphic-ts/summoners': ^3.0.0
   '@practical-fp/union-types': ^1.5.1
   '@types/node': ^18.8.2
   '@typescript-eslint/eslint-plugin': ^5.39.0
@@ -31,6 +33,8 @@ specifiers:
   vitest: ^0.22.1
 
 dependencies:
+  '@morphic-ts/batteries': 3.0.0_xl56khjnf545xsq4ndxsnopzya
+  '@morphic-ts/summoners': 3.0.0_d46loab35ijvqnuyfrjxyf37we
   '@practical-fp/union-types': 1.5.1
   dom-utils-ts: 1.0.0
   fp-ts: 2.12.3
@@ -46,11 +50,11 @@ devDependencies:
   aabccd021-tsconfig: 1.0.2
   c8: 7.12.0
   eslint: 8.24.0
-  eslint-config-aabccd021: 1.2.2_nodwa37h27p77lkszlppasigpa
+  eslint-config-aabccd021: 1.2.2_d6orke5o2uub3kbxmdpvhnenj4
   eslint-plugin-fp-ts: 0.3.2_ypn2ylkkyfa5i233caldtndbqa
   eslint-plugin-functional: 4.4.1_ypn2ylkkyfa5i233caldtndbqa
   eslint-plugin-only-warn: 1.0.3
-  eslint-plugin-prettier: 4.2.1_uoqzb7ub56apwdxrwurswvvfwe
+  eslint-plugin-prettier: 4.2.1_cfn5x6ujhhgzv3423d6k7r2zzm
   eslint-plugin-simple-import-sort: 8.0.0_eslint@8.24.0
   eslint-plugin-unused-imports: 2.0.0_huv4zm33phu4g26wxzquk6xtfu
   format-package: 7.0.0_prettier@2.7.1
@@ -179,6 +183,194 @@ packages:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
+
+  /@morphic-ts/adt/3.0.0:
+    resolution: {integrity: sha512-6ci3vrN19sHBPKpyZc4qnHECqk59lxftm8h1NZLfECsHpcdM4l8mkKakZ5OQ6m90oKxZrIJqgZAzSr3hJ2hZ5g==}
+    dependencies:
+      fp-ts: 2.12.3
+      monocle-ts: 2.3.13_fp-ts@2.12.3
+    dev: false
+
+  /@morphic-ts/algebras/3.0.0:
+    resolution: {integrity: sha512-hPVproq3vAi/OqSGJmHi3oqVc9fDN/PODen+9diFBcy6j/rAwpaB/sjhBB0UbRaYxbLqjhGePxXImSjto9OoHA==}
+    dependencies:
+      '@morphic-ts/common': 3.0.0
+    dev: false
+
+  /@morphic-ts/batteries/3.0.0_xl56khjnf545xsq4ndxsnopzya:
+    resolution: {integrity: sha512-gFR+6aKRbcIUxXK/7JjnBjrM6RQqiw35StqgE2bzl3wxHrWvAeciDBAU9FcfeLIe0TcbtqyVeqcFTrF99RUJLw==}
+    peerDependencies:
+      fast-equals: ^2.0.0
+      fp-ts: ^2.5.3
+      io-ts: ^2.1.3
+      io-ts-types: ^0.5.6
+      monocle-ts: ^2.0.1
+      newtype-ts: ^0.3.3
+    dependencies:
+      '@morphic-ts/adt': 3.0.0
+      '@morphic-ts/algebras': 3.0.0
+      '@morphic-ts/common': 3.0.0
+      '@morphic-ts/eq-interpreters': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      '@morphic-ts/fastcheck-interpreters': 3.0.0_sx6xmxhqg3egtnjut57erqpnzy
+      '@morphic-ts/io-ts-interpreters': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      '@morphic-ts/json-schema-interpreters': 3.0.0_khvh3nszqorxvjwv6zhaq3wdz4
+      '@morphic-ts/model-algebras': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      '@morphic-ts/ord-interpreters': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      '@morphic-ts/show-interpreters': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      '@morphic-ts/summoners': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      fast-equals: 2.0.4
+      fp-ts: 2.12.3
+      io-ts: 2.2.18_fp-ts@2.12.3
+      io-ts-types: 0.5.17_dhmfpnscpd24jpxuuq6qk4imtu
+      monocle-ts: 2.3.13_fp-ts@2.12.3
+      newtype-ts: 0.3.5_x3dhd2jyfdvkp6zhnkjzhfb2vy
+    transitivePeerDependencies:
+      - fast-check
+      - fp-ts-contrib
+    dev: false
+
+  /@morphic-ts/common/3.0.0:
+    resolution: {integrity: sha512-X5473jHmD9pHCyrEvvgeMDnezKAWh6pl1doFmwEfiZZmCm0ZGrfVbnt7LbwWuFNDkBgKXIBj1R2ERRL0qQk9IQ==}
+    dev: false
+
+  /@morphic-ts/eq-interpreters/3.0.0_d46loab35ijvqnuyfrjxyf37we:
+    resolution: {integrity: sha512-fA/vkoAq60dvojLAZRdr6q1gu5FkxOgGHKY83JpN7PA25EMOjV+HYPYSfMlvqRtaDMYC+tPV1oLGKzc898RcvQ==}
+    peerDependencies:
+      fp-ts: ^2.5.3
+      io-ts: ^2.1.3
+      io-ts-types: ^0.5.6
+      newtype-ts: ^0.3.3
+    dependencies:
+      '@morphic-ts/algebras': 3.0.0
+      '@morphic-ts/common': 3.0.0
+      '@morphic-ts/model-algebras': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      fast-equals: 2.0.4
+      fp-ts: 2.12.3
+      io-ts: 2.2.18_fp-ts@2.12.3
+      io-ts-types: 0.5.17_dhmfpnscpd24jpxuuq6qk4imtu
+      newtype-ts: 0.3.5_x3dhd2jyfdvkp6zhnkjzhfb2vy
+    dev: false
+
+  /@morphic-ts/fastcheck-interpreters/3.0.0_sx6xmxhqg3egtnjut57erqpnzy:
+    resolution: {integrity: sha512-hdMC1h3yO3leOnboZzImJmoqNj/xyaXRPsOn1gKXCQHUWDRPMVcQO7rX7zDWLuArJuCYF2gCROvH8a6oMLCdhw==}
+    peerDependencies:
+      fast-check: ^2.6.0
+      fp-ts: ^2.5.3
+      io-ts: ^2.1.3
+      io-ts-types: ^0.5.6
+      newtype-ts: ^0.3.3
+    dependencies:
+      '@morphic-ts/algebras': 3.0.0
+      '@morphic-ts/common': 3.0.0
+      '@morphic-ts/model-algebras': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      fast-check: 2.25.0
+      fp-ts: 2.12.3
+      io-ts: 2.2.18_fp-ts@2.12.3
+      io-ts-types: 0.5.17_dhmfpnscpd24jpxuuq6qk4imtu
+      newtype-ts: 0.3.5_x3dhd2jyfdvkp6zhnkjzhfb2vy
+    dev: false
+
+  /@morphic-ts/io-ts-interpreters/3.0.0_d46loab35ijvqnuyfrjxyf37we:
+    resolution: {integrity: sha512-wkKQIlTpBWkrKEs5f+/8iJmCo1vW/aBKb85aW+/325gh676igY4qWYc9X9p59ElKh6UXwxI04dGiO5h2ECQoAg==}
+    peerDependencies:
+      io-ts: ^2.1.3
+      io-ts-types: ^0.5.6
+      newtype-ts: ^0.3.3
+    dependencies:
+      '@morphic-ts/algebras': 3.0.0
+      '@morphic-ts/common': 3.0.0
+      '@morphic-ts/model-algebras': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      io-ts: 2.2.18_fp-ts@2.12.3
+      io-ts-types: 0.5.17_dhmfpnscpd24jpxuuq6qk4imtu
+      newtype-ts: 0.3.5_x3dhd2jyfdvkp6zhnkjzhfb2vy
+    transitivePeerDependencies:
+      - fp-ts
+    dev: false
+
+  /@morphic-ts/json-schema-interpreters/3.0.0_khvh3nszqorxvjwv6zhaq3wdz4:
+    resolution: {integrity: sha512-KmQEn5uuCWnCkIl773bjOQFc9K3nQl+ur5rm32vCCwQDxGk0Q2MFHA5W5lvybfh6f3FGVLpzmCp6OT9qUC3lHw==}
+    peerDependencies:
+      fp-ts: ^2.5.3
+      fp-ts-contrib: ^0.1.12
+      io-ts: ^2.1.3
+      io-ts-types: ^0.5.6
+      newtype-ts: ^0.3.3
+    dependencies:
+      '@morphic-ts/algebras': 3.0.0
+      '@morphic-ts/common': 3.0.0
+      '@morphic-ts/model-algebras': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      fp-ts: 2.12.3
+      fp-ts-contrib: 0.1.29_fp-ts@2.12.3
+      io-ts: 2.2.18_fp-ts@2.12.3
+      io-ts-types: 0.5.17_dhmfpnscpd24jpxuuq6qk4imtu
+      newtype-ts: 0.3.5_x3dhd2jyfdvkp6zhnkjzhfb2vy
+    dev: false
+
+  /@morphic-ts/model-algebras/3.0.0_d46loab35ijvqnuyfrjxyf37we:
+    resolution: {integrity: sha512-1It0q+HfyDTeE0hGvKfjXiRWXnkg6hWudPlzn2b5AqFIZcuqW71jY0mlrua2AfaBRGXU4W7xLlDqIox0wrfPUw==}
+    peerDependencies:
+      fp-ts: ^2.5.3
+      io-ts: ^2.1.3
+      io-ts-types: ^0.5.6
+      newtype-ts: ^0.3.3
+    dependencies:
+      '@morphic-ts/algebras': 3.0.0
+      '@morphic-ts/common': 3.0.0
+      fp-ts: 2.12.3
+      io-ts: 2.2.18_fp-ts@2.12.3
+      io-ts-types: 0.5.17_dhmfpnscpd24jpxuuq6qk4imtu
+      newtype-ts: 0.3.5_x3dhd2jyfdvkp6zhnkjzhfb2vy
+    dev: false
+
+  /@morphic-ts/ord-interpreters/3.0.0_d46loab35ijvqnuyfrjxyf37we:
+    resolution: {integrity: sha512-lAwHRPZNbHtReqj7vkLD+1TmfZuA3jglqzNV4GANG7SlrH1VwmTgJkEs80Y1WY+mKpzEd3Tozzp41vK7mX494Q==}
+    peerDependencies:
+      fp-ts: ^2.5.3
+      io-ts: ^2.1.3
+      io-ts-types: ^0.5.6
+      newtype-ts: ^0.3.3
+    dependencies:
+      '@morphic-ts/algebras': 3.0.0
+      '@morphic-ts/common': 3.0.0
+      '@morphic-ts/model-algebras': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      fp-ts: 2.12.3
+      io-ts: 2.2.18_fp-ts@2.12.3
+      io-ts-types: 0.5.17_dhmfpnscpd24jpxuuq6qk4imtu
+      newtype-ts: 0.3.5_x3dhd2jyfdvkp6zhnkjzhfb2vy
+    dev: false
+
+  /@morphic-ts/show-interpreters/3.0.0_d46loab35ijvqnuyfrjxyf37we:
+    resolution: {integrity: sha512-W6Vs6AyrDKPMkF2Fwnw6fspx+xiAwRPOxuJ9U2gEeRAanA1izbscx6J+bZTA0MKTk0GiJH/B1B6mnJ5Z1lpdsA==}
+    peerDependencies:
+      fp-ts: ^2.5.3
+      io-ts: ^2.1.3
+      io-ts-types: ^0.5.6
+      newtype-ts: ^0.3.3
+    dependencies:
+      '@morphic-ts/algebras': 3.0.0
+      '@morphic-ts/common': 3.0.0
+      '@morphic-ts/model-algebras': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      fp-ts: 2.12.3
+      io-ts: 2.2.18_fp-ts@2.12.3
+      io-ts-types: 0.5.17_dhmfpnscpd24jpxuuq6qk4imtu
+      newtype-ts: 0.3.5_x3dhd2jyfdvkp6zhnkjzhfb2vy
+    dev: false
+
+  /@morphic-ts/summoners/3.0.0_d46loab35ijvqnuyfrjxyf37we:
+    resolution: {integrity: sha512-6F0IKdd/lD5UDkAcDJVRmx9S5UWlxttLWRaW3+s7ux8IGn+6WZ/EgcgYePfzytlqRwzDD+2wfEg3vNnTVJ2Bkw==}
+    peerDependencies:
+      fp-ts: ^2.5.3
+    dependencies:
+      '@morphic-ts/adt': 3.0.0
+      '@morphic-ts/algebras': 3.0.0
+      '@morphic-ts/common': 3.0.0
+      '@morphic-ts/model-algebras': 3.0.0_d46loab35ijvqnuyfrjxyf37we
+      fp-ts: 2.12.3
+    transitivePeerDependencies:
+      - io-ts
+      - io-ts-types
+      - newtype-ts
+    dev: false
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -964,11 +1156,12 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /eslint-config-aabccd021/1.2.2_nodwa37h27p77lkszlppasigpa:
+  /eslint-config-aabccd021/1.2.2_d6orke5o2uub3kbxmdpvhnenj4:
     resolution: {integrity: sha512-8XX3ES6bJPYLWxNoet1APtxpHWTTV9PM+zUWPTvXZAlS7/W7yFNiEdW1dJkYU6kUyUTzMzyZTBl+1/4jaYS3eg==}
     peerDependencies:
       '@typescript-eslint/eslint-plugin': ^5.36.1
       eslint: '>= 7'
+      eslint-config-prettier: ^8.5.0
       eslint-plugin-fp-ts: ^0.3.2
       eslint-plugin-functional: ^4.2.2
       eslint-plugin-only-warn: ^1.0.3
@@ -983,7 +1176,7 @@ packages:
       eslint-plugin-fp-ts: 0.3.2_ypn2ylkkyfa5i233caldtndbqa
       eslint-plugin-functional: 4.4.1_ypn2ylkkyfa5i233caldtndbqa
       eslint-plugin-only-warn: 1.0.3
-      eslint-plugin-prettier: 4.2.1_uoqzb7ub56apwdxrwurswvvfwe
+      eslint-plugin-prettier: 4.2.1_cfn5x6ujhhgzv3423d6k7r2zzm
       eslint-plugin-simple-import-sort: 8.0.0_eslint@8.24.0
       eslint-plugin-unused-imports: 2.0.0_huv4zm33phu4g26wxzquk6xtfu
       prettier: 2.7.1
@@ -1046,7 +1239,7 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /eslint-plugin-prettier/4.2.1_uoqzb7ub56apwdxrwurswvvfwe:
+  /eslint-plugin-prettier/4.2.1_cfn5x6ujhhgzv3423d6k7r2zzm:
     resolution: {integrity: sha512-f/0rXLXUt0oFYs8ra4w49wYZBG5GKZpAYsJSm6rnYL5uVDjd+zowwMwVZHnAjf4edNrKpCDYfXDgmRE/Ak7QyQ==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -1058,6 +1251,7 @@ packages:
         optional: true
     dependencies:
       eslint: 8.24.0
+      eslint-config-prettier: 8.5.0_eslint@8.24.0
       prettier: 2.7.1
       prettier-linter-helpers: 1.0.0
     dev: true
@@ -1218,6 +1412,13 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
+  /fast-check/2.25.0:
+    resolution: {integrity: sha512-wRUT2KD2lAmT75WNIJIHECawoUUMHM0I5jrlLXGtGeqmPL8jl/EldUDjY1VCp6fDY8yflyfUeIOsOBrIbIiArg==}
+    engines: {node: '>=8.0.0'}
+    dependencies:
+      pure-rand: 5.0.3
+    dev: false
+
   /fast-deep-equal/3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
     dev: true
@@ -1225,6 +1426,10 @@ packages:
   /fast-diff/1.2.0:
     resolution: {integrity: sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==}
     dev: true
+
+  /fast-equals/2.0.4:
+    resolution: {integrity: sha512-caj/ZmjHljPrZtbzJ3kfH5ia/k4mTJe/qSiXAGzxZWRZgsgDV0cvNaQULqUX8t0/JVlzzEdYOwCN5DmzTxoD4w==}
+    dev: false
 
   /fast-glob/3.2.12:
     resolution: {integrity: sha512-DVj4CQIYYow0BlaelwK1pHl5n5cRSJfM60UA0zK891sVInoPri2Ekj7+e1CT3/3qxXenpI+nBBmQAcJPJgaj4w==}
@@ -1328,6 +1533,14 @@ packages:
       sort-scripts: 1.0.1
       yargs: 17.6.0
     dev: true
+
+  /fp-ts-contrib/0.1.29_fp-ts@2.12.3:
+    resolution: {integrity: sha512-y+f+xlZqYgj2t+Alu/oat10UC491PByvH7XrT0ITc/DbDJK7LDJLShZJy2orjE7PlcJkO5niDenc1A/woyeB/Q==}
+    peerDependencies:
+      fp-ts: ^2.1.2
+    dependencies:
+      fp-ts: 2.12.3
+    dev: false
 
   /fp-ts/2.12.3:
     resolution: {integrity: sha512-8m0XvW8kZbfnJOA4NvSVXu95mLbPf4LQGwQyqVukIYS4KzSNJiyKSmuZUmbVHteUi6MGkAJGPb0goPZqI+Tsqg==}
@@ -1530,6 +1743,20 @@ packages:
   /inherits/2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
     dev: true
+
+  /io-ts-types/0.5.17_dhmfpnscpd24jpxuuq6qk4imtu:
+    resolution: {integrity: sha512-W0zrePsFWAyBdvHj4b/LU4HaHfDiKQ0DvSYDeE5hgXYaEtTEqcyNTLGRcFSa32lZAQFQzyQRDVtN+B7MyBaXAw==}
+    peerDependencies:
+      fp-ts: ^2.0.0
+      io-ts: ^2.0.0
+      monocle-ts: ^2.0.0
+      newtype-ts: ^0.3.2
+    dependencies:
+      fp-ts: 2.12.3
+      io-ts: 2.2.18_fp-ts@2.12.3
+      monocle-ts: 2.3.13_fp-ts@2.12.3
+      newtype-ts: 0.3.5_x3dhd2jyfdvkp6zhnkjzhfb2vy
+    dev: false
 
   /io-ts/2.2.18_fp-ts@2.12.3:
     resolution: {integrity: sha512-3JxUUzRtPQPs5sOwB7pW0+Xb54nOzqA6M1sRB1hwgsRmkWMeGTjtOrCynGTJhIj+mBLUj2S37DAq2+BrPh9kTQ==}
@@ -1744,6 +1971,14 @@ packages:
       brace-expansion: 1.1.11
     dev: true
 
+  /monocle-ts/2.3.13_fp-ts@2.12.3:
+    resolution: {integrity: sha512-D5Ygd3oulEoAm3KuGO0eeJIrhFf1jlQIoEVV2DYsZUMz42j4tGxgct97Aq68+F8w4w4geEnwFa8HayTS/7lpKQ==}
+    peerDependencies:
+      fp-ts: ^2.5.0
+    dependencies:
+      fp-ts: 2.12.3
+    dev: false
+
   /ms/2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
     dev: true
@@ -1757,6 +1992,16 @@ packages:
   /natural-compare/1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
+
+  /newtype-ts/0.3.5_x3dhd2jyfdvkp6zhnkjzhfb2vy:
+    resolution: {integrity: sha512-v83UEQMlVR75yf1OUdoSFssjitxzjZlqBAjiGQ4WJaML8Jdc68LJ+BaSAXUmKY4bNzp7hygkKLYTsDi14PxI2g==}
+    peerDependencies:
+      fp-ts: ^2.0.0
+      monocle-ts: ^2.0.0
+    dependencies:
+      fp-ts: 2.12.3
+      monocle-ts: 2.3.13_fp-ts@2.12.3
+    dev: false
 
   /node-fetch/2.6.7:
     resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
@@ -1940,6 +2185,10 @@ packages:
     resolution: {integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==}
     engines: {node: '>=6'}
     dev: true
+
+  /pure-rand/5.0.3:
+    resolution: {integrity: sha512-9N8x1h8dptBQpHyC7aZMS+iNOAm97WMGY0AFrguU1cpfW3I5jINkWe5BIY5md0ofy+1TCIELsVcm/GJXZSaPbw==}
+    dev: false
 
   /qs/6.11.0:
     resolution: {integrity: sha512-MvjoMCJwEarSbUYk5O+nmoSzSutSsTwF85zcHPQ9OrlFoZOYIjaqBAJIqIXjptyD5vThxGq52Xu/MaJzRkIk4Q==}

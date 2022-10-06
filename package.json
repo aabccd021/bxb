@@ -32,6 +32,8 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "@morphic-ts/batteries": "^3.0.0",
+    "@morphic-ts/summoners": "^3.0.0",
     "@practical-fp/union-types": "^1.5.1",
     "dom-utils-ts": "^1.0.0",
     "fp-ts": "^2.12.3",
