@@ -30,11 +30,11 @@ export type GetDownloadUrlParam = {
 
 export type Stack = {
   readonly admin: {
-    readonly deploy: (c: DeployConfig) => Task<void>;
+    readonly deploy: (c: DeployConfig) => Task<unknown>;
   };
   readonly client: {
     readonly storage: {
-      readonly upload: (p: UploadParam) => Task<void>;
+      readonly upload: (p: UploadParam) => Task<unknown>;
       readonly getDownloadUrl: (p: GetDownloadUrlParam) => TaskEither<GetDownloadUrlError, string>;
     };
   };
