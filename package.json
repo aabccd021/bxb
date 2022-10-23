@@ -1,68 +1,40 @@
 {
-  "name": "masmott",
-  "version": "0.0.0-semantic-release",
-  "main": "./dist/masmott.umd.js",
-  "exports": {
-    ".": {
-      "import": "./dist/masmott.mjs",
-      "require": "./dist/masmott.umd.js"
-    }
+  "devDependencies": {
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.3.8",
+    "eslint": "^8.25.0",
+    "nazna": "^1.13.5",
+    "pnpm": "^7.13.4",
+    "typescript": "^4.8.4",
+    "vitest": "^0.24.1"
   },
-  "module": "./dist/masmott.mjs",
+  "scripts": {
+    "build": "pnpm build:types && pnpm build:es6 && pnpm build:cjs && nazna build cli",
+    "build:cjs": "swc src --out-dir dist/cjs --source-maps --config module.type=commonjs",
+    "build:es6": "swc src --out-dir dist/es6 --source-maps",
+    "build:types": "tsc --project tsconfig.dist.json",
+    "fix": "eslint --max-warnings=0 --ext .ts . --fix",
+    "lint": "eslint --max-warnings=0 --ext .ts .",
+    "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
+    "pre-push:dirty": "CI=true pnpm install && pnpm build && pnpm lint",
+    "test": "vitest"
+  },
+  "name": "masmott",
+  "repository": "https://github.com/chimeraant/masmott",
+  "version": "0.0.0-semantic-release",
+  "license": "MIT",
+  "types": "./dist/types/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/es6/index.js",
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/es6/index.js"
+  },
   "files": [
     "dist"
   ],
-  "scripts": {
-    "build": "vite build && tsc --emitDeclarationOnly",
-    "fix": "format-package --write && eslint --max-warnings=0 --ext .ts . --fix",
-    "lint": "format-package --check && eslint --max-warnings=0 --ext .ts .",
-    "test": "vitest"
-  },
-  "eslintConfig": {
-    "extends": "aabccd021"
-  },
-  "release": {
-    "branches": "main",
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/npm",
-      "@semantic-release/github"
-    ]
-  },
-  "types": "./dist/index.d.ts",
+  "bin": "./dist/cli.js",
   "dependencies": {
-    "@morphic-ts/batteries": "^3.0.0",
-    "@morphic-ts/summoners": "^3.0.0",
-    "@practical-fp/union-types": "^1.5.1",
-    "dom-utils-ts": "^1.0.0",
-    "fp-ts": "^2.12.3",
-    "io-ts": "^2.2.18",
-    "ioref-utils-ts": "^1.1.0",
-    "unit-test-ts": "^1.10.1"
-  },
-  "devDependencies": {
-    "@types/node": "^18.8.2",
-    "@typescript-eslint/eslint-plugin": "^5.39.0",
-    "@typescript-eslint/parser": "^5.39.0",
-    "@vitest/coverage-c8": "^0.22.1",
-    "aabccd021-tsconfig": "^1.0.2",
-    "c8": "^7.12.0",
-    "eslint": "^8.24.0",
-    "eslint-config-aabccd021": "^1.2.2",
-    "eslint-plugin-fp-ts": "^0.3.2",
-    "eslint-plugin-functional": "^4.4.1",
-    "eslint-plugin-only-warn": "^1.0.3",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-simple-import-sort": "^8.0.0",
-    "eslint-plugin-unused-imports": "^2.0.0",
-    "format-package": "^7.0.0",
-    "happy-dom": "^6.0.4",
-    "pnpm": "^7.13.2",
-    "prettier": "^2.7.1",
-    "typescript": "^4.8.4",
-    "typescript-language-server": "^1.2.0",
-    "vite": "^3.1.4",
-    "vitest": "^0.22.1"
+    "fp-ts": "^2.13.1"
   }
 }
