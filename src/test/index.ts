@@ -6,7 +6,7 @@ import { MkStack } from '../type';
 
 export const runTests = (mkStack: MkStack) =>
   describe('storage is independent between tests', () => {
-    test('a server can upload file kira', () => {
+    test('a server can upload file kira', async () => {
       const result = pipe(
         T.Do,
         T.bind('stack', () => mkStack),
@@ -19,10 +19,10 @@ export const runTests = (mkStack: MkStack) =>
         T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
         T.map(E.isRight)
       );
-      expect(result()).resolves.toEqual(true);
+      expect(await result()).toEqual(true);
     });
 
-    test('server from another test can not access file kira', () => {
+    test('server from another test can not access file kira', async () => {
       const result = pipe(
         T.Do,
         T.bind('stack', () => mkStack),
@@ -31,6 +31,6 @@ export const runTests = (mkStack: MkStack) =>
         ),
         T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
       );
-      expect(result()).resolves.toEqual(E.right({ code: 'not-found' }));
+      expect(await result()).toEqual(E.right({ code: 'not-found' }));
     });
   });
