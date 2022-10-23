@@ -20,7 +20,7 @@
     "test": "vitest"
   },
   "name": "masmott",
-  "repository": "https://github.com/chimeraant/masmott",
+  "repository": "https://github.com/aabccd021/masmott",
   "version": "0.0.0-semantic-release",
   "license": "MIT",
   "types": "./dist/types/index.d.ts",
