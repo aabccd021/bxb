@@ -31,6 +31,6 @@ export const runTests = (mkStack: MkStack) =>
         ),
         T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
       );
-      expect(await result()).toEqual(E.right({ code: 'not-found' }));
+      expect(await result()).toEqual(E.left({ code: 'not-found' }));
     });
   });
