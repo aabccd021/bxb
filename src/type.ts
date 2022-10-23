@@ -1,11 +1,16 @@
 import { Task } from 'fp-ts/Task';
 import { TaskEither } from 'fp-ts/TaskEither';
 
-type GetDownloadUrlError = {
-  readonly code: 'not-found';
-};
+export type GetDownloadUrlError =
+  | {
+      readonly code: 'not-found';
+    }
+  | {
+      readonly code: 'unknown';
+      readonly value: unknown;
+    };
 
-type DeployConfig = {
+export type DeployConfig = {
   readonly storage?: {
     readonly securityRule?: {
       readonly type?: 'allowAll';
@@ -13,18 +18,24 @@ type DeployConfig = {
   };
 };
 
-type Stack = {
+export type UploadParam = {
+  readonly key: string;
+  readonly file: string;
+  readonly format: 'base64';
+};
+
+export type GetDownloadUrlParam = {
+  readonly key: string;
+};
+
+export type Stack = {
   readonly admin: {
     readonly deploy: (c: DeployConfig) => Task<void>;
   };
   readonly client: {
     readonly storage: {
-      readonly upload: (p: {
-        readonly key: string;
-        readonly file: string;
-        readonly format: 'base64';
-      }) => Task<void>;
-      readonly getDownloadUrl: (key: string) => TaskEither<GetDownloadUrlError, string>;
+      readonly upload: (p: UploadParam) => Task<void>;
+      readonly getDownloadUrl: (p: GetDownloadUrlParam) => TaskEither<GetDownloadUrlError, string>;
     };
   };
 };

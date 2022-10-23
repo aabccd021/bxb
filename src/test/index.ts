@@ -16,7 +16,7 @@ export const runTests = (mkStack: MkStack) =>
         T.chainFirst(({ stack }) =>
           stack.client.storage.upload({ key: 'kira_key', file: 'kira_content', format: 'base64' })
         ),
-        T.chain(({ stack }) => stack.client.storage.getDownloadUrl('kira_key')),
+        T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
         T.map(E.isRight)
       );
       expect(result()).resolves.toEqual(true);
@@ -29,7 +29,7 @@ export const runTests = (mkStack: MkStack) =>
         T.chainFirst(({ stack }) =>
           stack.admin.deploy({ storage: { securityRule: { type: 'allowAll' } } })
         ),
-        T.chain(({ stack }) => stack.client.storage.getDownloadUrl('kira_key'))
+        T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
       );
       expect(result()).resolves.toEqual(E.right({ code: 'not-found' }));
     });
