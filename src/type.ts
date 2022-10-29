@@ -40,7 +40,9 @@ export type Stack = {
   readonly client: {
     readonly storage: {
       readonly upload: (p: UploadParam) => Task<unknown>;
-      readonly getDownloadUrl: (p: GetDownloadUrlParam) => TaskEither<GetDownloadUrlError, string>;
+      readonly getDownloadUrl: (
+        p: GetDownloadUrlParam
+      ) => TaskEither<GetDownloadUrlError['Union'], string>;
     };
   };
 };
