@@ -2,7 +2,7 @@ import { either as E, task as T } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 import { describe, expect, test } from 'vitest';
 
-import { MkStack } from '../type';
+import { GetDownloadUrlError, MkStack } from '../type';
 
 export const runTests = (mkStack: MkStack) =>
   describe('storage is independent between tests', () => {
@@ -31,6 +31,6 @@ export const runTests = (mkStack: MkStack) =>
         ),
         T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
       );
-      expect(await result()).toEqual(E.left({ code: 'not-found' }));
+      expect(await result()).toEqual(E.left(GetDownloadUrlError.Union.as.NotFound({})));
     });
   });
