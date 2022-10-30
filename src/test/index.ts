@@ -42,14 +42,16 @@ export const independencyTests = (mkStack: MkStack) => {
         T.bind('stack', () => mkStack),
         T.chainFirst(({ stack }) => stack.admin.deploy.db({ securityRule: { type: 'allowAll' } })),
         T.chainFirst(({ stack }) =>
-          stack.client.db.setDoc({ key: { collection: 'user', id: 'kira_id' }, data: 'kira_data' })
+          stack.client.db.setDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
         ),
         T.chain(({ stack }) =>
           stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
-        ),
-        T.map(E.isRight)
+        )
       );
-      expect(await result()).toEqual(true);
+      expect(await result()).toEqual(E.right({ name: 'masumoto' }));
     });
 
     test('server from another test can not access document kira', async () => {

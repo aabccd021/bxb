@@ -1,5 +1,6 @@
 import { summonFor, UM } from '@morphic-ts/batteries/es6/summoner-ESBST';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
+import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import { Task } from 'fp-ts/Task';
 import { TaskEither } from 'fp-ts/TaskEither';
 import { makeUnion, TypeOf } from 'make-union-morphic-ts';
@@ -75,9 +76,11 @@ export type DocKey = {
   readonly id: string;
 };
 
+export type DocData = ReadonlyRecord<string, unknown>;
+
 export type CreateDocParam = {
   readonly key: DocKey;
-  readonly data: unknown;
+  readonly data: DocData;
 };
 
 export type GetDownloadUrlParam = {
@@ -104,7 +107,7 @@ export type Stack = {
     };
     readonly db: {
       readonly setDoc: (p: CreateDocParam) => Task<unknown>;
-      readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], unknown>;
+      readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
     };
   };
 };
