@@ -52,16 +52,15 @@ export const GetDocError = makeUnion(summon)('code')({
 
 export type GetDocError = TypeOf<typeof GetDocError>;
 
-export type DeployConfig = {
-  readonly storage?: {
-    readonly securityRule?: {
-      readonly type?: 'allowAll';
-    };
+export type StorageDeployConfig = {
+  readonly securityRule?: {
+    readonly type?: 'allowAll';
   };
-  readonly db?: {
-    readonly securityRule?: {
-      readonly type?: 'allowAll';
-    };
+};
+
+export type DbDeployConfig = {
+  readonly securityRule?: {
+    readonly type?: 'allowAll';
   };
 };
 
@@ -91,7 +90,10 @@ export type GetDocParam = {
 
 export type Stack = {
   readonly admin: {
-    readonly deploy: (c: DeployConfig) => Task<unknown>;
+    readonly deploy: {
+      readonly storage: (c: StorageDeployConfig) => Task<unknown>;
+      readonly db: (c: DbDeployConfig) => Task<unknown>;
+    };
   };
   readonly client: {
     readonly storage: {
@@ -101,8 +103,8 @@ export type Stack = {
       ) => TaskEither<GetDownloadUrlError['Union'], string>;
     };
     readonly db: {
-      readonly create: (p: CreateDocParam) => Task<unknown>;
-      readonly get: (p: GetDocParam) => TaskEither<GetDownloadUrlError['Union'], string>;
+      readonly setDoc: (p: CreateDocParam) => Task<unknown>;
+      readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], unknown>;
     };
   };
 };

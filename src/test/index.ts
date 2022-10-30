@@ -11,7 +11,7 @@ export const independencyTests = (mkStack: MkStack) => {
         T.Do,
         T.bind('stack', () => mkStack),
         T.chainFirst(({ stack }) =>
-          stack.admin.deploy({ storage: { securityRule: { type: 'allowAll' } } })
+          stack.admin.deploy.storage({ securityRule: { type: 'allowAll' } })
         ),
         T.chainFirst(({ stack }) =>
           stack.client.storage.upload({ key: 'kira_key', file: 'kira_content', format: 'base64' })
@@ -27,7 +27,7 @@ export const independencyTests = (mkStack: MkStack) => {
         T.Do,
         T.bind('stack', () => mkStack),
         T.chainFirst(({ stack }) =>
-          stack.admin.deploy({ storage: { securityRule: { type: 'allowAll' } } })
+          stack.admin.deploy.storage({ securityRule: { type: 'allowAll' } })
         ),
         T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
       );
@@ -40,13 +40,13 @@ export const independencyTests = (mkStack: MkStack) => {
       const result = pipe(
         T.Do,
         T.bind('stack', () => mkStack),
+        T.chainFirst(({ stack }) => stack.admin.deploy.db({ securityRule: { type: 'allowAll' } })),
         T.chainFirst(({ stack }) =>
-          stack.admin.deploy({ db: { securityRule: { type: 'allowAll' } } })
+          stack.client.db.setDoc({ key: { collection: 'user', id: 'kira_id' }, data: 'kira_data' })
         ),
-        T.chainFirst(({ stack }) =>
-          stack.client.db.create({ key: { collection: 'user', id: 'kira_id' }, data: 'kira_data' })
+        T.chain(({ stack }) =>
+          stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
         ),
-        T.chain(({ stack }) => stack.client.db.get({ key: { collection: 'user', id: 'kira_id' } })),
         T.map(E.isRight)
       );
       expect(await result()).toEqual(true);
@@ -56,10 +56,10 @@ export const independencyTests = (mkStack: MkStack) => {
       const result = pipe(
         T.Do,
         T.bind('stack', () => mkStack),
-        T.chainFirst(({ stack }) =>
-          stack.admin.deploy({ db: { securityRule: { type: 'allowAll' } } })
-        ),
-        T.chain(({ stack }) => stack.client.db.get({ key: { collection: 'user', id: 'kira_id' } }))
+        T.chainFirst(({ stack }) => stack.admin.deploy.db({ securityRule: { type: 'allowAll' } })),
+        T.chain(({ stack }) =>
+          stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
+        )
       );
       expect(await result()).toEqual(E.left(GetDocError.Union.as.DocNotFound({})));
     });
