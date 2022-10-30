@@ -3,7 +3,7 @@
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.3.8",
     "eslint": "^8.25.0",
-    "nazna": "^1.13.11",
+    "nazna": "^1.13.12",
     "pnpm": "^7.13.4",
     "typescript": "^4.8.4",
     "vitest": "^0.24.1"
@@ -16,8 +16,8 @@
     "fix": "eslint --max-warnings=0 --ext .ts . --fix",
     "lint": "eslint --max-warnings=0 --ext .ts .",
     "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
-    "pre-push:dirty": "CI=true pnpm install && pnpm build && pnpm lint && pnpm test",
-    "test": "vitest"
+    "pre-push:dirty": "CI=true pnpm install && nazna fix && pnpm build && pnpm lint && pnpm test",
+    "test": "echo donothing"
   },
   "name": "masmott",
   "repository": "https://github.com/aabccd021/masmott",
