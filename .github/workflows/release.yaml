@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: chimeraant/dev@v1.3.2
+      - uses: chimeraant/dev@v1.3.3
 
       - name: Build es6
         run: pnpm build:es6
