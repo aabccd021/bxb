@@ -11,20 +11,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Prepare Dependencies
-        uses: chimeraant/dev@v1.3.1
+
+      - uses: chimeraant/dev@v1.3.2
+
       - name: Build es6
         run: pnpm build:es6
+
       - name: Build cjs
         run: pnpm build:cjs
+
       - name: Build types
         run: pnpm build:types
+
       - name: Build cli
         run: pnpm nazna build cli
+
       - name: Lint
         run: pnpm lint
+
       - name: Test
         run: pnpm test
+
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
