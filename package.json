@@ -1,15 +1,18 @@
 {
   "devDependencies": {
+    "@playwright/test": "^1.27.1",
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.3.8",
     "eslint": "^8.25.0",
     "nazna": "^1.13.19",
     "pnpm": "^7.13.4",
     "semantic-release": "^19.0.5",
+    "serve": "^14.1.1",
     "typescript": "^4.8.4",
     "vitest": "^0.24.1"
   },
   "scripts": {
+    "start": "serve .",
     "build": "pnpm build:es6 && pnpm build:cjs && pnpm build:types && nazna build cli",
     "build:cjs": "swc src --out-dir dist/cjs --source-maps --config module.type=commonjs",
     "build:es6": "swc src --out-dir dist/es6 --source-maps",
@@ -17,8 +20,8 @@
     "fix": "eslint --max-warnings=0 --ext .ts . --fix",
     "lint": "eslint --max-warnings=0 --ext .ts .",
     "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
-    "pre-push:dirty": "CI=true pnpm install && nazna fix && pnpm build && pnpm lint && pnpm test",
-    "test": "echo donothing"
+    "pre-push:dirty": "CI=true pnpm install && pnpm build && pnpm lint && pnpm test",
+    "test": "playwright test"
   },
   "name": "masmott",
   "repository": "https://github.com/aabccd021/masmott",

@@ -12,9 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Prepare Dependencies
-        uses: chimeraant/dev@v1.2.89
-      - name: Nazna fix
-        run: pnpm nazna fix
+        uses: chimeraant/dev@v1.3.1
       - name: Build es6
         run: pnpm build:es6
       - name: Build cjs
