@@ -12,15 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - run : https://raw.githubusercontent.com/cachix/install-nix-action/master/install-nix.sh
-        shell: bash
-        env:
-          INPUT_INSTALL_URL:
-          INPUT_INSTALL_OPTIONS:
-          INPUT_NIX_PATH:
-          INPUT_EXTRA_NIX_CONFIG:
-
-      - uses: chimeraant/dev@v1.3.3
+      - uses: chimeraant/dev@v1.3.0
 
       - name: Build es6
         run: pnpm build:es6
