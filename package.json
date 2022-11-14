@@ -21,7 +21,7 @@
     "fix": "eslint --max-warnings=0 --ext .ts . --fix",
     "lint": "eslint --max-warnings=0 --ext .ts .",
     "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
-    "pre-push:dirty": "CI=true pnpm install && pnpm build && pnpm lint && pnpm test",
+    "pre-push:dirty": "pnpm install && pnpm build && pnpm lint && pnpm test",
     "start": "serve .",
     "start:codegen": "start-test 3000 codegen",
     "test": "playwright test"
