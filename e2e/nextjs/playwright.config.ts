@@ -2,7 +2,6 @@ import type { PlaywrightTestConfig } from '@playwright/test';
 import { devices } from '@playwright/test';
 
 const config: PlaywrightTestConfig = {
-  testDir: './e2e',
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   workers: process.env['CI'] ? '100%' : undefined,
@@ -14,7 +13,7 @@ const config: PlaywrightTestConfig = {
     },
   ],
   webServer: {
-    command: 'pnpm start',
+    command: 'pnpm build && pnpm start',
     port: 3000,
   },
 };
