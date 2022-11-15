@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "codegen": "playwright codegen localhost:3000 --color-scheme dark",
+    "codegen": "playwright codegen --color-scheme dark localhost:3000",
     "start:codegen": "start-test 3000 codegen",
     "test": "playwright test"
   },

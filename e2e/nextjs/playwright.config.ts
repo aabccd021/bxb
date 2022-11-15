@@ -13,7 +13,7 @@ const config: PlaywrightTestConfig = {
     },
   ],
   webServer: {
-    command: 'pnpm start',
+    command: 'pnpm dev',
     port: 3000,
   },
 };
