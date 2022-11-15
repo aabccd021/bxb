@@ -3,7 +3,7 @@
 /* eslint-disable functional/no-return-void */
 export const signIn = () => {
   console.log(window.location);
-  const url = new URL(`${window.location.origin}/public/SignIn`);
+  const url = new URL(`${window.location.origin}/__masmott__/signIn`);
   url.searchParams.append('redirectUrl', window.location.href);
   window.location.href = url.toString();
 };

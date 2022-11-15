@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<form id="main-form">
+  <label>
+    <input id="email-input" type="text">
+    <span id="email-label">Email</span>
+  </label>
+
+  <button id="sign-in" type="submit">
+    Sign in
+  </button>
+</form>
+
+<script type="module">
+  const query = new URLSearchParams(location.search);
+  const redirectUrl = query.get('redirectUrl');
+  document.getElementById('sign-in').addEventListener('click', function (e) {
+    e.preventDefault();
+    window.location = redirectUrl;
+  });
+</script>
