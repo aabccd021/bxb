@@ -38,7 +38,8 @@
     "import": "./dist/es6/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "public"
   ],
   "bin": "./dist/cli.js",
   "dependencies": {
