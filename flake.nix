@@ -16,6 +16,7 @@
         export PLAYWRIGHT_BROWSERS_PATH=${playwright.browsers-chromium}
         export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
         pnpm install 
+        (cd e2e/nextjs && pnpm install)
       '';
     };
   };
