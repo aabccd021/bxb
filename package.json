@@ -20,6 +20,7 @@
     "pre-push:dirty": "pnpm install && pnpm build && pnpm lint && pnpm test",
     "test": "cd e2e/nextjs && pnpm test"
   },
+  "sideEffects": false,
   "name": "masmott",
   "repository": "https://github.com/aabccd021/masmott",
   "version": "0.0.0-semantic-release",
