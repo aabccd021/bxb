@@ -20,6 +20,7 @@
     "pre-push:dirty": "pnpm install && pnpm build && pnpm lint && pnpm test",
     "e2e:build-test": "cd e2e/nextjs && pnpm build && pnpm test",
     "e2e:test": "cd e2e/nextjs && pnpm test",
+    "e2e:build": "cd e2e/nextjs && pnpm build",
     "test": "pnpm e2e:build-test"
   },
   "sideEffects": false,

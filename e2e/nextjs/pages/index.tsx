@@ -1,6 +1,7 @@
 /* eslint-disable functional/no-return-void */
-import { signIn } from 'masmott/dist/es6/mock';
+
+import { masmott } from '../services';
 
 export default function Home() {
-  return <button onClick={() => signIn()}>Sign In</button>;
+  return <button onClick={() => masmott.signIn()}>Sign In</button>;
 }
