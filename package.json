@@ -17,7 +17,7 @@
     "build:cjs": "swc src --out-dir dist/cjs --source-maps --config module.type=commonjs",
     "build:es6": "swc src --out-dir dist/es6 --source-maps",
     "build:types": "tsc --project tsconfig.dist.json",
-    "codegen": "playwright codegen localhost:3000",
+    "codegen": "playwright codegen localhost:3000 --color-scheme dark",
     "fix": "eslint --max-warnings=0 --ext .ts . --fix",
     "lint": "eslint --max-warnings=0 --ext .ts .",
     "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
