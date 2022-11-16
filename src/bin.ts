@@ -1,3 +1,6 @@
+/* eslint-disable functional/no-return-void */
+/* eslint-disable functional/no-expression-statement */
+/* eslint-disable functional/no-conditional-statement */
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -18,7 +21,6 @@ const packageJson = `{
   "sideEffects": false
 }`;
 
-
 const methods = ['signIn'];
 
 const provider = 'provider';
@@ -28,7 +30,7 @@ if (!fs.existsSync('masmott')) {
 }
 
 if (!fs.existsSync('public/masmott')) {
-  fs.mkdirSync('public/masmott', {recursive: true});
+  fs.mkdirSync('public/masmott', { recursive: true });
 }
 
 fs.writeFileSync('masmott/index.ts', idx);
@@ -37,4 +39,7 @@ fs.writeFileSync('masmott/package.json', packageJson);
 
 methods.forEach((method) => fs.writeFileSync(`masmott/${method}.ts`, methodStr(method, provider)));
 
-fs.copyFileSync(path.join(__dirname, '..', '..', 'public', 'signIn.html'), 'public/masmott/signIn.html')
+fs.copyFileSync(
+  path.join(__dirname, '..', '..', 'public', 'signIn.html'),
+  'public/masmott/signIn.html'
+);
