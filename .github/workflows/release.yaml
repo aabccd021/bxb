@@ -12,13 +12,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - run : bash <(curl -sfL https://raw.githubusercontent.com/cachix/install-nix-action/master/install-nix.sh)
-        env:
-          INPUT_INSTALL_URL:
-          INPUT_INSTALL_OPTIONS:
-          INPUT_NIX_PATH:
-          INPUT_EXTRA_NIX_CONFIG:
-
       - uses: chimeraant/dev@v1.3.3
 
       - name: Build es6
