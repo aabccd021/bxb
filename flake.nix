@@ -15,10 +15,7 @@
       shellHook = ''
         export PLAYWRIGHT_BROWSERS_PATH=${playwright.browsers-chromium}
         export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
-        npm_dirs=$(git ls-files | grep pnpm-lock.yaml)
-        for npm_dir in $npm_dirs; do
-          pnpm install --dir $(dirname "$npm_dir")
-        done
+        for npm_dir in $(git ls-files | grep pnpm-lock.yaml); do pnpm install --dir $(dirname "$npm_dir"); done
       '';
     };
   };
