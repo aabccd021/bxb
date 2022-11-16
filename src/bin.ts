@@ -1,6 +1,8 @@
+/* eslint-disable functional/no-throw-statement */
 /* eslint-disable functional/no-return-void */
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/no-conditional-statement */
+import { pipe } from 'fp-ts/function';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -23,7 +25,23 @@ const packageJson = `{
 
 const methods = ['signIn'];
 
-const provider = 'provider';
+const dependencies = pipe(
+  fs.readFileSync('package.json', { encoding: 'utf8' }),
+  JSON.parse,
+  (a) => a.dependencies
+);
+
+if (typeof dependencies !== 'object') {
+  throw Error('');
+}
+
+const provider = Object.keys(dependencies)
+  .filter((dep) => dep.startsWith('masmott-'))[0]
+  ?.replace('masmott-', '');
+
+if (provider === undefined) {
+  throw Error('');
+}
 
 if (!fs.existsSync('masmott')) {
   fs.mkdirSync('masmott');
