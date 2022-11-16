@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 export const methodStr = (method: string, provider: string) => `
 import * as mock from 'masmott/dist/es6/mock';
@@ -26,8 +27,14 @@ if (!fs.existsSync('masmott')) {
   fs.mkdirSync('masmott');
 }
 
+if (!fs.existsSync('public/masmott')) {
+  fs.mkdirSync('public/masmott', {recursive: true});
+}
+
 fs.writeFileSync('masmott/index.ts', idx);
 fs.writeFileSync('masmott/masmott.ts', masmott(methods));
 fs.writeFileSync('masmott/package.json', packageJson);
 
 methods.forEach((method) => fs.writeFileSync(`masmott/${method}.ts`, methodStr(method, provider)));
+
+fs.copyFileSync(path.join(__dirname, '..', '..', 'public', 'signIn.html'), 'public/masmott/signIn.html')
