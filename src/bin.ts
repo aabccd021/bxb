@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export const methodStr = (method: string, provider: string) => `
-import * as mock from 'masmott/dist/es6/mock';
+import { mock } from 'masmott/dist/es6/mock';
 import * as impl from 'masmott-${provider}';
 
 export const ${method} =
