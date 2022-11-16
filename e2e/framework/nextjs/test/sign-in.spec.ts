@@ -13,6 +13,8 @@ test('test', async ({ page }) => {
 
   await expect(page).toHaveURL('/');
   await expect(page.locator('#auth-status')).toHaveText('email : aab');
+  await page.reload();
+  await expect(page.locator('#auth-status')).toHaveText('email : aab');
 
   await page.getByRole('button', { name: 'Sign Out' }).click();
   await expect(page.locator('#auth-status')).toHaveText('not signed in');
