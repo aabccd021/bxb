@@ -33,7 +33,7 @@
     "./dist/es6/mock": {
       "import": "./dist/es6/mock.js"
     },
-    "./dist/es6/next": {
+    "./dist/cjs/next": {
       "require": "./dist/cjs/next.js"
     }
   },
