@@ -1,3 +1,4 @@
+/* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/no-return-void */
 
 import { useEffect, useState } from 'react';
@@ -10,7 +11,7 @@ export default function Home() {
   return (
     <div>
       <button onClick={() => masmott.signIn()}>Sign In</button>;
-      <p>{auth !== undefined ? `email : ${auth}` : 'not signed in'}</p>
+      <p id="auth-status">{auth !== undefined ? `email : ${auth}` : 'not signed in'}</p>
     </div>
   );
 }
