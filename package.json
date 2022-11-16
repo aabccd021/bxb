@@ -18,7 +18,9 @@
     "lint": "eslint --max-warnings=0 --ext .ts .",
     "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
     "pre-push:dirty": "pnpm install && pnpm build && pnpm lint && pnpm test",
-    "test": "cd e2e/nextjs && pnpm install && pnpm test"
+    "build:foo": "cd e2e/provider && pnpm install && tsc",
+    "test:nextjs": "cd e2e/nextjs && pnpm install && pnpm generate && pnpm test",
+    "test": "pnpm build:foo && pnpm test:nextjs"
   },
   "sideEffects": false,
   "name": "masmott",
@@ -41,7 +43,7 @@
     "dist",
     "public"
   ],
-  "bin": "./dist/cli.js",
+  "bin": "./dist/cjs/bin.js",
   "dependencies": {
     "@morphic-ts/batteries": "^3.0.0",
     "@morphic-ts/summoners": "^3.0.0",

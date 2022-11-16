@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "generate": "masmott",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -18,6 +19,7 @@
     "eslint": "8.27.0",
     "eslint-config-next": "13.0.3",
     "masmott": "link:../..",
+    "masmott-provider": "link:../provider",
     "next": "13.0.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
