@@ -23,7 +23,7 @@ const packageJson = `{
   "sideEffects": false
 }`;
 
-const methods = ['signIn'];
+const methods = ['signIn', 'onAuthStateChanged'];
 
 const dependencies = pipe(
   fs.readFileSync('package.json', { encoding: 'utf8' }),

@@ -1,5 +1,6 @@
 import { summonFor, UM } from '@morphic-ts/batteries/es6/summoner-ESBST';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
+import { io } from 'fp-ts';
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import { Task } from 'fp-ts/Task';
 import { TaskEither } from 'fp-ts/TaskEither';
@@ -32,6 +33,8 @@ export const Condition: UM<{}, Condition> = summon((F) =>
     'ConditionRec'
   )
 );
+
+export type Unsubscribe = io.IO<void>;
 
 export const GetDownloadUrlError = makeUnion(summon)('code')({
   FileNotFound: summon((F) =>

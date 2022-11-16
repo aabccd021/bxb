@@ -16,6 +16,8 @@
   const redirectUrl = query.get('redirectUrl');
   document.getElementById('sign-in').addEventListener('click', function (e) {
     e.preventDefault();
+    var email = document.getElementById('email-input').value;
+    localStorage.setItem('auth', email)
     window.location = redirectUrl;
   });
 </script>
