@@ -32,6 +32,9 @@
     },
     "./dist/es6/mock": {
       "import": "./dist/es6/mock.js"
+    },
+    "./dist/es6/next": {
+      "require": "./dist/cjs/next.js"
     }
   },
   "files": [
@@ -43,6 +46,7 @@
     "@morphic-ts/batteries": "^3.0.0",
     "@morphic-ts/summoners": "^3.0.0",
     "fp-ts": "^2.13.1",
-    "make-union-morphic-ts": "^1.0.7"
+    "make-union-morphic-ts": "^1.0.7",
+    "next": "^13.0.3"
   }
 }

@@ -1,13 +1,8 @@
+const {withMasmott} = require('masmott/dist/es6/next')
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig = ({
   reactStrictMode: true,
   swcMinify: true,
-  rewrites: async () => [
-    {
-      source: '/__masmott__/signIn',
-      destination: '/masmott/signIn.html'
-  }
-  ],
-}
+})
 
-module.exports = nextConfig
+module.exports = withMasmott(nextConfig)
