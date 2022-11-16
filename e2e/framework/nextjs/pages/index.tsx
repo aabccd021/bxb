@@ -11,6 +11,7 @@ export default function Home() {
   return (
     <div>
       <button onClick={() => masmott.signIn()}>Sign In</button>;
+      <button onClick={() => masmott.signOut()}>Sign Out</button>;
       <p id="auth-status">{auth !== undefined ? `email : ${auth}` : 'not signed in'}</p>
     </div>
   );
