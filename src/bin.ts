@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export const methodStr = (method: string, provider: string) => `
-import { mock } from 'masmott/dist/es6/mock';
+import * as mock from 'masmott/dist/es6/mock';
 import * as impl from 'masmott-${provider}';
 
 export const ${method} =
@@ -23,7 +23,7 @@ const packageJson = `{
   "sideEffects": false
 }`;
 
-const methods = ['signIn', 'onAuthStateChanged'];
+const methods = ['signIn', 'onAuthStateChanged', 'signOut'];
 
 const dependencies = pipe(
   fs.readFileSync('package.json', { encoding: 'utf8' }),
