@@ -15,9 +15,10 @@
       shellHook = ''
         export PLAYWRIGHT_BROWSERS_PATH=${playwright.browsers-chromium}
         export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
-        pnpm install 
-        (cd e2e/nextjs && pnpm install)
-        (cd e2e/provider && pnpm install)
+        npm_dirs=$(git ls-files | grep pnpm-lock.yaml)
+        for npm_dir in $npm_dirs; do
+          pnpm install --dir $(dirname "$npm_dir")
+        done
       '';
     };
   };
