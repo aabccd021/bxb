@@ -1,9 +1,9 @@
 {
-  "name": "masmott-provider",
+  "name": "masmott-foo",
   "main": "index.js",
   "types": "index.d.js",
   "dependencies": {
-    "masmott": "link:../.."
+    "masmott": "link:../../.."
   },
   "devDependencies": {
     "typescript": "^4.9.3"

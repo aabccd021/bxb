@@ -1,11 +1,11 @@
 lockfileVersion: 5.4
 
 specifiers:
-  masmott: link:../..
+  masmott: link:../../..
   typescript: ^4.9.3
 
 dependencies:
-  masmott: link:../..
+  masmott: link:../../..
 
 devDependencies:
   typescript: 4.9.3
