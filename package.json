@@ -36,7 +36,7 @@
     "./dist/es6/browser": {
       "import": "./dist/es6/browser.js"
     },
-    "./dist/cjs/next": {
+    "./next": {
       "require": "./dist/cjs/next.js"
     }
   },
