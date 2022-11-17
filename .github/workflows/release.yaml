@@ -9,28 +9,37 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - uses: chimeraant/dev@v1.3.3
 
-      - name: Build es6
-        run: pnpm build:es6
+      - run: pnpm build:es6
 
-      - name: Build cjs
-        run: pnpm build:cjs
+      - run: pnpm build:cjs
 
-      - name: Build types
-        run: pnpm build:types
+      - run: pnpm build:types
 
-      - name: Build cli
-        run: pnpm nazna build cli
+      - run: pnpm nazna build cli
 
-      - name: Lint
-        run: pnpm lint
+      - run: pnpm lint
 
-      - name: Test
-        run: pnpm test
+      - run: pnpm install
+        working-directory: e2e/provider/foo
+
+      - run: pnpm build
+        working-directory: e2e/provider/foo
+
+      - run: pnpm install
+        working-directory: e2e/framework/nextjs
+
+      - run: pnpm generate
+        working-directory: e2e/framework/nextjs
+
+      - run: pnpm build
+        working-directory: e2e/framework/nextjs
+
+      - run: pnpm test
+        working-directory: e2e/framework/nextjs
 
       - name: Release
         env:
