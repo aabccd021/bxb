@@ -1,3 +1,3 @@
-export const signIn = () => undefined;
+export const signInWithRedirect = () => undefined;
 
 export const onAuthStateChanged = () => () => undefined;

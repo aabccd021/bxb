@@ -5,8 +5,8 @@ const rewrites = (phase: string) =>
   phase === PHASE_DEVELOPMENT_SERVER
     ? [
         {
-          source: '/__masmott__/signIn',
-          destination: '/masmott/signIn.html',
+          source: '/__masmott__/signInWithRedirect',
+          destination: '/masmott/signInWithRedirect.html',
         },
       ]
     : [];
