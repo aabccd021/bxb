@@ -10,7 +10,7 @@ import { masmott } from '../masmott';
 
 export default function Home() {
   const [auth, setAuth] = useState<Option<string>>(option.none);
-  useEffect(masmott.onAuthStateChanged((a) => () => setAuth(a)), []);
+  useEffect(() => masmott.onAuthStateChanged((a) => () => setAuth(a))(), [setAuth]);
   return (
     <div>
       <button onClick={() => masmott.signInGoogleWithRedirect()}>Sign In With Redirect</button>;
