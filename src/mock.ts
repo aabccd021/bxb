@@ -24,4 +24,5 @@ export const onAuthStateChanged = (callback: Callback): Unsubscribe => {
 
 export const signOut = () => {
   onAuthStateChangedCallback?.(undefined);
+  localStorage.removeItem('auth');
 };
