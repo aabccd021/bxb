@@ -19,8 +19,6 @@ jobs:
 
       - run: pnpm build:types
 
-      - run: pnpm nazna build cli
-
       - run: pnpm lint
 
       - run: pnpm install

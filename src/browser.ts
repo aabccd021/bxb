@@ -15,8 +15,8 @@ const fpLocalStorage = (ls: LocalStorage): FPLocalStorage => ({
 });
 
 const ls: LocalStorage = {
-  getItem: (key) => localStorage.getItem(key),
+  getItem: (browserStack) => localStorage.getItem(browserStack),
   removeItem: (key) => localStorage.removeItem(key),
 };
 
-export const stack = mkStack(fpLocalStorage(ls))();
+export const browserStack = mkStack(fpLocalStorage(ls))();
