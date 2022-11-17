@@ -1,12 +1,8 @@
 {
   "name": "masmott-foo",
+  "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist && tsc"
-  },
-  "exports": {
-    ".": {
-      "require": "./dist/index.js"
-    }
   },
   "dependencies": {
     "masmott": "link:../../.."

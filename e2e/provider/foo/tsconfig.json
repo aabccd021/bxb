@@ -2,8 +2,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "declaration": true,
-    "skipLibCheck": true,
-    "moduleResolution": "node16"
+    "skipLibCheck": true
   },
   "include": [
     "src"

@@ -1,4 +1,4 @@
-const {withMasmott} = require('masmott/next')
+const {withMasmott} = require('masmott/dist/cjs/next')
 /** @type {import('next').NextConfig} */
 const nextConfig = ({
   reactStrictMode: true,

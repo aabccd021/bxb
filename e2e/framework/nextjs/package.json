@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "rm -rf .next && next dev",
+    "dev": "next dev",
     "generate": "masmott",
-    "build": "rm -rf .next && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "codegen": "playwright codegen --color-scheme dark localhost:3000",
