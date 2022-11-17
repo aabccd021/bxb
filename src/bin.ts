@@ -7,11 +7,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export const methodStr = (method: string, provider: string) => `
-import * as mock from 'masmott/dist/es6/mock';
-import * as impl from 'masmott-${provider}';
+import {stack as mockStack} from 'masmott/dist/es6/browser';
+import {stack as providerStack} from 'masmott-${provider}';
 
 export const ${method} =
-  process.env.NODE_ENV === 'production' ? impl.${method} : mock.${method};
+  process.env.NODE_ENV === 'production' ? providerStack.${method} : mockStack.${method};
 `;
 
 const idx = `export * as masmott from './masmott'`;
@@ -23,7 +23,7 @@ const packageJson = `{
   "sideEffects": false
 }`;
 
-const methods = ['signInWithRedirect', 'onAuthStateChanged', 'signOut'];
+const methods = ['signInGoogleWithRedirect', 'onAuthStateChanged', 'signOut'];
 
 const dependencies = pipe(
   fs.readFileSync('package.json', { encoding: 'utf8' }),
@@ -43,19 +43,17 @@ if (provider === undefined) {
   throw Error('');
 }
 
-if (!fs.existsSync('masmott')) {
-  fs.mkdirSync('masmott');
-}
-
-if (!fs.existsSync('public/masmott')) {
-  fs.mkdirSync('public/masmott', { recursive: true });
-}
+fs.rmSync('masmott', { force: true, recursive: true });
+fs.mkdirSync('masmott');
 
 fs.writeFileSync('masmott/index.ts', idx);
 fs.writeFileSync('masmott/masmott.ts', masmott(methods));
 fs.writeFileSync('masmott/package.json', packageJson);
 
 methods.forEach((method) => fs.writeFileSync(`masmott/${method}.ts`, methodStr(method, provider)));
+
+fs.rmSync('public/masmott', { force: true, recursive: true });
+fs.mkdirSync('public/masmott', { recursive: true });
 
 fs.copyFileSync(
   path.join(__dirname, '..', '..', 'public', 'signInWithRedirect.html'),

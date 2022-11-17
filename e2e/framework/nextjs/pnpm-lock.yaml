@@ -7,6 +7,7 @@ specifiers:
   '@types/react-dom': 18.0.9
   eslint: 8.27.0
   eslint-config-next: 13.0.3
+  fp-ts: ^2.13.1
   masmott: link:../../..
   masmott-foo: link:../../provider/foo
   next: 13.0.3
@@ -21,6 +22,7 @@ dependencies:
   '@types/react-dom': 18.0.9
   eslint: 8.27.0
   eslint-config-next: 13.0.3_rmayb2veg2btbq6mbmnyivgasy
+  fp-ts: 2.13.1
   masmott: link:../../..
   masmott-foo: link:../../provider/foo
   next: 13.0.3_biqbaboplfbrettd7655fr4n2y
@@ -1077,6 +1079,10 @@ packages:
         optional: true
     dependencies:
       debug: 4.3.2
+    dev: false
+
+  /fp-ts/2.13.1:
+    resolution: {integrity: sha512-0eu5ULPS2c/jsa1lGFneEFFEdTbembJv8e4QKXeVJ3lm/5hyve06dlKZrpxmMwJt6rYen7sxmHHK2CLaXvWuWQ==}
     dev: false
 
   /from/0.1.7:
