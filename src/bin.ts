@@ -7,11 +7,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export const methodStr = (method: string, provider: string) => `
-import {browserStack} from 'masmott/browser';
+import {stack as mockStack} from 'masmott/dist/es6/browser';
 import {stack as providerStack} from 'masmott-${provider}';
 
 export const ${method} =
-  process.env.NODE_ENV === 'production' ? providerStack.${method} : browserStack.${method};
+  process.env.NODE_ENV === 'production' ? providerStack.${method} : mockStack.${method};
 `;
 
 const idx = `export * as masmott from './masmott'`;
