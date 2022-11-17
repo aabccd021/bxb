@@ -33,13 +33,6 @@
       "require": "./dist/cjs/index.js",
       "import": "./dist/es6/index.js"
     },
-    "./dist/cjs/type": {
-      "require": "./dist/cjs/type.js",
-      "import": "./dist/es6/type.js"
-    },
-    "./dist/es6/mock": {
-      "import": "./dist/es6/mock.js"
-    },
     "./dist/es6/browser": {
       "import": "./dist/es6/browser.js"
     },
