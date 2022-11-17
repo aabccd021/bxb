@@ -1,9 +1,10 @@
 import { Unsubscribe } from './type';
+/* eslint-disable functional/no-let */
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/immutable-data */
 /* eslint-disable functional/no-return-void */
-export const signIn = () => {
-  const url = new URL(`${window.location.origin}/__masmott__/signIn`);
+export const signInWithRedirect = () => {
+  const url = new URL(`${window.location.origin}/__masmott__/signInWithRedirect`);
   url.searchParams.append('redirectUrl', window.location.href);
   window.location.href = url.toString();
 };

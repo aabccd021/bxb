@@ -6,7 +6,9 @@ test('test', async ({ page }) => {
 
   await expect(page.locator('#auth-status')).toHaveText('not signed in');
   await page.getByRole('button', { name: 'Sign In' }).click();
-  await expect(page).toHaveURL('/__masmott__/signIn?redirectUrl=http%3A%2F%2Flocalhost%3A3000%2F');
+  await expect(page).toHaveURL(
+    '/__masmott__/signInWithRedirect?redirectUrl=http%3A%2F%2Flocalhost%3A3000%2F'
+  );
 
   await page.getByLabel('Email').fill('aab');
   await page.getByRole('button', { name: 'Sign in' }).click();

@@ -23,7 +23,7 @@ const packageJson = `{
   "sideEffects": false
 }`;
 
-const methods = ['signIn', 'onAuthStateChanged', 'signOut'];
+const methods = ['signInWithRedirect', 'onAuthStateChanged', 'signOut'];
 
 const dependencies = pipe(
   fs.readFileSync('package.json', { encoding: 'utf8' }),
@@ -58,6 +58,6 @@ fs.writeFileSync('masmott/package.json', packageJson);
 methods.forEach((method) => fs.writeFileSync(`masmott/${method}.ts`, methodStr(method, provider)));
 
 fs.copyFileSync(
-  path.join(__dirname, '..', '..', 'public', 'signIn.html'),
-  'public/masmott/signIn.html'
+  path.join(__dirname, '..', '..', 'public', 'signInWithRedirect.html'),
+  'public/masmott/signInWithRedirect.html'
 );
