@@ -1,6 +1,8 @@
 import { summonFor, UM } from '@morphic-ts/batteries/es6/summoner-ESBST';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
-import { io } from 'fp-ts';
+import { IO } from 'fp-ts/IO';
+import { IOOption } from 'fp-ts/IOOption';
+import { Option } from 'fp-ts/Option';
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import { Task } from 'fp-ts/Task';
 import { TaskEither } from 'fp-ts/TaskEither';
@@ -34,7 +36,7 @@ export const Condition: UM<{}, Condition> = summon((F) =>
   )
 );
 
-export type Unsubscribe = io.IO<void>;
+export type Unsubscribe = IO<void>;
 
 export const GetDownloadUrlError = makeUnion(summon)('code')({
   FileNotFound: summon((F) =>
@@ -94,25 +96,25 @@ export type GetDocParam = {
   readonly key: DocKey;
 };
 
+export type OnAuthStateChangedCallback = (user: Option<string>) => IO<void>;
+
 export type Stack = {
-  readonly admin: {
-    readonly deploy: {
-      readonly storage: (c: StorageDeployConfig) => Task<unknown>;
-      readonly db: (c: DbDeployConfig) => Task<unknown>;
-    };
-  };
-  readonly client: {
-    readonly storage: {
-      readonly upload: (p: UploadParam) => Task<unknown>;
-      readonly getDownloadUrl: (
-        p: GetDownloadUrlParam
-      ) => TaskEither<GetDownloadUrlError['Union'], string>;
-    };
-    readonly db: {
-      readonly setDoc: (p: CreateDocParam) => Task<unknown>;
-      readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
-    };
-  };
+  readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
+  readonly deployDb: (c: DbDeployConfig) => Task<unknown>;
+  readonly clientStorageUpload: (p: UploadParam) => Task<unknown>;
+  readonly clientStorageGetDownloadUrl: (
+    p: GetDownloadUrlParam
+  ) => TaskEither<GetDownloadUrlError['Union'], string>;
+  readonly clientDbSetDoc: (p: CreateDocParam) => Task<unknown>;
+  readonly clientDbGetDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
+  readonly signInGoogleWithRedirect: IO<void>;
+  readonly onAuthStateChanged: (callback: OnAuthStateChangedCallback) => IO<Unsubscribe>;
+  readonly signOut: IO<void>;
 };
 
-export type MkStack = Task<Stack>;
+export type MkStack = IO<Stack>;
+
+export type FPLocalStorage = {
+  readonly getItem: (key: string) => IOOption<string>;
+  readonly removeItem: (key: string) => IO<void>;
+};

@@ -1,7 +1,9 @@
 {
   "name": "masmott-foo",
-  "main": "index.js",
-  "types": "index.d.js",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
   "dependencies": {
     "masmott": "link:../../.."
   },
