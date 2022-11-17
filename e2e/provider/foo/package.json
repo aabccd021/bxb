@@ -2,7 +2,7 @@
   "name": "masmott-foo",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "rm -rf dist && tsc"
   },
   "dependencies": {
     "masmott": "link:../../.."
