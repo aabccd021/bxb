@@ -10,7 +10,7 @@ export default function Home() {
   useEffect(() => masmott.onAuthStateChanged((a) => setAuth(a)), []);
   return (
     <div>
-      <button onClick={() => masmott.signInWithRedirect()}>Sign In</button>;
+      <button onClick={() => masmott.signInWithRedirect()}>Sign In With Redirect</button>;
       <button onClick={() => masmott.signOut()}>Sign Out</button>;
       <p id="auth-status">{auth !== undefined ? `email : ${auth}` : 'not signed in'}</p>
     </div>
