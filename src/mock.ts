@@ -4,7 +4,6 @@ import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 
 import { FPLocalStorage, OnAuthStateChangedCallback, Stack } from './type';
-/* eslint-disable functional/no-let */
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/immutable-data */
 /* eslint-disable functional/no-return-void */
@@ -15,23 +14,6 @@ const signInWithRedirect = () => {
 };
 
 export const signInGoogleWithRedirect: IO<void> = signInWithRedirect;
-
-// export const onAuthStateChanged = (callback: OnAuthStateChangedCallback): Unsubscribe => {
-//   const user = localStorage.getItem('auth') ?? undefined;
-//   callback(user);
-//   onAuthStateChangedCallback = callback;
-//   return () => {
-//     onAuthStateChangedCallback = undefined;
-//   };
-// };
-//
-// export const signOut = () => {
-//   onAuthStateChangedCallback?.(undefined);
-//   localStorage.removeItem('auth');
-// };
-//
-//
-//
 
 export const mkStack = (
   ls: FPLocalStorage
