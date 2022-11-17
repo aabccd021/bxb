@@ -27,7 +27,7 @@ test('user go back to original url after sign in with redirect', async ({ page }
   await expect(page).toHaveURL('/');
 });
 
-test('user state is signed in after sign in and after reloaded', async ({ page }) => {
+test('user state is signed in after sign in', async ({ page }) => {
   await page.goto('/');
 
   await page.getByRole('button', { name: 'Sign In' }).click();
@@ -36,11 +36,21 @@ test('user state is signed in after sign in and after reloaded', async ({ page }
   await page.getByRole('button', { name: 'Sign in' }).click();
 
   await expect(page.locator('#auth-status')).toHaveText('email : masumoto');
+});
+
+test('user state is signed in after sign in and reload', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByRole('button', { name: 'Sign In' }).click();
+
+  await page.getByLabel('Email').fill('masumoto');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+
   await page.reload();
   await expect(page.locator('#auth-status')).toHaveText('email : masumoto');
 });
 
-test('user stats is signed out after sign out and after reloaded', async ({ page }) => {
+test('user stats is signed out after sign out', async ({ page }) => {
   await page.goto('/');
 
   await page.getByRole('button', { name: 'Sign In' }).click();
@@ -50,6 +60,17 @@ test('user stats is signed out after sign out and after reloaded', async ({ page
 
   await page.getByRole('button', { name: 'Sign Out' }).click();
   await expect(page.locator('#auth-status')).toHaveText('not signed in');
+});
+
+test('user stats is signed out after sign out and reload', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByRole('button', { name: 'Sign In' }).click();
+
+  await page.getByLabel('Email').fill('kira');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+
+  await page.getByRole('button', { name: 'Sign Out' }).click();
   await page.reload();
   await expect(page.locator('#auth-status')).toHaveText('not signed in');
 });
