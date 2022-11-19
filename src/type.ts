@@ -118,3 +118,5 @@ export type FPLocalStorage = {
   readonly getItem: (key: string) => IOOption<string>;
   readonly removeItem: (key: string) => IO<void>;
 };
+
+export type LocalStorage = Pick<typeof localStorage, 'getItem' | 'removeItem'>;
