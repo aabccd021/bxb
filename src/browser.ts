@@ -4,7 +4,7 @@
 
 import { option } from 'fp-ts';
 
-import { mkStack as pureMkStack } from './mock';
+import { mkStack } from './mock';
 import { Dom } from './type';
 
 const dom: Dom = {
@@ -25,6 +25,4 @@ const dom: Dom = {
   },
 };
 
-export const mkStack = pureMkStack(dom);
-
-export const stack = mkStack();
+export const stack = mkStack(dom)();
