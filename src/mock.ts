@@ -5,18 +5,18 @@ import { Option } from 'fp-ts/Option';
 
 import { Dom, OnAuthStateChangedCallback, Stack } from './type';
 
+const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
+  const searchParamsStr = new URLSearchParams({ redirectUrl: href }).toString();
+  return `${origin}/__masmott__/signInWithRedirect?${searchParamsStr}`;
+};
+
 const signInWithRedirect = (dom: Dom) =>
   pipe(
     io.Do,
     io.bind('origin', () => dom.window.location.origin),
     io.bind('href', () => dom.window.location.href.get),
-    io.chain(({ origin, href }) =>
-      dom.window.location.href.set(
-        `${origin}/__masmott__/signInWithRedirect?${new URLSearchParams({
-          redirectUrl: href,
-        }).toString()}`
-      )
-    )
+    io.map(mkRedirectUrl),
+    io.chain(dom.window.location.href.set)
   );
 
 const doNothing: IO<void> = () => undefined;
