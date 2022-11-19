@@ -3,39 +3,39 @@ import { pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 
-import { FPLocalStorage, LocalStorage, OnAuthStateChangedCallback, Stack } from './type';
-/* eslint-disable functional/no-expression-statement */
-/* eslint-disable functional/immutable-data */
-/* eslint-disable functional/no-return-void */
-const signInWithRedirect = () => {
-  const url = new URL(`${window.location.origin}/__masmott__/signInWithRedirect`);
-  url.searchParams.append('redirectUrl', window.location.href);
-  window.location.href = url.toString();
-};
+import { Dom, OnAuthStateChangedCallback, Stack } from './type';
 
-export const signInGoogleWithRedirect: IO<void> = signInWithRedirect;
+const signInWithRedirect = (dom: Dom) =>
+  pipe(
+    io.Do,
+    io.bind('origin', () => dom.window.location.origin),
+    io.bind('href', () => dom.window.location.href.get),
+    io.chain(({ origin, href }) =>
+      dom.window.location.href.set(
+        `${origin}/__masmott__/signInWithRedirect?${new URLSearchParams({
+          redirectUrl: href,
+        }).toString()}`
+      )
+    )
+  );
 
-const fpLocalStorage = (ls: LocalStorage): FPLocalStorage => ({
-  getItem: (key) => () => option.fromNullable(ls.getItem(key)),
-  removeItem: (key) => () => ls.removeItem(key),
-});
+const doNothing: IO<void> = () => undefined;
 
 export const mkStack = (
-  rawLs: LocalStorage
-): IO<Pick<Stack, 'signInGoogleWithRedirect' | 'onAuthStateChanged' | 'signOut'>> => {
-  const ls = fpLocalStorage(rawLs);
-  return pipe(
+  dom: Dom
+): IO<Pick<Stack, 'signInGoogleWithRedirect' | 'onAuthStateChanged' | 'signOut'>> =>
+  pipe(
     io.Do,
     io.bind('onAuthStateChangedCallback', () =>
       ioRef.newIORef<Option<OnAuthStateChangedCallback>>(option.none)
     ),
     io.map(({ onAuthStateChangedCallback }) => ({
-      signInGoogleWithRedirect,
+      signInGoogleWithRedirect: signInWithRedirect(dom),
       onAuthStateChanged: (onChangedCallback) =>
         pipe(
           io.Do,
           io.chainFirst(() => onAuthStateChangedCallback.write(option.some(onChangedCallback))),
-          io.bind('lsAuth', () => ls.getItem('auth')),
+          io.bind('lsAuth', () => dom.localStorage.getItem('auth')),
           io.chainFirst(({ lsAuth }) => onChangedCallback(lsAuth)),
           io.map(() => onAuthStateChangedCallback.write(option.none))
         ),
@@ -46,11 +46,10 @@ export const mkStack = (
           pipe(
             onChangedCallback,
             option.map((c) => c(option.none)),
-            option.getOrElse(() => () => {})
+            option.getOrElse(() => doNothing)
           )
         ),
-        io.chainFirst(() => ls.removeItem('auth'))
+        io.chainFirst(() => dom.localStorage.removeItem('auth'))
       ),
     }))
   );
-};
