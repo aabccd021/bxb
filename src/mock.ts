@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 
-import { FPLocalStorage, OnAuthStateChangedCallback, Stack } from './type';
+import { FPLocalStorage, LocalStorage, OnAuthStateChangedCallback, Stack } from './type';
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/immutable-data */
 /* eslint-disable functional/no-return-void */
@@ -15,10 +15,16 @@ const signInWithRedirect = () => {
 
 export const signInGoogleWithRedirect: IO<void> = signInWithRedirect;
 
+const fpLocalStorage = (ls: LocalStorage): FPLocalStorage => ({
+  getItem: (key) => () => option.fromNullable(ls.getItem(key)),
+  removeItem: (key) => () => ls.removeItem(key),
+});
+
 export const mkStack = (
-  ls: FPLocalStorage
-): IO<Pick<Stack, 'signInGoogleWithRedirect' | 'onAuthStateChanged' | 'signOut'>> =>
-  pipe(
+  rawLs: LocalStorage
+): IO<Pick<Stack, 'signInGoogleWithRedirect' | 'onAuthStateChanged' | 'signOut'>> => {
+  const ls = fpLocalStorage(rawLs);
+  return pipe(
     io.Do,
     io.bind('onAuthStateChangedCallback', () =>
       ioRef.newIORef<Option<OnAuthStateChangedCallback>>(option.none)
@@ -47,3 +53,4 @@ export const mkStack = (
       ),
     }))
   );
+};
