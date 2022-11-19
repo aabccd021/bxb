@@ -114,9 +114,18 @@ export type Stack = {
 
 export type MkStack = IO<Stack>;
 
-export type FPLocalStorage = {
-  readonly getItem: (key: string) => IOOption<string>;
-  readonly removeItem: (key: string) => IO<void>;
+export type Dom = {
+  readonly localStorage: {
+    readonly getItem: (key: string) => IOOption<string>;
+    readonly removeItem: (key: string) => IO<void>;
+  };
+  readonly window: {
+    readonly location: {
+      readonly origin: IO<string>;
+      readonly href: {
+        readonly get: IO<string>;
+        readonly set: (val: string) => IO<void>;
+      };
+    };
+  };
 };
-
-export type LocalStorage = Pick<typeof localStorage, 'getItem' | 'removeItem'>;
