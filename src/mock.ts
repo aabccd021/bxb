@@ -1,4 +1,4 @@
-import { io, ioRef, option } from 'fp-ts';
+import { io, ioOption, ioRef, option } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
@@ -18,8 +18,6 @@ const signInWithRedirect = (dom: Dom) =>
     io.map(mkRedirectUrl),
     io.chain(dom.window.location.href.set)
   );
-
-const doNothing: IO<void> = () => undefined;
 
 export const mkStack = (
   dom: Dom
@@ -41,14 +39,8 @@ export const mkStack = (
         ),
       signOut: pipe(
         io.Do,
-        io.bind('onChangedCallback', () => onAuthStateChangedCallback.read),
-        io.chainFirst(({ onChangedCallback }) =>
-          pipe(
-            onChangedCallback,
-            option.map((c) => c(option.none)),
-            option.getOrElse(() => doNothing)
-          )
-        ),
+        io.chain(() => onAuthStateChangedCallback.read),
+        ioOption.chainFirstIOK((onChangedCallback) => onChangedCallback(option.none)),
         io.chainFirst(() => dom.localStorage.removeItem('auth'))
       ),
     }))
