@@ -3,14 +3,14 @@ import { pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 
-import { Dom, OnAuthStateChangedCallback, Stack } from './type';
+import { Dom as FpDOM, OnAuthStateChangedCallback, Stack } from './type';
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
   const searchParamsStr = new URLSearchParams({ redirectUrl: href }).toString();
   return `${origin}/__masmott__/signInWithRedirect?${searchParamsStr}`;
 };
 
-const signInWithRedirect = (dom: Dom) =>
+const signInWithRedirect = (dom: FpDOM) =>
   pipe(
     io.Do,
     io.bind('origin', () => dom.window.location.origin),
@@ -19,8 +19,8 @@ const signInWithRedirect = (dom: Dom) =>
     io.chain(dom.window.location.href.set)
   );
 
-export const mkStackFromDom = (
-  dom: Dom
+export const mkStackFromFpDom = (
+  dom: FpDOM
 ): IO<
   Pick<
     Stack,
