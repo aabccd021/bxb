@@ -23,7 +23,6 @@
     "test:framework:nextjs": "cd e2e/framework/nextjs && pnpm install && pnpm generate && pnpm test",
     "test": "pnpm build:provider:foo && pnpm test:framework:nextjs"
   },
-  "sideEffects": false,
   "name": "masmott",
   "repository": "https://github.com/aabccd021/masmott",
   "version": "0.0.0-semantic-release",
