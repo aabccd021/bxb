@@ -14,11 +14,11 @@ const mapToAuthStatus = option.match(
 
 const useHome = () => {
   const [authStatus, setAuth] = useState<Option<string>>(option.none);
-  useEffect(() => masmott.onAuthStateChanged((a) => () => setAuth(a))(), [setAuth]);
+  useEffect(() => masmott.auth.onAuthStateChanged((a) => () => setAuth(a))(), [setAuth]);
   const authStatusStr = useMemo(() => mapToAuthStatus(authStatus), [authStatus]);
   return {
-    signInWithRedirect: masmott.signInGoogleWithRedirect,
-    signOut: masmott.signOut,
+    signInWithRedirect: masmott.auth.signInGoogleWithRedirect,
+    signOut: masmott.auth.signOut,
     authStatusStr,
   };
 };
