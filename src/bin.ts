@@ -6,24 +6,28 @@ import { pipe } from 'fp-ts/function';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export const methodStr = (method: string, provider: string) => `
+export const methodStr = (scope: string, method: string, provider: string) => `
 import {stack as mockStack} from 'masmott/dist/es6/browser';
 import {stack as providerStack} from 'masmott-${provider}';
 
-export const ${method.replaceAll('auth.', '')} =
-  process.env.NODE_ENV === 'production' ? providerStack.client.${method} : mockStack.client.${method};
+export const ${method} =
+  process.env.NODE_ENV === 'production' 
+    ? providerStack.client.${scope}.${method} 
+    : mockStack.client.${scope}.${method};
 `;
 
 const idx = `export * as masmott from './masmott'`;
 
-const masmott = (methods: readonly string[]) =>
-  methods.map((method) => `export * from './${method}'`).join('\n');
+const masmott = (scopes: readonly string[]) =>
+  scopes.map((scope) => `export * as ${scope} from './${scope}'`).join('\n');
 
 const packageJson = `{
   "sideEffects": false
 }`;
 
-const methods = ['auth.signInGoogleWithRedirect', 'auth.onAuthStateChanged', 'auth.signOut'];
+const scopes = {
+  auth: ['signInGoogleWithRedirect', 'onAuthStateChanged', 'signOut'],
+};
 
 const dependencies = pipe(
   fs.readFileSync('package.json', { encoding: 'utf8' }),
@@ -47,10 +51,19 @@ fs.rmSync('masmott', { force: true, recursive: true });
 fs.mkdirSync('masmott');
 
 fs.writeFileSync('masmott/index.ts', idx);
-fs.writeFileSync('masmott/masmott.ts', masmott(methods));
+fs.writeFileSync('masmott/masmott.ts', masmott(Object.keys(scopes)));
 fs.writeFileSync('masmott/package.json', packageJson);
 
-methods.forEach((method) => fs.writeFileSync(`masmott/${method}.ts`, methodStr(method, provider)));
+Object.entries(scopes).forEach(([scope, methods]) => {
+  fs.mkdirSync(`masmott/${scope}`);
+  fs.writeFileSync(
+    `masmott/${scope}/index.ts`,
+    methods.map((method) => `export * from './${method}'`).join('\n')
+  );
+  methods.forEach((method) =>
+    fs.writeFileSync(`masmott/${scope}/${method}.ts`, methodStr(scope, method, provider))
+  );
+});
 
 fs.rmSync('public/masmott', { force: true, recursive: true });
 fs.mkdirSync('public/masmott', { recursive: true });

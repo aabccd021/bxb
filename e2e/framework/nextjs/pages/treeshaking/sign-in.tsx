@@ -6,7 +6,7 @@ import { masmott } from '../../masmott';
 export default function Home() {
   return (
     <div>
-      <button onClick={masmott.signInGoogleWithRedirect}>Sign In With Redirect</button>;
+      <button onClick={masmott.auth.signInGoogleWithRedirect}>Sign In With Redirect</button>;
     </div>
   );
 }
