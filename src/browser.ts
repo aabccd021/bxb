@@ -21,6 +21,7 @@ const dom: Dom = {
   },
   localStorage: {
     getItem: (key) => () => option.fromNullable(localStorage.getItem(key)),
+    setItem: (key, value) => () => localStorage.setItem(key, value),
     removeItem: (key) => () => localStorage.removeItem(key),
   },
 };
