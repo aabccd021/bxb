@@ -21,7 +21,12 @@ const signInWithRedirect = (dom: Dom) =>
 
 export const mkStack = (
   dom: Dom
-): IO<Pick<Stack, 'signInGoogleWithRedirect' | 'onAuthStateChanged' | 'signOut'>> =>
+): IO<
+  Pick<
+    Stack,
+    'signInGoogleWithRedirect' | 'onAuthStateChanged' | 'signOut' | 'signInWithEmailAndPassword'
+  >
+> =>
   pipe(
     io.Do,
     io.bind('onAuthStateChangedCallback', () =>
@@ -29,6 +34,13 @@ export const mkStack = (
     ),
     io.map(({ onAuthStateChangedCallback }) => ({
       signInGoogleWithRedirect: signInWithRedirect(dom),
+      signInWithEmailAndPassword: (email, _password) =>
+        pipe(
+          io.Do,
+          io.chain(() => onAuthStateChangedCallback.read),
+          ioOption.chainFirstIOK((onChangedCallback) => onChangedCallback(option.some(email))),
+          io.chainFirst(() => dom.localStorage.setItem('auth', email))
+        ),
       onAuthStateChanged: (onChangedCallback) =>
         pipe(
           io.Do,

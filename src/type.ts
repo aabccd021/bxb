@@ -108,6 +108,7 @@ export type Stack = {
   readonly clientDbSetDoc: (p: CreateDocParam) => Task<unknown>;
   readonly clientDbGetDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
   readonly signInGoogleWithRedirect: IO<void>;
+  readonly signInWithEmailAndPassword: (email: string, password: string) => IO<void>;
   readonly onAuthStateChanged: (callback: OnAuthStateChangedCallback) => IO<Unsubscribe>;
   readonly signOut: IO<void>;
 };
@@ -117,6 +118,7 @@ export type MkStack = IO<Stack>;
 export type Dom = {
   readonly localStorage: {
     readonly getItem: (key: string) => IOOption<string>;
+    readonly setItem: (key: string, value: string) => IO<void>;
     readonly removeItem: (key: string) => IO<void>;
   };
   readonly window: {
