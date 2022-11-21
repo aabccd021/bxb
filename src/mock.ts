@@ -19,12 +19,15 @@ const signInWithRedirect = (dom: Dom) =>
     io.chain(dom.window.location.href.set)
   );
 
-export const mkStack = (
+export const mkStackFromDom = (
   dom: Dom
 ): IO<
   Pick<
     Stack,
-    'signInGoogleWithRedirect' | 'onAuthStateChanged' | 'signOut' | 'signInWithEmailAndPassword'
+    | 'signInGoogleWithRedirect'
+    | 'onAuthStateChanged'
+    | 'signOut'
+    | 'createAndSignInWithEmailAndPassword'
   >
 > =>
   pipe(
@@ -34,7 +37,7 @@ export const mkStack = (
     ),
     io.map(({ onAuthStateChangedCallback }) => ({
       signInGoogleWithRedirect: signInWithRedirect(dom),
-      signInWithEmailAndPassword: (email, _password) =>
+      createAndSignInWithEmailAndPassword: (email, _password) =>
         pipe(
           io.Do,
           io.chain(() => onAuthStateChangedCallback.read),

@@ -3,27 +3,38 @@
 /* eslint-disable functional/no-return-void */
 
 import { option } from 'fp-ts';
+import { pipe } from 'fp-ts/function';
+import { IO } from 'fp-ts/IO';
 
-import { mkStack } from './mock';
+import { mkStackFromDom } from './mock';
 import { Dom } from './type';
 
-const dom: Dom = {
+type Dum = {
+  readonly window: typeof window;
+  readonly localStorage: typeof localStorage;
+};
+
+const mkFpDom = (dum: IO<Dum>): Dom => ({
   window: {
     location: {
-      origin: () => window.location.origin,
+      origin: () => dum().window.location.origin,
       href: {
-        get: () => window.location.href,
+        get: () => dum().window.location.href,
         set: (newHref) => () => {
-          window.location.href = newHref;
+          dum().window.location.href = newHref;
         },
       },
     },
   },
   localStorage: {
-    getItem: (key) => () => option.fromNullable(localStorage.getItem(key)),
-    setItem: (key, value) => () => localStorage.setItem(key, value),
-    removeItem: (key) => () => localStorage.removeItem(key),
+    getItem: (key) => () => option.fromNullable(dum().localStorage.getItem(key)),
+    setItem: (key, value) => () => dum().localStorage.setItem(key, value),
+    removeItem: (key) => () => dum().localStorage.removeItem(key),
   },
-};
+});
 
-export const stack = mkStack(dom)();
+const mkDom = () => ({ window, localStorage });
+
+const mkStack = pipe(mkDom, mkFpDom, mkStackFromDom);
+
+export const stack = mkStack();
