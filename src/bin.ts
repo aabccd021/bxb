@@ -2,11 +2,12 @@
 /* eslint-disable functional/no-return-void */
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/no-conditional-statement */
-import { pipe } from 'fp-ts/function';
+import { option, readonlyArray, readonlyRecord, string } from 'fp-ts';
+import { flow, pipe } from 'fp-ts/function';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export const methodStr = (scope: string, method: string, provider: string) => `
+const methodStr = (scope: string, method: string, provider: string) => `
 import {stack as mockStack} from 'masmott/dist/es6/browser';
 import {stack as providerStack} from 'masmott-${provider}';
 
@@ -16,43 +17,47 @@ export const ${method} =
     : mockStack.client.${scope}.${method};
 `;
 
-const idx = `export * as masmott from './masmott'`;
-
-const masmott = (scopes: readonly string[]) =>
-  scopes.map((scope) => `export * as ${scope} from './${scope}'`).join('\n');
-
-const packageJson = `{
-  "sideEffects": false
-}`;
-
 const scopes = {
   auth: ['signInGoogleWithRedirect', 'onAuthStateChanged', 'signOut'],
 };
 
-const dependencies = pipe(
+const provider = pipe(
   fs.readFileSync('package.json', { encoding: 'utf8' }),
   JSON.parse,
-  (a) => a.dependencies
+  (a) => a.dependencies,
+  option.fromPredicate((x) => typeof x === 'object'),
+  option.chain(
+    flow(
+      readonlyRecord.keys,
+      readonlyArray.filter((dep) => dep.startsWith('masmott-')),
+      readonlyArray.head
+    )
+  ),
+  option.map(string.replace('masmott-', ''))
 );
 
-if (typeof dependencies !== 'object') {
-  throw Error('');
-}
-
-const provider = Object.keys(dependencies)
-  .filter((dep) => dep.startsWith('masmott-'))[0]
-  ?.replace('masmott-', '');
-
-if (provider === undefined) {
-  throw Error('');
+if (option.isNone(provider)) {
+  throw Error();
 }
 
 fs.rmSync('masmott', { force: true, recursive: true });
 fs.mkdirSync('masmott');
 
-fs.writeFileSync('masmott/index.ts', idx);
-fs.writeFileSync('masmott/masmott.ts', masmott(Object.keys(scopes)));
-fs.writeFileSync('masmott/package.json', packageJson);
+fs.writeFileSync('masmott/index.ts', `export * as masmott from './masmott'`);
+
+fs.writeFileSync(
+  'masmott/masmott.ts',
+  Object.keys(scopes)
+    .map((scope) => `export * as ${scope} from './${scope}'`)
+    .join('\n')
+);
+
+fs.writeFileSync(
+  'masmott/package.json',
+  `{
+  "sideEffects": false
+}`
+);
 
 Object.entries(scopes).forEach(([scope, methods]) => {
   fs.mkdirSync(`masmott/${scope}`);
@@ -61,7 +66,7 @@ Object.entries(scopes).forEach(([scope, methods]) => {
     methods.map((method) => `export * from './${method}'`).join('\n')
   );
   methods.forEach((method) =>
-    fs.writeFileSync(`masmott/${scope}/${method}.ts`, methodStr(scope, method, provider))
+    fs.writeFileSync(`masmott/${scope}/${method}.ts`, methodStr(scope, method, provider.value))
   );
 });
 
