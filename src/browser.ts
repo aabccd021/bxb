@@ -2,39 +2,62 @@
 /* eslint-disable functional/immutable-data */
 /* eslint-disable functional/no-return-void */
 
-import { option } from 'fp-ts';
+import { io, option } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 
-import { mkStackFromDom } from './mock';
+import { mkStackFromFpDom } from './mock';
 import { Dom } from './type';
 
-type Dum = {
+type DOM = {
   readonly window: typeof window;
   readonly localStorage: typeof localStorage;
 };
 
-const mkFpDom = (dum: IO<Dum>): Dom => ({
+const mkFpDom = (mkDom: IO<DOM>): Dom => ({
   window: {
     location: {
-      origin: () => dum().window.location.origin,
+      origin: pipe(
+        mkDom,
+        io.map((dom) => dom.window.location.origin)
+      ),
       href: {
-        get: () => dum().window.location.href,
-        set: (newHref) => () => {
-          dum().window.location.href = newHref;
-        },
+        get: pipe(
+          mkDom,
+          io.map((dom) => dom.window.location.href)
+        ),
+        set: (newHref) =>
+          pipe(
+            mkDom,
+            io.chain((dom) => () => {
+              dom.window.location.href = newHref;
+            })
+          ),
       },
     },
   },
   localStorage: {
-    getItem: (key) => () => option.fromNullable(dum().localStorage.getItem(key)),
-    setItem: (key, value) => () => dum().localStorage.setItem(key, value),
-    removeItem: (key) => () => dum().localStorage.removeItem(key),
+    getItem: (key) =>
+      pipe(
+        mkDom,
+        io.chain((dom) => () => dom.localStorage.getItem(key)),
+        io.map(option.fromNullable)
+      ),
+    setItem: (key, value) =>
+      pipe(
+        mkDom,
+        io.chain((dom) => () => dom.localStorage.setItem(key, value))
+      ),
+    removeItem: (key) =>
+      pipe(
+        mkDom,
+        io.chain((dom) => () => dom.localStorage.removeItem(key))
+      ),
   },
 });
 
 const mkDom = () => ({ window, localStorage });
 
-const mkStack = pipe(mkDom, mkFpDom, mkStackFromDom);
+const mkStack = pipe(mkDom, mkFpDom, mkStackFromFpDom);
 
 export const stack = mkStack();
