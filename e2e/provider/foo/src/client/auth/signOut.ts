@@ -1,7 +1,7 @@
 /* eslint-disable functional/no-expression-statement */
 import { Stack } from 'masmott';
 
-export const signOut: Stack['signOut'] = () => () => {
+export const signOut: Stack['client']['auth']['signOut'] = () => () => {
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');

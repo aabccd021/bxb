@@ -10,8 +10,8 @@ export const methodStr = (method: string, provider: string) => `
 import {stack as mockStack} from 'masmott/dist/es6/browser';
 import {stack as providerStack} from 'masmott-${provider}';
 
-export const ${method} =
-  process.env.NODE_ENV === 'production' ? providerStack.${method} : mockStack.${method};
+export const ${method.replaceAll('auth.', '')} =
+  process.env.NODE_ENV === 'production' ? providerStack.client.${method} : mockStack.client.${method};
 `;
 
 const idx = `export * as masmott from './masmott'`;
@@ -23,7 +23,7 @@ const packageJson = `{
   "sideEffects": false
 }`;
 
-const methods = ['signInGoogleWithRedirect', 'onAuthStateChanged', 'signOut'];
+const methods = ['auth.signInGoogleWithRedirect', 'auth.onAuthStateChanged', 'auth.signOut'];
 
 const dependencies = pipe(
   fs.readFileSync('package.json', { encoding: 'utf8' }),
