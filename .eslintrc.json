@@ -59,7 +59,8 @@
       "error",
       {
         "code": 100,
-        "ignoreUrls": true
+        "ignoreUrls": true,
+        "ignoreTemplateLiterals": true
       }
     ],
     "no-else-return": "error",

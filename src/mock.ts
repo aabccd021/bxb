@@ -21,42 +21,38 @@ const signInWithRedirect = (dom: FpDOM) =>
 
 export const mkStackFromFpDom = (
   dom: FpDOM
-): IO<
-  Pick<
-    Stack,
-    | 'signInGoogleWithRedirect'
-    | 'onAuthStateChanged'
-    | 'signOut'
-    | 'createUserAndSignInWithEmailAndPassword'
-  >
-> =>
+): IO<{ readonly client: { readonly auth: Stack['client']['auth'] } }> =>
   pipe(
     io.Do,
     io.bind('onAuthStateChangedCallback', () =>
       ioRef.newIORef<Option<OnAuthStateChangedCallback>>(option.none)
     ),
     io.map(({ onAuthStateChangedCallback }) => ({
-      signInGoogleWithRedirect: signInWithRedirect(dom),
-      createUserAndSignInWithEmailAndPassword: (email, _password) =>
-        pipe(
-          io.Do,
-          io.chain(() => onAuthStateChangedCallback.read),
-          ioOption.chainFirstIOK((onChangedCallback) => onChangedCallback(option.some(email))),
-          io.chainFirst(() => dom.localStorage.setItem('auth', email))
-        ),
-      onAuthStateChanged: (onChangedCallback) =>
-        pipe(
-          io.Do,
-          io.chainFirst(() => onAuthStateChangedCallback.write(option.some(onChangedCallback))),
-          io.bind('lsAuth', () => dom.localStorage.getItem('auth')),
-          io.chainFirst(({ lsAuth }) => onChangedCallback(lsAuth)),
-          io.map(() => onAuthStateChangedCallback.write(option.none))
-        ),
-      signOut: pipe(
-        io.Do,
-        io.chain(() => onAuthStateChangedCallback.read),
-        ioOption.chainFirstIOK((onChangedCallback) => onChangedCallback(option.none)),
-        io.chainFirst(() => dom.localStorage.removeItem('auth'))
-      ),
+      client: {
+        auth: {
+          signInGoogleWithRedirect: signInWithRedirect(dom),
+          createUserAndSignInWithEmailAndPassword: (email, _password) =>
+            pipe(
+              io.Do,
+              io.chain(() => onAuthStateChangedCallback.read),
+              ioOption.chainFirstIOK((onChangedCallback) => onChangedCallback(option.some(email))),
+              io.chainFirst(() => dom.localStorage.setItem('auth', email))
+            ),
+          onAuthStateChanged: (onChangedCallback) =>
+            pipe(
+              io.Do,
+              io.chainFirst(() => onAuthStateChangedCallback.write(option.some(onChangedCallback))),
+              io.bind('lsAuth', () => dom.localStorage.getItem('auth')),
+              io.chainFirst(({ lsAuth }) => onChangedCallback(lsAuth)),
+              io.map(() => onAuthStateChangedCallback.write(option.none))
+            ),
+          signOut: pipe(
+            io.Do,
+            io.chain(() => onAuthStateChangedCallback.read),
+            ioOption.chainFirstIOK((onChangedCallback) => onChangedCallback(option.none)),
+            io.chainFirst(() => dom.localStorage.removeItem('auth'))
+          ),
+        },
+      },
     }))
   );

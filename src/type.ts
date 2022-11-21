@@ -107,10 +107,17 @@ export type Stack = {
   ) => TaskEither<GetDownloadUrlError['Union'], string>;
   readonly clientDbSetDoc: (p: CreateDocParam) => Task<unknown>;
   readonly clientDbGetDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
-  readonly signInGoogleWithRedirect: IO<void>;
-  readonly createUserAndSignInWithEmailAndPassword: (email: string, password: string) => IO<void>;
-  readonly onAuthStateChanged: (callback: OnAuthStateChangedCallback) => IO<Unsubscribe>;
-  readonly signOut: IO<void>;
+  readonly client: {
+    readonly auth: {
+      readonly signInGoogleWithRedirect: IO<void>;
+      readonly createUserAndSignInWithEmailAndPassword: (
+        email: string,
+        password: string
+      ) => IO<void>;
+      readonly onAuthStateChanged: (callback: OnAuthStateChangedCallback) => IO<Unsubscribe>;
+      readonly signOut: IO<void>;
+    };
+  };
 };
 
 export type MkStack = IO<Stack>;
