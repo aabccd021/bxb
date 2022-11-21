@@ -108,7 +108,7 @@ export type Stack = {
   readonly clientDbSetDoc: (p: CreateDocParam) => Task<unknown>;
   readonly clientDbGetDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
   readonly signInGoogleWithRedirect: IO<void>;
-  readonly signInWithEmailAndPassword: (email: string, password: string) => IO<void>;
+  readonly createAndSignInWithEmailAndPassword: (email: string, password: string) => IO<void>;
   readonly onAuthStateChanged: (callback: OnAuthStateChangedCallback) => IO<Unsubscribe>;
   readonly signOut: IO<void>;
 };
