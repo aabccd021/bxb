@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 
-import { Dom as FpDOM, OnAuthStateChangedCallback, Stack } from './type';
+import { FpDOM, OnAuthStateChangedCallback, Stack } from './type';
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
   const searchParamsStr = new URLSearchParams({ redirectUrl: href }).toString();
@@ -27,7 +27,7 @@ export const mkStackFromFpDom = (
     | 'signInGoogleWithRedirect'
     | 'onAuthStateChanged'
     | 'signOut'
-    | 'createAndSignInWithEmailAndPassword'
+    | 'createUserAndSignInWithEmailAndPassword'
   >
 > =>
   pipe(
@@ -37,7 +37,7 @@ export const mkStackFromFpDom = (
     ),
     io.map(({ onAuthStateChangedCallback }) => ({
       signInGoogleWithRedirect: signInWithRedirect(dom),
-      createAndSignInWithEmailAndPassword: (email, _password) =>
+      createUserAndSignInWithEmailAndPassword: (email, _password) =>
         pipe(
           io.Do,
           io.chain(() => onAuthStateChangedCallback.read),
