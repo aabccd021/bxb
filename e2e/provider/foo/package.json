@@ -1,8 +1,21 @@
 {
   "name": "masmott-foo",
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "rm -rf dist && tsc"
+    "build": "rm -rf dist && pnpm build:es6 && pnpm build:cjs && pnpm build:types && nazna build cli",
+    "build:cjs": "swc src --out-dir dist/cjs --source-maps --config module.type=commonjs",
+    "build:es6": "swc src --out-dir dist/es6 --source-maps",
+    "build:types": "tsc && cp -R dist/types/. dist/cjs && cp -R dist/types/. dist/es6"
+  },
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/es6/index.js"
+    }
   },
   "dependencies": {
     "masmott": "link:../../.."
