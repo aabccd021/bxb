@@ -12,23 +12,30 @@ const mapToAuthStatus = option.match(
   (s) => `email : ${s}`
 );
 
+const useAuthState = () => {
+  const [authState, setAuthState] = useState<Option<string>>(option.none);
+  useEffect(
+    () => masmott.auth.onAuthStateChanged((newAuthState) => () => setAuthState(newAuthState))(),
+    [setAuthState]
+  );
+  return authState;
+};
+
 const useHome = () => {
-  const [authStatus, setAuth] = useState<Option<string>>(option.none);
-  useEffect(() => masmott.auth.onAuthStateChanged((a) => () => setAuth(a))(), [setAuth]);
-  const authStatusStr = useMemo(() => mapToAuthStatus(authStatus), [authStatus]);
+  const authState = useAuthState();
+  const authStateStr = useMemo(() => mapToAuthStatus(authState), [authState]);
   return {
-    signInWithRedirect: masmott.auth.signInGoogleWithRedirect,
-    signOut: masmott.auth.signOut,
-    authStatusStr,
+    authStateStr,
   };
 };
 
 export default function Home() {
-  const { signInWithRedirect, signOut, authStatusStr } = useHome();
+  const { authStateStr } = useHome();
   return (
     <div>
-      <button onClick={signInWithRedirect}>Sign In With Redirect</button>;
-      <button onClick={signOut}>Sign Out</button>;<p id="auth-status">{authStatusStr}</p>
+      <button onClick={masmott.auth.signInGoogleWithRedirect}>Sign In With Redirect</button>
+      <button onClick={masmott.auth.signOut}>Sign Out</button>
+      <p id="auth-status">{authStateStr}</p>
     </div>
   );
 }
