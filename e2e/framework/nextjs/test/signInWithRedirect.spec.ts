@@ -6,14 +6,6 @@ test('user is not signed in initially', async ({ page }) => {
   await expect(page.locator('#auth-status')).toHaveText('not signed in');
 });
 
-test('user go to redirected url after pressing sign in button', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Sign In With Redirect' }).click();
-  await expect(page).toHaveURL(
-    '/__masmott__/signInWithRedirect?redirectUrl=http%3A%2F%2Flocalhost%3A3000%2F'
-  );
-});
-
 test('user go back to original url after sign in with redirect', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Sign In With Redirect' }).click();
