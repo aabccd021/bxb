@@ -19,8 +19,6 @@ jobs:
 
       - run: pnpm build:types
 
-      - run: pnpm nazna build cli
-
       - run: pnpm lint
 
       - run: vitest
@@ -37,10 +35,10 @@ jobs:
       - run: pnpm generate
         working-directory: e2e/framework/nextjs
 
-      - run: pnpm build
+      - run: pnpm test:treeshaking
         working-directory: e2e/framework/nextjs
 
-      - run: pnpm test
+      - run: pnpm test:e2e
         working-directory: e2e/framework/nextjs
 
       - name: Release
