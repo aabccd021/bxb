@@ -1,10 +1,10 @@
-import { either, io, ioOption, ioRef, option, task, taskEither } from 'fp-ts';
+import { either, io, ioEither, ioOption, ioRef, option, task, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 
 import { mkFpWindow } from './mkFp';
-import { Env, GetDownloadUrlError, OnAuthStateChangedCallback, Stack } from './type';
+import { Env, GetDocError, GetDownloadUrlError, OnAuthStateChangedCallback, Stack } from './type';
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
   const searchParamsStr = new URLSearchParams({ redirectUrl: href }).toString();
@@ -59,8 +59,28 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
             ),
       },
       db: {
-        setDoc: () => () => task.of(undefined),
-        getDoc: () => () => taskEither.of({}),
+        setDoc:
+          (env) =>
+          ({ key, data }) =>
+            pipe(
+              env.browser.window,
+              mkFpWinIo,
+              io.chain((win) =>
+                win.localStorage.setItem(`db/${key.collection}/${key.id}`, JSON.stringify(data))
+              ),
+              task.fromIO
+            ),
+        getDoc:
+          ({ browser }) =>
+          ({ key }) =>
+            pipe(
+              browser.window,
+              mkFpWinIo,
+              io.chain((win) => win.localStorage.getItem(`db/${key.collection}/${key.id}`)),
+              io.map(either.fromOption(() => GetDocError.Union.of.DocNotFound({}))),
+              ioEither.map(JSON.parse),
+              taskEither.fromIOEither
+            ),
       },
       auth: {
         signInWithGoogleRedirect: signInWithRedirect,

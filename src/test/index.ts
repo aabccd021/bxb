@@ -61,7 +61,7 @@ export const independencyTests = <ClientEnv>(
     });
   });
 
-  describe.skip('db is independent between tests', () => {
+  describe('db is independent between tests', () => {
     test('a server can create document kira', async () => {
       const result = pipe(
         T.Do,
