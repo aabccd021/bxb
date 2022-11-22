@@ -79,11 +79,8 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
                   option.map(JSON.parse),
                   option.chain(option.fromPredicate(UnknownRecord.type.is)),
                   option.getOrElse(() => ({})),
-                  (dbData) => ({
-                    ...dbData,
-                    [`${key.collection}/${key.id}`]: data,
-                  }),
-                  (r: UnknownRecord) => JSON.stringify(r),
+                  readonlyRecord.upsertAt(`${key.collection}/${key.id}`, data),
+                  JSON.stringify,
                   (updatedDbData) => win.localStorage.setItem('db', updatedDbData)
                 )
               ),
@@ -132,26 +129,26 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
           pipe(
             io.Do,
             io.chain(() => mkFpWinIo(env.browser.window)),
-            io.chainFirst((win) => win.localStorage.setItem('auth', email)),
+            io.chain((win) => win.localStorage.setItem('auth', email)),
             io.chain(() => onAuthStateChangedCallback.read),
-            ioOption.chainFirstIOK((onChangedCallback) => onChangedCallback(option.some(email)))
+            ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(email)))
           ),
         onAuthStateChanged: (env) => (onChangedCallback) =>
           pipe(
             io.Do,
             io.bind('win', () => mkFpWinIo(env.browser.window)),
             io.chainFirst(() => onAuthStateChangedCallback.write(option.some(onChangedCallback))),
-            io.bind('lsAuth', ({ win }) => win.localStorage.getItem('auth')),
-            io.chainFirst(({ lsAuth }) => onChangedCallback(lsAuth)),
+            io.chain(({ win }) => win.localStorage.getItem('auth')),
+            io.chain((lsAuth) => onChangedCallback(lsAuth)),
             io.map(() => onAuthStateChangedCallback.write(option.none))
           ),
         signOut: (env) =>
           pipe(
             io.Do,
             io.chain(() => mkFpWinIo(env.browser.window)),
-            io.chainFirst((win) => win.localStorage.removeItem('auth')),
+            io.chain((win) => win.localStorage.removeItem('auth')),
             io.chain(() => onAuthStateChangedCallback.read),
-            ioOption.chainFirstIOK((onChangedCallback) => onChangedCallback(option.none))
+            ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.none))
           ),
       },
     },
