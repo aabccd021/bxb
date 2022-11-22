@@ -30,18 +30,18 @@ export const mkFpDom = (mkDom: IO<DOM>): FpDOM => ({
     getItem: (key) =>
       pipe(
         mkDom,
-        io.chain((dom) => () => dom.localStorage.getItem(key)),
+        io.chain((dom) => () => dom.window.localStorage.getItem(key)),
         io.map(option.fromNullable)
       ),
     setItem: (key, value) =>
       pipe(
         mkDom,
-        io.chain((dom) => () => dom.localStorage.setItem(key, value))
+        io.chain((dom) => () => dom.window.localStorage.setItem(key, value))
       ),
     removeItem: (key) =>
       pipe(
         mkDom,
-        io.chain((dom) => () => dom.localStorage.removeItem(key))
+        io.chain((dom) => () => dom.window.localStorage.removeItem(key))
       ),
   },
 });
