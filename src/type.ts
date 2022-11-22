@@ -99,23 +99,29 @@ export type GetDocParam = {
 export type OnAuthStateChangedCallback = (user: Option<string>) => IO<void>;
 
 export type Stack = {
-  readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
-  readonly deployDb: (c: DbDeployConfig) => Task<unknown>;
-  readonly clientStorageUpload: (p: UploadParam) => Task<unknown>;
-  readonly clientStorageGetDownloadUrl: (
-    p: GetDownloadUrlParam
-  ) => TaskEither<GetDownloadUrlError['Union'], string>;
-  readonly clientDbSetDoc: (p: CreateDocParam) => Task<unknown>;
-  readonly clientDbGetDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
+  readonly ci: {
+    readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
+    readonly deployDb: (c: DbDeployConfig) => Task<unknown>;
+  };
   readonly client: {
     readonly auth: {
-      readonly signInGoogleWithRedirect: IO<void>;
+      readonly signInWithGoogleRedirect: IO<void>;
       readonly createUserAndSignInWithEmailAndPassword: (
         email: string,
         password: string
       ) => IO<void>;
       readonly onAuthStateChanged: (callback: OnAuthStateChangedCallback) => IO<Unsubscribe>;
       readonly signOut: IO<void>;
+    };
+    readonly db: {
+      readonly setDoc: (p: CreateDocParam) => Task<unknown>;
+      readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
+    };
+    readonly storage: {
+      readonly uploadString: (p: UploadParam) => Task<unknown>;
+      readonly getDownloadUrl: (
+        p: GetDownloadUrlParam
+      ) => TaskEither<GetDownloadUrlError['Union'], string>;
     };
   };
 };

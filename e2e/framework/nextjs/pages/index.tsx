@@ -33,7 +33,7 @@ export default function Home() {
   const { authStateStr } = useHome();
   return (
     <div>
-      <button onClick={masmott.auth.signInGoogleWithRedirect}>Sign In With Redirect</button>
+      <button onClick={masmott.auth.signInWithGoogleRedirect}>Sign In With Redirect</button>
       <button onClick={masmott.auth.signOut}>Sign Out</button>
       <p id="auth-status">{authStateStr}</p>
     </div>

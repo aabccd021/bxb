@@ -18,7 +18,7 @@ export const ${method} =
 `;
 
 const scopes = {
-  auth: ['signInGoogleWithRedirect', 'onAuthStateChanged', 'signOut'],
+  auth: ['signInWithGoogleRedirect', 'onAuthStateChanged', 'signOut'],
 };
 
 const provider = pipe(
