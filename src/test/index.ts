@@ -9,9 +9,11 @@ export const independencyTests = <ClientEnv>(
   clientEnv: ClientEnv
 ) => {
   const mkStack = pipe(
-    mkMkStack,
-    io.map((stack) => {
-      const env = { browser: { window: () => new Window() as any }, client: clientEnv };
+    io.Do,
+    io.bind('stack', () => mkMkStack),
+    io.bind('window', () => () => new Window()),
+    io.map(({ stack, window }) => {
+      const env = { browser: { window: () => window as any }, client: clientEnv };
       return {
         ...stack,
         client: {
