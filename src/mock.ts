@@ -1,4 +1,4 @@
-import { io, ioOption, ioRef, option } from 'fp-ts';
+import { io, ioOption, ioRef, option, task, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
@@ -20,9 +20,7 @@ const signInWithRedirect = (dom: FpDOM) =>
     io.chain(dom.window.location.href.set)
   );
 
-export const mkStackFromDom = (
-  mkDom: IO<DOM>
-): IO<{ readonly client: { readonly auth: Stack['client']['auth'] } }> => {
+export const mkStackFromDom = (mkDom: IO<DOM>): IO<Stack> => {
   const dom = mkFpDom(mkDom);
   return pipe(
     io.Do,
@@ -30,7 +28,19 @@ export const mkStackFromDom = (
       ioRef.newIORef<Option<OnAuthStateChangedCallback>>(option.none)
     ),
     io.map(({ onAuthStateChangedCallback }) => ({
+      ci: {
+        deployStorage: () => task.of(undefined),
+        deployDb: () => task.of(undefined),
+      },
       client: {
+        storage: {
+          uploadString: () => task.of(undefined),
+          getDownloadUrl: () => taskEither.of(''),
+        },
+        db: {
+          setDoc: () => task.of(undefined),
+          getDoc: () => taskEither.of({}),
+        },
         auth: {
           signInWithGoogleRedirect: signInWithRedirect(dom),
           createUserAndSignInWithEmailAndPassword: (email, _password) =>

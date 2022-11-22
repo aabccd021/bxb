@@ -147,5 +147,4 @@ export type FpDOM = {
 
 export type DOM = {
   readonly window: typeof window;
-  readonly localStorage: typeof localStorage;
 };
