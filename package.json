@@ -3,6 +3,7 @@
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.3.8",
     "eslint": "^8.25.0",
+    "happy-dom": "^7.7.0",
     "nazna": "^1.13.19",
     "pnpm": "^7.13.4",
     "semantic-release": "^19.0.5",
@@ -21,7 +22,8 @@
     "pre-push:dirty": "pnpm install && pnpm build && pnpm lint && pnpm test",
     "build:provider:foo": "cd e2e/provider/foo && pnpm install && pnpm build",
     "test:framework:nextjs": "cd e2e/framework/nextjs && pnpm install && pnpm generate && pnpm test",
-    "test": "pnpm build:provider:foo && pnpm test:framework:nextjs"
+    "test:package": "vitest",
+    "test": "pnpm test:package && pnpm build:provider:foo && pnpm test:framework:nextjs"
   },
   "sideEffects": false,
   "name": "masmott",
