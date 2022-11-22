@@ -23,7 +23,7 @@
     "build:provider:foo": "cd e2e/provider/foo && pnpm install && pnpm build",
     "test:framework:nextjs": "cd e2e/framework/nextjs && pnpm install && pnpm generate && pnpm test",
     "test:package": "vitest",
-    "test": "pnpm test:package && pnpm build:provider:foo && pnpm test:framework:nextjs"
+    "test": "pnpm build:provider:foo && pnpm test:framework:nextjs"
   },
   "sideEffects": false,
   "name": "masmott",
