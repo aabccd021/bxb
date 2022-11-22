@@ -4,7 +4,7 @@ import { IO } from 'fp-ts/IO';
 
 import { FpWindow } from './type';
 
-export const mkFpDom = (mkDom: IO<typeof window>): FpWindow => ({
+export const mkFpWindow = (mkDom: IO<typeof window>): FpWindow => ({
   location: {
     origin: pipe(
       mkDom,
