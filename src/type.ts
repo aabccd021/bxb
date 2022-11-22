@@ -1,4 +1,4 @@
-import { summonFor, UM } from '@morphic-ts/batteries/lib/summoner-ESBST';
+import { summonFor, UM } from '@morphic-ts/batteries/es6/summoner-ESBST';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
 import { IO } from 'fp-ts/IO';
 import { IOOption } from 'fp-ts/IOOption';
@@ -73,6 +73,7 @@ export type DbDeployConfig = {
 export type UploadParam = {
   readonly key: string;
   readonly file: string;
+  readonly format: 'base64';
 };
 
 export type DocKey = {
@@ -117,7 +118,7 @@ export type Stack = {
       readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
     };
     readonly storage: {
-      readonly uploadBase64: (p: UploadParam) => Task<unknown>;
+      readonly uploadString: (p: UploadParam) => Task<unknown>;
       readonly getDownloadUrl: (
         p: GetDownloadUrlParam
       ) => TaskEither<GetDownloadUrlError['Union'], string>;
