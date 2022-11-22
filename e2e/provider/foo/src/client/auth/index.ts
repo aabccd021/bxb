@@ -1,3 +1,3 @@
 export * from './onAuthStateChanged';
-export * from './signInGoogleWithRedirect';
+export * from './signInWithGoogleRedirect';
 export * from './signOut';

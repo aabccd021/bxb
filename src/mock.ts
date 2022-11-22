@@ -32,7 +32,7 @@ export const mkStackFromDom = (
     io.map(({ onAuthStateChangedCallback }) => ({
       client: {
         auth: {
-          signInGoogleWithRedirect: signInWithRedirect(dom),
+          signInWithGoogleRedirect: signInWithRedirect(dom),
           createUserAndSignInWithEmailAndPassword: (email, _password) =>
             pipe(
               io.Do,

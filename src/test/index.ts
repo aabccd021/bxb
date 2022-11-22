@@ -10,11 +10,15 @@ export const independencyTests = (mkStack: MkStack) => {
       const result = pipe(
         T.Do,
         T.bind('stack', () => T.fromIO(mkStack)),
-        T.chainFirst(({ stack }) => stack.deployStorage({ securityRule: { type: 'allowAll' } })),
+        T.chainFirst(({ stack }) => stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })),
         T.chainFirst(({ stack }) =>
-          stack.clientStorageUpload({ key: 'kira_key', file: 'kira_content', format: 'base64' })
+          stack.client.storage.uploadString({
+            key: 'kira_key',
+            file: 'kira_content',
+            format: 'base64',
+          })
         ),
-        T.chain(({ stack }) => stack.clientStorageGetDownloadUrl({ key: 'kira_key' })),
+        T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
         T.map(E.isRight)
       );
       expect(await result()).toEqual(true);
@@ -24,8 +28,8 @@ export const independencyTests = (mkStack: MkStack) => {
       const result = pipe(
         T.Do,
         T.bind('stack', () => T.fromIO(mkStack)),
-        T.chainFirst(({ stack }) => stack.deployStorage({ securityRule: { type: 'allowAll' } })),
-        T.chain(({ stack }) => stack.clientStorageGetDownloadUrl({ key: 'kira_key' }))
+        T.chainFirst(({ stack }) => stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })),
+        T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
       );
       expect(await result()).toEqual(E.left(GetDownloadUrlError.Union.as.FileNotFound({})));
     });
@@ -36,14 +40,16 @@ export const independencyTests = (mkStack: MkStack) => {
       const result = pipe(
         T.Do,
         T.bind('stack', () => T.fromIO(mkStack)),
-        T.chainFirst(({ stack }) => stack.deployDb({ securityRule: { type: 'allowAll' } })),
+        T.chainFirst(({ stack }) => stack.ci.deployDb({ securityRule: { type: 'allowAll' } })),
         T.chainFirst(({ stack }) =>
-          stack.clientDbSetDoc({
+          stack.client.db.setDoc({
             key: { collection: 'user', id: 'kira_id' },
             data: { name: 'masumoto' },
           })
         ),
-        T.chain(({ stack }) => stack.clientDbGetDoc({ key: { collection: 'user', id: 'kira_id' } }))
+        T.chain(({ stack }) =>
+          stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
+        )
       );
       expect(await result()).toEqual(E.right({ name: 'masumoto' }));
     });
@@ -52,8 +58,10 @@ export const independencyTests = (mkStack: MkStack) => {
       const result = pipe(
         T.Do,
         T.bind('stack', () => T.fromIO(mkStack)),
-        T.chainFirst(({ stack }) => stack.deployDb({ securityRule: { type: 'allowAll' } })),
-        T.chain(({ stack }) => stack.clientDbGetDoc({ key: { collection: 'user', id: 'kira_id' } }))
+        T.chainFirst(({ stack }) => stack.ci.deployDb({ securityRule: { type: 'allowAll' } })),
+        T.chain(({ stack }) =>
+          stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
+        )
       );
       expect(await result()).toEqual(E.left(GetDocError.Union.as.DocNotFound({})));
     });
