@@ -128,23 +128,17 @@ export type Stack = {
 
 export type MkStack = IO<Stack>;
 
-export type FpDOM = {
+export type FpWindow = {
+  readonly location: {
+    readonly origin: IO<string>;
+    readonly href: {
+      readonly get: IO<string>;
+      readonly set: (val: string) => IO<void>;
+    };
+  };
   readonly localStorage: {
     readonly getItem: (key: string) => IOOption<string>;
     readonly setItem: (key: string, value: string) => IO<void>;
     readonly removeItem: (key: string) => IO<void>;
   };
-  readonly window: {
-    readonly location: {
-      readonly origin: IO<string>;
-      readonly href: {
-        readonly get: IO<string>;
-        readonly set: (val: string) => IO<void>;
-      };
-    };
-  };
-};
-
-export type DOM = {
-  readonly window: typeof window;
 };
