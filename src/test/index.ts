@@ -1,10 +1,40 @@
-import { either as E, task as T } from 'fp-ts';
+import { either as E, io, task as T } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import { Window } from 'happy-dom';
 import { describe, expect, test } from 'vitest';
 
 import { GetDocError, GetDownloadUrlError, MkStack } from '../type';
+export const independencyTests = <ClientEnv>(
+  mkMkStack: MkStack<ClientEnv>,
+  clientEnv: ClientEnv
+) => {
+  const mkStack = pipe(
+    mkMkStack,
+    io.map((stack) => {
+      const env = { browser: { window: () => new Window() as any }, client: clientEnv };
+      return {
+        ...stack,
+        client: {
+          auth: {
+            signInWithGoogleRedirect: stack.client.auth.signInWithGoogleRedirect(env),
+            createUserAndSignInWithEmailAndPassword:
+              stack.client.auth.createUserAndSignInWithEmailAndPassword(env),
+            onAuthStateChanged: stack.client.auth.onAuthStateChanged(env),
+            signOut: stack.client.auth.signOut(env),
+          },
+          db: {
+            setDoc: stack.client.db.setDoc(env),
+            getDoc: stack.client.db.getDoc(env),
+          },
+          storage: {
+            uploadBase64: stack.client.storage.uploadBase64(env),
+            getDownloadUrl: stack.client.storage.getDownloadUrl(env),
+          },
+        },
+      };
+    })
+  );
 
-export const independencyTests = (mkStack: MkStack) => {
   describe('storage is independent between tests', () => {
     test('a server can upload file kira', async () => {
       const result = pipe(

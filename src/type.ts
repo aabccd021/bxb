@@ -97,35 +97,47 @@ export type GetDocParam = {
 
 export type OnAuthStateChangedCallback = (user: Option<string>) => IO<void>;
 
-export type Stack = {
+export type Window = typeof window;
+
+export type BrowserEnv = { readonly window: IO<Window> };
+
+export type Env<T> = {
+  readonly browser: BrowserEnv;
+  readonly client: T;
+};
+
+export type Stack<ClientEnv> = {
   readonly ci: {
     readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
     readonly deployDb: (c: DbDeployConfig) => Task<unknown>;
   };
   readonly client: {
     readonly auth: {
-      readonly signInWithGoogleRedirect: IO<void>;
+      readonly signInWithGoogleRedirect: (env: Env<ClientEnv>) => IO<void>;
       readonly createUserAndSignInWithEmailAndPassword: (
-        email: string,
-        password: string
-      ) => IO<void>;
-      readonly onAuthStateChanged: (callback: OnAuthStateChangedCallback) => IO<Unsubscribe>;
-      readonly signOut: IO<void>;
+        env: Env<ClientEnv>
+      ) => (email: string, password: string) => IO<void>;
+      readonly onAuthStateChanged: (
+        env: Env<ClientEnv>
+      ) => (callback: OnAuthStateChangedCallback) => IO<Unsubscribe>;
+      readonly signOut: (env: Env<ClientEnv>) => IO<void>;
     };
     readonly db: {
-      readonly setDoc: (p: CreateDocParam) => Task<unknown>;
-      readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
+      readonly setDoc: (env: Env<ClientEnv>) => (p: CreateDocParam) => Task<unknown>;
+      readonly getDoc: (
+        env: Env<ClientEnv>
+      ) => (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
     };
     readonly storage: {
-      readonly uploadBase64: (p: UploadParam) => Task<unknown>;
+      readonly uploadBase64: (env: Env<ClientEnv>) => (p: UploadParam) => Task<unknown>;
       readonly getDownloadUrl: (
-        p: GetDownloadUrlParam
-      ) => TaskEither<GetDownloadUrlError['Union'], string>;
+        env: Env<ClientEnv>
+      ) => (p: GetDownloadUrlParam) => TaskEither<GetDownloadUrlError['Union'], string>;
     };
   };
 };
 
-export type MkStack = IO<Stack>;
+export type MkStack<ClientEnv> = IO<Stack<ClientEnv>>;
 
 export type FpWindow = {
   readonly location: {
