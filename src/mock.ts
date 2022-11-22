@@ -13,10 +13,12 @@ const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly hre
 
 type ClientEnv = {};
 
+const mkFpWinIo = io.map(mkFpWindow);
+
 const signInWithRedirect = (env: Env<ClientEnv>) =>
   pipe(
     io.Do,
-    io.bind('win', () => io.map(mkFpWindow)(env.browser.window)),
+    io.bind('win', () => mkFpWinIo(env.browser.window)),
     io.bind('origin', ({ win }) => win.location.origin),
     io.bind('href', ({ win }) => win.location.href.get),
     io.chain(({ win, origin, href }) =>
@@ -41,7 +43,7 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
           ({ key, file }) =>
             pipe(
               browser.window,
-              io.map(mkFpWindow),
+              mkFpWinIo,
               io.chain((win) => win.localStorage.setItem(`storage/${key}`, file)),
               task.fromIO
             ),
@@ -50,7 +52,7 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
           ({ key }) =>
             pipe(
               browser.window,
-              io.map(mkFpWindow),
+              mkFpWinIo,
               io.chain((win) => win.localStorage.getItem(`storage/${key}`)),
               io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
               taskEither.fromIOEither
@@ -65,7 +67,7 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
         createUserAndSignInWithEmailAndPassword: (env) => (email, _password) =>
           pipe(
             io.Do,
-            io.chain(() => io.map(mkFpWindow)(env.browser.window)),
+            io.chain(() => mkFpWinIo(env.browser.window)),
             io.chainFirst((win) => win.localStorage.setItem('auth', email)),
             io.chain(() => onAuthStateChangedCallback.read),
             ioOption.chainFirstIOK((onChangedCallback) => onChangedCallback(option.some(email)))
@@ -73,7 +75,7 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
         onAuthStateChanged: (env) => (onChangedCallback) =>
           pipe(
             io.Do,
-            io.bind('win', () => io.map(mkFpWindow)(env.browser.window)),
+            io.bind('win', () => mkFpWinIo(env.browser.window)),
             io.chainFirst(() => onAuthStateChangedCallback.write(option.some(onChangedCallback))),
             io.bind('lsAuth', ({ win }) => win.localStorage.getItem('auth')),
             io.chainFirst(({ lsAuth }) => onChangedCallback(lsAuth)),
@@ -82,7 +84,7 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
         signOut: (env) =>
           pipe(
             io.Do,
-            io.chain(() => io.map(mkFpWindow)(env.browser.window)),
+            io.chain(() => mkFpWinIo(env.browser.window)),
             io.chainFirst((win) => win.localStorage.removeItem('auth')),
             io.chain(() => onAuthStateChangedCallback.read),
             ioOption.chainFirstIOK((onChangedCallback) => onChangedCallback(option.none))
