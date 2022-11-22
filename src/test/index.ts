@@ -12,9 +12,10 @@ export const independencyTests = (mkStack: MkStack) => {
         T.bind('stack', () => T.fromIO(mkStack)),
         T.chainFirst(({ stack }) => stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })),
         T.chainFirst(({ stack }) =>
-          stack.client.storage.uploadBase64({
+          stack.client.storage.uploadString({
             key: 'kira_key',
             file: 'kira_content',
+            format: 'base64',
           })
         ),
         T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
