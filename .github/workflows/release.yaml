@@ -23,7 +23,7 @@ jobs:
 
       - run: pnpm lint
 
-      - run: pnpm test:package
+      - run: vitest
 
       - run: pnpm install
         working-directory: e2e/provider/foo
