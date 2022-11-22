@@ -34,7 +34,7 @@ export const mkStackFromDom = (mkWindow: IO<typeof window>): IO<Stack> => {
       },
       client: {
         storage: {
-          uploadBase64: () => task.of(undefined),
+          uploadString: () => task.of(undefined),
           getDownloadUrl: () => taskEither.of(''),
         },
         db: {
