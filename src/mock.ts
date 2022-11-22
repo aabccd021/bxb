@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 
-import { mkFpDom } from './mkFp';
+import { mkFpWindow } from './mkFp';
 import { FpWindow, OnAuthStateChangedCallback, Stack } from './type';
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
@@ -21,7 +21,7 @@ const signInWithRedirect = (window: FpWindow) =>
   );
 
 export const mkStackFromDom = (mkWindow: IO<typeof window>): IO<Stack> => {
-  const window = mkFpDom(mkWindow);
+  const window = mkFpWindow(mkWindow);
   return pipe(
     io.Do,
     io.bind('onAuthStateChangedCallback', () =>
