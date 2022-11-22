@@ -1,4 +1,5 @@
 import { summonFor, UM } from '@morphic-ts/batteries/lib/summoner-ESBST';
+import { AType } from '@morphic-ts/summoners/lib';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
 import { IO } from 'fp-ts/IO';
 import { IOOption } from 'fp-ts/IOOption';
@@ -9,6 +10,10 @@ import { TaskEither } from 'fp-ts/TaskEither';
 import { makeUnion, TypeOf } from 'make-union-morphic-ts';
 
 const { summon } = summonFor({});
+
+export const UnknownRecord = summon((F) => F.strMap(F.unknown()));
+
+export type UnknownRecord = AType<typeof UnknownRecord>;
 
 export type Condition =
   | {

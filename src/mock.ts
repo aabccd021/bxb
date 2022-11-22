@@ -1,10 +1,17 @@
-import { either, io, ioEither, ioOption, ioRef, option, task, taskEither } from 'fp-ts';
-import { pipe } from 'fp-ts/function';
+import { either, io, ioOption, ioRef, option, readonlyRecord, task, taskEither } from 'fp-ts';
+import { flow, pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 
 import { mkFpWindow } from './mkFp';
-import { Env, GetDocError, GetDownloadUrlError, OnAuthStateChangedCallback, Stack } from './type';
+import {
+  Env,
+  GetDocError,
+  GetDownloadUrlError,
+  OnAuthStateChangedCallback,
+  Stack,
+  UnknownRecord,
+} from './type';
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
   const searchParamsStr = new URLSearchParams({ redirectUrl: href }).toString();
@@ -63,22 +70,59 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
           (env) =>
           ({ key, data }) =>
             pipe(
-              env.browser.window,
-              mkFpWinIo,
-              io.chain((win) =>
-                win.localStorage.setItem(`db/${key.collection}/${key.id}`, JSON.stringify(data))
+              io.Do,
+              io.bind('win', () => mkFpWinIo(env.browser.window)),
+              io.bind('oldDbData', ({ win }) => win.localStorage.getItem('db')),
+              io.chain(({ win, oldDbData }) =>
+                pipe(
+                  oldDbData,
+                  option.map(JSON.parse),
+                  option.chain(option.fromPredicate(UnknownRecord.type.is)),
+                  option.getOrElse(() => ({})),
+                  (dbData) => ({
+                    ...dbData,
+                    [`${key.collection}/${key.id}`]: data,
+                  }),
+                  (r: UnknownRecord) => JSON.stringify(r),
+                  (updatedDbData) => win.localStorage.setItem('db', updatedDbData)
+                )
               ),
               task.fromIO
             ),
         getDoc:
-          ({ browser }) =>
+          (env) =>
           ({ key }) =>
             pipe(
-              browser.window,
-              mkFpWinIo,
-              io.chain((win) => win.localStorage.getItem(`db/${key.collection}/${key.id}`)),
-              io.map(either.fromOption(() => GetDocError.Union.of.DocNotFound({}))),
-              ioEither.map(JSON.parse),
+              mkFpWinIo(env.browser.window),
+              io.chain((win) => win.localStorage.getItem('db')),
+              io.map(
+                flow(
+                  either.fromOption(() => GetDocError.Union.of.DocNotFound({})),
+                  either.chainW(
+                    flow(
+                      JSON.parse,
+                      option.fromPredicate(UnknownRecord.type.is),
+                      either.fromOption(() =>
+                        GetDocError.Union.of.Unknown({ value: 'db is not an object' })
+                      )
+                    )
+                  ),
+                  either.chainW(
+                    flow(
+                      readonlyRecord.lookup(`${key.collection}/${key.id}`),
+                      either.fromOption(() => GetDocError.Union.of.DocNotFound({}))
+                    )
+                  ),
+                  either.chainW(
+                    flow(
+                      option.fromPredicate(UnknownRecord.type.is),
+                      either.fromOption(() =>
+                        GetDocError.Union.of.Unknown({ value: 'doc is not an object' })
+                      )
+                    )
+                  )
+                )
+              ),
               taskEither.fromIOEither
             ),
       },
