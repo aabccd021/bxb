@@ -4,44 +4,27 @@ import { IO } from 'fp-ts/IO';
 
 import { DOM, FpDOM } from './type';
 
-export const mkFpDom = (mkDom: IO<DOM>): FpDOM => ({
-  window: {
-    location: {
-      origin: pipe(
-        mkDom,
-        io.map((dom) => dom.window.location.origin)
-      ),
-      href: {
-        get: pipe(
-          mkDom,
-          io.map((dom) => dom.window.location.href)
-        ),
-        set: (newHref) =>
-          pipe(
-            mkDom,
-            io.chain((dom) => () => {
+export const mkFpDom = (mkDom: IO<DOM>): FpDOM => {
+  const domMapIO = <T>(f: (dom: DOM) => T) => io.map(f)(mkDom);
+  const domChainIO = <T>(f: (dom: DOM) => IO<T>) => io.chain(f)(mkDom);
+  return {
+    window: {
+      location: {
+        origin: domMapIO((dom) => dom.window.location.origin),
+        href: {
+          get: domMapIO((dom) => dom.window.location.href),
+          set: (newHref) =>
+            domChainIO((dom) => () => {
               dom.window.location.href = newHref;
-            })
-          ),
+            }),
+        },
       },
     },
-  },
-  localStorage: {
-    getItem: (key) =>
-      pipe(
-        mkDom,
-        io.chain((dom) => () => dom.localStorage.getItem(key)),
-        io.map(option.fromNullable)
-      ),
-    setItem: (key, value) =>
-      pipe(
-        mkDom,
-        io.chain((dom) => () => dom.localStorage.setItem(key, value))
-      ),
-    removeItem: (key) =>
-      pipe(
-        mkDom,
-        io.chain((dom) => () => dom.localStorage.removeItem(key))
-      ),
-  },
-});
+    localStorage: {
+      getItem: (key) =>
+        domChainIO((dom) => () => pipe(key, dom.localStorage.getItem, option.fromNullable)),
+      setItem: (key, value) => domChainIO((dom) => () => dom.localStorage.setItem(key, value)),
+      removeItem: (key) => domChainIO((dom) => () => dom.localStorage.removeItem(key)),
+    },
+  };
+};
