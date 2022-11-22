@@ -1,5 +1,3 @@
-import { mkStackFromDom } from './mock';
-
-const mkStack = mkStackFromDom(() => window);
+import { mkStack } from './mock';
 
 export const stack = mkStack();

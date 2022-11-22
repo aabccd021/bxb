@@ -13,8 +13,8 @@ import {stack as providerStack} from 'masmott-${provider}';
 
 export const ${method} =
   process.env.NODE_ENV === 'production' 
-    ? providerStack.client.${scope}.${method} 
-    : mockStack.client.${scope}.${method};
+    ? providerStack.client.${scope}.${method}({browser: {window: () => window}, client: {}})
+    : mockStack.client.${scope}.${method}({browser: {window: () => window}, client: {}});
 `;
 
 const scopes = {
