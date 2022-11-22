@@ -1,10 +1,5 @@
-import { pipe } from 'fp-ts/function';
+import { mkStackFromDom } from './mock';
 
-import { mkFpDom } from './mkFp';
-import { mkStackFromFpDom } from './mock';
-
-const mkDom = () => ({ window, localStorage });
-
-const mkStack = pipe(mkDom, mkFpDom, mkStackFromFpDom);
+const mkStack = mkStackFromDom(() => ({ window, localStorage }));
 
 export const stack = mkStack();

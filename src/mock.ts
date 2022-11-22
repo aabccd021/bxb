@@ -3,7 +3,8 @@ import { pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 
-import { FpDOM, OnAuthStateChangedCallback, Stack } from './type';
+import { mkFpDom } from './mkFp';
+import { DOM, FpDOM, OnAuthStateChangedCallback, Stack } from './type';
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
   const searchParamsStr = new URLSearchParams({ redirectUrl: href }).toString();
@@ -19,10 +20,11 @@ const signInWithRedirect = (dom: FpDOM) =>
     io.chain(dom.window.location.href.set)
   );
 
-export const mkStackFromFpDom = (
-  dom: FpDOM
-): IO<{ readonly client: { readonly auth: Stack['client']['auth'] } }> =>
-  pipe(
+export const mkStackFromDom = (
+  mkDom: IO<DOM>
+): IO<{ readonly client: { readonly auth: Stack['client']['auth'] } }> => {
+  const dom = mkFpDom(mkDom);
+  return pipe(
     io.Do,
     io.bind('onAuthStateChangedCallback', () =>
       ioRef.newIORef<Option<OnAuthStateChangedCallback>>(option.none)
@@ -56,3 +58,4 @@ export const mkStackFromFpDom = (
       },
     }))
   );
+};
