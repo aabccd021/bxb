@@ -47,15 +47,8 @@ const authStorage = mkSafeLocalStorage(string.isString, (data) => ({
   message: 'invalid auth data loaded',
   data,
 }))('auth');
-
 const dbStorage = mkSafeLocalStorage(UnknownRecord.type.is, (data, key) =>
-  GetDocError.Union.of.Unknown({
-    value: {
-      message: 'invalid db data loaded',
-      key,
-      data,
-    },
-  })
+  GetDocError.Union.of.Unknown({ value: { message: 'invalid db data loaded', key, data } })
 )('db');
 
 export const mkStack: IO<Stack<ClientEnv>> = pipe(
@@ -109,7 +102,7 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
                   ioEither.chainIOK((updatedDbData) => storage.setItem(updatedDbData))
                 )
               ),
-              task.fromIO
+              taskEither.fromIOEither
             ),
         getDoc:
           (env) =>
