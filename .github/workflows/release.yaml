@@ -23,8 +23,14 @@ jobs:
 
       - run: vitest
 
+      - run: pnpm install
+        working-directory: e2e/provider/foo
+
       - run: pnpm build
         working-directory: e2e/provider/foo
+
+      - run: pnpm install
+        working-directory: e2e/framework/nextjs
 
       - run: pnpm generate
         working-directory: e2e/framework/nextjs
