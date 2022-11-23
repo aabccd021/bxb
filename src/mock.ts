@@ -38,9 +38,7 @@ const signInWithRedirect = (env: Env<ClientEnv>) =>
     io.let('location', ({ win }) => mkFpLocation(win.location)),
     io.bind('origin', ({ location }) => location.origin),
     io.bind('href', ({ location }) => location.href.get),
-    io.chain(({ location, origin, href }) =>
-      pipe({ origin, href }, mkRedirectUrl, location.href.set)
-    )
+    io.chain(({ location, origin, href }) => location.href.set(mkRedirectUrl({ origin, href })))
   );
 
 const authStorage = mkSafeLocalStorage(string.isString, (data) => ({
