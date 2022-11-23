@@ -134,7 +134,7 @@ export type Stack<ClientEnv> = {
       ) => (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
     };
     readonly storage: {
-      readonly uploadBase64: (env: Env<ClientEnv>) => (p: UploadParam) => Task<unknown>;
+      readonly uploadDataUrl: (env: Env<ClientEnv>) => (p: UploadParam) => Task<unknown>;
       readonly getDownloadUrl: (
         env: Env<ClientEnv>
       ) => (p: GetDownloadUrlParam) => TaskEither<GetDownloadUrlError['Union'], string>;

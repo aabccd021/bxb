@@ -45,7 +45,7 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
     },
     client: {
       storage: {
-        uploadBase64:
+        uploadDataUrl:
           ({ browser }) =>
           ({ key, file }) =>
             pipe(
