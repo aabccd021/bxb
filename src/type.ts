@@ -2,7 +2,6 @@ import { summonFor, UM } from '@morphic-ts/batteries/lib/summoner-ESBST';
 import { AType } from '@morphic-ts/summoners/lib';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
 import { IO } from 'fp-ts/IO';
-import { IOOption } from 'fp-ts/IOOption';
 import { Option } from 'fp-ts/Option';
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import { Task } from 'fp-ts/Task';
@@ -143,18 +142,3 @@ export type Stack<ClientEnv> = {
 };
 
 export type MkStack<ClientEnv> = IO<Stack<ClientEnv>>;
-
-export type FpWindow = {
-  readonly location: {
-    readonly origin: IO<string>;
-    readonly href: {
-      readonly get: IO<string>;
-      readonly set: (val: string) => IO<void>;
-    };
-  };
-  readonly localStorage: {
-    readonly getItem: (key: string) => IOOption<string>;
-    readonly setItem: (key: string, value: string) => IO<void>;
-    readonly removeItem: (key: string) => IO<void>;
-  };
-};
