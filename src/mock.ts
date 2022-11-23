@@ -14,7 +14,7 @@ import { flow, pipe } from 'fp-ts/function';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 
-import { mkFpWindow, mkSafeLocalStorage } from './mkFp';
+import { mkFpLocation, mkFpWindow, mkSafeLocalStorage } from './mkFp';
 import {
   Env,
   GetDocError,
@@ -34,11 +34,12 @@ type ClientEnv = {};
 const signInWithRedirect = (env: Env<ClientEnv>) =>
   pipe(
     io.Do,
-    io.bind('win', () => io.map(mkFpWindow)(env.browser.window)),
-    io.bind('origin', ({ win }) => win.location.origin),
-    io.bind('href', ({ win }) => win.location.href.get),
-    io.chain(({ win, origin, href }) =>
-      pipe({ origin, href }, mkRedirectUrl, win.location.href.set)
+    io.bind('win', () => env.browser.window),
+    io.let('location', ({ win }) => mkFpLocation(win.location)),
+    io.bind('origin', ({ location }) => location.origin),
+    io.bind('href', ({ location }) => location.href.get),
+    io.chain(({ location, origin, href }) =>
+      pipe({ origin, href }, mkRedirectUrl, location.href.set)
     )
   );
 
@@ -58,11 +59,8 @@ const dbStorage = mkSafeLocalStorage(UnknownRecord.type.is, (data, key) =>
 )('db');
 
 export const mkStack: IO<Stack<ClientEnv>> = pipe(
-  io.Do,
-  io.bind('onAuthStateChangedCallback', () =>
-    ioRef.newIORef<Option<OnAuthStateChangedCallback>>(option.none)
-  ),
-  io.map(({ onAuthStateChangedCallback }) => ({
+  ioRef.newIORef<Option<OnAuthStateChangedCallback>>(option.none),
+  io.map((onAuthStateChangedCallback) => ({
     ci: {
       deployStorage: () => task.of(undefined),
       deployDb: () => task.of(undefined),
@@ -94,8 +92,9 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
           (env) =>
           ({ key, data }) =>
             pipe(
-              env.browser.window,
-              io.let('storage', (win) => dbStorage(win.localStorage)),
+              io.Do,
+              io.bind('win', () => env.browser.window),
+              io.let('storage', ({ win }) => dbStorage(win.localStorage)),
               io.bind('oldDbData', ({ storage }) => storage.getItem),
               io.chain(({ storage, oldDbData }) =>
                 pipe(
@@ -107,7 +106,6 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
                     )
                   ),
                   ioEither.fromEither,
-
                   ioEither.chainIOK((updatedDbData) => storage.setItem(updatedDbData))
                 )
               ),
@@ -117,9 +115,10 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
           (env) =>
           ({ key }) =>
             pipe(
-              env.browser.window,
-              io.map((win) => dbStorage(win.localStorage)),
-              io.chain((storage) => storage.getItem),
+              io.Do,
+              io.bind('win', () => env.browser.window),
+              io.let('storage', ({ win }) => dbStorage(win.localStorage)),
+              io.chain(({ storage }) => storage.getItem),
               ioEither.chainEitherK(
                 flow(
                   option.chain(readonlyRecord.lookup(`${key.collection}/${key.id}`)),
