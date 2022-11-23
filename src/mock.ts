@@ -147,10 +147,11 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
           ),
         onAuthStateChanged: (env) => (onChangedCallback) =>
           pipe(
-            onAuthStateChangedCallback.write(option.some(onChangedCallback)),
-            io.chain(() => io.map(mkFpWindow)(env.browser.window)),
+            env.browser.window,
+            io.map(mkFpWindow),
             io.chain((win) => win.localStorage.getItem('auth')),
             io.chain((lsAuth) => onChangedCallback(lsAuth)),
+            io.chain(() => onAuthStateChangedCallback.write(option.some(onChangedCallback))),
             io.map(() => onAuthStateChangedCallback.write(option.none))
           ),
         signOut: (env) =>
