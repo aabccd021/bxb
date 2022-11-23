@@ -94,13 +94,8 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
           (env) =>
           ({ key, data }) =>
             pipe(
-              io.Do,
-              io.bind('storage', () =>
-                pipe(
-                  env.browser.window,
-                  io.map((win) => dbStorage(win.localStorage))
-                )
-              ),
+              env.browser.window,
+              io.let('storage', (win) => dbStorage(win.localStorage)),
               io.bind('oldDbData', ({ storage }) => storage.getItem),
               io.chain(({ storage, oldDbData }) =>
                 pipe(
