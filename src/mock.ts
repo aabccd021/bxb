@@ -16,12 +16,12 @@ import { Option } from 'fp-ts/Option';
 
 import { mkFpLocation, mkFpWindow, mkSafeLocalStorage } from './mkFp';
 import {
+  DB,
   Env,
   GetDocError,
   GetDownloadUrlError,
   OnAuthStateChangedCallback,
   Stack,
-  UnknownRecord,
 } from './type';
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
@@ -47,7 +47,8 @@ const authStorage = mkSafeLocalStorage(string.isString, (data) => ({
   message: 'invalid auth data loaded',
   data,
 }))('auth');
-const dbStorage = mkSafeLocalStorage(UnknownRecord.type.is, (data, key) =>
+
+const dbStorage = mkSafeLocalStorage(DB.type.is, (data, key) =>
   GetDocError.Union.of.Unknown({ value: { message: 'invalid db data loaded', key, data } })
 )('db');
 
@@ -85,21 +86,18 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
           (env) =>
           ({ key, data }) =>
             pipe(
-              io.Do,
-              io.bind('win', () => env.browser.window),
-              io.let('storage', ({ win }) => dbStorage(win.localStorage)),
-              io.bind('oldDbData', ({ storage }) => storage.getItem),
-              io.chain(({ storage, oldDbData }) =>
+              env.browser.window,
+              io.map((win) => dbStorage(win.localStorage)),
+              io.chain((storage) =>
                 pipe(
-                  oldDbData,
-                  either.map(
+                  storage.getItem,
+                  ioEither.map(
                     flow(
                       option.getOrElse(() => ({})),
                       readonlyRecord.upsertAt(`${key.collection}/${key.id}`, data)
                     )
                   ),
-                  ioEither.fromEither,
-                  ioEither.chainIOK((updatedDbData) => storage.setItem(updatedDbData))
+                  ioEither.chainIOK(storage.setItem)
                 )
               ),
               taskEither.fromIOEither
@@ -108,21 +106,13 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
           (env) =>
           ({ key }) =>
             pipe(
-              io.Do,
-              io.bind('win', () => env.browser.window),
-              io.let('storage', ({ win }) => dbStorage(win.localStorage)),
-              io.chain(({ storage }) => storage.getItem),
+              env.browser.window,
+              io.map((win) => dbStorage(win.localStorage)),
+              io.chain((storage) => storage.getItem),
               ioEither.chainEitherK(
                 flow(
                   option.chain(readonlyRecord.lookup(`${key.collection}/${key.id}`)),
-                  either.fromOption(() => GetDocError.Union.of.DocNotFound({})),
-                  either.chain(
-                    either.fromPredicate(UnknownRecord.type.is, () =>
-                      GetDocError.Union.of.Unknown({
-                        value: { message: 'doc is not an object', key },
-                      })
-                    )
-                  )
+                  either.fromOption(() => GetDocError.Union.of.DocNotFound({}))
                 )
               ),
               taskEither.fromIOEither
