@@ -10,9 +10,9 @@ import { makeUnion, TypeOf } from 'make-union-morphic-ts';
 
 const { summon } = summonFor({});
 
-export const UnknownRecord = summon((F) => F.strMap(F.unknown()));
+export const DB = summon((F) => F.strMap(F.strMap(F.unknown())));
 
-export type UnknownRecord = AType<typeof UnknownRecord>;
+export type DB = AType<typeof DB>;
 
 export type Condition =
   | {
