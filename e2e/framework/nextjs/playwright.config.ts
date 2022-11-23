@@ -4,7 +4,6 @@ import { devices } from '@playwright/test';
 const config: PlaywrightTestConfig = {
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  workers: process.env.CI ? '100%' : undefined,
   projects: [
     {
       name: 'chromium',
