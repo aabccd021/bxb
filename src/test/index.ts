@@ -1,16 +1,20 @@
-import { apply, either as E, io, reader, task as T } from 'fp-ts';
-import { pipe } from 'fp-ts/function';
+import { apply, either, io, reader, task, taskEither } from 'fp-ts';
+import { identity, pipe } from 'fp-ts/function';
 import { Window } from 'happy-dom';
+import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
 
 import { GetDocError, GetDownloadUrlError, MkStack } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
-const adaptMkStack = <ClientEnv>(mkMkStack: MkStack<ClientEnv>, clientEnv: ClientEnv) =>
-  pipe(
+export const independencyTests = <ClientEnv>(
+  mkStackFromEnv: MkStack<ClientEnv>,
+  clientEnv: ClientEnv
+) => {
+  const mkStack = pipe(
     io.Do,
-    io.bind('stack', () => mkMkStack),
+    io.bind('stack', () => mkStackFromEnv),
     io.bind('window', () => () => new Window()),
     io.map(({ stack, window }) =>
       pipe(
@@ -23,73 +27,92 @@ const adaptMkStack = <ClientEnv>(mkMkStack: MkStack<ClientEnv>, clientEnv: Clien
         (client) => ({ ...stack, client })
       )
     ),
-    T.fromIO
+    task.fromIO
   );
-
-export const independencyTests = <ClientEnv>(
-  mkMkStack: MkStack<ClientEnv>,
-  clientEnv: ClientEnv
-) => {
-  const mkStack = adaptMkStack(mkMkStack, clientEnv);
 
   describe('storage is independent between tests', () => {
     test('a server can upload file kira', async () => {
       const result = pipe(
-        T.Do,
-        T.bind('stack', () => mkStack),
-        T.chainFirst(({ stack }) => stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })),
-        T.chainFirst(({ stack }) =>
-          stack.client.storage.uploadBase64({
+        task.Do,
+        task.bind('stack', () => mkStack),
+        task.chainFirst(({ stack }) =>
+          stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })
+        ),
+        task.chainFirst(({ stack }) =>
+          stack.client.storage.uploadDataUrl({
             key: 'kira_key',
             file: 'kira_content',
           })
         ),
-        T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
-        T.map(E.isRight)
+        task.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
+        task.map(either.isRight)
       );
       expect(await result()).toEqual(true);
     });
 
     test('server from another test can not access file kira', async () => {
       const result = pipe(
-        T.Do,
-        T.bind('stack', () => mkStack),
-        T.chainFirst(({ stack }) => stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })),
-        T.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
+        task.Do,
+        task.bind('stack', () => mkStack),
+        task.chainFirst(({ stack }) =>
+          stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })
+        ),
+        task.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
       );
-      expect(await result()).toEqual(E.left(GetDownloadUrlError.Union.as.FileNotFound({})));
+      expect(await result()).toEqual(either.left(GetDownloadUrlError.Union.as.FileNotFound({})));
     });
   });
 
   describe('db is independent between tests', () => {
     test('a server can create document kira', async () => {
       const result = pipe(
-        T.Do,
-        T.bind('stack', () => mkStack),
-        T.chainFirst(({ stack }) => stack.ci.deployDb({ securityRule: { type: 'allowAll' } })),
-        T.chainFirst(({ stack }) =>
+        task.Do,
+        task.bind('stack', () => mkStack),
+        task.chainFirst(({ stack }) => stack.ci.deployDb({ securityRule: { type: 'allowAll' } })),
+        task.chainFirst(({ stack }) =>
           stack.client.db.setDoc({
             key: { collection: 'user', id: 'kira_id' },
             data: { name: 'masumoto' },
           })
         ),
-        T.chain(({ stack }) =>
+        task.chain(({ stack }) =>
           stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
         )
       );
-      expect(await result()).toEqual(E.right({ name: 'masumoto' }));
+      expect(await result()).toEqual(either.right({ name: 'masumoto' }));
     });
 
     test('server from another test can not access document kira', async () => {
       const result = pipe(
-        T.Do,
-        T.bind('stack', () => mkStack),
-        T.chainFirst(({ stack }) => stack.ci.deployDb({ securityRule: { type: 'allowAll' } })),
-        T.chain(({ stack }) =>
+        task.Do,
+        task.bind('stack', () => mkStack),
+        task.chainFirst(({ stack }) => stack.ci.deployDb({ securityRule: { type: 'allowAll' } })),
+        task.chain(({ stack }) =>
           stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
         )
       );
-      expect(await result()).toEqual(E.left(GetDocError.Union.as.DocNotFound({})));
+      expect(await result()).toEqual(either.left(GetDocError.Union.as.DocNotFound({})));
     });
+  });
+
+  test('can upload data url and get download url', async () => {
+    const result = pipe(
+      task.Do,
+      task.bind('stack', () => mkStack),
+      task.chainFirst(({ stack }) =>
+        stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })
+      ),
+      task.chainFirst(({ stack }) =>
+        stack.client.storage.uploadDataUrl({
+          file: 'data:,kira masumoto',
+          key: 'masumo',
+        })
+      ),
+      task.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'masumo' })),
+      taskEither.chain((downloadUrl) => taskEither.tryCatch(() => fetch(downloadUrl), identity)),
+      taskEither.chain((res) => taskEither.tryCatch(() => res.text(), identity))
+    );
+
+    expect(await result()).toEqual(either.right('kira masumoto'));
   });
 };
