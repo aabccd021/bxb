@@ -41,7 +41,7 @@ export const independencyTests = <ClientEnv>(
         task.chainFirst(({ stack }) =>
           stack.client.storage.uploadDataUrl({
             key: 'kira_key',
-            file: 'kira_content',
+            file: 'data:;base64,a2lyYSBtYXN1bW90bw==',
           })
         ),
         task.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
@@ -104,7 +104,7 @@ export const independencyTests = <ClientEnv>(
       ),
       task.chainFirst(({ stack }) =>
         stack.client.storage.uploadDataUrl({
-          file: 'data:,kira masumoto',
+          file: 'data:;base64,a2lyYSBtYXN1bW90bw==',
           key: 'masumo',
         })
       ),
