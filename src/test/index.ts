@@ -1,10 +1,10 @@
-import { apply, either, io, reader, task, taskEither } from 'fp-ts';
+import { apply, either, io, option, reader, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 import { Window } from 'happy-dom';
 import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
 
-import type { MkStack } from '../type';
+import { MkStack, provider } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
@@ -75,9 +75,10 @@ export const tests = <ClientEnv>(mkStackFromEnv: MkStack<ClientEnv>, clientEnv: 
         ),
         task.chain(({ stack }) =>
           stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
-        )
+        ),
+        taskEither.map(provider.getValue)
       );
-      expect(await result()).toEqual(either.right({ name: 'masumoto' }));
+      expect(await result()).toEqual(either.right(option.some({ name: 'masumoto' })));
     });
 
     test('server from another test can not access document kira', async () => {
@@ -88,9 +89,9 @@ export const tests = <ClientEnv>(mkStackFromEnv: MkStack<ClientEnv>, clientEnv: 
         task.chain(({ stack }) =>
           stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
         ),
-        taskEither.mapLeft(({ code }) => code)
+        taskEither.map(provider.getValue)
       );
-      expect(await result()).toEqual(either.left('DocNotFound'));
+      expect(await result()).toEqual(either.right(option.none));
     });
   });
 

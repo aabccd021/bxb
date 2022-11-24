@@ -44,8 +44,8 @@ export const UploadDataUrlError = makeUnion(summon)('code')({
   InvalidDataUrlFormat: summon((F) =>
     F.interface({ code: F.stringLiteral('InvalidDataUrlFormat') }, 'InvalidDataUrlFormat')
   ),
-  Unknown: summon((F) =>
-    F.interface({ code: F.stringLiteral('Unknown'), value: F.unknown() }, 'Unknown')
+  ProviderError: summon((F) =>
+    F.interface({ code: F.stringLiteral('ProviderError'), value: F.unknown() }, 'ProviderError')
   ),
 });
 
@@ -63,9 +63,8 @@ export const GetDownloadUrlError = makeUnion(summon)('code')({
 export type GetDownloadUrlError = TypeOf<typeof GetDownloadUrlError>;
 
 export const GetDocError = makeUnion(summon)('code')({
-  DocNotFound: summon((F) => F.interface({ code: F.stringLiteral('DocNotFound') }, 'DocNotFound')),
-  Unknown: summon((F) =>
-    F.interface({ code: F.stringLiteral('Unknown'), value: F.unknown() }, 'Unknown')
+  ProviderError: summon((F) =>
+    F.interface({ code: F.stringLiteral('ProviderError'), value: F.unknown() }, 'ProviderError')
   ),
 });
 
@@ -138,12 +137,20 @@ export type ClientT<T, K extends Record<string, Record<string, unknown>>> = {
   readonly [KK in keyof K]: ClientScope<T, K[KK]>;
 };
 
-export type BaseTE<L, R> = TaskEither<
-  L,
-  R extends undefined
-    ? { readonly provider: string } | undefined
-    : { readonly value: R; readonly context?: { readonly provider: string } }
->;
+export type ProviderContext<T extends string = string> = { readonly provider: T } | undefined;
+
+export type ProviderResult<R, T extends string = string> = {
+  readonly value: R;
+  readonly context?: ProviderContext<T>;
+};
+
+export const provider = {
+  of: <T>(value: T) => ({ value }),
+  fromContext:
+    <K extends ProviderContext = ProviderContext>(context: K) =>
+    <T>(value: T) => ({ value, context }),
+  getValue: <R, T extends string = string>(p: ProviderResult<R, T>) => p.value,
+};
 
 export type ProviderError = { readonly code: 'ProviderError' };
 
@@ -151,22 +158,24 @@ export type Client<T> = ClientT<
   T,
   {
     readonly auth: {
-      readonly signInWithGoogleRedirect: IO<unknown>;
+      readonly signInWithGoogleRedirect: IO<ProviderContext>;
       readonly createUserAndSignInWithEmailAndPassword: (
         p: CreateUserAndSignInWithEmailAndPasswordParam
-      ) => IO<unknown>;
+      ) => IO<ProviderContext>;
       readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
-      readonly signOut: IO<unknown>;
+      readonly signOut: IO<ProviderContext>;
     };
     readonly db: {
-      readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, unknown>;
-      readonly getDoc: (p: GetDocParam) => TaskEither<{ readonly code: string }, unknown>;
+      readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, ProviderContext>;
+      readonly getDoc: (
+        p: GetDocParam
+      ) => TaskEither<GetDocError['Union'], ProviderResult<Option<DocData>>>;
     };
     readonly storage: {
-      readonly uploadDataUrl: (p: UploadParam) => BaseTE<UploadDataUrlError, undefined>;
+      readonly uploadDataUrl: (p: UploadParam) => TaskEither<UploadDataUrlError, ProviderContext>;
       readonly getDownloadUrl: (
         p: GetDownloadUrlParam
-      ) => BaseTE<GetDownloadUrlError['Union'], string>;
+      ) => TaskEither<GetDownloadUrlError['Union'], ProviderResult<string>>;
     };
   }
 >;
