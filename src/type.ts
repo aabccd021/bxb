@@ -163,7 +163,7 @@ export type Client<T> = ClientT<
         p: GetDownloadUrlParam
       ) => TaskEither<
         GetDownloadUrlError['Union'] | { readonly code: 'ProviderError'; readonly value: unknown },
-        { readonly value: string }
+        { readonly value: string; readonly context?: { readonly provider: string } }
       >;
     };
   }
