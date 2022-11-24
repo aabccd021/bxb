@@ -4,7 +4,6 @@
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
-    "emitDeclarationOnly": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "lib": [
@@ -35,8 +34,6 @@
   "include": [
     "src",
     "test",
-    "e2e",
-    "vitest.config.ts",
-    "playwright.config.ts"
+    "vitest.config.ts"
   ]
 }
