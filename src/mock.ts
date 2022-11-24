@@ -75,7 +75,7 @@ export const mkStack = pipe(
             env.browser.window,
             io.map(mkFpWindow),
             io.chain((win) => win.localStorage.getItem(`storage/${param.key}`)),
-            ioOption.map((value) => ({ value })),
+            ioOption.map((value) => ({ value, context: { provider: 'mock', aab: 'ccd' } })),
             io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
             taskEither.fromIOEither
           ),
