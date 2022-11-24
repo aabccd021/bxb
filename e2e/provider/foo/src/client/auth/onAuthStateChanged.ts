@@ -1,7 +1,6 @@
-import { Stack } from 'masmott';
+import { OnAuthStateChangedParam } from 'masmott/type';
 
-import { ClientEnv } from '../env';
+import { FooEnv } from '../env';
 
-export const onAuthStateChanged: Stack<ClientEnv>['client']['auth']['onAuthStateChanged'] =
-  () => () => () => () =>
-    undefined;
+export const onAuthStateChanged = (_env: FooEnv) => (_p: OnAuthStateChangedParam) => () => () =>
+  undefined;

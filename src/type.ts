@@ -40,13 +40,17 @@ export const Condition: UM<{}, Condition> = summon((F) =>
   )
 );
 
+export const ProviderError = summon((F) =>
+  F.interface({ code: F.stringLiteral('ProviderError'), value: F.unknown() }, 'ProviderError')
+);
+
+export type ProviderError = AType<typeof ProviderError>;
+
 export const UploadDataUrlError = makeUnion(summon)('code')({
   InvalidDataUrlFormat: summon((F) =>
     F.interface({ code: F.stringLiteral('InvalidDataUrlFormat') }, 'InvalidDataUrlFormat')
   ),
-  ProviderError: summon((F) =>
-    F.interface({ code: F.stringLiteral('ProviderError'), value: F.unknown() }, 'ProviderError')
-  ),
+  ProviderError,
 });
 
 export type UploadDataUrlError = TypeOf<typeof UploadDataUrlError>;
@@ -55,17 +59,13 @@ export const GetDownloadUrlError = makeUnion(summon)('code')({
   FileNotFound: summon((F) =>
     F.interface({ code: F.stringLiteral('FileNotFound') }, 'FileNotFound')
   ),
-  ProviderError: summon((F) =>
-    F.interface({ code: F.stringLiteral('ProviderError'), value: F.unknown() }, 'ProviderError')
-  ),
+  ProviderError,
 });
 
 export type GetDownloadUrlError = TypeOf<typeof GetDownloadUrlError>;
 
 export const GetDocError = makeUnion(summon)('code')({
-  ProviderError: summon((F) =>
-    F.interface({ code: F.stringLiteral('ProviderError'), value: F.unknown() }, 'ProviderError')
-  ),
+  ProviderError,
 });
 
 export type GetDocError = TypeOf<typeof GetDocError>;
@@ -137,22 +137,22 @@ export type ClientT<T, K extends Record<string, Record<string, unknown>>> = {
   readonly [KK in keyof K]: ClientScope<T, K[KK]>;
 };
 
-export type ProviderContext<T extends string = string> = { readonly provider: T } | undefined;
+export type ProviderContext<C = unknown, P extends string = string> =
+  | { readonly provider: P; readonly context: C }
+  | undefined;
 
-export type ProviderResult<R, T extends string = string> = {
-  readonly value: R;
-  readonly context?: ProviderContext<T>;
+export type ProviderResult<T, C = unknown, P extends string = string> = {
+  readonly value: T;
+  readonly context?: ProviderContext<C, P>;
 };
 
 export const provider = {
   of: <T>(value: T) => ({ value }),
   fromContext:
-    <K extends ProviderContext = ProviderContext>(context: K) =>
+    <C = unknown, P extends string = string>(context: ProviderContext<C, P>) =>
     <T>(value: T) => ({ value, context }),
-  getValue: <R, T extends string = string>(p: ProviderResult<R, T>) => p.value,
+  getValue: <T, C = unknown, P extends string = string>(p: ProviderResult<T, C, P>) => p.value,
 };
-
-export type ProviderError = { readonly code: 'ProviderError' };
 
 export type Client<T> = ClientT<
   T,
@@ -172,7 +172,9 @@ export type Client<T> = ClientT<
       ) => TaskEither<GetDocError['Union'], ProviderResult<Option<DocData>>>;
     };
     readonly storage: {
-      readonly uploadDataUrl: (p: UploadParam) => TaskEither<UploadDataUrlError, ProviderContext>;
+      readonly uploadDataUrl: (
+        p: UploadParam
+      ) => TaskEither<UploadDataUrlError['Union'], ProviderContext>;
       readonly getDownloadUrl: (
         p: GetDownloadUrlParam
       ) => TaskEither<GetDownloadUrlError['Union'], ProviderResult<string>>;

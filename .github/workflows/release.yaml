@@ -28,6 +28,9 @@ jobs:
       - run: pnpm install
         working-directory: e2e/provider/foo
 
+      - run: pnpm test
+        working-directory: e2e/provider/foo
+
       - run: pnpm build
         working-directory: e2e/provider/foo
 

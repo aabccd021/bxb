@@ -1,7 +1,3 @@
-import { Stack } from 'masmott';
+import { FooEnv } from '../env';
 
-import { ClientEnv } from '../env';
-
-// eslint-disable-next-line max-len
-export const signInWithGoogleRedirect: Stack<ClientEnv>['client']['auth']['signInWithGoogleRedirect'] =
-  () => () => () => undefined;
+export const signInWithGoogleRedirect = (_env: FooEnv) => () => undefined;
