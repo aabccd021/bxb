@@ -55,8 +55,8 @@ export const GetDownloadUrlError = makeUnion(summon)('code')({
   FileNotFound: summon((F) =>
     F.interface({ code: F.stringLiteral('FileNotFound') }, 'FileNotFound')
   ),
-  Unknown: summon((F) =>
-    F.interface({ code: F.stringLiteral('Unknown'), value: F.unknown() }, 'Unknown')
+  ProviderError: summon((F) =>
+    F.interface({ code: F.stringLiteral('ProviderError'), value: F.unknown() }, 'ProviderError')
   ),
 });
 
@@ -138,7 +138,12 @@ export type ClientT<T, K extends Record<string, Record<string, unknown>>> = {
   readonly [KK in keyof K]: ClientScope<T, K[KK]>;
 };
 
-export type BaseTE = TaskEither<{ readonly code: string }, unknown>;
+export type BaseTE<L, R> = TaskEither<
+  L,
+  R extends undefined
+    ? { readonly provider: string } | undefined
+    : { readonly value: R; readonly context?: { readonly provider: string } }
+>;
 
 export type ProviderError = { readonly code: 'ProviderError' };
 
@@ -158,13 +163,10 @@ export type Client<T> = ClientT<
       readonly getDoc: (p: GetDocParam) => TaskEither<{ readonly code: string }, unknown>;
     };
     readonly storage: {
-      readonly uploadDataUrl: (p: UploadParam) => BaseTE;
+      readonly uploadDataUrl: (p: UploadParam) => BaseTE<UploadDataUrlError, undefined>;
       readonly getDownloadUrl: (
         p: GetDownloadUrlParam
-      ) => TaskEither<
-        GetDownloadUrlError['Union'] | { readonly code: 'ProviderError'; readonly value: unknown },
-        { readonly value: string; readonly context?: { readonly provider: string } }
-      >;
+      ) => BaseTE<GetDownloadUrlError['Union'], string>;
     };
   }
 >;
