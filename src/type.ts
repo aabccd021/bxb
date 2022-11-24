@@ -141,17 +141,18 @@ export type ProviderContext<C = unknown, P extends string = string> =
   | { readonly provider: P; readonly context: C }
   | undefined;
 
-export type ProviderResult<T, C = unknown, P extends string = string> = {
+export type ProviderValue<T, C = unknown, P extends string = string> = {
   readonly value: T;
-  readonly context?: ProviderContext<C, P>;
+  readonly providerContext?: ProviderContext<C, P>;
 };
 
-export const provider = {
-  of: <T>(value: T) => ({ value }),
+export const providerValue = {
+  of: <T, C = unknown, P extends string = string>(value: T): ProviderValue<T, C, P> => ({ value }),
   fromContext:
-    <C = unknown, P extends string = string>(context: ProviderContext<C, P>) =>
-    <T>(value: T) => ({ value, context }),
-  getValue: <T, C = unknown, P extends string = string>(p: ProviderResult<T, C, P>) => p.value,
+    <P extends string = string>(provider: P) =>
+    <C = unknown>(context: C) =>
+    <T>(value: T): ProviderValue<T, C, P> => ({ value, providerContext: { provider, context } }),
+  getValue: <T, C = unknown, P extends string = string>(p: ProviderValue<T, C, P>) => p.value,
 };
 
 export type Client<T> = ClientT<
@@ -169,7 +170,7 @@ export type Client<T> = ClientT<
       readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, ProviderContext>;
       readonly getDoc: (
         p: GetDocParam
-      ) => TaskEither<GetDocError['Union'], ProviderResult<Option<DocData>>>;
+      ) => TaskEither<GetDocError['Union'], ProviderValue<Option<DocData>>>;
     };
     readonly storage: {
       readonly uploadDataUrl: (
@@ -177,7 +178,7 @@ export type Client<T> = ClientT<
       ) => TaskEither<UploadDataUrlError['Union'], ProviderContext>;
       readonly getDownloadUrl: (
         p: GetDownloadUrlParam
-      ) => TaskEither<GetDownloadUrlError['Union'], ProviderResult<string>>;
+      ) => TaskEither<GetDownloadUrlError['Union'], ProviderValue<string>>;
     };
   }
 >;
