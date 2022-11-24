@@ -56,9 +56,9 @@ const dbStorage = mkSafeLocalStorage(DB.type.is, (data, key) => ({
   value: { message: 'invalid db data loaded', key, data },
 }))('db');
 
-const mockProviderValue = {
-  fromContext: providerValue.fromContext('mock'),
-};
+// const mockProviderValue = {
+//   fromContext: providerValue.fromContext('mock' as const),
+// };
 
 export const mkStack = pipe(
   ioRef.newIORef<Option<OnAuthStateChangedCallback>>(option.none),
@@ -81,7 +81,10 @@ export const mkStack = pipe(
             env.browser.window,
             io.map(mkFpWindow),
             io.chain((win) => win.localStorage.getItem(`storage/${param.key}`)),
-            ioOption.map(mockProviderValue.fromContext({ aab: 'ccd' })),
+            ioOption.map((value) => ({
+              value,
+              providerContext: option.some({ provider: 'mock' as const, context: { aab: 'ccd' } }),
+            })),
             io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
             taskEither.fromIOEither
           ),
