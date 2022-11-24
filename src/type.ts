@@ -1,7 +1,6 @@
 import { summonFor, UM } from '@morphic-ts/batteries/lib/summoner-ESBST';
 import { AType } from '@morphic-ts/summoners/lib';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
-import { option } from 'fp-ts';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
@@ -108,11 +107,7 @@ export type GetDocParam = {
   readonly key: DocKey;
 };
 
-export type OnAuthStateChangedCallback = (user: Option<string>) => IO<void>;
-
-export type OnAuthStateChangedParam = {
-  readonly callback: OnAuthStateChangedCallback;
-};
+export type OnAuthStateChangedParam = (user: Option<string>) => IO<void>;
 
 export type Window = typeof window;
 
@@ -138,64 +133,35 @@ export type ClientT<T, K extends Record<string, Record<string, unknown>>> = {
   readonly [KK in keyof K]: ClientScope<T, K[KK]>;
 };
 
-export type ProviderContext = {
-  readonly provider: string;
-  readonly context: unknown;
+export type Client = {
+  readonly auth: {
+    readonly signInWithGoogleRedirect: IO<void>;
+    readonly createUserAndSignInWithEmailAndPassword: (
+      p: CreateUserAndSignInWithEmailAndPasswordParam
+    ) => IO<void>;
+    readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
+    readonly signOut: IO<void>;
+  };
+  readonly db: {
+    readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, void>;
+    readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], Option<DocData>>;
+  };
+  readonly storage: {
+    readonly uploadDataUrl: (p: UploadParam) => TaskEither<UploadDataUrlError['Union'], void>;
+    readonly getDownloadUrl: (
+      p: GetDownloadUrlParam
+    ) => TaskEither<GetDownloadUrlError['Union'], string>;
+  };
 };
 
-export type ProviderValue<T, P extends ProviderContext = ProviderContext> = {
-  readonly value: T;
-  readonly providerContext: Option<P>;
-};
-
-export const providerValue = {
-  of: <T>(value: T): ProviderValue<T> => ({ value, providerContext: option.none }),
-  fromContext:
-    (provider: string) =>
-    (context: unknown) =>
-    <T>(value: T): ProviderValue<T> => ({
-      value,
-      providerContext: option.some({ provider, context }),
-    }),
-  getValue: <T>(p: ProviderValue<T>) => p.value,
-};
-
-export type Client<T> = ClientT<
-  T,
-  {
-    readonly auth: {
-      readonly signInWithGoogleRedirect: IO<ProviderContext | undefined>;
-      readonly createUserAndSignInWithEmailAndPassword: (
-        p: CreateUserAndSignInWithEmailAndPasswordParam
-      ) => IO<ProviderContext | undefined>;
-      readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
-      readonly signOut: IO<ProviderContext | undefined>;
-    };
-    readonly db: {
-      readonly setDoc: (
-        p: SetDocParam
-      ) => TaskEither<{ readonly code: string }, ProviderContext | undefined>;
-      readonly getDoc: (
-        p: GetDocParam
-      ) => TaskEither<GetDocError['Union'], ProviderValue<Option<DocData>>>;
-    };
-    readonly storage: {
-      readonly uploadDataUrl: (
-        p: UploadParam
-      ) => TaskEither<UploadDataUrlError['Union'], ProviderContext | undefined>;
-      readonly getDownloadUrl: (
-        p: GetDownloadUrlParam
-      ) => TaskEither<GetDownloadUrlError['Union'], ProviderValue<string>>;
-    };
-  }
->;
+export type ClientWithEnv<T> = ClientT<T, Client>;
 
 export type Stack<T> = {
   readonly ci: {
     readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
     readonly deployDb: (c: DbDeployConfig) => Task<unknown>;
   };
-  readonly client: Client<T>;
+  readonly client: ClientWithEnv<T>;
 };
 
 export type MkStack<ClientEnv> = IO<Stack<ClientEnv>>;

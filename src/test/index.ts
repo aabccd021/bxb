@@ -4,7 +4,7 @@ import { Window } from 'happy-dom';
 import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
 
-import { MkStack, providerValue } from '../type';
+import { MkStack } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
@@ -75,8 +75,7 @@ export const tests = <ClientEnv>(mkStackFromEnv: MkStack<ClientEnv>, clientEnv: 
         ),
         task.chain(({ stack }) =>
           stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
-        ),
-        taskEither.map(providerValue.getValue)
+        )
       );
       expect(await result()).toEqual(either.right(option.some({ name: 'masumoto' })));
     });
@@ -88,8 +87,7 @@ export const tests = <ClientEnv>(mkStackFromEnv: MkStack<ClientEnv>, clientEnv: 
         task.chainFirst(({ stack }) => stack.ci.deployDb({ securityRule: { type: 'allowAll' } })),
         task.chain(({ stack }) =>
           stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
-        ),
-        taskEither.map(providerValue.getValue)
+        )
       );
       expect(await result()).toEqual(either.right(option.none));
     });
@@ -109,7 +107,6 @@ export const tests = <ClientEnv>(mkStackFromEnv: MkStack<ClientEnv>, clientEnv: 
         })
       ),
       task.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'masumo' })),
-      taskEither.map(providerValue.getValue),
       taskEither.chain((downloadUrl) => taskEither.tryCatch(() => fetch(downloadUrl), identity)),
       taskEither.chain((res) => taskEither.tryCatch(() => res.text(), identity))
     );

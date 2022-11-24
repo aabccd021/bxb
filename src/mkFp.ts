@@ -4,14 +4,8 @@ import { Refinement } from 'fp-ts/Refinement';
 
 export const mkFpLocalStorage = (localStorage: typeof window['localStorage']) => ({
   getItem: (key: string) => pipe(() => localStorage.getItem(key), io.map(option.fromNullable)),
-  setItem: (key: string, value: string) => () => {
-    localStorage.setItem(key, value);
-    return undefined;
-  },
-  removeItem: (key: string) => () => {
-    localStorage.removeItem(key);
-    return undefined;
-  },
+  setItem: (key: string, value: string) => () => localStorage.setItem(key, value),
+  removeItem: (key: string) => () => localStorage.removeItem(key),
 });
 
 export const mkFpLocation = (location: typeof window['location']) => ({
@@ -20,7 +14,6 @@ export const mkFpLocation = (location: typeof window['location']) => ({
     get: () => location.href,
     set: (newHref: string) => () => {
       location.href = newHref;
-      return undefined;
     },
   },
 });
