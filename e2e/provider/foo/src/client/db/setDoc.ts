@@ -1,6 +1,9 @@
 import { taskEither } from 'fp-ts';
-import { SetDocParam } from 'masmott/type';
+import { Client } from 'masmott/dist/es6/type';
 
 import { FooEnv } from '../env';
-export const setDoc = (_env: FooEnv) => (_p: SetDocParam) =>
-  taskEither.right<unknown, unknown>(undefined);
+type Type = Client['db']['setDoc'];
+export const setDoc =
+  (_env: FooEnv): Type =>
+  (_p) =>
+    taskEither.right(undefined);

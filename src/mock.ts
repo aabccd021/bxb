@@ -21,9 +21,7 @@ import {
   GetDocParam,
   GetDownloadUrlError,
   GetDownloadUrlParam,
-  OnAuthStateChangedCallback,
   OnAuthStateChangedParam,
-  providerValue,
   SetDocParam,
   UploadParam,
 } from './type';
@@ -56,12 +54,8 @@ const dbStorage = mkSafeLocalStorage(DB.type.is, (data, key) => ({
   value: { message: 'invalid db data loaded', key, data },
 }))('db');
 
-// const mockProviderValue = {
-//   fromContext: providerValue.fromContext('mock' as const),
-// };
-
 export const mkStack = pipe(
-  ioRef.newIORef<Option<OnAuthStateChangedCallback>>(option.none),
+  ioRef.newIORef<Option<OnAuthStateChangedParam>>(option.none),
   io.map((onAuthStateChangedCallback) => ({
     ci: {
       deployStorage: () => task.of(undefined),
@@ -81,10 +75,6 @@ export const mkStack = pipe(
             env.browser.window,
             io.map(mkFpWindow),
             io.chain((win) => win.localStorage.getItem(`storage/${param.key}`)),
-            ioOption.map((value) => ({
-              value,
-              providerContext: option.some({ provider: 'mock' as const, context: { aab: 'ccd' } }),
-            })),
             io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
             taskEither.fromIOEither
           ),
@@ -114,10 +104,7 @@ export const mkStack = pipe(
             io.map((win) => dbStorage(win.localStorage)),
             io.chain((storage) => storage.getItem),
             ioEither.map(
-              flow(
-                option.chain(readonlyRecord.lookup(`${param.key.collection}/${param.key.id}`)),
-                providerValue.of
-              )
+              option.chain(readonlyRecord.lookup(`${param.key.collection}/${param.key.id}`))
             ),
             taskEither.fromIOEither
           ),
@@ -131,16 +118,15 @@ export const mkStack = pipe(
               io.map((win) => authStorage(win.localStorage)),
               io.chain((storage) => storage.setItem(param.email)),
               io.chain(() => onAuthStateChangedCallback.read),
-              ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(param.email))),
-              io.map(() => undefined)
+              ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(param.email)))
             ),
         onAuthStateChanged: (env: Env) => (param: OnAuthStateChangedParam) =>
           pipe(
             env.browser.window,
             io.map(mkFpWindow),
             io.chain((win) => win.localStorage.getItem('auth')),
-            io.chain((lsAuth) => param.callback(lsAuth)),
-            io.chain(() => onAuthStateChangedCallback.write(option.some(param.callback))),
+            io.chain((lsAuth) => param(lsAuth)),
+            io.chain(() => onAuthStateChangedCallback.write(option.some(param))),
             io.map(() => onAuthStateChangedCallback.write(option.none))
           ),
         signOut: (env: Env) =>
@@ -149,8 +135,7 @@ export const mkStack = pipe(
             io.map(mkFpWindow),
             io.chain((win) => win.localStorage.removeItem('auth')),
             io.chain(() => onAuthStateChangedCallback.read),
-            ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.none)),
-            io.map(() => undefined)
+            ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.none))
           ),
       },
     },
