@@ -42,6 +42,17 @@ export const Condition: UM<{}, Condition> = summon((F) =>
 
 export type Unsubscribe = IO<void>;
 
+export const UploadDataUrlError = makeUnion(summon)('code')({
+  InvalidDataUrlFormat: summon((F) =>
+    F.interface({ code: F.stringLiteral('InvalidDataUrlFormat') }, 'InvalidDataUrlFormat')
+  ),
+  Unknown: summon((F) =>
+    F.interface({ code: F.stringLiteral('Unknown'), value: F.unknown() }, 'Unknown')
+  ),
+});
+
+export type UploadDataUrlError = TypeOf<typeof UploadDataUrlError>;
+
 export const GetDownloadUrlError = makeUnion(summon)('code')({
   FileNotFound: summon((F) =>
     F.interface({ code: F.stringLiteral('FileNotFound') }, 'FileNotFound')
@@ -133,7 +144,9 @@ export type Stack<ClientEnv> = {
       ) => (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
     };
     readonly storage: {
-      readonly uploadDataUrl: (env: Env<ClientEnv>) => (p: UploadParam) => Task<unknown>;
+      readonly uploadDataUrl: (
+        env: Env<ClientEnv>
+      ) => (p: UploadParam) => TaskEither<unknown, unknown>;
       readonly getDownloadUrl: (
         env: Env<ClientEnv>
       ) => (p: GetDownloadUrlParam) => TaskEither<GetDownloadUrlError['Union'], string>;
