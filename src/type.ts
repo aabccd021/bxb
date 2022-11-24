@@ -130,8 +130,6 @@ export type CreateUserAndSignInWithEmailAndPasswordParam = {
 
 export type Unsubscribe = IO<void>;
 
-export type ClientR<T, F> = (env: Env<T>) => F;
-
 export type ClientScope<T, K extends Record<string, unknown>> = {
   readonly [KK in keyof K]: (env: Env<T>) => K[KK];
 };
@@ -139,6 +137,10 @@ export type ClientScope<T, K extends Record<string, unknown>> = {
 export type ClientT<T, K extends Record<string, Record<string, unknown>>> = {
   readonly [KK in keyof K]: ClientScope<T, K[KK]>;
 };
+
+export type BaseTE = TaskEither<{ readonly code: string }, unknown>;
+
+export type ProviderError = { readonly code: 'ProviderError' };
 
 export type Client<T> = ClientT<
   T,
@@ -152,12 +154,17 @@ export type Client<T> = ClientT<
       readonly signOut: IO<unknown>;
     };
     readonly db: {
-      readonly setDoc: <L, R>(p: SetDocParam) => TaskEither<L, R>;
-      readonly getDoc: (p: GetDocParam) => TaskEither<unknown, unknown>;
+      readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, unknown>;
+      readonly getDoc: (p: GetDocParam) => TaskEither<{ readonly code: string }, unknown>;
     };
     readonly storage: {
-      readonly uploadDataUrl: (p: UploadParam) => TaskEither<unknown, unknown>;
-      readonly getDownloadUrl: (p: GetDownloadUrlParam) => TaskEither<unknown, unknown>;
+      readonly uploadDataUrl: (p: UploadParam) => BaseTE;
+      readonly getDownloadUrl: (
+        p: GetDownloadUrlParam
+      ) => TaskEither<
+        GetDownloadUrlError['Union'] | { readonly code: 'ProviderError'; readonly value: unknown },
+        { readonly value: string }
+      >;
     };
   }
 >;
