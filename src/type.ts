@@ -40,8 +40,6 @@ export const Condition: UM<{}, Condition> = summon((F) =>
   )
 );
 
-export type Unsubscribe = IO<void>;
-
 export const UploadDataUrlError = makeUnion(summon)('code')({
   InvalidDataUrlFormat: summon((F) =>
     F.interface({ code: F.stringLiteral('InvalidDataUrlFormat') }, 'InvalidDataUrlFormat')
@@ -130,6 +128,8 @@ export type CreateUserAndSignInWithEmailAndPasswordParam = {
   readonly password: string;
 };
 
+export type Unsubscribe = IO<void>;
+
 export type Stack<ClientEnv> = {
   readonly ci: {
     readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
@@ -137,20 +137,18 @@ export type Stack<ClientEnv> = {
   };
   readonly client: {
     readonly auth: {
-      readonly signInWithGoogleRedirect: (env: Env<ClientEnv>) => IO<void>;
+      readonly signInWithGoogleRedirect: (env: Env<ClientEnv>) => IO<unknown>;
       readonly createUserAndSignInWithEmailAndPassword: (
         env: Env<ClientEnv>
-      ) => (p: CreateUserAndSignInWithEmailAndPasswordParam) => IO<void>;
+      ) => (p: CreateUserAndSignInWithEmailAndPasswordParam) => IO<unknown>;
       readonly onAuthStateChanged: (
         env: Env<ClientEnv>
       ) => (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
-      readonly signOut: (env: Env<ClientEnv>) => IO<void>;
+      readonly signOut: (env: Env<ClientEnv>) => IO<unknown>;
     };
     readonly db: {
       readonly setDoc: (env: Env<ClientEnv>) => (p: SetDocParam) => Task<unknown>;
-      readonly getDoc: (
-        env: Env<ClientEnv>
-      ) => (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
+      readonly getDoc: (env: Env<ClientEnv>) => (p: GetDocParam) => TaskEither<unknown, unknown>;
     };
     readonly storage: {
       readonly uploadDataUrl: (
@@ -158,7 +156,7 @@ export type Stack<ClientEnv> = {
       ) => (p: UploadParam) => TaskEither<unknown, unknown>;
       readonly getDownloadUrl: (
         env: Env<ClientEnv>
-      ) => (p: GetDownloadUrlParam) => TaskEither<GetDownloadUrlError['Union'], string>;
+      ) => (p: GetDownloadUrlParam) => TaskEither<unknown, unknown>;
     };
   };
 };
