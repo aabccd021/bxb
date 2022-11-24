@@ -8,10 +8,7 @@ import { GetDocError, GetDownloadUrlError, MkStack } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
-export const independencyTests = <ClientEnv>(
-  mkStackFromEnv: MkStack<ClientEnv>,
-  clientEnv: ClientEnv
-) => {
+export const tests = <ClientEnv>(mkStackFromEnv: MkStack<ClientEnv>, clientEnv: ClientEnv) => {
   const mkStack = pipe(
     io.Do,
     io.bind('stack', () => mkStackFromEnv),
