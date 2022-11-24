@@ -97,7 +97,7 @@ export type DocKey = {
 
 export type DocData = ReadonlyRecord<string, unknown>;
 
-export type CreateDocParam = {
+export type SetDocParam = {
   readonly key: DocKey;
   readonly data: DocData;
 };
@@ -112,6 +112,10 @@ export type GetDocParam = {
 
 export type OnAuthStateChangedCallback = (user: Option<string>) => IO<void>;
 
+export type OnAuthStateChangedParam = {
+  readonly callback: OnAuthStateChangedCallback;
+};
+
 export type Window = typeof window;
 
 export type BrowserEnv = { readonly window: IO<Window> };
@@ -119,6 +123,11 @@ export type BrowserEnv = { readonly window: IO<Window> };
 export type Env<T> = {
   readonly browser: BrowserEnv;
   readonly client: T;
+};
+
+export type CreateUserAndSignInWithEmailAndPasswordParam = {
+  readonly email: string;
+  readonly password: string;
 };
 
 export type Stack<ClientEnv> = {
@@ -131,14 +140,14 @@ export type Stack<ClientEnv> = {
       readonly signInWithGoogleRedirect: (env: Env<ClientEnv>) => IO<void>;
       readonly createUserAndSignInWithEmailAndPassword: (
         env: Env<ClientEnv>
-      ) => (email: string, password: string) => IO<void>;
+      ) => (p: CreateUserAndSignInWithEmailAndPasswordParam) => IO<void>;
       readonly onAuthStateChanged: (
         env: Env<ClientEnv>
-      ) => (callback: OnAuthStateChangedCallback) => IO<Unsubscribe>;
+      ) => (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
       readonly signOut: (env: Env<ClientEnv>) => IO<void>;
     };
     readonly db: {
-      readonly setDoc: (env: Env<ClientEnv>) => (p: CreateDocParam) => Task<unknown>;
+      readonly setDoc: (env: Env<ClientEnv>) => (p: SetDocParam) => Task<unknown>;
       readonly getDoc: (
         env: Env<ClientEnv>
       ) => (p: GetDocParam) => TaskEither<GetDocError['Union'], DocData>;
