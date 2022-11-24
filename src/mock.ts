@@ -66,7 +66,7 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
               browser.window,
               io.map(mkFpWindow),
               io.chain((win) => win.localStorage.setItem(`storage/${key}`, file)),
-              task.fromIO
+              taskEither.fromIO
             ),
         getDownloadUrl:
           ({ browser }) =>
