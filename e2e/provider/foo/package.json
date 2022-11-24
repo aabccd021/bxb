@@ -1,6 +1,7 @@
 {
   "name": "masmott-foo",
   "main": "dist/index.js",
+  "sideEffects": false,
   "files": [
     "dist"
   ],
