@@ -3,4 +3,4 @@ import { GetDocParam, providerValue } from 'masmott/type';
 
 import { FooEnv } from '../env';
 export const getDoc = (_env: FooEnv) => (_p: GetDocParam) =>
-  taskEither.right(providerValue.of(option.none));
+  taskEither.right<unknown, unknown>(providerValue.of(option.none));

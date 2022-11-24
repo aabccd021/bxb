@@ -1,6 +1,7 @@
 import { summonFor, UM } from '@morphic-ts/batteries/lib/summoner-ESBST';
 import { AType } from '@morphic-ts/summoners/lib';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
+import { option } from 'fp-ts';
 import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
@@ -137,37 +138,43 @@ export type ClientT<T, K extends Record<string, Record<string, unknown>>> = {
   readonly [KK in keyof K]: ClientScope<T, K[KK]>;
 };
 
-export type ProviderContext<C = unknown, P extends string = string> =
-  | { readonly provider: P; readonly context: C }
-  | undefined;
+export type ProviderContext = {
+  readonly provider: string;
+  readonly context: unknown;
+};
 
-export type ProviderValue<T, C = unknown, P extends string = string> = {
+export type ProviderValue<T, P extends ProviderContext = ProviderContext> = {
   readonly value: T;
-  readonly providerContext?: ProviderContext<C, P>;
+  readonly providerContext: Option<P>;
 };
 
 export const providerValue = {
-  of: <T, C = unknown, P extends string = string>(value: T): ProviderValue<T, C, P> => ({ value }),
+  of: <T>(value: T): ProviderValue<T> => ({ value, providerContext: option.none }),
   fromContext:
-    <P extends string = string>(provider: P) =>
-    <C = unknown>(context: C) =>
-    <T>(value: T): ProviderValue<T, C, P> => ({ value, providerContext: { provider, context } }),
-  getValue: <T, C = unknown, P extends string = string>(p: ProviderValue<T, C, P>) => p.value,
+    (provider: string) =>
+    (context: unknown) =>
+    <T>(value: T): ProviderValue<T> => ({
+      value,
+      providerContext: option.some({ provider, context }),
+    }),
+  getValue: <T>(p: ProviderValue<T>) => p.value,
 };
 
 export type Client<T> = ClientT<
   T,
   {
     readonly auth: {
-      readonly signInWithGoogleRedirect: IO<ProviderContext>;
+      readonly signInWithGoogleRedirect: IO<ProviderContext | undefined>;
       readonly createUserAndSignInWithEmailAndPassword: (
         p: CreateUserAndSignInWithEmailAndPasswordParam
-      ) => IO<ProviderContext>;
+      ) => IO<ProviderContext | undefined>;
       readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
-      readonly signOut: IO<ProviderContext>;
+      readonly signOut: IO<ProviderContext | undefined>;
     };
     readonly db: {
-      readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, ProviderContext>;
+      readonly setDoc: (
+        p: SetDocParam
+      ) => TaskEither<{ readonly code: string }, ProviderContext | undefined>;
       readonly getDoc: (
         p: GetDocParam
       ) => TaskEither<GetDocError['Union'], ProviderValue<Option<DocData>>>;
@@ -175,7 +182,7 @@ export type Client<T> = ClientT<
     readonly storage: {
       readonly uploadDataUrl: (
         p: UploadParam
-      ) => TaskEither<UploadDataUrlError['Union'], ProviderContext>;
+      ) => TaskEither<UploadDataUrlError['Union'], ProviderContext | undefined>;
       readonly getDownloadUrl: (
         p: GetDownloadUrlParam
       ) => TaskEither<GetDownloadUrlError['Union'], ProviderValue<string>>;
