@@ -130,35 +130,44 @@ export type CreateUserAndSignInWithEmailAndPasswordParam = {
 
 export type Unsubscribe = IO<void>;
 
-export type Stack<ClientEnv> = {
+export type ClientR<T, F> = (env: Env<T>) => F;
+
+export type ClientScope<T, K extends Record<string, unknown>> = {
+  readonly [KK in keyof K]: (env: Env<T>) => K[KK];
+};
+
+export type ClientT<T, K extends Record<string, Record<string, unknown>>> = {
+  readonly [KK in keyof K]: ClientScope<T, K[KK]>;
+};
+
+export type Client<T> = ClientT<
+  T,
+  {
+    readonly auth: {
+      readonly signInWithGoogleRedirect: IO<unknown>;
+      readonly createUserAndSignInWithEmailAndPassword: (
+        p: CreateUserAndSignInWithEmailAndPasswordParam
+      ) => IO<unknown>;
+      readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
+      readonly signOut: IO<unknown>;
+    };
+    readonly db: {
+      readonly setDoc: <L, R>(p: SetDocParam) => TaskEither<L, R>;
+      readonly getDoc: (p: GetDocParam) => TaskEither<unknown, unknown>;
+    };
+    readonly storage: {
+      readonly uploadDataUrl: (p: UploadParam) => TaskEither<unknown, unknown>;
+      readonly getDownloadUrl: (p: GetDownloadUrlParam) => TaskEither<unknown, unknown>;
+    };
+  }
+>;
+
+export type Stack<T> = {
   readonly ci: {
     readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
     readonly deployDb: (c: DbDeployConfig) => Task<unknown>;
   };
-  readonly client: {
-    readonly auth: {
-      readonly signInWithGoogleRedirect: (env: Env<ClientEnv>) => IO<unknown>;
-      readonly createUserAndSignInWithEmailAndPassword: (
-        env: Env<ClientEnv>
-      ) => (p: CreateUserAndSignInWithEmailAndPasswordParam) => IO<unknown>;
-      readonly onAuthStateChanged: (
-        env: Env<ClientEnv>
-      ) => (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
-      readonly signOut: (env: Env<ClientEnv>) => IO<unknown>;
-    };
-    readonly db: {
-      readonly setDoc: (env: Env<ClientEnv>) => (p: SetDocParam) => Task<unknown>;
-      readonly getDoc: (env: Env<ClientEnv>) => (p: GetDocParam) => TaskEither<unknown, unknown>;
-    };
-    readonly storage: {
-      readonly uploadDataUrl: (
-        env: Env<ClientEnv>
-      ) => (p: UploadParam) => TaskEither<unknown, unknown>;
-      readonly getDownloadUrl: (
-        env: Env<ClientEnv>
-      ) => (p: GetDownloadUrlParam) => TaskEither<unknown, unknown>;
-    };
-  };
+  readonly client: Client<T>;
 };
 
 export type MkStack<ClientEnv> = IO<Stack<ClientEnv>>;
