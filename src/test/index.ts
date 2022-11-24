@@ -1,4 +1,4 @@
-import { apply, either, io, reader, task, taskEither } from 'fp-ts';
+import { apply, either, io, reader, string, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 import { Window } from 'happy-dom';
 import fetch from 'node-fetch';
@@ -109,6 +109,9 @@ export const independencyTests = <ClientEnv>(
         })
       ),
       task.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'masumo' })),
+      task.map(
+        either.chainW(either.fromPredicate(string.isString, () => 'download url is not string'))
+      ),
       taskEither.chain((downloadUrl) => taskEither.tryCatch(() => fetch(downloadUrl), identity)),
       taskEither.chain((res) => taskEither.tryCatch(() => res.text(), identity))
     );
