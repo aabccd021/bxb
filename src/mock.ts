@@ -63,86 +63,75 @@ export const mkStack = pipe(
     },
     client: {
       storage: {
-        uploadDataUrl:
-          (env: Env) =>
-          ({ key, file }: UploadParam) =>
-            pipe(
-              env.browser.window,
-              io.map(mkFpWindow),
-              io.chain((win) => win.localStorage.setItem(`storage/${key}`, file)),
-              taskEither.fromIO
-            ),
-        getDownloadUrl:
-          (env: Env) =>
-          ({ key }: GetDownloadUrlParam) =>
-            pipe(
-              env.browser.window,
-              io.map(mkFpWindow),
-              io.chain((win) => win.localStorage.getItem(`storage/${key}`)),
-              io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
-              taskEither.fromIOEither
-            ),
+        uploadDataUrl: (env: Env) => (param: UploadParam) =>
+          pipe(
+            env.browser.window,
+            io.map(mkFpWindow),
+            io.chain((win) => win.localStorage.setItem(`storage/${param.key}`, param.file)),
+            taskEither.fromIO
+          ),
+        getDownloadUrl: (env: Env) => (param: GetDownloadUrlParam) =>
+          pipe(
+            env.browser.window,
+            io.map(mkFpWindow),
+            io.chain((win) => win.localStorage.getItem(`storage/${param.key}`)),
+            io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({ param }))),
+            taskEither.fromIOEither
+          ),
       },
       db: {
-        setDoc:
-          (env: Env) =>
-          ({ key, data }: SetDocParam) =>
-            pipe(
-              env.browser.window,
-              io.map((win) => dbStorage(win.localStorage)),
-              io.chain((storage) =>
-                pipe(
-                  storage.getItem,
-                  ioEither.map(
-                    flow(
-                      option.getOrElse(() => ({})),
-                      readonlyRecord.upsertAt(`${key.collection}/${key.id}`, data)
-                    )
-                  ),
-                  ioEither.chainIOK(storage.setItem)
-                )
-              ),
-              taskEither.fromIOEither
+        setDoc: (env: Env) => (param: SetDocParam) =>
+          pipe(
+            env.browser.window,
+            io.map((win) => dbStorage(win.localStorage)),
+            io.chain((storage) =>
+              pipe(
+                storage.getItem,
+                ioEither.map(
+                  flow(
+                    option.getOrElse(() => ({})),
+                    readonlyRecord.upsertAt(`${param.key.collection}/${param.key.id}`, param.data)
+                  )
+                ),
+                ioEither.chainIOK(storage.setItem)
+              )
             ),
-        getDoc:
-          (env: Env) =>
-          ({ key }: GetDocParam) =>
-            pipe(
-              env.browser.window,
-              io.map((win) => dbStorage(win.localStorage)),
-              io.chain((storage) => storage.getItem),
-              ioEither.chainEitherK(
-                flow(
-                  option.chain(readonlyRecord.lookup(`${key.collection}/${key.id}`)),
-                  either.fromOption(() => GetDocError.Union.of.DocNotFound({}))
-                )
-              ),
-              taskEither.fromIOEither
+            taskEither.fromIOEither
+          ),
+        getDoc: (env: Env) => (param: GetDocParam) =>
+          pipe(
+            env.browser.window,
+            io.map((win) => dbStorage(win.localStorage)),
+            io.chain((storage) => storage.getItem),
+            ioEither.chainEitherK(
+              flow(
+                option.chain(readonlyRecord.lookup(`${param.key.collection}/${param.key.id}`)),
+                either.fromOption(() => GetDocError.Union.of.DocNotFound({}))
+              )
             ),
+            taskEither.fromIOEither
+          ),
       },
       auth: {
         signInWithGoogleRedirect: signInWithRedirect,
         createUserAndSignInWithEmailAndPassword:
-          (env: Env) =>
-          ({ email }: CreateUserAndSignInWithEmailAndPasswordParam) =>
+          (env: Env) => (param: CreateUserAndSignInWithEmailAndPasswordParam) =>
             pipe(
               env.browser.window,
               io.map((win) => authStorage(win.localStorage)),
-              io.chain((storage) => storage.setItem(email)),
+              io.chain((storage) => storage.setItem(param.email)),
               io.chain(() => onAuthStateChangedCallback.read),
-              ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(email)))
+              ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(param.email)))
             ),
-        onAuthStateChanged:
-          (env: Env) =>
-          ({ callback }: OnAuthStateChangedParam) =>
-            pipe(
-              env.browser.window,
-              io.map(mkFpWindow),
-              io.chain((win) => win.localStorage.getItem('auth')),
-              io.chain((lsAuth) => callback(lsAuth)),
-              io.chain(() => onAuthStateChangedCallback.write(option.some(callback))),
-              io.map(() => onAuthStateChangedCallback.write(option.none))
-            ),
+        onAuthStateChanged: (env: Env) => (param: OnAuthStateChangedParam) =>
+          pipe(
+            env.browser.window,
+            io.map(mkFpWindow),
+            io.chain((win) => win.localStorage.getItem('auth')),
+            io.chain((lsAuth) => param.callback(lsAuth)),
+            io.chain(() => onAuthStateChangedCallback.write(option.some(param.callback))),
+            io.map(() => onAuthStateChangedCallback.write(option.none))
+          ),
         signOut: (env: Env) =>
           pipe(
             env.browser.window,

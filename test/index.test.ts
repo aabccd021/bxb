@@ -1,4 +1,4 @@
-import { independencyTests } from '../src';
+import { tests } from '../src';
 import { mkStack } from '../src/mock';
 
-independencyTests(mkStack, {});
+tests(mkStack, {});
