@@ -75,7 +75,7 @@ export const mkStack = pipe(
             env.browser.window,
             io.map(mkFpWindow),
             io.chain((win) => win.localStorage.getItem(`storage/${param.key}`)),
-            io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({ param }))),
+            io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
             taskEither.fromIOEither
           ),
       },
