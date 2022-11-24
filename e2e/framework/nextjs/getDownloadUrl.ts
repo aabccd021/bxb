@@ -4,43 +4,29 @@ import { GetDownloadUrlError, GetDownloadUrlParam, ProviderValue } from 'masmott
 import { stack as mockStack } from 'masmott/dist/es6/browser';
 import { stack as providerStack } from 'masmott-foo';
 
-type PCMock = {
-  readonly provider: 'mock';
-  readonly context: {
-    readonly aab: string;
-  };
-};
+type Fnu = (...args: readonly any[]) => unknown;
 
-type PCFoo = {
-  readonly provider: 'foo';
-  readonly context: {
-    readonly bar: string;
-  };
-};
+type Fn<T extends Fnu> = ReturnType<T> extends TaskEither<
+  any,
+  { readonly providerContext: Option<infer R> }
+>
+  ? R
+  : never;
 
-type PC = PCMock | PCFoo;
+type FFn<A extends Fnu, B extends Fnu> = Fn<A> | Fn<B>;
 
-export const getDownloadUrl
-: (
+///
+const a = providerStack.client.storage.getDownloadUrl({
+  browser: { window: () => window },
+  client: {},
+});
+
+const b = mockStack.client.storage.getDownloadUrl({
+  browser: { window: () => window },
+  client: {},
+});
+
+export const getDownloadUrl: (
   _p: GetDownloadUrlParam
-) => TaskEither<GetDownloadUrlError['Union'], ProviderValue<string, PC>> =
-  process.env.NODE_ENV === 'production'
-    ? providerStack.client.storage.getDownloadUrl({ browser: { window: () => window }, client: {} })
-    : mockStack.client.storage.getDownloadUrl({ browser: { window: () => window }, client: {} });
-
-// const a = providerStack.client.storage.getDownloadUrl({
-//   browser: { window: () => window },
-//   client: {},
-// });
-//
-// const b = mockStack.client.storage.getDownloadUrl({
-//   browser: { window: () => window },
-//   client: {},
-// });
-//
-// type A = typeof a;
-// type B = typeof b;
-//
-// type Fn<T> = ReturnType<T> extends TaskEither<any, {providerContext: Option<infer R>}> ? R : never;
-// type AA = Fn<A>;
-// type BB = Fn<B>;
+) => TaskEither<GetDownloadUrlError['Union'], ProviderValue<string, FFn<typeof a, typeof b>>> =
+  process.env.NODE_ENV === 'production' ? a : b;
