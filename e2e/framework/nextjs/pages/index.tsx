@@ -1,11 +1,19 @@
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/no-return-void */
 
-import { option } from 'fp-ts';
+import { option, taskEither } from 'fp-ts';
+import { pipe } from 'fp-ts/function';
 import { Option } from 'fp-ts/Option';
 import { useEffect, useMemo, useState } from 'react';
 
+import { getDownloadUrl } from '../getDownloadUrl';
 import { masmott } from '../masmott';
+
+export const res = pipe(
+  getDownloadUrl({ key: 'a' }),
+  taskEither.map((a) => a.providerContext),
+  taskEither.map(option.map((a) => (a.provider === 'foo' ? a.context.bar : a.context.aab)))
+);
 
 const mapToAuthStatus = option.match(
   () => 'not signed in',
