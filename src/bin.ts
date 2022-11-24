@@ -19,6 +19,8 @@ export const ${method} =
 
 const scopes = {
   auth: ['signInWithGoogleRedirect', 'onAuthStateChanged', 'signOut'],
+  db: ['setDoc', 'getDoc'],
+  storage: ['uploadDataUrl', 'getDownloadUrl'],
 };
 
 const provider = pipe(
