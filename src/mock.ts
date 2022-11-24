@@ -11,17 +11,21 @@ import {
   taskEither,
 } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
-import { IO } from 'fp-ts/IO';
 import { Option } from 'fp-ts/Option';
 
 import { mkFpLocation, mkFpWindow, mkSafeLocalStorage } from './mkFp';
 import {
+  CreateUserAndSignInWithEmailAndPasswordParam,
   DB,
-  Env,
+  Env as _Env,
   GetDocError,
+  GetDocParam,
   GetDownloadUrlError,
+  GetDownloadUrlParam,
   OnAuthStateChangedCallback,
-  Stack,
+  OnAuthStateChangedParam,
+  SetDocParam,
+  UploadParam,
 } from './type';
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
@@ -29,9 +33,9 @@ const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly hre
   return `${origin}/__masmott__/signInWithRedirect?${searchParamsStr}`;
 };
 
-type ClientEnv = {};
+type Env = _Env<{}>;
 
-const signInWithRedirect = (env: Env<ClientEnv>) =>
+const signInWithRedirect = (env: Env) =>
   pipe(
     io.Do,
     io.bind('win', () => env.browser.window),
@@ -50,7 +54,7 @@ const dbStorage = mkSafeLocalStorage(DB.type.is, (data, key) =>
   GetDocError.Union.of.Unknown({ value: { message: 'invalid db data loaded', key, data } })
 )('db');
 
-export const mkStack: IO<Stack<ClientEnv>> = pipe(
+export const mkStack = pipe(
   ioRef.newIORef<Option<OnAuthStateChangedCallback>>(option.none),
   io.map((onAuthStateChangedCallback) => ({
     ci: {
@@ -60,19 +64,19 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
     client: {
       storage: {
         uploadDataUrl:
-          ({ browser }) =>
-          ({ key, file }) =>
+          (env: Env) =>
+          ({ key, file }: UploadParam) =>
             pipe(
-              browser.window,
+              env.browser.window,
               io.map(mkFpWindow),
               io.chain((win) => win.localStorage.setItem(`storage/${key}`, file)),
               taskEither.fromIO
             ),
         getDownloadUrl:
-          ({ browser }) =>
-          ({ key }) =>
+          (env: Env) =>
+          ({ key }: GetDownloadUrlParam) =>
             pipe(
-              browser.window,
+              env.browser.window,
               io.map(mkFpWindow),
               io.chain((win) => win.localStorage.getItem(`storage/${key}`)),
               io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
@@ -81,8 +85,8 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
       },
       db: {
         setDoc:
-          (env) =>
-          ({ key, data }) =>
+          (env: Env) =>
+          ({ key, data }: SetDocParam) =>
             pipe(
               env.browser.window,
               io.map((win) => dbStorage(win.localStorage)),
@@ -101,8 +105,8 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
               taskEither.fromIOEither
             ),
         getDoc:
-          (env) =>
-          ({ key }) =>
+          (env: Env) =>
+          ({ key }: GetDocParam) =>
             pipe(
               env.browser.window,
               io.map((win) => dbStorage(win.localStorage)),
@@ -118,24 +122,28 @@ export const mkStack: IO<Stack<ClientEnv>> = pipe(
       },
       auth: {
         signInWithGoogleRedirect: signInWithRedirect,
-        createUserAndSignInWithEmailAndPassword: (env) => (email, _password) =>
-          pipe(
-            env.browser.window,
-            io.map((win) => authStorage(win.localStorage)),
-            io.chain((storage) => storage.setItem(email)),
-            io.chain(() => onAuthStateChangedCallback.read),
-            ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(email)))
-          ),
-        onAuthStateChanged: (env) => (onChangedCallback) =>
-          pipe(
-            env.browser.window,
-            io.map(mkFpWindow),
-            io.chain((win) => win.localStorage.getItem('auth')),
-            io.chain((lsAuth) => onChangedCallback(lsAuth)),
-            io.chain(() => onAuthStateChangedCallback.write(option.some(onChangedCallback))),
-            io.map(() => onAuthStateChangedCallback.write(option.none))
-          ),
-        signOut: (env) =>
+        createUserAndSignInWithEmailAndPassword:
+          (env: Env) =>
+          ({ email }: CreateUserAndSignInWithEmailAndPasswordParam) =>
+            pipe(
+              env.browser.window,
+              io.map((win) => authStorage(win.localStorage)),
+              io.chain((storage) => storage.setItem(email)),
+              io.chain(() => onAuthStateChangedCallback.read),
+              ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(email)))
+            ),
+        onAuthStateChanged:
+          (env: Env) =>
+          ({ callback }: OnAuthStateChangedParam) =>
+            pipe(
+              env.browser.window,
+              io.map(mkFpWindow),
+              io.chain((win) => win.localStorage.getItem('auth')),
+              io.chain((lsAuth) => callback(lsAuth)),
+              io.chain(() => onAuthStateChangedCallback.write(option.some(callback))),
+              io.map(() => onAuthStateChangedCallback.write(option.none))
+            ),
+        signOut: (env: Env) =>
           pipe(
             env.browser.window,
             io.map(mkFpWindow),

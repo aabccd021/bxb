@@ -15,7 +15,7 @@ const mapToAuthStatus = option.match(
 const useAuthState = () => {
   const [authState, setAuthState] = useState<Option<string>>(option.none);
   useEffect(
-    () => masmott.auth.onAuthStateChanged((newAuthState) => () => setAuthState(newAuthState))(),
+    () => masmott.auth.onAuthStateChanged({callback:(newAuthState) => () => setAuthState(newAuthState)})(),
     [setAuthState]
   );
   return authState;
