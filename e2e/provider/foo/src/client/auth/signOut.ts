@@ -1,9 +1,7 @@
 /* eslint-disable functional/no-expression-statement */
-import { Stack } from 'masmott';
+import { FooEnv } from '../env';
 
-import { ClientEnv } from '../env';
-
-export const signOut: Stack<ClientEnv>['client']['auth']['signOut'] = () => () => {
+export const signOut = (_env: FooEnv) => () => {
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');

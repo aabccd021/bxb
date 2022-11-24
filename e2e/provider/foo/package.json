@@ -1,6 +1,7 @@
 {
   "name": "masmott-foo",
   "main": "dist/index.js",
+  "sideEffects": false,
   "files": [
     "dist"
   ],
@@ -8,7 +9,8 @@
     "build": "rm -rf dist && pnpm build:es6 && pnpm build:cjs && pnpm build:types",
     "build:cjs": "swc src --out-dir dist/cjs --source-maps --config module.type=commonjs",
     "build:es6": "swc src --out-dir dist/es6 --source-maps",
-    "build:types": "tsc && cp -R dist/types/. dist/cjs && cp -R dist/types/. dist/es6"
+    "build:types": "tsc --project tsconfig.dist.json && cp -R dist/types/. dist/cjs && cp -R dist/types/. dist/es6",
+    "test": "tsc --noEmit"
   },
   "types": "./dist/types/index.d.ts",
   "exports": {

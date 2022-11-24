@@ -18,10 +18,10 @@
     "lint": "eslint --max-warnings=0 --ext .ts .",
     "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
     "pre-push:dirty": "pnpm install && pnpm build && pnpm lint && pnpm test",
-    "build:provider:foo": "cd e2e/provider/foo && pnpm install && pnpm build",
+    "test:provider:foo": "cd e2e/provider/foo && pnpm install && pnpm test && pnpm build",
     "test:framework:nextjs": "cd e2e/framework/nextjs && pnpm install && pnpm generate && pnpm test:treeshaking && pnpm test:e2e",
     "test:types": "tsc --noEmit",
-    "test": "pnpm test:types && vitest --run && pnpm build:provider:foo && pnpm test:framework:nextjs"
+    "test": "pnpm test:types && vitest --run && pnpm test:provider:foo && pnpm test:framework:nextjs"
   },
   "sideEffects": false,
   "name": "masmott",
@@ -39,6 +39,16 @@
     },
     "./next": {
       "require": "./dist/cjs/next.js"
+    },
+    "./type": {
+      "require": "./dist/cjs/type.js",
+      "import": "./dist/es6/type.js",
+      "types": "./dist/types/type.d.ts"
+    },
+    "./test": {
+      "require": "./dist/cjs/test/index.js",
+      "import": "./dist/es6/test/index.js",
+      "types": "./dist/types/test/index.d.ts"
     }
   },
   "files": [
