@@ -23,7 +23,7 @@ import {
   GetDownloadUrlParam,
   OnAuthStateChangedCallback,
   OnAuthStateChangedParam,
-  provider,
+  providerValue,
   SetDocParam,
   UploadParam,
 } from './type';
@@ -56,6 +56,10 @@ const dbStorage = mkSafeLocalStorage(DB.type.is, (data, key) => ({
   value: { message: 'invalid db data loaded', key, data },
 }))('db');
 
+const mockProviderValue = {
+  fromContext: providerValue.fromContext('mock'),
+};
+
 export const mkStack = pipe(
   ioRef.newIORef<Option<OnAuthStateChangedCallback>>(option.none),
   io.map((onAuthStateChangedCallback) => ({
@@ -77,7 +81,7 @@ export const mkStack = pipe(
             env.browser.window,
             io.map(mkFpWindow),
             io.chain((win) => win.localStorage.getItem(`storage/${param.key}`)),
-            ioOption.map(provider.fromContext({ provider: 'mock', context: 'bar' })),
+            ioOption.map(mockProviderValue.fromContext({ aab: 'ccd' })),
             io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
             taskEither.fromIOEither
           ),
@@ -109,7 +113,7 @@ export const mkStack = pipe(
             ioEither.map(
               flow(
                 option.chain(readonlyRecord.lookup(`${param.key.collection}/${param.key.id}`)),
-                provider.of
+                providerValue.of
               )
             ),
             taskEither.fromIOEither
