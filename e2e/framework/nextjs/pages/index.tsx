@@ -15,8 +15,6 @@ export const res = pipe(
   taskEither.map(option.map((a) => (a.provider === 'foo' ? a.context.bar : a.context.aab)))
 );
 
-
-
 const mapToAuthStatus = option.match(
   () => 'not signed in',
   (s) => `email : ${s}`
