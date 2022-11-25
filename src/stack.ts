@@ -17,7 +17,7 @@ import type { Option } from 'fp-ts/Option';
 import validDataUrl from 'valid-data-url';
 
 import { mkFpLocation, mkFpWindow, mkSafeLocalStorage } from './mkFp';
-import type { ClientWithEnv, OnAuthStateChangedParam } from './type';
+import type { Client, OnAuthStateChangedParam, Stack } from './type';
 import { UploadDataUrlError } from './type';
 import { DB, GetDownloadUrlError } from './type';
 
@@ -26,13 +26,13 @@ const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly hre
   return `${origin}/__masmott__/signInWithRedirect?${searchParamsStr}`;
 };
 
-type ProviderEnv = {
+type ClientEnv = {
   readonly onAuthStateChangedCallback: IORef<Option<OnAuthStateChangedParam>>;
 };
 
 export type ClientConfig = Record<string, unknown>;
 
-export const mkClientEnv: IO<ProviderEnv> = pipe(
+export const mkClientEnv: IO<ClientEnv> = pipe(
   ioRef.newIORef<Option<OnAuthStateChangedParam>>(option.none),
   io.map((onAuthStateChangedCallback) => ({
     onAuthStateChangedCallback,
@@ -50,7 +50,7 @@ const dbStorage = mkSafeLocalStorage(DB.type.is, (data, key) => ({
   value: { message: 'invalid db data loaded', key, data },
 }))('db');
 
-const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
+const client: Client<ClientEnv, ClientConfig> = {
   storage: {
     uploadDataUrl: (env) => (param) =>
       pipe(
@@ -59,14 +59,14 @@ const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
           UploadDataUrlError.Union.of.InvalidDataUrlFormat({})
         ),
         ioEither.fromEither,
-        ioEither.chainIOK(() => env.browser.window),
+        ioEither.chainIOK(() => env.browser.getWindow),
         ioEither.map(mkFpWindow),
         ioEither.chainIOK((win) => win.localStorage.setItem(`storage/${param.key}`, param.dataUrl)),
         taskEither.fromIOEither
       ),
     getDownloadUrl: (env) => (param) =>
       pipe(
-        env.browser.window,
+        env.browser.getWindow,
         io.map(mkFpWindow),
         io.chain((win) => win.localStorage.getItem(`storage/${param.key}`)),
         io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
@@ -76,7 +76,7 @@ const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
   db: {
     setDoc: (env) => (param) =>
       pipe(
-        env.browser.window,
+        env.browser.getWindow,
         io.map((win) => dbStorage(win.localStorage)),
         io.chain((storage) =>
           pipe(
@@ -94,7 +94,7 @@ const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
       ),
     getDoc: (env) => (param) =>
       pipe(
-        env.browser.window,
+        env.browser.getWindow,
         io.map((win) => dbStorage(win.localStorage)),
         io.chain((storage) => storage.getItem),
         ioEither.map(
@@ -107,7 +107,7 @@ const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
     signInWithGoogleRedirect: (env) =>
       pipe(
         io.Do,
-        io.bind('win', () => env.browser.window),
+        io.bind('win', () => env.browser.getWindow),
         io.let('location', ({ win }) => mkFpLocation(win.location)),
         io.bind('origin', ({ location }) => location.origin),
         io.bind('href', ({ location }) => location.href.get),
@@ -115,7 +115,7 @@ const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
       ),
     createUserAndSignInWithEmailAndPassword: (env) => (param) =>
       pipe(
-        env.browser.window,
+        env.browser.getWindow,
         io.map((win) => authStorage(win.localStorage)),
         io.chain((storage) => storage.setItem(param.email)),
         io.chain(() => env.provider.onAuthStateChangedCallback.read),
@@ -123,7 +123,7 @@ const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
       ),
     onAuthStateChanged: (env) => (onChangedCallback) =>
       pipe(
-        env.browser.window,
+        env.browser.getWindow,
         io.map(mkFpWindow),
         io.chain((win) => win.localStorage.getItem('auth')),
         io.chain((lsAuth) => onChangedCallback(lsAuth)),
@@ -134,7 +134,7 @@ const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
       ),
     signOut: (env) =>
       pipe(
-        env.browser.window,
+        env.browser.getWindow,
         io.map(mkFpWindow),
         io.chain((win) => win.localStorage.removeItem('auth')),
         io.chain(() => env.provider.onAuthStateChangedCallback.read),
@@ -143,7 +143,7 @@ const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
   },
 };
 
-export const stack = {
+export const stack: Stack<ClientEnv, ClientConfig> = {
   ci: {
     deployStorage: () => task.of(undefined),
     deployDb: () => task.of(undefined),
