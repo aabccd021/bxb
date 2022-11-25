@@ -19,8 +19,6 @@ jobs:
 
       - run: pnpm build:types
 
-      - run: pnpm lint
-
       - run: pnpm test:types
 
       - run: vitest
@@ -45,6 +43,8 @@ jobs:
 
       - run: pnpm test:e2e
         working-directory: e2e/framework/nextjs
+
+      - run: pnpm lint
 
       - name: Release
         env:
