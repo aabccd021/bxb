@@ -113,9 +113,10 @@ export type Window = typeof window;
 
 export type BrowserEnv = { readonly window: IO<Window> };
 
-export type Env<T> = {
+export type Env<ProviderEnv, Config> = {
   readonly browser: BrowserEnv;
-  readonly client: T;
+  readonly provider: ProviderEnv;
+  readonly config: Config;
 };
 
 export type CreateUserAndSignInWithEmailAndPasswordParam = {
@@ -125,12 +126,12 @@ export type CreateUserAndSignInWithEmailAndPasswordParam = {
 
 export type Unsubscribe = IO<void>;
 
-export type ClientScope<T, K extends Record<string, unknown>> = {
-  readonly [KK in keyof K]: (env: Env<T>) => K[KK];
+export type ClientScope<ProviderEnv, Config, K extends Record<string, unknown>> = {
+  readonly [KK in keyof K]: (env: Env<ProviderEnv, Config>) => K[KK];
 };
 
-export type ClientT<T, K extends Record<string, Record<string, unknown>>> = {
-  readonly [KK in keyof K]: ClientScope<T, K[KK]>;
+export type ClientT<ProviderEnv, Config, K extends Record<string, Record<string, unknown>>> = {
+  readonly [KK in keyof K]: ClientScope<ProviderEnv, Config, K[KK]>;
 };
 
 export type Client = {
@@ -154,12 +155,12 @@ export type Client = {
   };
 };
 
-export type ClientWithEnv<T> = ClientT<T, Client>;
+export type ClientWithEnv<ProviderEnv, Config> = ClientT<ProviderEnv, Config, Client>;
 
-export type Stack<T> = {
+export type Stack<ProviderEnv, Config> = {
   readonly ci: {
     readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
     readonly deployDb: (c: DbDeployConfig) => Task<unknown>;
   };
-  readonly client: ClientWithEnv<T>;
+  readonly client: ClientWithEnv<ProviderEnv, Config>;
 };

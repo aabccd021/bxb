@@ -9,14 +9,18 @@ import { Stack } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
-const applyStackEnv = <ClientEnv>(envStack: Stack<ClientEnv>, mkClientEnv: IO<ClientEnv>) =>
+const applyStackEnv = <ClientEnv, ClientConfig>(
+  envStack: Stack<ClientEnv, ClientConfig>,
+  mkClientEnv: IO<ClientEnv>,
+  config: ClientConfig
+) =>
   pipe(
     io.Do,
     io.bind('clientEnv', () => mkClientEnv),
     io.bind('window', () => () => new Window()),
     io.map(({ clientEnv, window }) =>
       pipe(
-        { browser: { window: () => window as any }, client: clientEnv },
+        { browser: { window: () => window as any }, provider: clientEnv, config },
         readerS({
           auth: readerS(envStack.client.auth),
           db: readerS(envStack.client.db),
@@ -28,8 +32,12 @@ const applyStackEnv = <ClientEnv>(envStack: Stack<ClientEnv>, mkClientEnv: IO<Cl
     task.fromIO
   );
 
-export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, mkClientTestEnv: IO<ClientEnv>) => {
-  const mkStack = applyStackEnv(realStack, mkClientTestEnv);
+export const tests = <ClientEnv, ClientConfig>(
+  realStack: Stack<ClientEnv, ClientConfig>,
+  mkClientTestEnv: IO<ClientEnv>,
+  config: ClientConfig
+) => {
+  const mkStack = applyStackEnv(realStack, mkClientTestEnv, config);
 
   describe('storage is independent between tests', () => {
     test('a server can upload file kira', async () => {

@@ -7,10 +7,11 @@ import { flow, pipe } from 'fp-ts/function';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const envStr = (importUrl: string) => `
-import { mkClientEnv } from '${importUrl}';
+const envStr = (provider: string) => `
+import { mkClientEnv } from '${provider}';
 import { adaptClientEnv } from 'masmott';
-export const env = adaptClientEnv(mkClientEnv());
+import { clientConfig } from '../${provider}.config'
+export const env = adaptClientEnv(mkClientEnv(), clientConfig);
 `;
 
 const methodStr = (scope: string, method: string, provider: string) => `
