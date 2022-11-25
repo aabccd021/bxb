@@ -26,7 +26,12 @@ export const ${method} =
 `;
 
 const scopes = {
-  auth: ['signInWithGoogleRedirect', 'onAuthStateChanged', 'signOut'],
+  auth: [
+    'signInWithGoogleRedirect',
+    'onAuthStateChanged',
+    'signOut',
+    'createUserAndSignInWithEmailAndPassword',
+  ],
   db: ['setDoc', 'getDoc'],
   storage: ['uploadDataUrl', 'getDownloadUrl'],
 };
