@@ -26,8 +26,6 @@ jobs:
       - run: pnpm install
         working-directory: e2e/provider/foo
 
-      - run: pnpm lint
-
       - run: pnpm test
         working-directory: e2e/provider/foo
 
@@ -48,6 +46,8 @@ jobs:
 
       - run: pnpm lint
         working-directory: e2e/framework/nextjs
+
+      - run: pnpm lint
 
       - name: Release
         env:
