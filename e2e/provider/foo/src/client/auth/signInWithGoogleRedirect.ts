@@ -1,8 +1,3 @@
-import { Client } from 'masmott/dist/es6/type';
-
-import { FooEnv } from '../env';
-type Type = Client['auth']['signInWithGoogleRedirect'];
-export const signInWithGoogleRedirect =
-  (_env: FooEnv): Type =>
-  () =>
-    undefined;
+import { FooClient } from '../env';
+type Type = FooClient['auth']['signInWithGoogleRedirect'];
+export const signInWithGoogleRedirect: Type = (_env) => () => undefined;
