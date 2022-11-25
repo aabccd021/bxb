@@ -7,14 +7,11 @@ import type { Option } from 'fp-ts/Option';
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import type { Task } from 'fp-ts/Task';
 import type { TaskEither } from 'fp-ts/TaskEither';
+import type { Window as WindowMock } from 'happy-dom';
 import type { TypeOf } from 'make-union-morphic-ts';
 import { makeUnion } from 'make-union-morphic-ts';
 
-import type { DataUrl } from './branded-types/DataUrl';
-
 const { summon } = summonFor({});
-
-export * from './branded-types/DataUrl';
 
 export const DB = summon((F) => F.strMap(F.strMap(F.unknown())));
 
@@ -90,7 +87,7 @@ export type DbDeployConfig = {
 
 export type UploadDataUrlParam = {
   readonly key: string;
-  readonly dataUrl: DataUrl;
+  readonly dataUrl: string;
 };
 
 export type DocKey = {
@@ -115,7 +112,7 @@ export type GetDocParam = {
 
 export type OnAuthStateChangedParam = (user: Option<string>) => IO<void>;
 
-export type Window = typeof window;
+export type Window = typeof window | WindowMock;
 
 export type BrowserEnv = { readonly window: IO<Window> };
 
