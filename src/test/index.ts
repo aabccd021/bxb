@@ -6,6 +6,7 @@ import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
 
 import type { Stack } from '../type';
+import { DataUrl } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
@@ -20,6 +21,8 @@ const applyStackEnv = <ClientEnv, ClientConfig>(
     io.bind('window', () => () => new Window()),
     io.map(({ clientEnv, window }) =>
       pipe(
+        // eslint-disable-next-line max-len
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
         { browser: { window: () => window as any }, provider: clientEnv, config },
         readerS({
           auth: readerS(envStack.client.auth),
@@ -42,18 +45,18 @@ export const tests = <ClientEnv, ClientConfig>(
   describe('storage is independent between tests', () => {
     test('a server can upload file kira', async () => {
       const result = pipe(
-        task.Do,
-        task.bind('stack', () => mkStack),
-        task.chainFirst(({ stack }) =>
-          stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })
+        mkStack,
+        task.chainFirst((stack) => stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })),
+        task.chain((stack) =>
+          pipe(
+            'data:;base64,a2lyYSBtYXN1bW90bw==',
+            DataUrl.type.decode,
+            either.map((dataUrl) => ({ key: 'kira_key', dataUrl })),
+            taskEither.fromEither,
+            taskEither.chainW(stack.client.storage.uploadDataUrl),
+            taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
+          )
         ),
-        task.chainFirst(({ stack }) =>
-          stack.client.storage.uploadDataUrl({
-            key: 'kira_key',
-            file: 'data:;base64,a2lyYSBtYXN1bW90bw==',
-          })
-        ),
-        task.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
         task.map(either.isRight)
       );
       expect(await result()).toEqual(true);
@@ -107,22 +110,21 @@ export const tests = <ClientEnv, ClientConfig>(
 
   test('can upload data url and get download url', async () => {
     const result = pipe(
-      task.Do,
-      task.bind('stack', () => mkStack),
-      task.chainFirst(({ stack }) =>
-        stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })
+      mkStack,
+      task.chainFirst((stack) => stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })),
+      task.chain((stack) =>
+        pipe(
+          'data:;base64,a2lyYSBtYXN1bW90bw==',
+          DataUrl.type.decode,
+          either.map((dataUrl) => ({ key: 'kira_key', dataUrl })),
+          taskEither.fromEither,
+          taskEither.chainW(stack.client.storage.uploadDataUrl),
+          taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
+        )
       ),
-      task.chainFirst(({ stack }) =>
-        stack.client.storage.uploadDataUrl({
-          file: 'data:;base64,a2lyYSBtYXN1bW90bw==',
-          key: 'masumo',
-        })
-      ),
-      task.chain(({ stack }) => stack.client.storage.getDownloadUrl({ key: 'masumo' })),
       taskEither.chain((downloadUrl) => taskEither.tryCatch(() => fetch(downloadUrl), identity)),
       taskEither.chain((res) => taskEither.tryCatch(() => res.text(), identity))
     );
-
     expect(await result()).toEqual(either.right('kira masumoto'));
   });
 };

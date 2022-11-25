@@ -2,10 +2,22 @@
 /* eslint-disable functional/no-return-void */
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/no-conditional-statement */
+import { summonFor } from '@morphic-ts/batteries/lib/summoner-ESBST';
 import { option, readonlyArray, readonlyRecord } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 import * as fs from 'fs';
 import * as path from 'path';
+
+const { summon } = summonFor({});
+
+const PackageJson = summon((F) =>
+  F.interface(
+    {
+      dependencies: F.strMap(F.string()),
+    },
+    'PackageJson'
+  )
+);
 
 const envStr = (provider: string) => `
 import { mkClientEnv } from '${provider}';
@@ -40,8 +52,9 @@ const scopes = {
 const provider = pipe(
   fs.readFileSync('package.json', { encoding: 'utf8' }),
   JSON.parse,
-  (a) => a.dependencies,
-  option.fromPredicate((x) => typeof x === 'object'),
+  PackageJson.type.decode,
+  option.fromEither,
+  option.map((p) => p.dependencies),
   option.chain(
     flow(
       readonlyRecord.keys,
@@ -52,7 +65,7 @@ const provider = pipe(
 );
 
 if (option.isNone(provider)) {
-  throw Error();
+  throw Error('No provider found');
 }
 
 fs.rmSync('masmott', { force: true, recursive: true });

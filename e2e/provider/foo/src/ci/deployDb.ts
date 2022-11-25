@@ -1,1 +1,2 @@
-export const deployDb = () => async () => undefined;
+import { task } from 'fp-ts';
+export const deployDb = () => task.of(undefined);

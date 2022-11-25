@@ -28,7 +28,7 @@ type ProviderEnv = {
   readonly onAuthStateChangedCallback: IORef<Option<OnAuthStateChangedParam>>;
 };
 
-export type ClientConfig = {};
+export type ClientConfig = Record<string, unknown>;
 
 export const mkClientEnv: IO<ProviderEnv> = pipe(
   ioRef.newIORef<Option<OnAuthStateChangedParam>>(option.none),
@@ -54,7 +54,7 @@ const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
       pipe(
         env.browser.window,
         io.map(mkFpWindow),
-        io.chain((win) => win.localStorage.setItem(`storage/${param.key}`, param.file)),
+        io.chain((win) => win.localStorage.setItem(`storage/${param.key}`, param.dataUrl)),
         taskEither.fromIO
       ),
     getDownloadUrl: (env) => (param) =>

@@ -14,6 +14,8 @@ import type { DataUrl } from './branded-types/DataUrl';
 
 const { summon } = summonFor({});
 
+export * from './branded-types/DataUrl';
+
 export const DB = summon((F) => F.strMap(F.strMap(F.unknown())));
 
 export type DB = AType<typeof DB>;
@@ -27,7 +29,7 @@ export type Condition =
   | { readonly type: 'true' }
   | { readonly type: 'false' };
 
-export const Condition: UM<{}, Condition> = summon((F) =>
+export const Condition: UM<Record<string, unknown>, Condition> = summon((F) =>
   F.recursive(
     (GTree) =>
       F.taggedUnion(
