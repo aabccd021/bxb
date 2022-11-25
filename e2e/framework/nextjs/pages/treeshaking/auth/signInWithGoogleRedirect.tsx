@@ -4,6 +4,6 @@
 import { masmott } from '../../../masmott';
 
 export default function Home() {
-  masmott.auth.signOut;
+  masmott.auth.signInWithGoogleRedirect;
   return <div> </div>;
 }
