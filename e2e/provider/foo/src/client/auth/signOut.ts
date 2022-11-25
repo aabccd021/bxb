@@ -1,6 +1,6 @@
 /* eslint-disable functional/no-expression-statement */
 
-import { FooClient } from '../env';
+import type { FooClient } from '../env';
 type Type = FooClient['auth']['signOut'];
 
 export const signOut: Type = (_env) => () => {

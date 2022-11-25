@@ -1,4 +1,4 @@
-import { ClientWithEnv } from 'masmott';
+import type { ClientWithEnv } from 'masmott';
 
 export type FooClientEnv = {};
 

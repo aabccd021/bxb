@@ -11,12 +11,13 @@ import {
   taskEither,
 } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
-import { IO } from 'fp-ts/IO';
-import { IORef } from 'fp-ts/IORef';
-import { Option } from 'fp-ts/Option';
+import type { IO } from 'fp-ts/IO';
+import type { IORef } from 'fp-ts/IORef';
+import type { Option } from 'fp-ts/Option';
 
 import { mkFpLocation, mkFpWindow, mkSafeLocalStorage } from './mkFp';
-import { ClientWithEnv, DB, GetDownloadUrlError, OnAuthStateChangedParam } from './type';
+import type { ClientWithEnv, OnAuthStateChangedParam } from './type';
+import { DB, GetDownloadUrlError } from './type';
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
   const searchParamsStr = new URLSearchParams({ redirectUrl: href }).toString();
