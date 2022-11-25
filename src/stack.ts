@@ -14,9 +14,11 @@ import { flow, pipe } from 'fp-ts/function';
 import type { IO } from 'fp-ts/IO';
 import type { IORef } from 'fp-ts/IORef';
 import type { Option } from 'fp-ts/Option';
+import validDataUrl from 'valid-data-url';
 
 import { mkFpLocation, mkFpWindow, mkSafeLocalStorage } from './mkFp';
 import type { ClientWithEnv, OnAuthStateChangedParam } from './type';
+import { UploadDataUrlError } from './type';
 import { DB, GetDownloadUrlError } from './type';
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
@@ -52,10 +54,15 @@ const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
   storage: {
     uploadDataUrl: (env) => (param) =>
       pipe(
-        env.browser.window,
-        io.map(mkFpWindow),
-        io.chain((win) => win.localStorage.setItem(`storage/${param.key}`, param.dataUrl)),
-        taskEither.fromIO
+        param.dataUrl,
+        either.fromPredicate(validDataUrl, () =>
+          UploadDataUrlError.Union.of.InvalidDataUrlFormat({})
+        ),
+        ioEither.fromEither,
+        ioEither.chainIOK(() => env.browser.window),
+        ioEither.map(mkFpWindow),
+        ioEither.chainIOK((win) => win.localStorage.setItem(`storage/${param.key}`, param.dataUrl)),
+        taskEither.fromIOEither
       ),
     getDownloadUrl: (env) => (param) =>
       pipe(
