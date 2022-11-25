@@ -1,5 +1,5 @@
-import { Env } from 'masmott/dist/es6/type';
+import { ClientWithEnv } from 'masmott';
 
 export type FooClientEnv = {};
 
-export type FooEnv = Env<FooClientEnv>;
+export type FooClient = ClientWithEnv<FooClientEnv>;

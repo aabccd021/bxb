@@ -1,10 +1,6 @@
 import { taskEither } from 'fp-ts';
-import { Client } from 'masmott/dist/es6/type';
 
-import { FooEnv } from '../env';
-type Type = Client['storage']['getDownloadUrl'];
+import { FooClient } from '../env';
+type Type = FooClient['storage']['getDownloadUrl'];
 
-export const getDownloadUrl =
-  (_env: FooEnv): Type =>
-  (_p) =>
-    taskEither.right('');
+export const getDownloadUrl: Type = (_env) => (_p) => taskEither.right('');

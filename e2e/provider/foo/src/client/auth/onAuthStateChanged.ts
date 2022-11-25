@@ -1,12 +1,5 @@
-import { Client } from 'masmott/dist/es6/type';
+import { FooClient } from '../env';
 
-import { FooEnv } from '../env';
+type Type = FooClient['auth']['onAuthStateChanged'];
 
-type Type = Client['auth']['onAuthStateChanged'];
-
-export const onAuthStateChanged =
-  (_env: FooEnv): Type =>
-  (_p) =>
-  () =>
-  () =>
-    undefined;
+export const onAuthStateChanged: Type = (_env) => (_p) => () => () => undefined;

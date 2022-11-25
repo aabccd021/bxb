@@ -1,11 +1,5 @@
-import { Client } from 'masmott/dist/es6/type';
+import { FooClient } from '../env';
 
-import { FooEnv } from '../env';
+type Type = FooClient['auth']['createUserAndSignInWithEmailAndPassword'];
 
-type Type = Client['auth']['createUserAndSignInWithEmailAndPassword'];
-
-export const createUserAndSignInWithEmailAndPassword =
-  (_env: FooEnv): Type =>
-  (_param) =>
-  () =>
-    undefined;
+export const createUserAndSignInWithEmailAndPassword: Type = (_env) => (_param) => () => undefined;
