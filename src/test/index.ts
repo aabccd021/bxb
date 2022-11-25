@@ -122,4 +122,15 @@ export const tests = <ClientEnv, ClientConfig>(
     );
     expect(await result()).toEqual(either.right('kira masumoto'));
   });
+
+  test('return left on invalid dataUrl upload', async () => {
+    const result = pipe(
+      mkStack,
+      task.chain((stack) =>
+        stack.client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'invalidDataUrl' })
+      ),
+      taskEither.mapLeft(({ code }) => code)
+    );
+    expect(await result()).toEqual(either.left('InvalidDataUrlFormat'));
+  });
 };
