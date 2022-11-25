@@ -13,7 +13,7 @@
     "build": "rm -rf dist && pnpm build:es6 && pnpm build:cjs && pnpm build:types",
     "build:cjs": "swc src --out-dir dist/cjs --source-maps --config module.type=commonjs",
     "build:es6": "swc src --out-dir dist/es6 --source-maps",
-    "build:types": "tsc --project tsconfig.dist.json && cp -R dist/types/. dist/cjs && cp -R dist/types/. dist/es6 && rm -rf dist/types/",
+    "build:types": "tsc --project tsconfig.dist.json",
     "fix": "eslint --max-warnings=0 . --fix",
     "lint": "eslint --max-warnings=0 .",
     "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
@@ -36,10 +36,6 @@
     },
     "./next": {
       "require": "./dist/cjs/next.js"
-    },
-    "./dist/cjs/test": {
-      "require": "./dist/cjs/test/index.js",
-      "import": "./dist/es6/test/index.js"
     }
   },
   "files": [
