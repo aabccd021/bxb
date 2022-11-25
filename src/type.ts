@@ -114,7 +114,7 @@ export type OnAuthStateChangedParam = (user: Option<string>) => IO<void>;
 
 export type Window = typeof window | WindowMock;
 
-export type BrowserEnv = { readonly window: IO<Window> };
+export type BrowserEnv = { readonly getWindow: IO<Window> };
 
 export type Env<ProviderEnv, Config> = {
   readonly browser: BrowserEnv;
@@ -133,11 +133,15 @@ export type ClientScope<ProviderEnv, Config, K extends Record<string, unknown>> 
   readonly [KK in keyof K]: (env: Env<ProviderEnv, Config>) => K[KK];
 };
 
-export type ClientT<ProviderEnv, Config, K extends Record<string, Record<string, unknown>>> = {
+export type ApplyClientEnv<
+  ProviderEnv,
+  Config,
+  K extends Record<string, Record<string, unknown>>
+> = {
   readonly [KK in keyof K]: ClientScope<ProviderEnv, Config, K[KK]>;
 };
 
-export type Client = {
+export type NoEnvClient = {
   readonly auth: {
     readonly signInWithGoogleRedirect: IO<void>;
     readonly createUserAndSignInWithEmailAndPassword: (
@@ -160,12 +164,12 @@ export type Client = {
   };
 };
 
-export type ClientWithEnv<ProviderEnv, Config> = ClientT<ProviderEnv, Config, Client>;
+export type Client<ProviderEnv, Config> = ApplyClientEnv<ProviderEnv, Config, NoEnvClient>;
 
 export type Stack<ProviderEnv, Config> = {
   readonly ci: {
     readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
     readonly deployDb: (c: DbDeployConfig) => Task<unknown>;
   };
-  readonly client: ClientWithEnv<ProviderEnv, Config>;
+  readonly client: Client<ProviderEnv, Config>;
 };

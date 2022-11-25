@@ -10,34 +10,35 @@ import type { Stack } from '../type';
 const readerS = apply.sequenceS(reader.Apply);
 
 const applyStackEnv = <ClientEnv, ClientConfig>(
-  envStack: Stack<ClientEnv, ClientConfig>,
-  mkClientEnv: IO<ClientEnv>,
-  config: ClientConfig
+  stack: Stack<ClientEnv, ClientConfig>,
+  getTestClientEnv: IO<ClientEnv>,
+  testClientConfig: ClientConfig
 ) =>
   pipe(
     io.Do,
-    io.bind('clientEnv', () => mkClientEnv),
-    io.bind('window', () => () => new WindowMock()),
-    io.map(({ clientEnv, window }) =>
-      pipe(
-        { browser: { window: () => window }, provider: clientEnv, config },
-        readerS({
-          auth: readerS(envStack.client.auth),
-          db: readerS(envStack.client.db),
-          storage: readerS(envStack.client.storage),
-        }),
-        (client) => ({ ...envStack, client })
-      )
-    ),
+    io.bind('providerEnv', () => getTestClientEnv),
+    io.bind('windowMock', () => () => new WindowMock()),
+    io.map(({ providerEnv: testClientEnv, windowMock }) => ({
+      ...stack,
+      client: readerS({
+        auth: readerS(stack.client.auth),
+        db: readerS(stack.client.db),
+        storage: readerS(stack.client.storage),
+      })({
+        browser: { getWindow: () => windowMock },
+        provider: testClientEnv,
+        config: testClientConfig,
+      }),
+    })),
     task.fromIO
   );
 
 export const tests = <ClientEnv, ClientConfig>(
   realStack: Stack<ClientEnv, ClientConfig>,
-  mkClientTestEnv: IO<ClientEnv>,
-  config: ClientConfig
+  getTestClientEnv: IO<ClientEnv>,
+  testClientConfig: ClientConfig
 ) => {
-  const mkStack = applyStackEnv(realStack, mkClientTestEnv, config);
+  const mkStack = applyStackEnv(realStack, getTestClientEnv, testClientConfig);
 
   describe('storage is independent between tests', () => {
     test('a server can upload file kira', async () => {
