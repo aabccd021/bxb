@@ -1,12 +1,11 @@
 import { apply, either, io, option, reader, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 import type { IO } from 'fp-ts/IO';
-import { Window } from 'happy-dom';
+import { Window as WindowMock } from 'happy-dom';
 import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
 
 import type { Stack } from '../type';
-import { DataUrl } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
@@ -18,12 +17,10 @@ const applyStackEnv = <ClientEnv, ClientConfig>(
   pipe(
     io.Do,
     io.bind('clientEnv', () => mkClientEnv),
-    io.bind('window', () => () => new Window()),
+    io.bind('window', () => () => new WindowMock()),
     io.map(({ clientEnv, window }) =>
       pipe(
-        // eslint-disable-next-line max-len
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
-        { browser: { window: () => window as any }, provider: clientEnv, config },
+        { browser: { window: () => window }, provider: clientEnv, config },
         readerS({
           auth: readerS(envStack.client.auth),
           db: readerS(envStack.client.db),
@@ -49,11 +46,10 @@ export const tests = <ClientEnv, ClientConfig>(
         task.chainFirst((stack) => stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })),
         task.chain((stack) =>
           pipe(
-            'data:;base64,a2lyYSBtYXN1bW90bw==',
-            DataUrl.type.decode,
-            either.map((dataUrl) => ({ key: 'kira_key', dataUrl })),
-            taskEither.fromEither,
-            taskEither.chainW(stack.client.storage.uploadDataUrl),
+            stack.client.storage.uploadDataUrl({
+              key: 'kira_key',
+              dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
+            }),
             taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
           )
         ),
@@ -114,11 +110,10 @@ export const tests = <ClientEnv, ClientConfig>(
       task.chainFirst((stack) => stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })),
       task.chain((stack) =>
         pipe(
-          'data:;base64,a2lyYSBtYXN1bW90bw==',
-          DataUrl.type.decode,
-          either.map((dataUrl) => ({ key: 'kira_key', dataUrl })),
-          taskEither.fromEither,
-          taskEither.chainW(stack.client.storage.uploadDataUrl),
+          stack.client.storage.uploadDataUrl({
+            key: 'kira_key',
+            dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
+          }),
           taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
         )
       ),

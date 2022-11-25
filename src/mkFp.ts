@@ -2,13 +2,15 @@ import { either, io, ioOption, option } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 import type { Refinement } from 'fp-ts/Refinement';
 
-export const mkFpLocalStorage = (localStorage: typeof window['localStorage']) => ({
+import type { Window } from './type';
+
+export const mkFpLocalStorage = (localStorage: Window['localStorage']) => ({
   getItem: (key: string) => pipe(() => localStorage.getItem(key), io.map(option.fromNullable)),
   setItem: (key: string, value: string) => () => localStorage.setItem(key, value),
   removeItem: (key: string) => () => localStorage.removeItem(key),
 });
 
-export const mkFpLocation = (location: typeof window['location']) => ({
+export const mkFpLocation = (location: Window['location']) => ({
   origin: () => location.origin,
   href: {
     get: () => location.href,
@@ -18,7 +20,7 @@ export const mkFpLocation = (location: typeof window['location']) => ({
   },
 });
 
-export const mkFpWindow = (win: typeof window) => ({
+export const mkFpWindow = (win: Window) => ({
   location: mkFpLocation(win.location),
   localStorage: mkFpLocalStorage(win.localStorage),
 });
