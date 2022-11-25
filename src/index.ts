@@ -1,7 +1,10 @@
+import { Env } from './type';
+
 export * from './stack';
 export * from './type';
 
-export const adaptClientEnv = <T>(clientEnv: T) => ({
+export const adaptClientEnv = <T, C>(providerEnv: T, config: C): Env<T, C> => ({
   browser: { window: () => window },
-  client: clientEnv,
+  provider: providerEnv,
+  config,
 });

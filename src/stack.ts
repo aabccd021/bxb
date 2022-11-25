@@ -23,11 +23,13 @@ const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly hre
   return `${origin}/__masmott__/signInWithRedirect?${searchParamsStr}`;
 };
 
-type ClientEnv = {
+type ProviderEnv = {
   readonly onAuthStateChangedCallback: IORef<Option<OnAuthStateChangedParam>>;
 };
 
-export const mkClientEnv: IO<ClientEnv> = pipe(
+export type ClientConfig = {};
+
+export const mkClientEnv: IO<ProviderEnv> = pipe(
   ioRef.newIORef<Option<OnAuthStateChangedParam>>(option.none),
   io.map((onAuthStateChangedCallback) => ({
     onAuthStateChangedCallback,
@@ -45,7 +47,7 @@ const dbStorage = mkSafeLocalStorage(DB.type.is, (data, key) => ({
   value: { message: 'invalid db data loaded', key, data },
 }))('db');
 
-const client: ClientWithEnv<ClientEnv> = {
+const client: ClientWithEnv<ProviderEnv, ClientConfig> = {
   storage: {
     uploadDataUrl: (env) => (param) =>
       pipe(
@@ -108,7 +110,7 @@ const client: ClientWithEnv<ClientEnv> = {
         env.browser.window,
         io.map((win) => authStorage(win.localStorage)),
         io.chain((storage) => storage.setItem(param.email)),
-        io.chain(() => env.client.onAuthStateChangedCallback.read),
+        io.chain(() => env.provider.onAuthStateChangedCallback.read),
         ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(param.email)))
       ),
     onAuthStateChanged: (env) => (onChangedCallback) =>
@@ -117,15 +119,17 @@ const client: ClientWithEnv<ClientEnv> = {
         io.map(mkFpWindow),
         io.chain((win) => win.localStorage.getItem('auth')),
         io.chain((lsAuth) => onChangedCallback(lsAuth)),
-        io.chain(() => env.client.onAuthStateChangedCallback.write(option.some(onChangedCallback))),
-        io.map(() => env.client.onAuthStateChangedCallback.write(option.none))
+        io.chain(() =>
+          env.provider.onAuthStateChangedCallback.write(option.some(onChangedCallback))
+        ),
+        io.map(() => env.provider.onAuthStateChangedCallback.write(option.none))
       ),
     signOut: (env) =>
       pipe(
         env.browser.window,
         io.map(mkFpWindow),
         io.chain((win) => win.localStorage.removeItem('auth')),
-        io.chain(() => env.client.onAuthStateChangedCallback.read),
+        io.chain(() => env.provider.onAuthStateChangedCallback.read),
         ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.none))
       ),
   },

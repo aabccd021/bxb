@@ -2,4 +2,6 @@ import { ClientWithEnv } from 'masmott';
 
 export type FooClientEnv = {};
 
-export type FooClient = ClientWithEnv<FooClientEnv>;
+export type FooClientConfig = {};
+
+export type FooClient = ClientWithEnv<FooClientEnv, FooClientConfig>;
