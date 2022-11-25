@@ -1,4 +1,4 @@
-import { Env } from './type';
+import type { Env } from './type';
 
 export * from './stack';
 export * from './type';

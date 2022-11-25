@@ -1,11 +1,11 @@
 import { apply, either, io, option, reader, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
-import { IO } from 'fp-ts/IO';
+import type { IO } from 'fp-ts/IO';
 import { Window } from 'happy-dom';
 import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
 
-import { Stack } from '../type';
+import type { Stack } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 

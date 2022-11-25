@@ -32,6 +32,7 @@
       "type"
     ],
     "@typescript-eslint/no-shadow": "error",
+    "@typescript-eslint/consistent-type-imports": "error",
     "@typescript-eslint/unbound-method": "off",
     "functional/functional-parameters": "off",
     "functional/no-mixed-type": "off",

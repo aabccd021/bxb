@@ -1,12 +1,16 @@
-import { summonFor, UM } from '@morphic-ts/batteries/lib/summoner-ESBST';
-import { AType } from '@morphic-ts/summoners/lib';
+import type { UM } from '@morphic-ts/batteries/lib/summoner-ESBST';
+import { summonFor } from '@morphic-ts/batteries/lib/summoner-ESBST';
+import type { AType } from '@morphic-ts/summoners/lib';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
-import { IO } from 'fp-ts/IO';
-import { Option } from 'fp-ts/Option';
-import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
-import { Task } from 'fp-ts/Task';
-import { TaskEither } from 'fp-ts/TaskEither';
-import { makeUnion, TypeOf } from 'make-union-morphic-ts';
+import type { IO } from 'fp-ts/IO';
+import type { Option } from 'fp-ts/Option';
+import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
+import type { Task } from 'fp-ts/Task';
+import type { TaskEither } from 'fp-ts/TaskEither';
+import type { TypeOf } from 'make-union-morphic-ts';
+import { makeUnion } from 'make-union-morphic-ts';
+
+import type { DataUrl } from './branded-types/DataUrl';
 
 const { summon } = summonFor({});
 
@@ -82,9 +86,9 @@ export type DbDeployConfig = {
   };
 };
 
-export type UploadParam = {
+export type UploadDataUrlParam = {
   readonly key: string;
-  readonly file: string;
+  readonly dataUrl: DataUrl;
 };
 
 export type DocKey = {
@@ -148,7 +152,9 @@ export type Client = {
     readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], Option<DocData>>;
   };
   readonly storage: {
-    readonly uploadDataUrl: (p: UploadParam) => TaskEither<UploadDataUrlError['Union'], void>;
+    readonly uploadDataUrl: (
+      p: UploadDataUrlParam
+    ) => TaskEither<UploadDataUrlError['Union'], void>;
     readonly getDownloadUrl: (
       p: GetDownloadUrlParam
     ) => TaskEither<GetDownloadUrlError['Union'], string>;

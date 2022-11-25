@@ -5,9 +5,11 @@ specifiers:
   '@morphic-ts/summoners': ^3.0.0
   '@swc/cli': ^0.1.57
   '@swc/core': ^1.3.19
+  '@types/valid-data-url': ^2.0.0
   eslint: ^8.28.0
   fp-ts: ^2.13.1
   happy-dom: ^7.7.0
+  io-ts: ^2.2.19
   make-union-morphic-ts: ^1.0.7
   nazna: ^1.14.2
   next: ^13.0.4
@@ -15,16 +17,20 @@ specifiers:
   pnpm: ^7.17.0
   semantic-release: ^19.0.5
   typescript: ^4.9.3
+  valid-data-url: ^4.0.1
   vitest: ^0.24.5
 
 dependencies:
   '@morphic-ts/batteries': 3.0.0_ijxaxaqzvtydjr7nx22rxz23xi
   '@morphic-ts/summoners': 3.0.0_4d7wvhfwbxj4u6itqsiiv2wloq
+  '@types/valid-data-url': 2.0.0
   fp-ts: 2.13.1
   happy-dom: 7.7.0
+  io-ts: 2.2.19_fp-ts@2.13.1
   make-union-morphic-ts: 1.0.7_tkkhkw7abvjyxavu6h6oqh543q
   next: 13.0.4_biqbaboplfbrettd7655fr4n2y
   node-fetch: 3.3.0
+  valid-data-url: 4.0.1
 
 devDependencies:
   '@swc/cli': 0.1.57_@swc+core@1.3.19
@@ -864,6 +870,10 @@ packages:
   /@types/semver/7.3.13:
     resolution: {integrity: sha512-21cFJr9z3g5dW8B0CVI9g2O9beqaThGQ6ZFBqHfwhzLDKUxaqTIy3vnfah/UPkfOiF2pLq+tGz+W8RyCskuslw==}
     dev: true
+
+  /@types/valid-data-url/2.0.0:
+    resolution: {integrity: sha512-96NadqQC1BDUJQYjjwYVTo6XaBuiFQo2vfvsTLTlHxg8RbjfMNTHeD5ErRsz4rHdA4rDChFjLB2rCayoulPHmQ==}
+    dev: false
 
   /@typescript-eslint/eslint-plugin/5.44.0_fnsv2sbzcckq65bwfk7a5xwslu:
     resolution: {integrity: sha512-j5ULd7FmmekcyWeArx+i8x7sdRHzAtXTkmDPthE4amxZOWKFK7bomoJ4r7PJ8K7PoMzD16U8MmuZFAonr1ERvw==}
@@ -4076,6 +4086,11 @@ packages:
 
   /util-deprecate/1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  /valid-data-url/4.0.1:
+    resolution: {integrity: sha512-t0oA6VCnlQ/MPKP/Ie9ZD3biEpB2JTxK1Hx4KC72RbhubL9HsXznoBn228UQTazL7cPvsY36bhzt3fk424TjyA==}
+    engines: {node: '>=10'}
+    dev: false
 
   /validate-npm-package-license/3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}

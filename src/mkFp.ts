@@ -1,6 +1,6 @@
 import { either, io, ioOption, option } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
-import { Refinement } from 'fp-ts/Refinement';
+import type { Refinement } from 'fp-ts/Refinement';
 
 export const mkFpLocalStorage = (localStorage: typeof window['localStorage']) => ({
   getItem: (key: string) => pipe(() => localStorage.getItem(key), io.map(option.fromNullable)),
