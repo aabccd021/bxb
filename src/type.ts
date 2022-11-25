@@ -163,5 +163,3 @@ export type Stack<T> = {
   };
   readonly client: ClientWithEnv<T>;
 };
-
-export type MkStack<ClientEnv> = IO<Stack<ClientEnv>>;

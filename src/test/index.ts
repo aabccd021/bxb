@@ -1,31 +1,35 @@
 import { apply, either, io, option, reader, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
+import { IO } from 'fp-ts/IO';
 import { Window } from 'happy-dom';
 import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
 
-import { MkStack } from '../type';
+import { Stack } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
-export const tests = <ClientEnv>(mkStackFromEnv: MkStack<ClientEnv>, clientEnv: ClientEnv) => {
-  const mkStack = pipe(
+const applyStackEnv = <ClientEnv>(envStack: Stack<ClientEnv>, mkClientEnv: IO<ClientEnv>) =>
+  pipe(
     io.Do,
-    io.bind('stack', () => mkStackFromEnv),
+    io.bind('clientEnv', () => mkClientEnv),
     io.bind('window', () => () => new Window()),
-    io.map(({ stack, window }) =>
+    io.map(({ clientEnv, window }) =>
       pipe(
         { browser: { window: () => window as any }, client: clientEnv },
         readerS({
-          auth: readerS(stack.client.auth),
-          db: readerS(stack.client.db),
-          storage: readerS(stack.client.storage),
+          auth: readerS(envStack.client.auth),
+          db: readerS(envStack.client.db),
+          storage: readerS(envStack.client.storage),
         }),
-        (client) => ({ ...stack, client })
+        (client) => ({ ...envStack, client })
       )
     ),
     task.fromIO
   );
+
+export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, mkClientTestEnv: IO<ClientEnv>) => {
+  const mkStack = applyStackEnv(realStack, mkClientTestEnv);
 
   describe('storage is independent between tests', () => {
     test('a server can upload file kira', async () => {

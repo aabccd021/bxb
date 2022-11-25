@@ -2,19 +2,27 @@
 /* eslint-disable functional/no-return-void */
 /* eslint-disable functional/no-expression-statement */
 /* eslint-disable functional/no-conditional-statement */
-import { option, readonlyArray, readonlyRecord, string } from 'fp-ts';
+import { option, readonlyArray, readonlyRecord } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 import * as fs from 'fs';
 import * as path from 'path';
 
+const envStr = (importUrl: string) => `
+import { mkClientEnv } from '${importUrl}';
+import { adaptClientEnv } from 'masmott';
+export const env = adaptClientEnv(mkClientEnv());
+`;
+
 const methodStr = (scope: string, method: string, provider: string) => `
-import {stack as mockStack} from 'masmott/dist/es6/browser';
-import {stack as providerStack} from 'masmott-${provider}';
+import {stack as providerStack} from '${provider}';
+import {env as providerEnv} from '../provider-env';
+import {stack as mockStack} from 'masmott';
+import {env as mockEnv} from '../mock-env';
 
 export const ${method} =
   process.env.NODE_ENV === 'production' 
-    ? providerStack.client.${scope}.${method}({browser: {window: () => window}, client: {}})
-    : mockStack.client.${scope}.${method}({browser: {window: () => window}, client: {}});
+    ? providerStack.client.${scope}.${method}(providerEnv)
+    : mockStack.client.${scope}.${method}(mockEnv);
 `;
 
 const scopes = {
@@ -34,8 +42,7 @@ const provider = pipe(
       readonlyArray.filter((dep) => dep.startsWith('masmott-')),
       readonlyArray.head
     )
-  ),
-  option.map(string.replace('masmott-', ''))
+  )
 );
 
 if (option.isNone(provider)) {
@@ -60,6 +67,9 @@ fs.writeFileSync(
   "sideEffects": false
 }`
 );
+
+fs.writeFileSync('masmott/provider-env.ts', envStr(`${provider.value}`));
+fs.writeFileSync('masmott/mock-env.ts', envStr('masmott'));
 
 Object.entries(scopes).forEach(([scope, methods]) => {
   fs.mkdirSync(`masmott/${scope}`);

@@ -34,9 +34,6 @@
       "require": "./dist/cjs/index.js",
       "import": "./dist/es6/index.js"
     },
-    "./dist/es6/browser": {
-      "import": "./dist/es6/browser.js"
-    },
     "./next": {
       "require": "./dist/cjs/next.js"
     },

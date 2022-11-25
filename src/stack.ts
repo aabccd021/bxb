@@ -39,7 +39,9 @@ type ClientEnv = {
 
 export const mkClientEnv: IO<ClientEnv> = pipe(
   ioRef.newIORef<Option<OnAuthStateChangedParam>>(option.none),
-  io.map((onAuthStateChangedCallback) => ({ onAuthStateChangedCallback }))
+  io.map((onAuthStateChangedCallback) => ({
+    onAuthStateChangedCallback,
+  }))
 );
 
 type Env = _Env<ClientEnv>;
