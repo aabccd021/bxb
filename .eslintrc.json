@@ -33,9 +33,10 @@
       "error",
       "type"
     ],
-    "@typescript-eslint/no-shadow": "error",
-    "@typescript-eslint/consistent-type-imports": "error",
     "@typescript-eslint/consistent-type-exports": "error",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "@typescript-eslint/no-redundant-type-constituents": "error",
+    "@typescript-eslint/no-shadow": "error",
     "@typescript-eslint/no-unnecessary-qualifier": "error",
     "@typescript-eslint/no-useless-empty-export": "error",
     "@typescript-eslint/sort-type-constituents": "error",
