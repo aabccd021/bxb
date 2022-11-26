@@ -108,22 +108,11 @@
   "overrides": [
     {
       "files": [
-        "test/**.test.ts",
-        "src/test/**.ts"
+        "**/test/**.ts"
       ],
       "rules": {
         "functional/no-return-void": "off",
         "functional/no-expression-statement": "off"
-      }
-    },
-    {
-      "files": [
-        "mkFp.ts"
-      ],
-      "rules": {
-        "functional/no-expression-statement": "off",
-        "functional/immutable-data": "off",
-        "functional/no-return-void": "off"
       }
     }
   ]

@@ -15,11 +15,50 @@ import { flow, pipe } from 'fp-ts/function';
 import type { IO } from 'fp-ts/IO';
 import type { IORef } from 'fp-ts/IORef';
 import type { Option } from 'fp-ts/Option';
+import type { Refinement } from 'fp-ts/Refinement';
 import validDataUrl from 'valid-data-url';
 
-import { mkFpLocation, mkFpWindow, mkSafeLocalStorage } from './mkFp';
 import type { Client, OnAuthStateChangedParam, Stack, Window } from './type';
 import { DB, GetDownloadUrlError, UploadDataUrlError } from './type';
+
+const mkFpLocalStorage = (localStorage: Window['localStorage']) => ({
+  getItem: (key: string) => pipe(() => localStorage.getItem(key), io.map(option.fromNullable)),
+  // eslint-disable-next-line functional/no-return-void
+  setItem: (key: string, value: string) => () => localStorage.setItem(key, value),
+  // eslint-disable-next-line functional/no-return-void
+  removeItem: (key: string) => () => localStorage.removeItem(key),
+});
+
+const mkFpLocation = (location: Window['location']) => ({
+  origin: () => location.origin,
+  href: {
+    get: () => location.href,
+    // eslint-disable-next-line functional/no-return-void
+    set: (newHref: string) => () => {
+      // eslint-disable-next-line functional/immutable-data, functional/no-expression-statement
+      location.href = newHref;
+    },
+  },
+});
+
+const mkFpWindow = (win: Window) => ({
+  location: mkFpLocation(win.location),
+  localStorage: mkFpLocalStorage(win.localStorage),
+});
+
+const mkSafeLocalStorage =
+  <T, K>(refinement: Refinement<unknown, T>, onFalse: (data: unknown, key: string) => K) =>
+  (key: string) =>
+    flow(mkFpLocalStorage, (localStorage) => ({
+      setItem: (data: T) =>
+        pipe(data, JSON.stringify, (typeSafeData) => localStorage.setItem(key, typeSafeData)),
+      getItem: pipe(
+        localStorage.getItem(key),
+        ioOption.map(JSON.parse),
+        ioOption.map(either.fromPredicate(refinement, (data) => onFalse(data, key))),
+        io.map(option.match(() => either.right(option.none), either.map(option.some)))
+      ),
+    }));
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
   const searchParamsStr = new URLSearchParams({ redirectUrl: href }).toString();
