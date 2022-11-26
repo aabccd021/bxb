@@ -1,4 +1,4 @@
-/* eslint-disable functional/no-expression-statement */
+
 import { expect, test } from '@playwright/test';
 
 test('user is not signed in initially', async ({ page }) => {
