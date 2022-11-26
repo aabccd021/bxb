@@ -1,7 +1,9 @@
-import { apply, either, io, option, reader, task, taskEither } from 'fp-ts';
+import { apply, either, io, option, reader, task } from 'fp-ts';
 import { flow, identity, pipe } from 'fp-ts/function';
 import type { IO } from 'fp-ts/IO';
 import type { Task } from 'fp-ts/Task';
+// eslint-disable-next-line fp-ts/no-module-imports
+import { chainW as then, tryCatch } from 'fp-ts/TaskEither';
 import fetch from 'node-fetch';
 import { describe, expect, test as test_ } from 'vitest';
 
@@ -13,12 +15,12 @@ const mkTest =
   <ClientEnv>(stack: Stack<ClientEnv>, getTestClientEnv: IO<ClientEnv>) =>
   <T>({
     name,
-    expect: expectFn,
-    toEqual: toResultEqual,
+    expect: fn,
+    toResult,
   }: {
     readonly name: string;
     readonly expect: (stack: NoEnvStack) => Task<T>;
-    readonly toEqual: T;
+    readonly toResult: T;
   }) =>
     test_(name, async () => {
       const result = pipe(
@@ -34,10 +36,16 @@ const mkTest =
           )
         ),
         task.fromIO,
-        task.chain(expectFn)
+        task.chain(fn)
       );
-      expect(await result()).toEqual(toResultEqual);
+      expect(await result()).toEqual(toResult);
     });
+
+const fetchText = (url: string) =>
+  pipe(
+    tryCatch(() => fetch(url), identity),
+    then((downloadResult) => tryCatch(() => downloadResult.text(), identity))
+  );
 
 export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: IO<ClientEnv>) => {
   const test = mkTest(realStack, getTestClientEnv);
@@ -45,93 +53,83 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
   describe('storage is independent between tests', () => {
     test({
       name: 'a server can upload file kira',
-      expect: (stack) =>
+      expect: ({ client, ci }) =>
         pipe(
-          stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
-          taskEither.chainW(() =>
-            stack.client.storage.uploadDataUrl({
+          ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+          then(() =>
+            client.storage.uploadDataUrl({
               key: 'kira_key',
               dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
             })
           ),
-          taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
-          task.map(either.isRight)
+          then(() => client.storage.getDownloadUrl({ key: 'kira_key' }))
         ),
-      toEqual: true,
+      toResult: either.right('a'),
     });
 
     test({
       name: 'server from another test can not access file kira',
-      expect: (stack) =>
+      expect: ({ client, ci }) =>
         pipe(
-          stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
-          taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
-          taskEither.mapLeft(({ code }) => code)
+          ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+          then(() => client.storage.getDownloadUrl({ key: 'kira_key' }))
         ),
-      toEqual: either.left('FileNotFound'),
+      toResult: either.left({ code: 'FileNotFound' }),
     });
   });
 
   describe('db is independent between tests', () => {
     test({
       name: 'a server can create document kira',
-      expect: (stack) =>
+      expect: ({ client, ci }) =>
         pipe(
-          stack.ci.deployDb({ securityRule: { type: 'allowAll' } }),
-          taskEither.chain(() =>
-            stack.client.db.setDoc({
+          ci.deployDb({ securityRule: { type: 'allowAll' } }),
+          then(() =>
+            client.db.setDoc({
               key: { collection: 'user', id: 'kira_id' },
               data: { name: 'masumoto' },
             })
           ),
-          taskEither.chainW(() =>
-            stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
-          )
+          then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
         ),
-      toEqual: either.right(option.some({ name: 'masumoto' })),
+      toResult: either.right(option.some({ name: 'masumoto' })),
     });
 
     test({
       name: 'server from another test can not access document kira',
-      expect: (stack) =>
+      expect: ({ client, ci }) =>
         pipe(
-          stack.ci.deployDb({ securityRule: { type: 'allowAll' } }),
-          taskEither.chainW(() =>
-            stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
-          )
+          ci.deployDb({ securityRule: { type: 'allowAll' } }),
+          then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
         ),
-      toEqual: either.right(option.none),
+      toResult: either.right(option.none),
     });
   });
 
   test({
     name: 'can upload data url and get download url',
-    expect: (stack) =>
+    expect: ({ client, ci }) =>
       pipe(
-        stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
-        taskEither.chainW(() =>
-          stack.client.storage.uploadDataUrl({
+        ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+        then(() =>
+          client.storage.uploadDataUrl({
             key: 'kira_key',
             dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
           })
         ),
-        taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
-        taskEither.chain((downloadUrl) => taskEither.tryCatch(() => fetch(downloadUrl), identity)),
-        taskEither.chain((res) => taskEither.tryCatch(() => res.text(), identity))
+        then(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
+        then(fetchText)
       ),
-    toEqual: either.right('kira masumoto'),
+    toResult: either.right('kira masumoto'),
   });
 
   test({
     name: 'return left on invalid dataUrl upload',
-    expect: (stack) =>
+    expect: ({ client, ci }) =>
       pipe(
-        stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
-        taskEither.chainW(() =>
-          stack.client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'invalidDataUrl' })
-        ),
-        taskEither.mapLeft(({ code }) => code)
+        ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+        then(() => client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'invalidDataUrl' }))
       ),
-    toEqual: either.left('InvalidDataUrlFormat'),
+    toResult: either.left({ code: 'InvalidDataUrlFormat' }),
   });
 };
