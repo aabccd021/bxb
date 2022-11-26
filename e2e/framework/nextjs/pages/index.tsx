@@ -1,8 +1,5 @@
-/* eslint-disable functional/no-expression-statement */
-/* eslint-disable functional/no-return-void */
-
 import { option } from 'fp-ts';
-import { Option } from 'fp-ts/Option';
+import { Option } from 'fp-ts/lib/Option';
 import { useEffect, useMemo, useState } from 'react';
 
 import { masmott } from '../masmott';
