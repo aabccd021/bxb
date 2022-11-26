@@ -59,7 +59,7 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
           then(() =>
             client.storage.uploadDataUrl({
               key: 'kira_key',
-              dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
+              dataUrl: `data:;base64,${Buffer.from('kira masumoto').toString('base64')}`,
             })
           ),
           then(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
@@ -115,7 +115,7 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
         then(() =>
           client.storage.uploadDataUrl({
             key: 'kira_key',
-            dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
+            dataUrl: `data:;base64,${Buffer.from('kira masumoto').toString('base64')}`,
           })
         ),
         then(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
