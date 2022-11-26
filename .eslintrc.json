@@ -40,6 +40,7 @@
     "@typescript-eslint/no-useless-empty-export": "error",
     "@typescript-eslint/sort-type-constituents": "error",
     "@typescript-eslint/strict-boolean-expressions": "error",
+    "@typescript-eslint/switch-exhaustiveness-check": "error",
     "@typescript-eslint/unbound-method": "off",
     "functional/functional-parameters": "off",
     "functional/no-mixed-type": "off",
