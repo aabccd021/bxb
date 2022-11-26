@@ -1,9 +1,9 @@
-import { apply, either, io, option, reader, task } from 'fp-ts';
+import { apply, either, option, reader } from 'fp-ts';
+import type { Either } from 'fp-ts/Either';
 import { flow, identity, pipe } from 'fp-ts/function';
-import type { IO } from 'fp-ts/IO';
-import type { Task } from 'fp-ts/Task';
+import type { TaskEither } from 'fp-ts/TaskEither';
 // eslint-disable-next-line fp-ts/no-module-imports
-import { chainW as then, tryCatch } from 'fp-ts/TaskEither';
+import { chainW as then, map, right, tryCatch } from 'fp-ts/TaskEither';
 import fetch from 'node-fetch';
 import { describe, expect, test as test_ } from 'vitest';
 
@@ -12,20 +12,20 @@ import type { NoEnvStack, Stack } from '../type';
 const readerS = apply.sequenceS(reader.Apply);
 
 const mkTest =
-  <ClientEnv>(stack: Stack<ClientEnv>, getTestClientEnv: IO<ClientEnv>) =>
+  <ClientEnv>(stack: Stack<ClientEnv>, getTestClientEnv: TaskEither<unknown, ClientEnv>) =>
   <T>({
     name,
     expect: fn,
     toResult,
   }: {
     readonly name: string;
-    readonly expect: (stack: NoEnvStack) => Task<T>;
-    readonly toResult: T;
+    readonly expect: (stack: NoEnvStack) => TaskEither<unknown, T>;
+    readonly toResult: Either<unknown, T>;
   }) =>
     test_(name, async () => {
       const result = pipe(
         getTestClientEnv,
-        io.map(
+        map(
           flow(
             readerS({
               auth: readerS(stack.client.auth),
@@ -35,8 +35,7 @@ const mkTest =
             (client) => ({ ...stack, client })
           )
         ),
-        task.fromIO,
-        task.chain(fn)
+        then(fn)
       );
       expect(await result()).toEqual(toResult);
     });
@@ -47,7 +46,10 @@ const fetchText = (url: string) =>
     then((downloadResult) => tryCatch(() => downloadResult.text(), identity))
   );
 
-export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: IO<ClientEnv>) => {
+export const runTests = <ClientEnv>(
+  realStack: Stack<ClientEnv>,
+  getTestClientEnv: TaskEither<unknown, ClientEnv>
+) => {
   const test = mkTest(realStack, getTestClientEnv);
 
   describe('storage is independent between tests', () => {
@@ -58,9 +60,9 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
           ci.deployStorage({ securityRule: { type: 'allowAll' } }),
           then(() => client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'data:,foo' })),
           then(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
-          task.map(either.isRight)
+          then(() => right('download success'))
         ),
-      toResult: true,
+      toResult: either.right('download success'),
     });
 
     test({
@@ -68,7 +70,8 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
       expect: ({ client, ci }) =>
         pipe(
           ci.deployStorage({ securityRule: { type: 'allowAll' } }),
-          then(() => client.storage.getDownloadUrl({ key: 'kira_key' }))
+          then(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
+          then(() => right('download success'))
         ),
       toResult: either.left({ code: 'FileNotFound' }),
     });
