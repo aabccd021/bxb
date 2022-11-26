@@ -1,7 +1,8 @@
 import type { Client } from 'masmott';
 
-export type FooClientEnv = Record<string, unknown>;
+export type FooProviderClient = {
+  readonly env: unknown;
+  readonly config: unknown;
+};
 
-export type FooClientConfig = Record<string, unknown>;
-
-export type FooClient = Client<FooClientEnv, FooClientConfig>;
+export type FooClient = Client<FooProviderClient>;

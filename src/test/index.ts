@@ -5,20 +5,20 @@ import { Window as WindowMock } from 'happy-dom';
 import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
 
-import type { Stack } from '../type';
+import type { Provider, Stack } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
-const applyStackEnv = <ClientEnv, ClientConfig>(
-  stack: Stack<ClientEnv, ClientConfig>,
-  getTestClientEnv: IO<ClientEnv>,
-  testClientConfig: ClientConfig
+const applyStackEnv = <P extends Provider>(
+  stack: Stack<P>,
+  getTestClientEnv: IO<P['client']['env']>,
+  testClientConfig: P['client']['config']
 ) =>
   pipe(
     io.Do,
-    io.bind('providerEnv', () => getTestClientEnv),
+    io.bind('testClientEnv', () => getTestClientEnv),
     io.bind('windowMock', () => () => new WindowMock()),
-    io.map(({ providerEnv: testClientEnv, windowMock }) => ({
+    io.map(({ testClientEnv, windowMock }) => ({
       ...stack,
       client: readerS({
         auth: readerS(stack.client.auth),
@@ -26,17 +26,17 @@ const applyStackEnv = <ClientEnv, ClientConfig>(
         storage: readerS(stack.client.storage),
       })({
         browser: { getWindow: () => windowMock },
-        provider: testClientEnv,
+        env: testClientEnv,
         config: testClientConfig,
       }),
     })),
     task.fromIO
   );
 
-export const tests = <ClientEnv, ClientConfig>(
-  realStack: Stack<ClientEnv, ClientConfig>,
-  getTestClientEnv: IO<ClientEnv>,
-  testClientConfig: ClientConfig
+export const tests = <P extends Provider>(
+  realStack: Stack<P>,
+  getTestClientEnv: IO<P['client']['env']>,
+  testClientConfig: P['client']['config']
 ) => {
   const mkStack = applyStackEnv(realStack, getTestClientEnv, testClientConfig);
 
