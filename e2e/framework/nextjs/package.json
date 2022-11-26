@@ -2,6 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "sideEffects": false,
   "scripts": {
     "build": "next build",
     "codegen": "playwright codegen --color-scheme dark localhost:3000",

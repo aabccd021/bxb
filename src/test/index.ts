@@ -1,44 +1,31 @@
 import { apply, either, io, option, reader, task, taskEither } from 'fp-ts';
-import { identity, pipe } from 'fp-ts/function';
+import { flow, identity, pipe } from 'fp-ts/function';
 import type { IO } from 'fp-ts/IO';
-import { Window as WindowMock } from 'happy-dom';
 import fetch from 'node-fetch';
 import { describe, expect, test } from 'vitest';
 
-import type { Provider, Stack } from '../type';
+import type { Stack } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
-const applyStackEnv = <P extends Provider>(
-  stack: Stack<P>,
-  getTestClientEnv: IO<P['client']['env']>,
-  testClientConfig: P['client']['config']
-) =>
+const applyStackEnv = <ClientEnv>(stack: Stack<ClientEnv>, getTestClientEnv: IO<ClientEnv>) =>
   pipe(
-    io.Do,
-    io.bind('testClientEnv', () => getTestClientEnv),
-    io.bind('windowMock', () => () => new WindowMock()),
-    io.map(({ testClientEnv, windowMock }) => ({
-      ...stack,
-      client: readerS({
-        auth: readerS(stack.client.auth),
-        db: readerS(stack.client.db),
-        storage: readerS(stack.client.storage),
-      })({
-        browser: { getWindow: () => windowMock },
-        env: testClientEnv,
-        config: testClientConfig,
-      }),
-    })),
+    getTestClientEnv,
+    io.map(
+      flow(
+        readerS({
+          auth: readerS(stack.client.auth),
+          db: readerS(stack.client.db),
+          storage: readerS(stack.client.storage),
+        }),
+        (client) => ({ ...stack, client })
+      )
+    ),
     task.fromIO
   );
 
-export const tests = <P extends Provider>(
-  realStack: Stack<P>,
-  getTestClientEnv: IO<P['client']['env']>,
-  testClientConfig: P['client']['config']
-) => {
-  const mkStack = applyStackEnv(realStack, getTestClientEnv, testClientConfig);
+export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: IO<ClientEnv>) => {
+  const mkStack = applyStackEnv(realStack, getTestClientEnv);
 
   describe('storage is independent between tests', () => {
     test('a server can upload file kira', async () => {

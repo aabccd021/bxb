@@ -1,6 +1,6 @@
 /* eslint-disable functional/no-expression-statement */
 import { tests } from 'masmott/dist/cjs/test';
 
-import { mkClientEnv, stack } from '../src';
+import { stack } from '../src';
 
-tests(stack, mkClientEnv, undefined);
+tests(stack, () => undefined);
