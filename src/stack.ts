@@ -104,6 +104,20 @@ export const mkClientEnvFromWindow = (getGetWindow: IO<IO<Window>>) =>
 
 export const mkClientEnv = mkClientEnvFromWindow(() => () => window);
 
+const setItem = (getWindow: IO<Window>, key: string, value: string) =>
+  pipe(
+    getWindow,
+    // eslint-disable-next-line functional/no-return-void
+    io.chain((win) => () => win.localStorage.setItem(key, value))
+  );
+
+const getItem = (getWindow: IO<Window>, key: string) =>
+  pipe(
+    getWindow,
+    io.chain((win) => () => win.localStorage.getItem(key)),
+    io.map(option.fromNullable)
+  );
+
 const fpLocalStorageFromEnv = (env: MockClientEnv) =>
   pipe(
     env.getWindow,
@@ -112,28 +126,28 @@ const fpLocalStorageFromEnv = (env: MockClientEnv) =>
 
 const client: Client<MockClientEnv> = {
   storage: {
-    uploadDataUrl: (env) => (param) =>
-      pipe(
-        param.dataUrl,
-        either.fromPredicate(validDataUrl, () =>
-          UploadDataUrlError.Union.of.InvalidDataUrlFormat({})
+    uploadDataUrl:
+      ({ getWindow }) =>
+      (param) =>
+        pipe(
+          param.dataUrl,
+          either.fromPredicate(validDataUrl, () =>
+            UploadDataUrlError.Union.of.InvalidDataUrlFormat({})
+          ),
+          ioEither.fromEither,
+          ioEither.chainIOK((vlidDataUrl) =>
+            setItem(getWindow, `storage/${param.key}`, vlidDataUrl)
+          ),
+          taskEither.fromIOEither
         ),
-        ioEither.fromEither,
-        ioEither.chainIOK((vlidDataUrl) =>
-          pipe(
-            fpLocalStorageFromEnv(env),
-            io.chain((localStorage) => localStorage.setItem(`storage/${param.key}`, vlidDataUrl))
-          )
+    getDownloadUrl:
+      ({ getWindow }) =>
+      (param) =>
+        pipe(
+          getItem(getWindow, `storage/${param.key}`),
+          io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
+          taskEither.fromIOEither
         ),
-        taskEither.fromIOEither
-      ),
-    getDownloadUrl: (env) => (param) =>
-      pipe(
-        fpLocalStorageFromEnv(env),
-        io.chain((localStorage) => localStorage.getItem(`storage/${param.key}`)),
-        io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
-        taskEither.fromIOEither
-      ),
   },
   db: {
     setDoc: (env) => (param) =>
