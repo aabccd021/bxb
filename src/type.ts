@@ -7,15 +7,10 @@ import type { Option } from 'fp-ts/Option';
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import type { Task } from 'fp-ts/Task';
 import type { TaskEither } from 'fp-ts/TaskEither';
-import type { Window as WindowMock } from 'happy-dom';
 import type { TypeOf } from 'make-union-morphic-ts';
 import { makeUnion } from 'make-union-morphic-ts';
 
 const { summon } = summonFor({});
-
-export const DB = summon((F) => F.strMap(F.strMap(F.unknown())));
-
-export type DB = AType<typeof DB>;
 
 export type Condition =
   | {
@@ -111,8 +106,6 @@ export type GetDocParam = {
 };
 
 export type OnAuthStateChangedParam = (user: Option<string>) => IO<void>;
-
-export type Window = WindowMock | typeof window;
 
 export type CreateUserAndSignInWithEmailAndPasswordParam = {
   readonly email: string;
