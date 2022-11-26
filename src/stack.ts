@@ -1,3 +1,5 @@
+import { summonFor } from '@morphic-ts/batteries/lib/summoner-ESBST';
+import type { AType } from '@morphic-ts/summoners/lib';
 import {
   apply,
   either,
@@ -16,10 +18,28 @@ import type { IO } from 'fp-ts/IO';
 import type { IORef } from 'fp-ts/IORef';
 import type { Option } from 'fp-ts/Option';
 import type { Refinement } from 'fp-ts/Refinement';
+import type { DeepPick } from 'ts-essentials';
 import validDataUrl from 'valid-data-url';
 
-import type { Client, OnAuthStateChangedParam, Stack, Window } from './type';
-import { DB, GetDownloadUrlError, UploadDataUrlError } from './type';
+import type { Client, OnAuthStateChangedParam, Stack } from './type';
+import { GetDownloadUrlError, UploadDataUrlError } from './type';
+
+const { summon } = summonFor({});
+
+export type Window = DeepPick<
+  typeof window,
+  {
+    readonly location: {
+      readonly origin: never;
+      readonly href: never;
+    };
+    readonly localStorage: never;
+  }
+>;
+
+export const DB = summon((F) => F.strMap(F.strMap(F.unknown())));
+
+export type DB = AType<typeof DB>;
 
 const mkFpLocalStorage = (localStorage: Window['localStorage']) => ({
   getItem: (key: string) => pipe(() => localStorage.getItem(key), io.map(option.fromNullable)),
@@ -39,11 +59,6 @@ const mkFpLocation = (location: Window['location']) => ({
       location.href = newHref;
     },
   },
-});
-
-const mkFpWindow = (win: Window) => ({
-  location: mkFpLocation(win.location),
-  localStorage: mkFpLocalStorage(win.localStorage),
 });
 
 const mkSafeLocalStorage =
@@ -89,6 +104,12 @@ export const mkClientEnvFromWindow = (getGetWindow: IO<IO<Window>>) =>
 
 export const mkClientEnv = mkClientEnvFromWindow(() => () => window);
 
+const fpLocalStorageFromEnv = (env: MockClientEnv) =>
+  pipe(
+    env.getWindow,
+    io.map((win) => mkFpLocalStorage(win.localStorage))
+  );
+
 const client: Client<MockClientEnv> = {
   storage: {
     uploadDataUrl: (env) => (param) =>
@@ -98,16 +119,18 @@ const client: Client<MockClientEnv> = {
           UploadDataUrlError.Union.of.InvalidDataUrlFormat({})
         ),
         ioEither.fromEither,
-        ioEither.chainIOK(() => env.getWindow),
-        ioEither.map(mkFpWindow),
-        ioEither.chainIOK((win) => win.localStorage.setItem(`storage/${param.key}`, param.dataUrl)),
+        ioEither.chainIOK((vlidDataUrl) =>
+          pipe(
+            fpLocalStorageFromEnv(env),
+            io.chain((localStorage) => localStorage.setItem(`storage/${param.key}`, vlidDataUrl))
+          )
+        ),
         taskEither.fromIOEither
       ),
     getDownloadUrl: (env) => (param) =>
       pipe(
-        env.getWindow,
-        io.map(mkFpWindow),
-        io.chain((win) => win.localStorage.getItem(`storage/${param.key}`)),
+        fpLocalStorageFromEnv(env),
+        io.chain((localStorage) => localStorage.getItem(`storage/${param.key}`)),
         io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
         taskEither.fromIOEither
       ),
@@ -162,18 +185,16 @@ const client: Client<MockClientEnv> = {
       ),
     onAuthStateChanged: (env) => (onChangedCallback) =>
       pipe(
-        env.getWindow,
-        io.map(mkFpWindow),
-        io.chain((win) => win.localStorage.getItem('auth')),
+        fpLocalStorageFromEnv(env),
+        io.chain((localStorage) => localStorage.getItem('auth')),
         io.chain((lsAuth) => onChangedCallback(lsAuth)),
         io.chain(() => env.onAuthStateChangedCallback.write(option.some(onChangedCallback))),
         io.map(() => env.onAuthStateChangedCallback.write(option.none))
       ),
     signOut: (env) =>
       pipe(
-        env.getWindow,
-        io.map(mkFpWindow),
-        io.chain((win) => win.localStorage.removeItem('auth')),
+        fpLocalStorageFromEnv(env),
+        io.chain((localStorage) => localStorage.removeItem('auth')),
         io.chain(() => env.onAuthStateChangedCallback.read),
         ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.none))
       ),
