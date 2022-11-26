@@ -9,7 +9,6 @@ import {
   ioRef,
   option,
   readonlyRecord,
-  string,
   task,
   taskEither,
 } from 'fp-ts';
@@ -19,7 +18,7 @@ import type { IORef } from 'fp-ts/IORef';
 import type { Option } from 'fp-ts/Option';
 import type { Refinement } from 'fp-ts/Refinement';
 import type { DeepPick } from 'ts-essentials';
-import validDataUrl from 'valid-data-url';
+import isValidDataUrl from 'valid-data-url';
 
 import type { Client, OnAuthStateChangedParam, Stack } from './type';
 import { GetDownloadUrlError, UploadDataUrlError } from './type';
@@ -37,59 +36,84 @@ export type Window = DeepPick<
   }
 >;
 
-export const DB = summon((F) => F.strMap(F.strMap(F.unknown())));
+const DB = summon((F) => F.strMap(F.strMap(F.unknown())));
 
-export type DB = AType<typeof DB>;
+type DB = AType<typeof DB>;
 
-const mkFpLocalStorage = (localStorage: Window['localStorage']) => ({
-  getItem: (key: string) => pipe(() => localStorage.getItem(key), io.map(option.fromNullable)),
-  // eslint-disable-next-line functional/no-return-void
-  setItem: (key: string, value: string) => () => localStorage.setItem(key, value),
-  // eslint-disable-next-line functional/no-return-void
-  removeItem: (key: string) => () => localStorage.removeItem(key),
-});
+const authLocalStorageKey = 'auth';
+const dbLocalStorageKey = 'db';
+const storageKey = 'storage';
 
-const mkFpLocation = (location: Window['location']) => ({
-  origin: () => location.origin,
-  href: {
-    get: () => location.href,
+const getLocationOrigin = (getWindow: IO<Window>) =>
+  pipe(
+    getWindow,
+    io.map((win) => win.location.origin)
+  );
+
+const getLocationHref = (getWindow: IO<Window>) =>
+  pipe(
+    getWindow,
+    io.map((win) => win.location.href)
+  );
+
+const setLocationHref = (getWindow: IO<Window>, newHref: string) =>
+  pipe(
+    getWindow,
     // eslint-disable-next-line functional/no-return-void
-    set: (newHref: string) => () => {
+    io.map((win) => {
       // eslint-disable-next-line functional/immutable-data, functional/no-expression-statement
-      location.href = newHref;
-    },
-  },
-});
-
-const mkSafeLocalStorage =
-  <T, K>(refinement: Refinement<unknown, T>, onFalse: (data: unknown, key: string) => K) =>
-  (key: string) =>
-    flow(mkFpLocalStorage, (localStorage) => ({
-      setItem: (data: T) =>
-        pipe(data, JSON.stringify, (typeSafeData) => localStorage.setItem(key, typeSafeData)),
-      getItem: pipe(
-        localStorage.getItem(key),
-        ioOption.map(JSON.parse),
-        ioOption.map(either.fromPredicate(refinement, (data) => onFalse(data, key))),
-        io.map(option.match(() => either.right(option.none), either.map(option.some)))
-      ),
-    }));
+      win.location.href = newHref;
+    })
+  );
 
 const mkRedirectUrl = ({ origin, href }: { readonly origin: string; readonly href: string }) => {
   const searchParamsStr = new URLSearchParams({ redirectUrl: href }).toString();
   return `${origin}/__masmott__/signInWithRedirect?${searchParamsStr}`;
 };
 
-const authStorage = mkSafeLocalStorage(string.isString, (data) => ({
-  message: 'invalid auth data loaded',
-  data,
-}))('auth');
+const setItem = (getWindow: IO<Window>, key: string, value: string) =>
+  pipe(
+    getWindow,
+    // eslint-disable-next-line functional/no-return-void
+    io.map((win) => win.localStorage.setItem(key, value))
+  );
 
-const dbStorage = mkSafeLocalStorage(DB.type.is, (data, key) => ({
-  code: 'ProviderError' as const,
-  provider: 'mock',
-  value: { message: 'invalid db data loaded', key, data },
-}))('db');
+const removeItem = (getWindow: IO<Window>, key: string) =>
+  pipe(
+    getWindow,
+    // eslint-disable-next-line functional/no-return-void
+    io.map((win) => win.localStorage.removeItem(key))
+  );
+
+const getItem = (getWindow: IO<Window>, key: string) =>
+  pipe(
+    getWindow,
+    io.map((win) => win.localStorage.getItem(key)),
+    io.map(option.fromNullable)
+  );
+
+const getObjectItem = <T, K>(
+  getWindow: IO<Window>,
+  key: string,
+  refinement: Refinement<unknown, T>,
+  onFalse: (data: unknown) => K
+) =>
+  pipe(
+    getItem(getWindow, key),
+    ioOption.map(JSON.parse),
+    ioOption.map(either.fromPredicate(refinement, onFalse)),
+    io.map(option.match(() => either.right(option.none), either.map(option.some)))
+  );
+
+const setObjectItem = <T>(getWindow: IO<Window>, key: string, data: T) =>
+  pipe(data, JSON.stringify, (typeSafeData) => setItem(getWindow, key, typeSafeData));
+
+const getDb = (getWindow: IO<Window>) =>
+  getObjectItem(getWindow, dbLocalStorageKey, DB.type.is, (data) => ({
+    code: 'ProviderError' as const,
+    provider: 'mock',
+    value: { message: 'invalid db data loaded', data },
+  }));
 
 export type MockClientEnv = {
   readonly onAuthStateChangedCallback: IORef<Option<OnAuthStateChangedParam>>;
@@ -104,75 +128,41 @@ export const mkClientEnvFromWindow = (getGetWindow: IO<IO<Window>>) =>
 
 export const mkClientEnv = mkClientEnvFromWindow(() => () => window);
 
-const setItem = (getWindow: IO<Window>, key: string, value: string) =>
-  pipe(
-    getWindow,
-    // eslint-disable-next-line functional/no-return-void
-    io.chain((win) => () => win.localStorage.setItem(key, value))
-  );
-
-const getItem = (getWindow: IO<Window>, key: string) =>
-  pipe(
-    getWindow,
-    io.chain((win) => () => win.localStorage.getItem(key)),
-    io.map(option.fromNullable)
-  );
-
-const fpLocalStorageFromEnv = (env: MockClientEnv) =>
-  pipe(
-    env.getWindow,
-    io.map((win) => mkFpLocalStorage(win.localStorage))
-  );
-
 const client: Client<MockClientEnv> = {
   storage: {
-    uploadDataUrl:
-      ({ getWindow }) =>
-      (param) =>
-        pipe(
-          param.dataUrl,
-          either.fromPredicate(validDataUrl, () =>
-            UploadDataUrlError.Union.of.InvalidDataUrlFormat({})
-          ),
-          ioEither.fromEither,
-          ioEither.chainIOK((vlidDataUrl) =>
-            setItem(getWindow, `storage/${param.key}`, vlidDataUrl)
-          ),
-          taskEither.fromIOEither
+    uploadDataUrl: (env) => (param) =>
+      pipe(
+        param.dataUrl,
+        either.fromPredicate(isValidDataUrl, () =>
+          UploadDataUrlError.Union.of.InvalidDataUrlFormat({})
         ),
-    getDownloadUrl:
-      ({ getWindow }) =>
-      (param) =>
-        pipe(
-          getItem(getWindow, `storage/${param.key}`),
-          io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
-          taskEither.fromIOEither
-        ),
+        ioEither.fromEither,
+        ioEither.chainIOK((data) => setItem(env.getWindow, `${storageKey}/${param.key}`, data)),
+        taskEither.fromIOEither
+      ),
+    getDownloadUrl: (env) => (param) =>
+      pipe(
+        getItem(env.getWindow, `${storageKey}/${param.key}`),
+        io.map(either.fromOption(() => GetDownloadUrlError.Union.of.FileNotFound({}))),
+        taskEither.fromIOEither
+      ),
   },
   db: {
     setDoc: (env) => (param) =>
       pipe(
-        env.getWindow,
-        io.map((win) => dbStorage(win.localStorage)),
-        io.chain((storage) =>
-          pipe(
-            storage.getItem,
-            ioEither.map(
-              flow(
-                option.getOrElse(() => ({})),
-                readonlyRecord.upsertAt(`${param.key.collection}/${param.key.id}`, param.data)
-              )
-            ),
-            ioEither.chainIOK(storage.setItem)
+        getDb(env.getWindow),
+        ioEither.map(
+          flow(
+            option.getOrElse(() => ({})),
+            readonlyRecord.upsertAt(`${param.key.collection}/${param.key.id}`, param.data)
           )
         ),
+        ioEither.chainIOK((data) => setObjectItem(env.getWindow, dbLocalStorageKey, data)),
         taskEither.fromIOEither
       ),
     getDoc: (env) => (param) =>
       pipe(
-        env.getWindow,
-        io.map((win) => dbStorage(win.localStorage)),
-        io.chain((storage) => storage.getItem),
+        getDb(env.getWindow),
         ioEither.map(
           option.chain(readonlyRecord.lookup(`${param.key.collection}/${param.key.id}`))
         ),
@@ -182,33 +172,29 @@ const client: Client<MockClientEnv> = {
   auth: {
     signInWithGoogleRedirect: (env) =>
       pipe(
-        io.Do,
-        io.bind('win', () => env.getWindow),
-        io.let('location', ({ win }) => mkFpLocation(win.location)),
-        io.bind('origin', ({ location }) => location.origin),
-        io.bind('href', ({ location }) => location.href.get),
-        io.chain(({ location, origin, href }) => location.href.set(mkRedirectUrl({ origin, href })))
+        apply.sequenceS(io.Apply)({
+          origin: getLocationOrigin(env.getWindow),
+          href: getLocationHref(env.getWindow),
+        }),
+        io.map(mkRedirectUrl),
+        io.chain((url) => setLocationHref(env.getWindow, url))
       ),
     createUserAndSignInWithEmailAndPassword: (env) => (param) =>
       pipe(
-        env.getWindow,
-        io.map((win) => authStorage(win.localStorage)),
-        io.chain((storage) => storage.setItem(param.email)),
+        setItem(env.getWindow, authLocalStorageKey, param.email),
         io.chain(() => env.onAuthStateChangedCallback.read),
         ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(param.email)))
       ),
     onAuthStateChanged: (env) => (onChangedCallback) =>
       pipe(
-        fpLocalStorageFromEnv(env),
-        io.chain((localStorage) => localStorage.getItem('auth')),
+        getItem(env.getWindow, authLocalStorageKey),
         io.chain((lsAuth) => onChangedCallback(lsAuth)),
         io.chain(() => env.onAuthStateChangedCallback.write(option.some(onChangedCallback))),
         io.map(() => env.onAuthStateChangedCallback.write(option.none))
       ),
     signOut: (env) =>
       pipe(
-        fpLocalStorageFromEnv(env),
-        io.chain((localStorage) => localStorage.removeItem('auth')),
+        removeItem(env.getWindow, authLocalStorageKey),
         io.chain(() => env.onAuthStateChangedCallback.read),
         ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.none))
       ),
