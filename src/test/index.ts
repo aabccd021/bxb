@@ -62,9 +62,10 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
               dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
             })
           ),
-          then(() => client.storage.getDownloadUrl({ key: 'kira_key' }))
+          then(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
+          task.map(either.isRight)
         ),
-      toResult: either.right('a'),
+      toResult: true,
     });
 
     test({
