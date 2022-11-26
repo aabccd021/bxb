@@ -3,37 +3,49 @@ import { flow, identity, pipe } from 'fp-ts/function';
 import type { IO } from 'fp-ts/IO';
 import type { Task } from 'fp-ts/Task';
 import fetch from 'node-fetch';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test as test_ } from 'vitest';
 
 import type { NoEnvStack, Stack } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
-const applyStackEnv =
+const mkTest =
   <ClientEnv>(stack: Stack<ClientEnv>, getTestClientEnv: IO<ClientEnv>) =>
-  <T>(f: (stack: NoEnvStack) => Task<T>) =>
-    pipe(
-      getTestClientEnv,
-      io.map(
-        flow(
-          readerS({
-            auth: readerS(stack.client.auth),
-            db: readerS(stack.client.db),
-            storage: readerS(stack.client.storage),
-          }),
-          (client) => ({ ...stack, client })
-        )
-      ),
-      task.fromIO,
-      task.chain(f)
-    );
+  <T>({
+    name,
+    expect: expectFn,
+    toEqual: toResultEqual,
+  }: {
+    readonly name: string;
+    readonly expect: (stack: NoEnvStack) => Task<T>;
+    readonly toEqual: T;
+  }) =>
+    test_(name, async () => {
+      const result = pipe(
+        getTestClientEnv,
+        io.map(
+          flow(
+            readerS({
+              auth: readerS(stack.client.auth),
+              db: readerS(stack.client.db),
+              storage: readerS(stack.client.storage),
+            }),
+            (client) => ({ ...stack, client })
+          )
+        ),
+        task.fromIO,
+        task.chain(expectFn)
+      );
+      expect(await result()).toEqual(toResultEqual);
+    });
 
 export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: IO<ClientEnv>) => {
-  const runWithStack = applyStackEnv(realStack, getTestClientEnv);
+  const test = mkTest(realStack, getTestClientEnv);
 
   describe('storage is independent between tests', () => {
-    test('a server can upload file kira', async () => {
-      const result = runWithStack((stack) =>
+    test({
+      name: 'a server can upload file kira',
+      expect: (stack) =>
         pipe(
           stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
           taskEither.chainW(() =>
@@ -44,26 +56,26 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
           ),
           taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
           task.map(either.isRight)
-        )
-      );
-      expect(await result()).toEqual(true);
+        ),
+      toEqual: true,
     });
 
-    test('server from another test can not access file kira', async () => {
-      const result = runWithStack((stack) =>
+    test({
+      name: 'server from another test can not access file kira',
+      expect: (stack) =>
         pipe(
           stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
           taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
           taskEither.mapLeft(({ code }) => code)
-        )
-      );
-      expect(await result()).toEqual(either.left('FileNotFound'));
+        ),
+      toEqual: either.left('FileNotFound'),
     });
   });
 
   describe('db is independent between tests', () => {
-    test('a server can create document kira', async () => {
-      const result = runWithStack((stack) =>
+    test({
+      name: 'a server can create document kira',
+      expect: (stack) =>
         pipe(
           stack.ci.deployDb({ securityRule: { type: 'allowAll' } }),
           taskEither.chain(() =>
@@ -75,26 +87,26 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
           taskEither.chainW(() =>
             stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
           )
-        )
-      );
-      expect(await result()).toEqual(either.right(option.some({ name: 'masumoto' })));
+        ),
+      toEqual: either.right(option.some({ name: 'masumoto' })),
     });
 
-    test('server from another test can not access document kira', async () => {
-      const result = runWithStack((stack) =>
+    test({
+      name: 'server from another test can not access document kira',
+      expect: (stack) =>
         pipe(
           stack.ci.deployDb({ securityRule: { type: 'allowAll' } }),
           taskEither.chainW(() =>
             stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
           )
-        )
-      );
-      expect(await result()).toEqual(either.right(option.none));
+        ),
+      toEqual: either.right(option.none),
     });
   });
 
-  test('can upload data url and get download url', async () => {
-    const result = runWithStack((stack) =>
+  test({
+    name: 'can upload data url and get download url',
+    expect: (stack) =>
       pipe(
         stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
         taskEither.chainW(() =>
@@ -106,21 +118,20 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
         taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
         taskEither.chain((downloadUrl) => taskEither.tryCatch(() => fetch(downloadUrl), identity)),
         taskEither.chain((res) => taskEither.tryCatch(() => res.text(), identity))
-      )
-    );
-    expect(await result()).toEqual(either.right('kira masumoto'));
+      ),
+    toEqual: either.right('kira masumoto'),
   });
 
-  test('return left on invalid dataUrl upload', async () => {
-    const result = runWithStack((stack) =>
+  test({
+    name: 'return left on invalid dataUrl upload',
+    expect: (stack) =>
       pipe(
         stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
         taskEither.chainW(() =>
           stack.client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'invalidDataUrl' })
         ),
         taskEither.mapLeft(({ code }) => code)
-      )
-    );
-    expect(await result()).toEqual(either.left('InvalidDataUrlFormat'));
+      ),
+    toEqual: either.left('InvalidDataUrlFormat'),
   });
 };
