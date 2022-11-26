@@ -56,12 +56,7 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
       expect: ({ client, ci }) =>
         pipe(
           ci.deployStorage({ securityRule: { type: 'allowAll' } }),
-          then(() =>
-            client.storage.uploadDataUrl({
-              key: 'kira_key',
-              dataUrl: `data:;base64,${Buffer.from('kira masumoto').toString('base64')}`,
-            })
-          ),
+          then(() => client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'data:,foo' })),
           then(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
           task.map(either.isRight)
         ),
