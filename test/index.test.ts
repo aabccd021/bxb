@@ -1,4 +1,9 @@
-import { mkClientEnv, stack } from '../src';
+import { io } from 'fp-ts';
+import { Window } from 'happy-dom';
+
+import { mkClientEnvFromWindow, stack } from '../src';
 import { tests } from '../src/test';
 
-tests(stack, mkClientEnv, undefined);
+const mkTestClientEnv = mkClientEnvFromWindow(() => io.of(new Window()));
+
+tests(stack, mkTestClientEnv);

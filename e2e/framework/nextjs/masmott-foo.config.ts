@@ -1,1 +1,1 @@
-export const clientConfig = {};
+export const clientEnv = undefined;

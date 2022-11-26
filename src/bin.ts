@@ -19,23 +19,16 @@ const PackageJson = summon((F) =>
   )
 );
 
-const contextStr = (provider: string) => `
-import { mkClientEnv } from '${provider}';
-import { mkClientContext } from 'masmott';
-import { clientConfig } from '../${provider}.config'
-export const context = mkClientContext(mkClientEnv(), clientConfig);
-`;
-
 const methodStr = (scope: string, method: string, provider: string) => `
-import {stack as providerStack} from '${provider}';
-import {context as providerContext} from '../provider-context';
-import {stack as mockStack} from 'masmott';
-import {context as mockContext} from '../mock-context';
+import { stack as providerStack } from '${provider}';
+import { stack as mockStack } from 'masmott';
 
-export const ${method} =
-  process.env.NODE_ENV === 'production' 
-    ? providerStack.client.${scope}.${method}(providerContext)
-    : mockStack.client.${scope}.${method}(mockContext);
+import { clientEnv as providerClientEnv } from '../../${provider}.config'
+import { clientEnv as mockClientEnv } from '../../masmott.config'
+
+export const ${method} = process.env.NODE_ENV === 'production' 
+    ? providerStack.client.${scope}.${method}(providerClientEnv)
+    : mockStack.client.${scope}.${method}(mockClientEnv);
 `;
 
 const scopes = {
@@ -86,9 +79,6 @@ fs.writeFileSync(
   "sideEffects": false
 }`
 );
-
-fs.writeFileSync('masmott/provider-context.ts', contextStr(`${provider.value}`));
-fs.writeFileSync('masmott/mock-context.ts', contextStr('masmott'));
 
 Object.entries(scopes).forEach(([scope, methods]) => {
   fs.mkdirSync(`masmott/${scope}`);

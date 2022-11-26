@@ -114,23 +114,6 @@ export type OnAuthStateChangedParam = (user: Option<string>) => IO<void>;
 
 export type Window = typeof window | WindowMock;
 
-export type BrowserEnv = { readonly getWindow: IO<Window> };
-
-export type ProviderClient = {
-  readonly config: unknown;
-  readonly env: unknown;
-};
-
-export type Provider = {
-  readonly client: ProviderClient;
-};
-
-export type ClientContext<PC extends ProviderClient> = {
-  readonly browser: BrowserEnv;
-  readonly env: PC['env'];
-  readonly config: PC['config'];
-};
-
 export type CreateUserAndSignInWithEmailAndPasswordParam = {
   readonly email: string;
   readonly password: string;
@@ -138,46 +121,44 @@ export type CreateUserAndSignInWithEmailAndPasswordParam = {
 
 export type Unsubscribe = IO<void>;
 
-export type ClientScope<PC extends ProviderClient, K extends Record<string, unknown>> = {
-  readonly [KK in keyof K]: (env: ClientContext<PC>) => K[KK];
+export type ApplyClientEnvScope<ClientEnv, J extends Record<string, unknown>> = {
+  readonly [JJ in keyof J]: (env: ClientEnv) => J[JJ];
 };
 
-export type ApplyClientEnv<
-  PC extends ProviderClient,
-  K extends Record<string, Record<string, unknown>>
-> = {
-  readonly [KK in keyof K]: ClientScope<PC, K[KK]>;
+export type ApplyClientEnv<ClientEnv, K extends Record<string, Record<string, unknown>>> = {
+  readonly [KK in keyof K]: ApplyClientEnvScope<ClientEnv, K[KK]>;
 };
 
-export type NoEnvClient = {
-  readonly auth: {
-    readonly signInWithGoogleRedirect: IO<void>;
-    readonly createUserAndSignInWithEmailAndPassword: (
-      p: CreateUserAndSignInWithEmailAndPasswordParam
-    ) => IO<void>;
-    readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
-    readonly signOut: IO<void>;
-  };
-  readonly db: {
-    readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, void>;
-    readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], Option<DocData>>;
-  };
-  readonly storage: {
-    readonly uploadDataUrl: (
-      p: UploadDataUrlParam
-    ) => TaskEither<UploadDataUrlError['Union'], void>;
-    readonly getDownloadUrl: (
-      p: GetDownloadUrlParam
-    ) => TaskEither<GetDownloadUrlError['Union'], string>;
-  };
-};
+export type Client<ClientEnv> = ApplyClientEnv<
+  ClientEnv,
+  {
+    readonly auth: {
+      readonly signInWithGoogleRedirect: IO<void>;
+      readonly createUserAndSignInWithEmailAndPassword: (
+        p: CreateUserAndSignInWithEmailAndPasswordParam
+      ) => IO<void>;
+      readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
+      readonly signOut: IO<void>;
+    };
+    readonly db: {
+      readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, void>;
+      readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], Option<DocData>>;
+    };
+    readonly storage: {
+      readonly uploadDataUrl: (
+        p: UploadDataUrlParam
+      ) => TaskEither<UploadDataUrlError['Union'], void>;
+      readonly getDownloadUrl: (
+        p: GetDownloadUrlParam
+      ) => TaskEither<GetDownloadUrlError['Union'], string>;
+    };
+  }
+>;
 
-export type Client<PC extends ProviderClient> = ApplyClientEnv<PC, NoEnvClient>;
-
-export type Stack<P extends Provider> = {
+export type Stack<ClientEnv> = {
   readonly ci: {
     readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
     readonly deployDb: (c: DbDeployConfig) => Task<unknown>;
   };
-  readonly client: Client<P['client']>;
+  readonly client: Client<ClientEnv>;
 };
