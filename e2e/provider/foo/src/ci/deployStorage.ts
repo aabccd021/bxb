@@ -1,2 +1,2 @@
-import { task } from 'fp-ts';
-export const deployStorage = () => task.of(undefined);
+import { taskEither } from 'fp-ts';
+export const deployStorage = () => taskEither.of(undefined);

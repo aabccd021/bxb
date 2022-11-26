@@ -5,7 +5,6 @@ import type {} from '@morphic-ts/summoners/lib/tagged-union';
 import type { IO } from 'fp-ts/IO';
 import type { Option } from 'fp-ts/Option';
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
-import type { Task } from 'fp-ts/Task';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import type { TypeOf } from 'make-union-morphic-ts';
 import { makeUnion } from 'make-union-morphic-ts';
@@ -150,8 +149,10 @@ export type Client<ClientEnv> = ApplyClientEnv<
 
 export type Stack<ClientEnv> = {
   readonly ci: {
-    readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
-    readonly deployDb: (c: DbDeployConfig) => Task<unknown>;
+    readonly deployStorage: (
+      c: StorageDeployConfig
+    ) => TaskEither<{ readonly code: string }, unknown>;
+    readonly deployDb: (c: DbDeployConfig) => TaskEither<{ readonly code: string }, unknown>;
   };
   readonly client: Client<ClientEnv>;
 };

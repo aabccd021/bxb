@@ -9,7 +9,6 @@ import {
   ioRef,
   option,
   readonlyRecord,
-  task,
   taskEither,
 } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
@@ -203,8 +202,8 @@ const client: Client<MockClientEnv> = {
 
 export const stack: Stack<MockClientEnv> = {
   ci: {
-    deployStorage: () => task.of(undefined),
-    deployDb: () => task.of(undefined),
+    deployStorage: () => taskEither.of(undefined),
+    deployDb: () => taskEither.of(undefined),
   },
   client,
 };

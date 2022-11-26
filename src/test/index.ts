@@ -31,15 +31,15 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
     test('a server can upload file kira', async () => {
       const result = pipe(
         mkStack,
-        taskEither.chainFirstTaskK((stack) =>
-          stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })
-        ),
         taskEither.chain((stack) =>
           pipe(
-            stack.client.storage.uploadDataUrl({
-              key: 'kira_key',
-              dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
-            }),
+            stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+            taskEither.chainW(() =>
+              stack.client.storage.uploadDataUrl({
+                key: 'kira_key',
+                dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
+              })
+            ),
             taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
           )
         ),
@@ -51,10 +51,12 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
     test('server from another test can not access file kira', async () => {
       const result = pipe(
         mkStack,
-        taskEither.chainFirstTaskK((stack) =>
-          stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })
+        taskEither.chain((stack) =>
+          pipe(
+            stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+            taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
+          )
         ),
-        taskEither.chain((stack) => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
         taskEither.mapLeft(({ code }) => code)
       );
       expect(await result()).toEqual(either.left('FileNotFound'));
@@ -65,15 +67,15 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
     test('a server can create document kira', async () => {
       const result = pipe(
         mkStack,
-        taskEither.chainFirstTaskK((stack) =>
-          stack.ci.deployDb({ securityRule: { type: 'allowAll' } })
-        ),
         taskEither.chain((stack) =>
           pipe(
-            stack.client.db.setDoc({
-              key: { collection: 'user', id: 'kira_id' },
-              data: { name: 'masumoto' },
-            }),
+            stack.ci.deployDb({ securityRule: { type: 'allowAll' } }),
+            taskEither.chain(() =>
+              stack.client.db.setDoc({
+                key: { collection: 'user', id: 'kira_id' },
+                data: { name: 'masumoto' },
+              })
+            ),
             taskEither.chainW(() =>
               stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
             )
@@ -86,11 +88,13 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
     test('server from another test can not access document kira', async () => {
       const result = pipe(
         mkStack,
-        taskEither.chainFirstTaskK((stack) =>
-          stack.ci.deployDb({ securityRule: { type: 'allowAll' } })
-        ),
         taskEither.chainW((stack) =>
-          stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
+          pipe(
+            stack.ci.deployDb({ securityRule: { type: 'allowAll' } }),
+            taskEither.chainW(() =>
+              stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
+            )
+          )
         )
       );
       expect(await result()).toEqual(either.right(option.none));
@@ -100,15 +104,15 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
   test('can upload data url and get download url', async () => {
     const result = pipe(
       mkStack,
-      taskEither.chainFirstTaskK((stack) =>
-        stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })
-      ),
       taskEither.chain((stack) =>
         pipe(
-          stack.client.storage.uploadDataUrl({
-            key: 'kira_key',
-            dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
-          }),
+          stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+          taskEither.chainW(() =>
+            stack.client.storage.uploadDataUrl({
+              key: 'kira_key',
+              dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
+            })
+          ),
           taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' }))
         )
       ),
@@ -121,11 +125,13 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
   test('return left on invalid dataUrl upload', async () => {
     const result = pipe(
       mkStack,
-      taskEither.chainFirstTaskK((stack) =>
-        stack.ci.deployStorage({ securityRule: { type: 'allowAll' } })
-      ),
       taskEither.chain((stack) =>
-        stack.client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'invalidDataUrl' })
+        pipe(
+          stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+          taskEither.chainW(() =>
+            stack.client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'invalidDataUrl' })
+          )
+        )
       ),
       taskEither.mapLeft(({ code }) => code)
     );
