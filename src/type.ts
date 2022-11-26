@@ -121,31 +121,30 @@ export type ApplyClientEnv<ClientEnv, K extends Record<string, Record<string, un
   readonly [KK in keyof K]: ApplyClientEnvScope<ClientEnv, K[KK]>;
 };
 
-export type Client<ClientEnv> = ApplyClientEnv<
-  ClientEnv,
-  {
-    readonly auth: {
-      readonly signInWithGoogleRedirect: IO<void>;
-      readonly createUserAndSignInWithEmailAndPassword: (
-        p: CreateUserAndSignInWithEmailAndPasswordParam
-      ) => IO<void>;
-      readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
-      readonly signOut: IO<void>;
-    };
-    readonly db: {
-      readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, void>;
-      readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], Option<DocData>>;
-    };
-    readonly storage: {
-      readonly uploadDataUrl: (
-        p: UploadDataUrlParam
-      ) => TaskEither<UploadDataUrlError['Union'], void>;
-      readonly getDownloadUrl: (
-        p: GetDownloadUrlParam
-      ) => TaskEither<GetDownloadUrlError['Union'], string>;
-    };
-  }
->;
+export type NoEnvClient = {
+  readonly auth: {
+    readonly signInWithGoogleRedirect: IO<void>;
+    readonly createUserAndSignInWithEmailAndPassword: (
+      p: CreateUserAndSignInWithEmailAndPasswordParam
+    ) => IO<void>;
+    readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
+    readonly signOut: IO<void>;
+  };
+  readonly db: {
+    readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, void>;
+    readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], Option<DocData>>;
+  };
+  readonly storage: {
+    readonly uploadDataUrl: (
+      p: UploadDataUrlParam
+    ) => TaskEither<UploadDataUrlError['Union'], void>;
+    readonly getDownloadUrl: (
+      p: GetDownloadUrlParam
+    ) => TaskEither<GetDownloadUrlError['Union'], string>;
+  };
+};
+
+export type Client<ClientEnv> = ApplyClientEnv<ClientEnv, NoEnvClient>;
 
 export type Stack<ClientEnv> = {
   readonly ci: {
@@ -155,4 +154,14 @@ export type Stack<ClientEnv> = {
     readonly deployDb: (c: DbDeployConfig) => TaskEither<{ readonly code: string }, unknown>;
   };
   readonly client: Client<ClientEnv>;
+};
+
+export type NoEnvStack = {
+  readonly ci: {
+    readonly deployStorage: (
+      c: StorageDeployConfig
+    ) => TaskEither<{ readonly code: string }, unknown>;
+    readonly deployDb: (c: DbDeployConfig) => TaskEither<{ readonly code: string }, unknown>;
+  };
+  readonly client: NoEnvClient;
 };
