@@ -1,4 +1,4 @@
-import { apply, either as E, io, option as O, reader, task as T, taskEither as TE } from 'fp-ts';
+import { apply, either, io, option, reader, task, taskEither } from 'fp-ts';
 import { flow, identity, pipe } from 'fp-ts/function';
 import type { IO } from 'fp-ts/IO';
 import type { Task } from 'fp-ts/Task';
@@ -24,8 +24,8 @@ const applyStackEnv =
           (client) => ({ ...stack, client })
         )
       ),
-      T.fromIO,
-      T.chain(f)
+      task.fromIO,
+      task.chain(f)
     );
 
 export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: IO<ClientEnv>) => {
@@ -36,14 +36,14 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
       const result = runWithStack((stack) =>
         pipe(
           stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
-          TE.chainW(() =>
+          taskEither.chainW(() =>
             stack.client.storage.uploadDataUrl({
               key: 'kira_key',
               dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
             })
           ),
-          TE.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
-          T.map(E.isRight)
+          taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
+          task.map(either.isRight)
         )
       );
       expect(await result()).toEqual(true);
@@ -53,11 +53,11 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
       const result = runWithStack((stack) =>
         pipe(
           stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
-          TE.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
-          TE.mapLeft(({ code }) => code)
+          taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
+          taskEither.mapLeft(({ code }) => code)
         )
       );
-      expect(await result()).toEqual(E.left('FileNotFound'));
+      expect(await result()).toEqual(either.left('FileNotFound'));
     });
   });
 
@@ -66,26 +66,30 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
       const result = runWithStack((stack) =>
         pipe(
           stack.ci.deployDb({ securityRule: { type: 'allowAll' } }),
-          TE.chain(() =>
+          taskEither.chain(() =>
             stack.client.db.setDoc({
               key: { collection: 'user', id: 'kira_id' },
               data: { name: 'masumoto' },
             })
           ),
-          TE.chainW(() => stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+          taskEither.chainW(() =>
+            stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
+          )
         )
       );
-      expect(await result()).toEqual(E.right(O.some({ name: 'masumoto' })));
+      expect(await result()).toEqual(either.right(option.some({ name: 'masumoto' })));
     });
 
     test('server from another test can not access document kira', async () => {
       const result = runWithStack((stack) =>
         pipe(
           stack.ci.deployDb({ securityRule: { type: 'allowAll' } }),
-          TE.chainW(() => stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+          taskEither.chainW(() =>
+            stack.client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } })
+          )
         )
       );
-      expect(await result()).toEqual(E.right(O.none));
+      expect(await result()).toEqual(either.right(option.none));
     });
   });
 
@@ -93,30 +97,30 @@ export const tests = <ClientEnv>(realStack: Stack<ClientEnv>, getTestClientEnv: 
     const result = runWithStack((stack) =>
       pipe(
         stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
-        TE.chainW(() =>
+        taskEither.chainW(() =>
           stack.client.storage.uploadDataUrl({
             key: 'kira_key',
             dataUrl: 'data:;base64,a2lyYSBtYXN1bW90bw==',
           })
         ),
-        TE.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
-        TE.chain((downloadUrl) => TE.tryCatch(() => fetch(downloadUrl), identity)),
-        TE.chain((res) => TE.tryCatch(() => res.text(), identity))
+        taskEither.chainW(() => stack.client.storage.getDownloadUrl({ key: 'kira_key' })),
+        taskEither.chain((downloadUrl) => taskEither.tryCatch(() => fetch(downloadUrl), identity)),
+        taskEither.chain((res) => taskEither.tryCatch(() => res.text(), identity))
       )
     );
-    expect(await result()).toEqual(E.right('kira masumoto'));
+    expect(await result()).toEqual(either.right('kira masumoto'));
   });
 
   test('return left on invalid dataUrl upload', async () => {
     const result = runWithStack((stack) =>
       pipe(
         stack.ci.deployStorage({ securityRule: { type: 'allowAll' } }),
-        TE.chainW(() =>
+        taskEither.chainW(() =>
           stack.client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'invalidDataUrl' })
         ),
-        TE.mapLeft(({ code }) => code)
+        taskEither.mapLeft(({ code }) => code)
       )
     );
-    expect(await result()).toEqual(E.left('InvalidDataUrlFormat'));
+    expect(await result()).toEqual(either.left('InvalidDataUrlFormat'));
   });
 };
