@@ -1,5 +1,5 @@
 import * as stack from './stack';
 
-export const mkClientEnv = () => ({});
+export const mkClientEnv = () => undefined;
 
 export { stack };

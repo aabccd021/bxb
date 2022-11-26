@@ -116,10 +116,19 @@ export type Window = typeof window | WindowMock;
 
 export type BrowserEnv = { readonly getWindow: IO<Window> };
 
-export type Env<ProviderEnv, Config> = {
+export type ProviderClient = {
+  readonly config: unknown;
+  readonly env: unknown;
+};
+
+export type Provider = {
+  readonly client: ProviderClient;
+};
+
+export type ClientContext<PC extends ProviderClient> = {
   readonly browser: BrowserEnv;
-  readonly provider: ProviderEnv;
-  readonly config: Config;
+  readonly env: PC['env'];
+  readonly config: PC['config'];
 };
 
 export type CreateUserAndSignInWithEmailAndPasswordParam = {
@@ -129,16 +138,15 @@ export type CreateUserAndSignInWithEmailAndPasswordParam = {
 
 export type Unsubscribe = IO<void>;
 
-export type ClientScope<ProviderEnv, Config, K extends Record<string, unknown>> = {
-  readonly [KK in keyof K]: (env: Env<ProviderEnv, Config>) => K[KK];
+export type ClientScope<PC extends ProviderClient, K extends Record<string, unknown>> = {
+  readonly [KK in keyof K]: (env: ClientContext<PC>) => K[KK];
 };
 
 export type ApplyClientEnv<
-  ProviderEnv,
-  Config,
+  PC extends ProviderClient,
   K extends Record<string, Record<string, unknown>>
 > = {
-  readonly [KK in keyof K]: ClientScope<ProviderEnv, Config, K[KK]>;
+  readonly [KK in keyof K]: ClientScope<PC, K[KK]>;
 };
 
 export type NoEnvClient = {
@@ -164,12 +172,12 @@ export type NoEnvClient = {
   };
 };
 
-export type Client<ProviderEnv, Config> = ApplyClientEnv<ProviderEnv, Config, NoEnvClient>;
+export type Client<PC extends ProviderClient> = ApplyClientEnv<PC, NoEnvClient>;
 
-export type Stack<ProviderEnv, Config> = {
+export type Stack<P extends Provider> = {
   readonly ci: {
     readonly deployStorage: (c: StorageDeployConfig) => Task<unknown>;
     readonly deployDb: (c: DbDeployConfig) => Task<unknown>;
   };
-  readonly client: Client<ProviderEnv, Config>;
+  readonly client: Client<P['client']>;
 };
