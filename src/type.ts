@@ -23,8 +23,8 @@ export type Condition =
       readonly left: Condition;
       readonly right: Condition;
     }
-  | { readonly type: 'true' }
-  | { readonly type: 'false' };
+  | { readonly type: 'false' }
+  | { readonly type: 'true' };
 
 export const Condition: UM<Record<string, unknown>, Condition> = summon((F) =>
   F.recursive(
@@ -112,7 +112,7 @@ export type GetDocParam = {
 
 export type OnAuthStateChangedParam = (user: Option<string>) => IO<void>;
 
-export type Window = typeof window | WindowMock;
+export type Window = WindowMock | typeof window;
 
 export type CreateUserAndSignInWithEmailAndPasswordParam = {
   readonly email: string;

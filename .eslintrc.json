@@ -38,6 +38,7 @@
     "@typescript-eslint/consistent-type-exports": "error",
     "@typescript-eslint/no-unnecessary-qualifier": "error",
     "@typescript-eslint/no-useless-empty-export": "error",
+    "@typescript-eslint/sort-type-constituents": "error",
     "@typescript-eslint/unbound-method": "off",
     "functional/functional-parameters": "off",
     "functional/no-mixed-type": "off",
