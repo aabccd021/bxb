@@ -38,6 +38,13 @@
     },
     "./next": {
       "require": "./dist/cjs/next.js"
+    },
+    "./test": {
+      "require": "./dist/cjs/test/index.js",
+      "import": "./dist/es6/test/index.js"
+    },
+    "./cjs/test/index.js": {
+      "require": "./dist/cjs/test/index.js"
     }
   },
   "files": [
