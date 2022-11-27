@@ -122,7 +122,7 @@ export const runTests = <ClientEnv>(
           ),
           then(() => right('create user kira two times success'))
         ),
-      toResult: either.left({ code: 'UserAlreadyExists' }),
+      toResult: either.left({ code: 'EmailAlreadyInUse' }),
     });
 
     test({

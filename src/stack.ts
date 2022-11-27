@@ -186,7 +186,7 @@ const client: Client<MockClientEnv> = {
         ioOption.match(
           () => either.right(undefined),
           () =>
-            either.left(CreateUserAndSignInWithEmailAndPasswordError.Union.of.UserAlreadyExists({}))
+            either.left(CreateUserAndSignInWithEmailAndPasswordError.Union.of.EmailAlreadyInUse({}))
         ),
         ioEither.chainIOK(() =>
           pipe(
