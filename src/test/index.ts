@@ -1,9 +1,10 @@
-import { apply, either, option, reader } from 'fp-ts';
+import { apply, either, io, ioRef, option, reader } from 'fp-ts';
 import type { Either } from 'fp-ts/Either';
 import { flow, identity, pipe } from 'fp-ts/function';
+import type { Option } from 'fp-ts/Option';
 import type { TaskEither } from 'fp-ts/TaskEither';
 // eslint-disable-next-line fp-ts/no-module-imports
-import { chainW as then, map, right, tryCatch } from 'fp-ts/TaskEither';
+import { chainW as then, fromIO, map, right, tryCatch } from 'fp-ts/TaskEither';
 import fetch from 'node-fetch';
 import { describe, expect, test as test_ } from 'vitest';
 
@@ -164,5 +165,86 @@ export const runTests = <ClientEnv>(
         then(() => client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'invalidDataUrl' }))
       ),
     toResult: either.left({ code: 'InvalidDataUrlFormat' }),
+  });
+
+  test({
+    name: 'initial auth state is signed out',
+    expect: ({ client }) =>
+      pipe(
+        ioRef.newIORef<Option<string>>(option.none),
+        io.chain((authStateRef) =>
+          pipe(
+            client.auth.onAuthStateChanged(authStateRef.write),
+            io.chain(() => authStateRef.read)
+          )
+        ),
+        fromIO
+      ),
+    toResult: either.right(option.none),
+  });
+
+  test({
+    name: 'auth state changes to signed in after sign in',
+    expect: ({ client }) =>
+      pipe(
+        fromIO(ioRef.newIORef<Option<string>>(option.none)),
+        then((authStateRef) =>
+          pipe(
+            fromIO(client.auth.onAuthStateChanged(authStateRef.write)),
+            then(() =>
+              client.auth.createUserAndSignInWithEmailAndPassword({
+                email: 'kira@sakurazaka.com',
+                password: 'dorokatsu',
+              })
+            ),
+            then(() => fromIO(authStateRef.read))
+          )
+        )
+      ),
+    toResult: either.right(option.some('kira@sakurazaka.com')),
+  });
+
+  test({
+    name: 'auth state changes to signed out after sign in and then sign out',
+    expect: ({ client }) =>
+      pipe(
+        fromIO(ioRef.newIORef<Option<string>>(option.none)),
+        then((authStateRef) =>
+          pipe(
+            fromIO(client.auth.onAuthStateChanged(authStateRef.write)),
+            then(() =>
+              client.auth.createUserAndSignInWithEmailAndPassword({
+                email: 'kira@sakurazaka.com',
+                password: 'dorokatsu',
+              })
+            ),
+            then(() => client.auth.signOut),
+            then(() => fromIO(authStateRef.read))
+          )
+        )
+      ),
+    toResult: either.right(option.none),
+  });
+
+  test({
+    name: 'auth state does not change after unsubscribed',
+    expect: ({ client }) =>
+      pipe(
+        fromIO(ioRef.newIORef<Option<string>>(option.none)),
+        then((authStateRef) =>
+          pipe(
+            fromIO(client.auth.onAuthStateChanged(authStateRef.write)),
+            then((unsubscribe) => fromIO(unsubscribe)),
+            then(() =>
+              client.auth.createUserAndSignInWithEmailAndPassword({
+                email: 'kira@sakurazaka.com',
+                password: 'dorokatsu',
+              })
+            ),
+            then(() => fromIO(authStateRef.read))
+          )
+        )
+      ),
+    toResult: either.right(option.none),
   });
 };
