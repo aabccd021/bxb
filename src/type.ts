@@ -43,6 +43,17 @@ export const ProviderError = summon((F) =>
 
 export type ProviderError = AType<typeof ProviderError>;
 
+export const CreateUserAndSignInWithEmailAndPasswordError = makeUnion(summon)('code')({
+  UserAlreadyExists: summon((F) =>
+    F.interface({ code: F.stringLiteral('UserAlreadyExists') }, 'UserAlreadyExists')
+  ),
+  ProviderError,
+});
+
+export type CreateUserAndSignInWithEmailAndPasswordError = TypeOf<
+  typeof CreateUserAndSignInWithEmailAndPasswordError
+>;
+
 export const UploadDataUrlError = makeUnion(summon)('code')({
   InvalidDataUrlFormat: summon((F) =>
     F.interface({ code: F.stringLiteral('InvalidDataUrlFormat') }, 'InvalidDataUrlFormat')
@@ -66,6 +77,18 @@ export const GetDocError = makeUnion(summon)('code')({
 });
 
 export type GetDocError = TypeOf<typeof GetDocError>;
+
+export const SignInWithGoogleRedirectError = makeUnion(summon)('code')({
+  ProviderError,
+});
+
+export type SignInWithGoogleRedirectError = TypeOf<typeof SignInWithGoogleRedirectError>;
+
+export const SignOutError = makeUnion(summon)('code')({
+  ProviderError,
+});
+
+export type SignOutError = TypeOf<typeof SignOutError>;
 
 export type StorageDeployConfig = {
   readonly securityRule?: {
@@ -123,12 +146,12 @@ export type ApplyClientEnv<ClientEnv, K extends Record<string, Record<string, un
 
 export type NoEnvClient = {
   readonly auth: {
-    readonly signInWithGoogleRedirect: IO<void>;
+    readonly signInWithGoogleRedirect: TaskEither<SignInWithGoogleRedirectError, void>;
     readonly createUserAndSignInWithEmailAndPassword: (
       p: CreateUserAndSignInWithEmailAndPasswordParam
-    ) => IO<void>;
+    ) => TaskEither<CreateUserAndSignInWithEmailAndPasswordError, void>;
     readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
-    readonly signOut: IO<void>;
+    readonly signOut: TaskEither<SignOutError, void>;
   };
   readonly db: {
     readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, void>;

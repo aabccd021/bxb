@@ -105,6 +105,40 @@ export const runTests = <ClientEnv>(
     });
   });
 
+  describe('user is independent between test', () => {
+    test({
+      name: 'a test can create user kira for the first time and return error for the second time',
+      expect: ({ client }) =>
+        pipe(
+          client.auth.createUserAndSignInWithEmailAndPassword({
+            email: 'kira@sakurazaka.com',
+            password: 'dorokatsu',
+          }),
+          then(() =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
+          ),
+          then(() => right('create user kira two times success'))
+        ),
+      toResult: either.left({ code: 'UserAlreadyExists' }),
+    });
+
+    test({
+      name: 'another test can create the same user',
+      expect: ({ client }) =>
+        pipe(
+          client.auth.createUserAndSignInWithEmailAndPassword({
+            email: 'kira@sakurazaka.com',
+            password: 'dorokatsu',
+          }),
+          then(() => right('create user kira success'))
+        ),
+      toResult: either.right('create user kira success'),
+    });
+  });
+
   test({
     name: 'can upload data url and get download url',
     expect: ({ client, ci }) =>

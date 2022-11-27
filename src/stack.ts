@@ -176,13 +176,15 @@ const client: Client<MockClientEnv> = {
           href: getLocationHref(env.getWindow),
         }),
         io.map(mkRedirectUrl),
-        io.chain((url) => setLocationHref(env.getWindow, url))
+        io.chain((url) => setLocationHref(env.getWindow, url)),
+        taskEither.fromIO
       ),
     createUserAndSignInWithEmailAndPassword: (env) => (param) =>
       pipe(
-        setItem(env.getWindow, authLocalStorageKey, param.email),
-        io.chain(() => env.onAuthStateChangedCallback.read),
-        ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(param.email)))
+        env.onAuthStateChangedCallback.read,
+        ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(param.email))),
+        io.chain(() => setItem(env.getWindow, authLocalStorageKey, param.email)),
+        taskEither.fromIO
       ),
     onAuthStateChanged: (env) => (onChangedCallback) =>
       pipe(
@@ -193,9 +195,10 @@ const client: Client<MockClientEnv> = {
       ),
     signOut: (env) =>
       pipe(
-        removeItem(env.getWindow, authLocalStorageKey),
-        io.chain(() => env.onAuthStateChangedCallback.read),
-        ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.none))
+        env.onAuthStateChangedCallback.read,
+        ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.none)),
+        io.chain(() => removeItem(env.getWindow, authLocalStorageKey)),
+        taskEither.fromIO
       ),
   },
 };
