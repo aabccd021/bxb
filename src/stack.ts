@@ -20,6 +20,7 @@ import type { DeepPick } from 'ts-essentials';
 import isValidDataUrl from 'valid-data-url';
 
 import type { Client, OnAuthStateChangedParam, Stack } from './type';
+import { CreateUserAndSignInWithEmailAndPasswordError } from './type';
 import { GetDownloadUrlError, UploadDataUrlError } from './type';
 
 const { summon } = summonFor({});
@@ -181,10 +182,20 @@ const client: Client<MockClientEnv> = {
       ),
     createUserAndSignInWithEmailAndPassword: (env) => (param) =>
       pipe(
-        env.onAuthStateChangedCallback.read,
-        ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(param.email))),
-        io.chain(() => setItem(env.getWindow, authLocalStorageKey, param.email)),
-        taskEither.fromIO
+        getItem(env.getWindow, authLocalStorageKey),
+        ioOption.match(
+          () => either.right(undefined),
+          () =>
+            either.left(CreateUserAndSignInWithEmailAndPasswordError.Union.of.UserAlreadyExists({}))
+        ),
+        ioEither.chainIOK(() =>
+          pipe(
+            env.onAuthStateChangedCallback.read,
+            ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(param.email))),
+            io.chain(() => setItem(env.getWindow, authLocalStorageKey, param.email))
+          )
+        ),
+        taskEither.fromIOEither
       ),
     onAuthStateChanged: (env) => (onChangedCallback) =>
       pipe(

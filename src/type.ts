@@ -146,12 +146,12 @@ export type ApplyClientEnv<ClientEnv, K extends Record<string, Record<string, un
 
 export type NoEnvClient = {
   readonly auth: {
-    readonly signInWithGoogleRedirect: TaskEither<SignInWithGoogleRedirectError, void>;
+    readonly signInWithGoogleRedirect: TaskEither<SignInWithGoogleRedirectError['Union'], void>;
     readonly createUserAndSignInWithEmailAndPassword: (
       p: CreateUserAndSignInWithEmailAndPasswordParam
-    ) => TaskEither<CreateUserAndSignInWithEmailAndPasswordError, void>;
+    ) => TaskEither<CreateUserAndSignInWithEmailAndPasswordError['Union'], void>;
     readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
-    readonly signOut: TaskEither<SignOutError, void>;
+    readonly signOut: TaskEither<SignOutError['Union'], void>;
   };
   readonly db: {
     readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, void>;

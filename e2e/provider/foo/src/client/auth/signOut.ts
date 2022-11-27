@@ -1,9 +1,11 @@
 /* eslint-disable functional/no-expression-statement */
 
+import { taskEither } from 'fp-ts';
+
 import type { FooClient } from '../env';
 type Type = FooClient['auth']['signOut'];
 
-export const signOut: Type = (_env) => () => {
+export const signOut: Type = (_env) => {
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');
@@ -305,5 +307,5 @@ export const signOut: Type = (_env) => () => {
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');
-  return undefined;
+  return taskEither.of(undefined);
 };

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 expected=$(cat << EOF
-auth createUserAndSignInWithEmailAndPassword 79.1 kB
+auth createUserAndSignInWithEmailAndPassword 80.3 kB
 auth onAuthStateChanged 79.2 kB
-auth signInWithGoogleRedirect 79.2 kB
-auth signOut 79.5 kB
+auth signInWithGoogleRedirect 80.4 kB
+auth signOut 80.7 kB
 db getDoc 80.4 kB
 db setDoc 80.3 kB
 storage getDownloadUrl 80.3 kB
