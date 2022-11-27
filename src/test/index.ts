@@ -199,9 +199,10 @@ export const runTests = <ClientEnv>(
             ),
             then(() => fromIO(authStateRef.read))
           )
-        )
+        ),
+        map(option.isSome)
       ),
-    toResult: either.right(option.some('kira@sakurazaka.com')),
+    toResult: either.right(true),
   });
 
   test({
