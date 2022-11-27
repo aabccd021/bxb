@@ -40,7 +40,8 @@
       "require": "./dist/cjs/next.js"
     },
     "./dist/cjs/test": {
-      "require": "./dist/cjs/test/index.js"
+      "require": "./dist/cjs/test/index.js",
+      "import": "./dist/cjs/es6/index.js"
     }
   },
   "files": [
