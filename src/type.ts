@@ -44,8 +44,8 @@ export const ProviderError = summon((F) =>
 export type ProviderError = AType<typeof ProviderError>;
 
 export const CreateUserAndSignInWithEmailAndPasswordError = makeUnion(summon)('code')({
-  UserAlreadyExists: summon((F) =>
-    F.interface({ code: F.stringLiteral('UserAlreadyExists') }, 'UserAlreadyExists')
+  EmailAlreadyInUse: summon((F) =>
+    F.interface({ code: F.stringLiteral('EmailAlreadyInUse') }, 'EmailAlreadyInUse')
   ),
   ProviderError,
 });
