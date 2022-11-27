@@ -41,7 +41,7 @@
     },
     "./dist/cjs/test": {
       "require": "./dist/cjs/test/index.js",
-      "import": "./dist/cjs/es6/index.js"
+      "import": "./dist/es6/test/index.js"
     }
   },
   "files": [
