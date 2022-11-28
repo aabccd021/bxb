@@ -1,4 +1,3 @@
-import type { UM } from '@morphic-ts/batteries/lib/summoner-ESBST';
 import { summonFor } from '@morphic-ts/batteries/lib/summoner-ESBST';
 import type { AType } from '@morphic-ts/summoners/lib';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
@@ -11,31 +10,32 @@ import { makeUnion } from 'make-union-morphic-ts';
 
 const { summon } = summonFor({});
 
-export type Condition =
-  | {
-      readonly type: 'and' | 'or';
-      readonly left: Condition;
-      readonly right: Condition;
-    }
-  | { readonly type: 'false' }
-  | { readonly type: 'true' };
-
-export const Condition: UM<Record<string, unknown>, Condition> = summon((F) =>
-  F.recursive(
-    (GTree) =>
-      F.taggedUnion(
-        'type',
-        {
-          and: F.interface({ type: F.stringLiteral('and'), left: GTree, right: GTree }, 'and'),
-          or: F.interface({ type: F.stringLiteral('or'), left: GTree, right: GTree }, 'or'),
-          tre: F.interface({ type: F.stringLiteral('true') }, 'true'),
-          false: F.interface({ type: F.stringLiteral('false') }, 'false'),
-        },
-        'Condition'
-      ),
-    'ConditionRec'
-  )
-);
+// import type { UM } from '@morphic-ts/batteries/lib/summoner-ESBST';
+// export type Condition =
+//   | {
+//       readonly type: 'and' | 'or';
+//       readonly left: Condition;
+//       readonly right: Condition;
+//     }
+//   | { readonly type: 'false' }
+//   | { readonly type: 'true' };
+//
+// export const Condition: UM<Record<string, unknown>, Condition> = summon((F) =>
+//   F.recursive(
+//     (GTree) =>
+//       F.taggedUnion(
+//         'type',
+//         {
+//           and: F.interface({ type: F.stringLiteral('and'), left: GTree, right: GTree }, 'and'),
+//           or: F.interface({ type: F.stringLiteral('or'), left: GTree, right: GTree }, 'or'),
+//           tre: F.interface({ type: F.stringLiteral('true') }, 'true'),
+//           false: F.interface({ type: F.stringLiteral('false') }, 'false'),
+//         },
+//         'Condition'
+//       ),
+//     'ConditionRec'
+//   )
+// );
 
 export const ProviderError = summon((F) =>
   F.interface({ code: F.stringLiteral('ProviderError'), value: F.unknown() }, 'ProviderError')
@@ -95,6 +95,10 @@ export type StorageDeployConfig = {
     readonly type?: 'allowAll';
   };
 };
+
+export type DbSecurityRule = {
+
+}
 
 export type DbDeployConfig = {
   readonly securityRule?: {
@@ -169,22 +173,19 @@ export type NoEnvClient = {
 
 export type Client<ClientEnv> = ApplyClientEnv<ClientEnv, NoEnvClient>;
 
+export type CI = {
+  readonly deployStorage: (
+    c: StorageDeployConfig
+  ) => TaskEither<{ readonly code: string }, unknown>;
+  readonly deployDb: (c: DbDeployConfig) => TaskEither<{ readonly code: string }, unknown>;
+};
+
 export type Stack<ClientEnv> = {
-  readonly ci: {
-    readonly deployStorage: (
-      c: StorageDeployConfig
-    ) => TaskEither<{ readonly code: string }, unknown>;
-    readonly deployDb: (c: DbDeployConfig) => TaskEither<{ readonly code: string }, unknown>;
-  };
+  readonly ci: CI;
   readonly client: Client<ClientEnv>;
 };
 
 export type NoEnvStack = {
-  readonly ci: {
-    readonly deployStorage: (
-      c: StorageDeployConfig
-    ) => TaskEither<{ readonly code: string }, unknown>;
-    readonly deployDb: (c: DbDeployConfig) => TaskEither<{ readonly code: string }, unknown>;
-  };
+  readonly ci: CI;
   readonly client: NoEnvClient;
 };
