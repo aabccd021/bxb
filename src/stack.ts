@@ -20,7 +20,7 @@ import type { Refinement } from 'fp-ts/Refinement';
 import type { DeepPick } from 'ts-essentials';
 import isValidDataUrl from 'valid-data-url';
 
-import type { Client, DeployDb, OnAuthStateChangedParam, Stack, UpsertDoc } from './type';
+import type { Client, DeployDb, OnAuthStateChangedParam, Stack } from './type';
 import { CreateUserAndSignInWithEmailAndPasswordError } from './type';
 import { GetDownloadUrlError, UploadDataUrlError } from './type';
 
@@ -131,20 +131,6 @@ export const mkClientEnvFromWindow = (getGetWindow: IO<IO<Window>>): IO<MockClie
 
 export const mkClientEnv = mkClientEnvFromWindow(() => () => window);
 
-const validateUpsert =
-  (param: UpsertDoc.Param) =>
-  (config: DeployDb.Config): boolean =>
-    config[param.key.collection]?.securityRule?.create?.type === 'True' &&
-    pipe(
-      param.data,
-      readonlyRecord.mapWithIndex(
-        (fieldName, fieldValue) =>
-          config[param.key.collection]?.schema[fieldName]?.type === 'StringField' &&
-          typeof fieldValue === 'string'
-      ),
-      readonlyRecord.reduce(string.Ord)(true, (a, b) => a && b)
-    );
-
 const client: Client<MockClientEnv> = {
   storage: {
     uploadDataUrl: (env) => (param) =>
@@ -176,7 +162,20 @@ const client: Client<MockClientEnv> = {
           }))
         ),
         ioEither.chainEitherKW(
-          either.fromPredicate(validateUpsert(param), () => ({ code: 'ForbiddenError' as const }))
+          either.fromPredicate(
+            (config) =>
+              config[param.key.collection]?.securityRule?.create?.type === 'True' &&
+              pipe(
+                param.data,
+                readonlyRecord.mapWithIndex(
+                  (fieldName, fieldValue) =>
+                    config[param.key.collection]?.schema[fieldName]?.type === 'StringField' &&
+                    typeof fieldValue === 'string'
+                ),
+                readonlyRecord.reduce(string.Ord)(true, (a, b) => a && b)
+              ),
+            () => ({ code: 'ForbiddenError' as const })
+          )
         ),
         ioEither.chainW(() => getDb(env.getWindow)),
         ioEither.map(
