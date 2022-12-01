@@ -83,7 +83,15 @@ export const runTests = <ClientEnv>(
       name: 'a server can create document kira',
       expect: ({ client, ci }) =>
         pipe(
-          ci.deployDb({ securityRule: { type: 'allowAll' } }),
+          ci.deployDb({
+            user: {
+              schema: { name: { type: 'StringField' } },
+              securityRule: {
+                create: { type: 'True' },
+                get: { type: 'True' },
+              },
+            },
+          }),
           then(() =>
             client.db.upsertDoc({
               key: { collection: 'user', id: 'kira_id' },
@@ -99,7 +107,15 @@ export const runTests = <ClientEnv>(
       name: 'server from another test can not access document kira',
       expect: ({ client, ci }) =>
         pipe(
-          ci.deployDb({ securityRule: { type: 'allowAll' } }),
+          ci.deployDb({
+            user: {
+              schema: { name: { type: 'StringField' } },
+              securityRule: {
+                create: { type: 'True' },
+                get: { type: 'True' },
+              },
+            },
+          }),
           then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
         ),
       toResult: either.right(option.none),

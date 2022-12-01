@@ -7,6 +7,10 @@ import type { TaskEither } from 'fp-ts/TaskEither';
 import type { TypeOf } from 'make-union-morphic-ts';
 import { makeUnion } from 'make-union-morphic-ts';
 
+import * as DeployDb from './ci/deployDb';
+
+export { DeployDb };
+
 const { summon } = summonFor({});
 
 export const ProviderError = summon((F) =>
@@ -63,14 +67,6 @@ export const SignOutError = makeUnion(summon)('code')({
 export type SignOutError = TypeOf<typeof SignOutError>;
 
 export type StorageDeployConfig = {
-  readonly securityRule?: {
-    readonly type?: 'allowAll';
-  };
-};
-
-export type DbSecurityRule = Record<string, unknown>;
-
-export type DbDeployConfig = {
   readonly securityRule?: {
     readonly type?: 'allowAll';
   };
@@ -147,7 +143,7 @@ export type CI = {
   readonly deployStorage: (
     c: StorageDeployConfig
   ) => TaskEither<{ readonly code: string }, unknown>;
-  readonly deployDb: (c: DbDeployConfig) => TaskEither<{ readonly code: string }, unknown>;
+  readonly deployDb: DeployDb.Fn;
 };
 
 export type Stack<ClientEnv> = {
