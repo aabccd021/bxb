@@ -354,7 +354,7 @@ export const runTests = <ClientEnv>(
   });
 
   test({
-    name: 'fail upsert doc if violates schema',
+    name: 'fail upsert doc if string given when int field required',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -367,6 +367,26 @@ export const runTests = <ClientEnv>(
           client.db.upsertDoc({
             key: { collection: 'user', id: 'kira_id' },
             data: { name: 'masumoto' },
+          })
+        )
+      ),
+    toResult: either.left({ code: 'ForbiddenError' }),
+  });
+
+  test({
+    name: 'fail upsert doc if int given when string field required',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: { get: { type: 'True' } },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 46 },
           })
         )
       ),
