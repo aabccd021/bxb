@@ -45,12 +45,7 @@ export type ApplyClientEnv<ClientEnv, K extends Record<string, Record<string, un
 };
 
 export type NoEnvClient = {
-  readonly auth: {
-    readonly signInWithGoogleRedirect: stack.client.auth.SignInWithGoogleRedirect.Fn;
-    readonly createUserAndSignInWithEmailAndPassword: stack.client.auth.CreateUserAndSignInWithEmailAndPassword.Fn;
-    readonly onAuthStateChanged: stack.client.auth.OnAuthStateChanged.Fn;
-    readonly signOut: stack.client.auth.SignOut.Fn;
-  };
+  readonly auth: stack.client.auth.Scope;
   readonly db: {
     readonly upsertDoc: stack.client.db.UpsertDoc.Fn;
     readonly getDoc: stack.client.db.GetDoc.Fn;

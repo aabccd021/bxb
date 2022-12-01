@@ -75,7 +75,7 @@
         "code": 100,
         "ignoreUrls": true,
         "ignoreTemplateLiterals": true,
-        "ignorePattern": "(^export|^\\s*readonly)"
+        "ignorePattern": "(^export|^\\s*readonly|^import)"
       }
     ],
     "no-else-return": "error",
