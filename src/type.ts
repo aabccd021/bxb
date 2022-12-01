@@ -10,33 +10,6 @@ import { makeUnion } from 'make-union-morphic-ts';
 
 const { summon } = summonFor({});
 
-// import type { UM } from '@morphic-ts/batteries/lib/summoner-ESBST';
-// export type Condition =
-//   | {
-//       readonly type: 'and' | 'or';
-//       readonly left: Condition;
-//       readonly right: Condition;
-//     }
-//   | { readonly type: 'false' }
-//   | { readonly type: 'true' };
-//
-// export const Condition: UM<Record<string, unknown>, Condition> = summon((F) =>
-//   F.recursive(
-//     (GTree) =>
-//       F.taggedUnion(
-//         'type',
-//         {
-//           and: F.interface({ type: F.stringLiteral('and'), left: GTree, right: GTree }, 'and'),
-//           or: F.interface({ type: F.stringLiteral('or'), left: GTree, right: GTree }, 'or'),
-//           tre: F.interface({ type: F.stringLiteral('true') }, 'true'),
-//           false: F.interface({ type: F.stringLiteral('false') }, 'false'),
-//         },
-//         'Condition'
-//       ),
-//     'ConditionRec'
-//   )
-// );
-
 export const ProviderError = summon((F) =>
   F.interface({ code: F.stringLiteral('ProviderError'), value: F.unknown() }, 'ProviderError')
 );
@@ -158,7 +131,7 @@ export type NoEnvClient = {
     readonly signOut: TaskEither<SignOutError['Union'], void>;
   };
   readonly db: {
-    readonly setDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, void>;
+    readonly upsertDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, void>;
     readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], Option<DocData>>;
   };
   readonly storage: {

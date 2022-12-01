@@ -1,2 +1,2 @@
 export * from './getDoc';
-export * from './setDoc';
+export * from './upsertDoc';

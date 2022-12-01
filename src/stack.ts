@@ -148,7 +148,7 @@ const client: Client<MockClientEnv> = {
       ),
   },
   db: {
-    setDoc: (env) => (param) =>
+    upsertDoc: (env) => (param) =>
       pipe(
         getDb(env.getWindow),
         ioEither.map(

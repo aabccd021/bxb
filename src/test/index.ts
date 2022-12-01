@@ -85,7 +85,7 @@ export const runTests = <ClientEnv>(
         pipe(
           ci.deployDb({ securityRule: { type: 'allowAll' } }),
           then(() =>
-            client.db.setDoc({
+            client.db.upsertDoc({
               key: { collection: 'user', id: 'kira_id' },
               data: { name: 'masumoto' },
             })

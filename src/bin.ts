@@ -38,7 +38,7 @@ const scopes = {
     'signOut',
     'createUserAndSignInWithEmailAndPassword',
   ],
-  db: ['setDoc', 'getDoc'],
+  db: ['upsertDoc', 'getDoc'],
   storage: ['uploadDataUrl', 'getDownloadUrl'],
 };
 
