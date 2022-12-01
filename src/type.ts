@@ -3,7 +3,6 @@ import type { AType } from '@morphic-ts/summoners/lib';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
 import type { IO } from 'fp-ts/IO';
 import type { Option } from 'fp-ts/Option';
-import type { Record } from 'fp-ts/Record';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import type { TypeOf } from 'make-union-morphic-ts';
 import { makeUnion } from 'make-union-morphic-ts';
