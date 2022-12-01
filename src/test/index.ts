@@ -412,4 +412,18 @@ export const runTests = <ClientEnv>(
       ),
     toResult: either.left({ code: 'ForbiddenError' }),
   });
+
+  test({
+    name: 'can not get doc if not allowed, even if the doc does not exists',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+          },
+        }),
+        then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+      ),
+    toResult: either.left({code: 'ForbiddenError'}),
+  });
 };
