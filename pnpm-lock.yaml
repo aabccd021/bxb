@@ -9,6 +9,7 @@ specifiers:
   eslint: ^8.28.0
   fp-ts: ^2.13.1
   happy-dom: ^7.7.0
+  io-ts: ^2.2.19
   make-union-morphic-ts: ^1.0.7
   nazna: ^1.14.2
   next: ^13.0.4
@@ -25,6 +26,7 @@ dependencies:
   '@morphic-ts/summoners': 3.0.0_4d7wvhfwbxj4u6itqsiiv2wloq
   '@types/valid-data-url': 2.0.0
   fp-ts: 2.13.1
+  io-ts: 2.2.19_fp-ts@2.13.1
   make-union-morphic-ts: 1.0.7_tkkhkw7abvjyxavu6h6oqh543q
   next: 13.0.4_biqbaboplfbrettd7655fr4n2y
   node-fetch: 3.3.0
