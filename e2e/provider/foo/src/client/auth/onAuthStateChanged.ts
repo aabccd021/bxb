@@ -1,4 +1,4 @@
-import type { FooClient } from '../env';
+import type { FooClient } from '../../env';
 
 type Type = FooClient['auth']['onAuthStateChanged'];
 

@@ -2,7 +2,7 @@
 
 import { taskEither } from 'fp-ts';
 
-import type { FooClient } from '../env';
+import type { FooClient } from '../../env';
 type Type = FooClient['auth']['signOut'];
 
 export const signOut: Type = (_env) => {

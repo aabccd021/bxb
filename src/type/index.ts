@@ -10,7 +10,7 @@ import { makeUnion } from 'make-union-morphic-ts';
 import type * as DeployDb from './ci/deployDb';
 import type * as UpsertDoc from './client/upsertDoc';
 
-export { DeployDb };
+export { DeployDb, UpsertDoc };
 
 const { summon } = summonFor({});
 
@@ -135,19 +135,21 @@ export type NoEnvClient = {
 
 export type Client<ClientEnv> = ApplyClientEnv<ClientEnv, NoEnvClient>;
 
-export type CI = {
+export type NoEnvCI = {
   readonly deployStorage: (
     c: StorageDeployConfig
   ) => TaskEither<{ readonly code: string }, unknown>;
   readonly deployDb: DeployDb.Fn;
 };
 
+export type CI<ClientEnv> = ApplyClientEnvScope<ClientEnv, NoEnvCI>;
+
 export type Stack<ClientEnv> = {
-  readonly ci: CI;
+  readonly ci: CI<ClientEnv>;
   readonly client: Client<ClientEnv>;
 };
 
 export type NoEnvStack = {
-  readonly ci: CI;
+  readonly ci: NoEnvCI;
   readonly client: NoEnvClient;
 };

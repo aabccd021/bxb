@@ -1,2 +1,6 @@
 import { taskEither } from 'fp-ts';
-export const deployStorage = () => taskEither.of(undefined);
+
+import type { FooCI } from '../env';
+
+type Type = FooCI['deployStorage'];
+export const deployStorage: Type = () => () => taskEither.of(undefined);

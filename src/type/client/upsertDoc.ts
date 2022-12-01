@@ -8,7 +8,7 @@ export type Param = {
   readonly data: DocData;
 };
 
-export type Error = {
+export type ProviderError = {
   readonly code: 'ProviderError';
   readonly value: unknown;
 };
@@ -16,5 +16,7 @@ export type Error = {
 export type ForbiddenError = {
   readonly code: 'ForbiddenError';
 };
+
+export type Error = ForbiddenError | ProviderError;
 
 export type Fn = (p: Param) => TaskEither<Error, void>;

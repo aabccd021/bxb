@@ -1,6 +1,6 @@
 import { apply, either, io, ioRef, option, reader } from 'fp-ts';
 import type { Either } from 'fp-ts/Either';
-import { flow, identity, pipe } from 'fp-ts/function';
+import { identity, pipe } from 'fp-ts/function';
 import type { Option } from 'fp-ts/Option';
 import type { TaskEither } from 'fp-ts/TaskEither';
 // eslint-disable-next-line fp-ts/no-module-imports
@@ -27,14 +27,14 @@ const mkTest =
       const result = pipe(
         getTestClientEnv,
         map(
-          flow(
-            readerS({
+          readerS({
+            client: readerS({
               auth: readerS(stack.client.auth),
               db: readerS(stack.client.db),
               storage: readerS(stack.client.storage),
             }),
-            (client) => ({ ...stack, client })
-          )
+            ci: readerS(stack.ci),
+          })
         ),
         then(fn)
       );
@@ -313,20 +313,6 @@ export const runTests = <ClientEnv>(
   });
 
   test({
-    name: 'can not get doc if not allowed, even if the doc does not exists',
-    expect: ({ client, ci }) =>
-      pipe(
-        ci.deployDb({
-          user: {
-            schema: { name: { type: 'StringField' } },
-          },
-        }),
-        then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
-      ),
-    toResult: either.right(option.some({ name: 'masumoto' })),
-  });
-
-  test({
     name: 'can upsert doc',
     expect: ({ client, ci }) =>
       pipe(
@@ -364,7 +350,7 @@ export const runTests = <ClientEnv>(
           })
         )
       ),
-    toResult: either.left({ type: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError' }),
   });
 
   test({
@@ -384,7 +370,7 @@ export const runTests = <ClientEnv>(
           })
         )
       ),
-    toResult: either.left({ type: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError' }),
   });
 
   test({
@@ -404,6 +390,6 @@ export const runTests = <ClientEnv>(
           })
         )
       ),
-    toResult: either.left({ type: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError' }),
   });
 };

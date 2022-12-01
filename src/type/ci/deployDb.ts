@@ -12,8 +12,12 @@ type True = {
   readonly type: 'True';
 };
 
+export type Field = IntField | StringField;
+
+export type Schema = Record<string, Field>;
+
 export type CollectionConfig = {
-  readonly schema: Record<string, IntField | StringField>;
+  readonly schema: Schema;
   readonly securityRule?: {
     readonly get?: True;
     readonly create?: True;

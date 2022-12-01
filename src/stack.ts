@@ -9,6 +9,7 @@ import {
   ioRef,
   option,
   readonlyRecord,
+  string,
   taskEither,
 } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
@@ -19,7 +20,7 @@ import type { Refinement } from 'fp-ts/Refinement';
 import type { DeepPick } from 'ts-essentials';
 import isValidDataUrl from 'valid-data-url';
 
-import type { Client, OnAuthStateChangedParam, Stack } from './type';
+import type { Client, DeployDb, OnAuthStateChangedParam, Stack, UpsertDoc } from './type';
 import { CreateUserAndSignInWithEmailAndPasswordError } from './type';
 import { GetDownloadUrlError, UploadDataUrlError } from './type';
 
@@ -117,16 +118,32 @@ const getDb = (getWindow: IO<Window>) =>
 
 export type MockClientEnv = {
   readonly onAuthStateChangedCallback: IORef<Option<OnAuthStateChangedParam>>;
+  readonly dbDeployConfig: IORef<Option<DeployDb.Config>>;
   readonly getWindow: IO<Window>;
 };
 
-export const mkClientEnvFromWindow = (getGetWindow: IO<IO<Window>>) =>
+export const mkClientEnvFromWindow = (getGetWindow: IO<IO<Window>>): IO<MockClientEnv> =>
   apply.sequenceS(io.Apply)({
-    onAuthStateChangedCallback: ioRef.newIORef<Option<OnAuthStateChangedParam>>(option.none),
+    onAuthStateChangedCallback: ioRef.newIORef(option.none),
+    dbDeployConfig: ioRef.newIORef(option.none),
     getWindow: getGetWindow,
   });
 
 export const mkClientEnv = mkClientEnvFromWindow(() => () => window);
+
+const validateUpsert =
+  (param: UpsertDoc.Param) =>
+  (config: DeployDb.Config): boolean =>
+    config[param.key.collection]?.securityRule?.create?.type === 'True' &&
+    pipe(
+      param.data,
+      readonlyRecord.mapWithIndex(
+        (fieldName, fieldValue) =>
+          config[param.key.collection]?.schema[fieldName]?.type === 'StringField' &&
+          typeof fieldValue === 'string'
+      ),
+      readonlyRecord.reduce(string.Ord)(true, (a, b) => a && b)
+    );
 
 const client: Client<MockClientEnv> = {
   storage: {
@@ -150,7 +167,18 @@ const client: Client<MockClientEnv> = {
   db: {
     upsertDoc: (env) => (param) =>
       pipe(
-        getDb(env.getWindow),
+        env.dbDeployConfig.read,
+        io.map(
+          either.fromOption(() => ({
+            code: 'ProviderError' as const,
+            provider: 'mock',
+            value: 'db deploy config not found',
+          }))
+        ),
+        ioEither.chainEitherKW(
+          either.fromPredicate(validateUpsert(param), () => ({ code: 'ForbiddenError' as const }))
+        ),
+        ioEither.chainW(() => getDb(env.getWindow)),
         ioEither.map(
           flow(
             option.getOrElse(() => ({})),
@@ -158,6 +186,7 @@ const client: Client<MockClientEnv> = {
           )
         ),
         ioEither.chainIOK((data) => setObjectItem(env.getWindow, dbLocalStorageKey, data)),
+        (x) => x,
         taskEither.fromIOEither
       ),
     getDoc: (env) => (param) =>
@@ -216,8 +245,8 @@ const client: Client<MockClientEnv> = {
 
 export const stack: Stack<MockClientEnv> = {
   ci: {
-    deployStorage: () => taskEither.of(undefined),
-    deployDb: () => taskEither.of(undefined),
+    deployStorage: () => () => taskEither.of(undefined),
+    deployDb: (env) => (config) => taskEither.fromIO(env.dbDeployConfig.write(option.some(config))),
   },
   client,
 };
