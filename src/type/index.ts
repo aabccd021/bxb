@@ -8,9 +8,10 @@ import type { TypeOf } from 'make-union-morphic-ts';
 import { makeUnion } from 'make-union-morphic-ts';
 
 import type * as DeployDb from './ci/deployDb';
+import type * as GetDoc from './client/getDoc';
 import type * as UpsertDoc from './client/upsertDoc';
 
-export { DeployDb, UpsertDoc };
+export { DeployDb, GetDoc, UpsertDoc };
 
 const { summon } = summonFor({});
 
@@ -49,12 +50,6 @@ export const GetDownloadUrlError = makeUnion(summon)('code')({
 
 export type GetDownloadUrlError = TypeOf<typeof GetDownloadUrlError>;
 
-export const GetDocError = makeUnion(summon)('code')({
-  ProviderError,
-});
-
-export type GetDocError = TypeOf<typeof GetDocError>;
-
 export const SignInWithGoogleRedirectError = makeUnion(summon)('code')({
   ProviderError,
 });
@@ -89,10 +84,6 @@ export type GetDownloadUrlParam = {
   readonly key: string;
 };
 
-export type GetDocParam = {
-  readonly key: DocKey;
-};
-
 export type OnAuthStateChangedParam = (user: Option<string>) => IO<void>;
 
 export type CreateUserAndSignInWithEmailAndPasswordParam = {
@@ -121,7 +112,7 @@ export type NoEnvClient = {
   };
   readonly db: {
     readonly upsertDoc: UpsertDoc.Fn;
-    readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], Option<DocData>>;
+    readonly getDoc: GetDoc.Fn;
   };
   readonly storage: {
     readonly uploadDataUrl: (

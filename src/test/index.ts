@@ -309,7 +309,7 @@ export const runTests = <ClientEnv>(
         ),
         then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
       ),
-    toResult: either.right(option.some({ name: 'masumoto' })),
+    toResult: either.left({ code: 'ForbiddenError' }),
   });
 
   test({
