@@ -1,11 +1,11 @@
+import type { Option } from 'fp-ts/Option';
 import type { TaskEither } from 'fp-ts/TaskEither';
 
 import type { DocKey } from '../..';
-import type { DocData } from '..';
+import type { DocData } from '../..';
 
 export type Param = {
   readonly key: DocKey;
-  readonly data: DocData;
 };
 
 export type ProviderError = {
@@ -19,4 +19,4 @@ export type ForbiddenError = {
 
 export type Error = ForbiddenError | ProviderError;
 
-export type Fn = (p: Param) => TaskEither<Error, void>;
+export type Fn = (p: Param) => TaskEither<Error, Option<DocData>>;

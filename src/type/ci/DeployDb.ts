@@ -24,6 +24,6 @@ export type CollectionConfig = {
   };
 };
 
-export type Config = Record<string, CollectionConfig>;
+export type Param = Record<string, CollectionConfig>;
 
-export type Fn = (c: Config) => TaskEither<{ readonly code: string }, unknown>;
+export type Fn = (c: Param) => TaskEither<{ readonly code: string }, unknown>;
