@@ -1,11 +1,7 @@
-import { summonFor } from '@morphic-ts/batteries/lib/summoner-ESBST';
-import type { AType } from '@morphic-ts/summoners/lib';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
 import type { IO } from 'fp-ts/IO';
 import type { Option } from 'fp-ts/Option';
 import type { TaskEither } from 'fp-ts/TaskEither';
-import type { TypeOf } from 'make-union-morphic-ts';
-import { makeUnion } from 'make-union-morphic-ts';
 
 import type * as DeployDb from './ci/deployDb';
 import type * as GetDoc from './client/getDoc';
@@ -13,54 +9,22 @@ import type * as UpsertDoc from './client/upsertDoc';
 
 export { DeployDb, GetDoc, UpsertDoc };
 
-const { summon } = summonFor({});
+export type ProviderError = {
+  readonly code: 'ProviderError';
+  readonly value: unknown;
+};
 
-export const ProviderError = summon((F) =>
-  F.interface({ code: F.stringLiteral('ProviderError'), value: F.unknown() }, 'ProviderError')
-);
+export type CreateUserAndSignInWithEmailAndPasswordError =
+  | ProviderError
+  | { readonly code: 'EmailAlreadyInUse' };
 
-export type ProviderError = AType<typeof ProviderError>;
+export type UploadDataUrlError = ProviderError | { readonly code: 'InvalidDataUrlFormat' };
 
-export const CreateUserAndSignInWithEmailAndPasswordError = makeUnion(summon)('code')({
-  EmailAlreadyInUse: summon((F) =>
-    F.interface({ code: F.stringLiteral('EmailAlreadyInUse') }, 'EmailAlreadyInUse')
-  ),
-  ProviderError,
-});
+export type GetDownloadUrlError = ProviderError | { readonly code: 'FileNotFound' };
 
-export type CreateUserAndSignInWithEmailAndPasswordError = TypeOf<
-  typeof CreateUserAndSignInWithEmailAndPasswordError
->;
+export type SignInWithGoogleRedirectError = ProviderError;
 
-export const UploadDataUrlError = makeUnion(summon)('code')({
-  InvalidDataUrlFormat: summon((F) =>
-    F.interface({ code: F.stringLiteral('InvalidDataUrlFormat') }, 'InvalidDataUrlFormat')
-  ),
-  ProviderError,
-});
-
-export type UploadDataUrlError = TypeOf<typeof UploadDataUrlError>;
-
-export const GetDownloadUrlError = makeUnion(summon)('code')({
-  FileNotFound: summon((F) =>
-    F.interface({ code: F.stringLiteral('FileNotFound') }, 'FileNotFound')
-  ),
-  ProviderError,
-});
-
-export type GetDownloadUrlError = TypeOf<typeof GetDownloadUrlError>;
-
-export const SignInWithGoogleRedirectError = makeUnion(summon)('code')({
-  ProviderError,
-});
-
-export type SignInWithGoogleRedirectError = TypeOf<typeof SignInWithGoogleRedirectError>;
-
-export const SignOutError = makeUnion(summon)('code')({
-  ProviderError,
-});
-
-export type SignOutError = TypeOf<typeof SignOutError>;
+export type SignOutError = ProviderError;
 
 export type StorageDeployConfig = {
   readonly securityRule?: {
@@ -103,24 +67,20 @@ export type ApplyClientEnv<ClientEnv, K extends Record<string, Record<string, un
 
 export type NoEnvClient = {
   readonly auth: {
-    readonly signInWithGoogleRedirect: TaskEither<SignInWithGoogleRedirectError['Union'], void>;
+    readonly signInWithGoogleRedirect: TaskEither<SignInWithGoogleRedirectError, void>;
     readonly createUserAndSignInWithEmailAndPassword: (
       p: CreateUserAndSignInWithEmailAndPasswordParam
-    ) => TaskEither<CreateUserAndSignInWithEmailAndPasswordError['Union'], void>;
+    ) => TaskEither<CreateUserAndSignInWithEmailAndPasswordError, void>;
     readonly onAuthStateChanged: (p: OnAuthStateChangedParam) => IO<Unsubscribe>;
-    readonly signOut: TaskEither<SignOutError['Union'], void>;
+    readonly signOut: TaskEither<SignOutError, void>;
   };
   readonly db: {
     readonly upsertDoc: UpsertDoc.Fn;
     readonly getDoc: GetDoc.Fn;
   };
   readonly storage: {
-    readonly uploadDataUrl: (
-      p: UploadDataUrlParam
-    ) => TaskEither<UploadDataUrlError['Union'], void>;
-    readonly getDownloadUrl: (
-      p: GetDownloadUrlParam
-    ) => TaskEither<GetDownloadUrlError['Union'], string>;
+    readonly uploadDataUrl: (p: UploadDataUrlParam) => TaskEither<UploadDataUrlError, void>;
+    readonly getDownloadUrl: (p: GetDownloadUrlParam) => TaskEither<GetDownloadUrlError, string>;
   };
 };
 
