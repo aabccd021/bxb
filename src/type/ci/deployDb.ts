@@ -4,16 +4,16 @@ type StringField = {
   readonly type: 'StringField';
 };
 
-// type False = {
-//   readonly type: 'False';
-// };
+type IntField = {
+  readonly type: 'IntField';
+};
 
 type True = {
   readonly type: 'True';
 };
 
 export type CollectionConfig = {
-  readonly schema: Record<string, StringField>;
+  readonly schema: Record<string, IntField | StringField>;
   readonly securityRule?: {
     readonly get?: True;
     readonly create?: True;

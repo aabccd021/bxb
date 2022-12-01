@@ -7,7 +7,8 @@ import type { TaskEither } from 'fp-ts/TaskEither';
 import type { TypeOf } from 'make-union-morphic-ts';
 import { makeUnion } from 'make-union-morphic-ts';
 
-import * as DeployDb from './ci/deployDb';
+import type * as DeployDb from './ci/deployDb';
+import type * as UpsertDoc from './client/upsertDoc';
 
 export { DeployDb };
 
@@ -84,11 +85,6 @@ export type DocKey = {
 
 export type DocData = Record<string, unknown>;
 
-export type SetDocParam = {
-  readonly key: DocKey;
-  readonly data: DocData;
-};
-
 export type GetDownloadUrlParam = {
   readonly key: string;
 };
@@ -124,7 +120,7 @@ export type NoEnvClient = {
     readonly signOut: TaskEither<SignOutError['Union'], void>;
   };
   readonly db: {
-    readonly upsertDoc: (p: SetDocParam) => TaskEither<{ readonly code: string }, void>;
+    readonly upsertDoc: UpsertDoc.Fn;
     readonly getDoc: (p: GetDocParam) => TaskEither<GetDocError['Union'], Option<DocData>>;
   };
   readonly storage: {
