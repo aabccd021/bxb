@@ -3,7 +3,7 @@ import type { AType } from '@morphic-ts/summoners/lib';
 import type {} from '@morphic-ts/summoners/lib/tagged-union';
 import type { IO } from 'fp-ts/IO';
 import type { Option } from 'fp-ts/Option';
-import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
+import type { Record } from 'fp-ts/Record';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import type { TypeOf } from 'make-union-morphic-ts';
 import { makeUnion } from 'make-union-morphic-ts';
@@ -69,9 +69,7 @@ export type StorageDeployConfig = {
   };
 };
 
-export type DbSecurityRule = {
-
-}
+export type DbSecurityRule = Record<string, unknown>;
 
 export type DbDeployConfig = {
   readonly securityRule?: {
@@ -89,7 +87,7 @@ export type DocKey = {
   readonly id: string;
 };
 
-export type DocData = ReadonlyRecord<string, unknown>;
+export type DocData = Record<string, unknown>;
 
 export type SetDocParam = {
   readonly key: DocKey;
