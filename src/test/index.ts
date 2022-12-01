@@ -8,19 +8,19 @@ import { chainW as then, fromIO, map, right, tryCatch } from 'fp-ts/TaskEither';
 import fetch from 'node-fetch';
 import { describe, expect, test as test_ } from 'vitest';
 
-import type { NoEnvStack, Stack } from '../type';
+import type { Stack, StackWithEnv } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
 const mkTest =
-  <ClientEnv>(stack: Stack<ClientEnv>, getTestClientEnv: TaskEither<unknown, ClientEnv>) =>
+  <ClientEnv>(stack: StackWithEnv<ClientEnv>, getTestClientEnv: TaskEither<unknown, ClientEnv>) =>
   <T>({
     name,
     expect: fn,
     toResult,
   }: {
     readonly name: string;
-    readonly expect: (stack: NoEnvStack) => TaskEither<unknown, T>;
+    readonly expect: (stack: Stack.Type) => TaskEither<unknown, T>;
     readonly toResult: Either<unknown, T>;
   }) =>
     test_(name, async () => {
@@ -48,7 +48,7 @@ const fetchText = (url: string) =>
   );
 
 export const runTests = <ClientEnv>(
-  realStack: Stack<ClientEnv>,
+  realStack: StackWithEnv<ClientEnv>,
   getTestClientEnv: TaskEither<unknown, ClientEnv>
 ) => {
   const test = mkTest(realStack, getTestClientEnv);

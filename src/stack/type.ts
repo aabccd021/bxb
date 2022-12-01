@@ -3,7 +3,7 @@ import type { IORef } from 'fp-ts/IORef';
 import type { Option } from 'fp-ts/Option';
 import type { DeepPick } from 'ts-essentials';
 
-import type { Stack as _Stack, StackType } from '../type';
+import type { Stack, StackWithEnv } from '../type';
 
 export type MockableWindow = DeepPick<
   typeof window,
@@ -17,11 +17,9 @@ export type MockableWindow = DeepPick<
 >;
 
 export type Env = {
-  readonly onAuthStateChangedCallback: IORef<
-    Option<StackType.client.auth.OnAuthStateChanged.Param>
-  >;
-  readonly dbDeployConfig: IORef<Option<StackType.ci.DeployDb.Param>>;
+  readonly onAuthStateChangedCallback: IORef<Option<Stack.client.auth.OnAuthStateChanged.Param>>;
+  readonly dbDeployConfig: IORef<Option<Stack.ci.DeployDb.Param>>;
   readonly getWindow: IO<MockableWindow>;
 };
 
-export type Stack = _Stack<Env>;
+export type Stack = StackWithEnv<Env>;
