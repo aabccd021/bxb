@@ -40,12 +40,6 @@ const mkTest =
       expect(await result()).toEqual(toResult);
     });
 
-const fetchText = (url: string) =>
-  pipe(
-    tryCatch(() => fetch(url), identity),
-    then((downloadResult) => tryCatch(() => downloadResult.text(), identity))
-  );
-
 export const runTests = <ClientEnv>(
   realStack: StackWithEnv<ClientEnv>,
   getTestClientEnv: TaskEither<unknown, ClientEnv>
@@ -167,7 +161,8 @@ export const runTests = <ClientEnv>(
           })
         ),
         then(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
-        then(fetchText)
+        then((url) => tryCatch(() => fetch(url), identity)),
+        then((downloadResult) => tryCatch(() => downloadResult.text(), identity))
       ),
     toResult: either.right('kira masumoto'),
   });
