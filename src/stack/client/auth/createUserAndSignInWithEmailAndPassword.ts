@@ -17,7 +17,9 @@ export const createUserAndSignInWithEmailAndPassword: Type = (env) => (param) =>
     ioEither.chainIOK(() =>
       pipe(
         env.onAuthStateChangedCallback.read,
-        ioOption.chainIOK((onChangedCallback) => onChangedCallback(option.some(param.email))),
+        ioOption.chainIOK((onChangedCallback) =>
+          onChangedCallback(option.some({ uid: param.email }))
+        ),
         io.chain(() => setItem(env.getWindow, authLocalStorageKey, param.email))
       )
     ),

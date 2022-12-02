@@ -1,4 +1,4 @@
-import type {} from '@morphic-ts/summoners/lib/tagged-union';
+import type { Option } from 'fp-ts/Option';
 
 import type * as Stack from './stack';
 
@@ -13,6 +13,12 @@ export type DocKey = {
   readonly collection: string;
   readonly id: string;
 };
+
+export type AuthUser = {
+  readonly uid: string;
+};
+
+export type AuthState = Option<AuthUser>;
 
 export type DocData = Record<string, unknown>;
 

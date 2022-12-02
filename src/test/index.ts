@@ -187,7 +187,7 @@ export const runTests = <ClientEnv>(
     name: 'initial auth state is signed out',
     expect: ({ client }) =>
       pipe(
-        ioRef.newIORef<Option<string>>(option.none),
+        ioRef.newIORef<Option<{ readonly uid: string }>>(option.none),
         io.chain((authStateRef) =>
           pipe(
             client.auth.onAuthStateChanged(authStateRef.write),
@@ -203,7 +203,7 @@ export const runTests = <ClientEnv>(
     name: 'auth state changes to signed in after sign in',
     expect: ({ client }) =>
       pipe(
-        fromIO(ioRef.newIORef<Option<string>>(option.none)),
+        fromIO(ioRef.newIORef<Option<{ readonly uid: string }>>(option.none)),
         then((authStateRef) =>
           pipe(
             fromIO(client.auth.onAuthStateChanged(authStateRef.write)),
@@ -225,7 +225,7 @@ export const runTests = <ClientEnv>(
     name: 'auth state changes to signed out after sign in and then sign out',
     expect: ({ client }) =>
       pipe(
-        fromIO(ioRef.newIORef<Option<string>>(option.none)),
+        fromIO(ioRef.newIORef<Option<{ readonly uid: string }>>(option.none)),
         then((authStateRef) =>
           pipe(
             fromIO(client.auth.onAuthStateChanged(authStateRef.write)),
@@ -247,7 +247,7 @@ export const runTests = <ClientEnv>(
     name: 'auth state does not change after unsubscribed',
     expect: ({ client }) =>
       pipe(
-        fromIO(ioRef.newIORef<Option<string>>(option.none)),
+        fromIO(ioRef.newIORef<Option<{ readonly uid: string }>>(option.none)),
         then((authStateRef) =>
           pipe(
             fromIO(client.auth.onAuthStateChanged(authStateRef.write)),
