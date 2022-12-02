@@ -1,25 +1,71 @@
-import { either, io, ioEither, option, readonlyRecord, string, taskEither } from 'fp-ts';
+import { either, io, ioEither, ioOption, option, readonlyRecord, string, taskEither } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 
+import type { AuthState, DocData, Stack as StackType } from '../../../type';
 import type { Stack } from '../../type';
-import { setObjectItem } from '../../util';
+import { getItem, setObjectItem } from '../../util';
+import { authLocalStorageKey } from '../util';
 import { dbLocalStorageKey, getDb } from './util';
+
 type Type = Stack['client']['db']['upsertDoc'];
+
+const compare = (
+  docData: DocData,
+  authState: AuthState,
+  _authUid: StackType.ci.DeployDb.AuthUid,
+  documentField: StackType.ci.DeployDb.DocumentField
+) =>
+  pipe(
+    authState,
+    option.map(({ uid }) => docData[documentField.fieldName] === uid),
+    option.getOrElse(() => false)
+  );
+
+const validateEqual = (
+  docData: DocData,
+  authState: AuthState,
+  { compare: [lhs, rhs] }: StackType.ci.DeployDb.Equal
+): boolean =>
+  (lhs.type === 'AuthUid' &&
+    rhs.type === 'DocumentField' &&
+    compare(docData, authState, lhs, rhs)) ||
+  (rhs.type === 'AuthUid' && lhs.type === 'DocumentField' && compare(docData, authState, rhs, lhs));
+
+const validateSecurityRule =
+  (docData: DocData, authState: AuthState) =>
+  (rule: StackType.ci.DeployDb.CreateRule): boolean =>
+    rule.type === 'True' || validateEqual(docData, authState, rule);
 
 export const upsertDoc: Type = (env) => (param) =>
   pipe(
-    env.dbDeployConfig.read,
-    io.map(
-      either.fromOption(() => ({
-        code: 'ProviderError' as const,
-        provider: 'mock',
-        value: 'db deploy config not found',
-      }))
+    ioEither.Do,
+    ioEither.bindW('config', () =>
+      pipe(
+        env.dbDeployConfig.read,
+        io.map(
+          either.fromOption(() => ({
+            code: 'ProviderError' as const,
+            provider: 'mock',
+            value: 'db deploy config not found',
+          }))
+        )
+      )
+    ),
+    ioEither.bindW('authState', () =>
+      pipe(
+        getItem(env.getWindow, authLocalStorageKey),
+        ioOption.map((uid) => ({ uid })),
+        ioEither.fromIO
+      )
     ),
     ioEither.chainEitherKW(
       either.fromPredicate(
-        (config) =>
-          config[param.key.collection]?.securityRule?.create?.type === 'True' &&
+        ({ config, authState }) =>
+          pipe(
+            option.fromNullable(config[param.key.collection]?.securityRule?.create),
+            option.map(validateSecurityRule(param.data, authState)),
+            option.getOrElse(() => false)
+          ) &&
           pipe(
             param.data,
             readonlyRecord.mapWithIndex(

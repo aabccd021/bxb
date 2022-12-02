@@ -1,23 +1,23 @@
 import type { TaskEither } from 'fp-ts/TaskEither';
 
-type StringField = {
+export type StringField = {
   readonly type: 'StringField';
 };
 
-type IntField = {
+export type IntField = {
   readonly type: 'IntField';
 };
 
-type True = {
+export type True = {
   readonly type: 'True';
 };
 
-type DocumentField = {
+export type DocumentField = {
   readonly type: 'DocumentField';
   readonly fieldName: string;
 };
 
-type AuthUid = {
+export type AuthUid = {
   readonly type: 'AuthUid';
 };
 
@@ -25,20 +25,24 @@ type Commutative<T> = T extends readonly [infer A, infer B]
   ? readonly [A, B] | readonly [B, A]
   : never;
 
-type Equal = {
+export type Comparable = Commutative<readonly [DocumentField, AuthUid]>;
+
+export type Equal = {
   readonly type: 'Equal';
-  readonly compare: Commutative<readonly [DocumentField, AuthUid]>;
+  readonly compare: Comparable;
 };
 
 export type Field = IntField | StringField;
 
 export type Schema = Record<string, Field>;
 
+export type CreateRule = Equal | True;
+
 export type CollectionConfig = {
   readonly schema: Schema;
   readonly securityRule?: {
     readonly get?: True;
-    readonly create?: True | Equal;
+    readonly create?: CreateRule;
   };
 };
 

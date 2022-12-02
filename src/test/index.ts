@@ -611,4 +611,29 @@ export const runTests = <ClientEnv>(
       ),
     toResult: either.left({ code: 'ForbiddenError' }),
   });
+
+  test({
+    name: `can not create tweet if not signed in, swap comparation`,
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          tweet: {
+            schema: { owner: { type: 'StringField' } },
+            securityRule: {
+              create: {
+                type: 'Equal',
+                compare: [{ type: 'DocumentField', fieldName: 'owner' }, { type: 'AuthUid' }],
+              },
+            },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'tweet', id: '1' },
+            data: { owner: 'random auth user uid' },
+          })
+        )
+      ),
+    toResult: either.left({ code: 'ForbiddenError' }),
+  });
 };

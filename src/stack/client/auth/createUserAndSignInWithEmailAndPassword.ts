@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/function';
 
 import type { Stack } from '../../type';
 import { getItem, setItem } from '../../util';
-import { authLocalStorageKey } from './util';
+import { authLocalStorageKey } from '../util';
 
 type Type = Stack['client']['auth']['createUserAndSignInWithEmailAndPassword'];
 
