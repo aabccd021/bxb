@@ -809,19 +809,73 @@ export const runTests = <ClientEnv>(
   });
 
   test({
+    name: 'can upsert on server and get doc on client',
+    expect: ({ server, client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              get: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          server.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+      ),
+    toResult: either.right(option.some({ name: 'masumoto' })),
+  });
+
+  test({
+    name: 'can upsert on client and get doc on server',
+    expect: ({ server, client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: { create: { type: 'True' } },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() => server.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+      ),
+    toResult: either.right(option.some({ name: 'masumoto' })),
+  });
+
+  test({
     name: `can upsert doc when user created`,
     expect: ({ client, ci }) =>
       pipe(
-        ci.deployFunctions({
-          detectUserExists: {
-            trigger: 'onAuthCreated',
-            handler: ({ server }) =>
-              server.db.upsertDoc({
-                key: { collection: 'detection', id: '1' },
-                data: { status: 'true' },
-              }),
+        ci.deployDb({
+          detection: {
+            schema: { status: { type: 'StringField' } },
+            securityRule: { get: { type: 'True' } },
           },
         }),
+        then(() =>
+          ci.deployFunctions({
+            functions: {
+              detectUserExists: {
+                trigger: 'onAuthCreated',
+                handler: ({ server }) =>
+                  server.db.upsertDoc({
+                    key: { collection: 'detection', id: '1' },
+                    data: { status: 'true' },
+                  }),
+              },
+            },
+          })
+        ),
         then(() =>
           client.auth.createUserAndSignInWithEmailAndPassword({
             email: 'kira@sakurazaka.com',

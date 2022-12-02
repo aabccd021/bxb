@@ -19,6 +19,7 @@ export type MockableWindow = DeepPick<
 export type Env = {
   readonly onAuthStateChangedCallback: IORef<Option<Stack.client.auth.OnAuthStateChanged.Param>>;
   readonly dbDeployConfig: IORef<Option<Stack.ci.DeployDb.Param>>;
+  readonly functions: IORef<Option<Stack.ci.DeployFunctions.Param>>;
   readonly getWindow: IO<MockableWindow>;
 };
 

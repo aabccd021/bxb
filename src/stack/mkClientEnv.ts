@@ -7,6 +7,7 @@ export const mkClientEnvFromWindow = (getGetWindow: IO<IO<MockableWindow>>): IO<
   apply.sequenceS(io.Apply)({
     onAuthStateChangedCallback: ioRef.newIORef(option.none),
     dbDeployConfig: ioRef.newIORef(option.none),
+    functions: ioRef.newIORef(option.none),
     getWindow: getGetWindow,
   });
 
