@@ -1,7 +1,8 @@
-import { taskEither } from 'fp-ts';
-
+import { augmentCapability } from '../../..';
 import type { Stack } from '../../type';
+import { onAuthStateChanged } from './onAuthStateChanged';
 
 type Type = Stack['client']['auth']['getAuthState'];
 
-export const getAuthState: Type = () => taskEither.left({ code: 'not implemented' });
+export const getAuthState: Type =
+  augmentCapability.getAuthState.fromOnAuthStateChanged(onAuthStateChanged);
