@@ -33,6 +33,9 @@ const mkTest =
               storage: readerS(stack.client.storage),
             }),
             ci: readerS(stack.ci),
+            server: readerS({
+              db: readerS(stack.server.db),
+            }),
           })
         ),
         then(fn)

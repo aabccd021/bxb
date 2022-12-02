@@ -33,4 +33,5 @@ export type ApplyClientEnv<ClientEnv, K extends Record<string, Record<string, un
 export type StackWithEnv<ClientEnv> = {
   readonly ci: ApplyClientEnvScope<ClientEnv, Stack.ci.Type>;
   readonly client: ApplyClientEnv<ClientEnv, Stack.client.Type>;
+  readonly server: ApplyClientEnv<ClientEnv, Stack.server.Type>;
 };

@@ -2,7 +2,7 @@ import { either, io, ioEither, option, readonlyRecord, taskEither } from 'fp-ts'
 import { flow, pipe } from 'fp-ts/function';
 
 import type { Stack } from '../../type';
-import { getDb } from './util';
+import { getDb } from '../../util';
 type Type = Stack['client']['db']['getDoc'];
 
 export const getDoc: Type = (env) => (param) =>

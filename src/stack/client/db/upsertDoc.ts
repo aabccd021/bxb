@@ -3,9 +3,8 @@ import { flow, pipe } from 'fp-ts/function';
 
 import type { AuthState, DocData, Stack as StackType } from '../../../type';
 import type { Stack } from '../../type';
-import { getItem, setObjectItem } from '../../util';
+import { dbLocalStorageKey, getDb, getItem, setObjectItem } from '../../util';
 import { authLocalStorageKey } from '../util';
-import { dbLocalStorageKey, getDb } from './util';
 
 type Type = Stack['client']['db']['upsertDoc'];
 

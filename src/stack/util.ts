@@ -2,6 +2,7 @@ import { either, io, ioOption, option } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 import type { IO } from 'fp-ts/IO';
 import type { Refinement } from 'fp-ts/Refinement';
+import * as t from 'io-ts';
 
 import type { MockableWindow } from './type';
 
@@ -41,3 +42,14 @@ export const getObjectItem = <T, K>(
 
 export const setObjectItem = <T>(getWindow: IO<MockableWindow>, key: string, data: T) =>
   pipe(data, JSON.stringify, (typeSafeData) => setItem(getWindow, key, typeSafeData));
+
+const DB = t.record(t.string, t.record(t.string, t.unknown));
+
+export const dbLocalStorageKey = 'db';
+
+export const getDb = (getWindow: IO<MockableWindow>) =>
+  getObjectItem(getWindow, dbLocalStorageKey, DB.is, (data) => ({
+    code: 'ProviderError' as const,
+    provider: 'mock',
+    value: { message: 'invalid db data loaded', data },
+  }));
