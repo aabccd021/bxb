@@ -3,7 +3,7 @@ import type { Either } from 'fp-ts/Either';
 import { identity, pipe } from 'fp-ts/function';
 import type { TaskEither } from 'fp-ts/TaskEither';
 // eslint-disable-next-line fp-ts/no-module-imports
-import { chainW as then, fromIO, map, right, tryCatch } from 'fp-ts/TaskEither';
+import { chainEitherKW, chainW as then, fromIO, map, right, tryCatch } from 'fp-ts/TaskEither';
 import fetch from 'node-fetch';
 import { describe, expect, test as test_ } from 'vitest';
 
@@ -518,5 +518,97 @@ export const runTests = <ClientEnv>(
         then(() => client.auth.getAuthState)
       ),
     toResult: either.right(option.none),
+  });
+
+  test({
+    name: `can create tweet if owner field value is owner's auth uid`,
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          tweet: {
+            schema: { owner: { type: 'StringField' } },
+            securityRule: {
+              create: {
+                type: 'Equal',
+                compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+              },
+            },
+          },
+        }),
+        then(() =>
+          client.auth.createUserAndSignInWithEmailAndPassword({
+            email: 'kira@sakurazaka.com',
+            password: 'dorokatsu',
+          })
+        ),
+        then(() => client.auth.getAuthState),
+        chainEitherKW(either.fromOption(() => ({ code: 'user not signed in' }))),
+        then((authUser) =>
+          client.db.upsertDoc({
+            key: { collection: 'tweet', id: '1' },
+            data: { owner: authUser.uid },
+          })
+        ),
+        map(() => 'upsert success')
+      ),
+    toResult: either.right('upsert success'),
+  });
+
+  test({
+    name: `can not create tweet if owner field value is not owner's auth uid, even if signed in`,
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          tweet: {
+            schema: { owner: { type: 'StringField' } },
+            securityRule: {
+              create: {
+                type: 'Equal',
+                compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+              },
+            },
+          },
+        }),
+        then(() =>
+          client.auth.createUserAndSignInWithEmailAndPassword({
+            email: 'kira@sakurazaka.com',
+            password: 'dorokatsu',
+          })
+        ),
+        then(() => client.auth.getAuthState),
+        chainEitherKW(either.fromOption(() => ({ code: 'user not signed in' }))),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'tweet', id: '1' },
+            data: { owner: 'random auth user uid' },
+          })
+        )
+      ),
+    toResult: either.left({ code: 'ForbiddenError' }),
+  });
+
+  test({
+    name: `can not create tweet if not signed in`,
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          tweet: {
+            schema: { owner: { type: 'StringField' } },
+            securityRule: {
+              create: {
+                type: 'Equal',
+                compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+              },
+            },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'tweet', id: '1' },
+            data: { owner: 'random auth user uid' },
+          })
+        )
+      ),
+    toResult: either.left({ code: 'ForbiddenError' }),
   });
 };
