@@ -426,4 +426,38 @@ export const runTests = <ClientEnv>(
       ),
     toResult: either.left({ code: 'ForbiddenError' }),
   });
+
+  test({
+    name: 'initial result of getAuthState is signed out',
+    expect: ({ client }) => client.auth.getAuthState,
+    toResult: either.right(option.none),
+  });
+
+  test({
+    name: 'getAuthState returns signed in after sign in',
+    expect: ({ client }) =>
+      pipe(
+        client.auth.createUserAndSignInWithEmailAndPassword({
+          email: 'kira@sakurazaka.com',
+          password: 'dorokatsu',
+        }),
+        then(() => client.auth.getAuthState),
+        map(option.isSome)
+      ),
+    toResult: either.right(true),
+  });
+
+  test({
+    name: 'getAuthState returns signed out after sign in and then sign out',
+    expect: ({ client }) =>
+      pipe(
+        client.auth.createUserAndSignInWithEmailAndPassword({
+          email: 'kira@sakurazaka.com',
+          password: 'dorokatsu',
+        }),
+        then(() => client.auth.signOut),
+        then(() => client.auth.getAuthState)
+      ),
+    toResult: either.right(option.none),
+  });
 };
