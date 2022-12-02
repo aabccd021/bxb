@@ -1,14 +1,10 @@
 import { option } from 'fp-ts';
-import { Option } from 'fp-ts/lib/Option';
 import { useEffect, useMemo, useState } from 'react';
 
-import { masmott } from '../masmott';
+import { pipe } from 'fp-ts/lib/function';
 import { AuthState } from 'masmott';
+import { masmott } from '../masmott';
 
-const mapToAuthStatus = option.match(
-  () => 'not signed in',
-  (s) => `email : ${s}`
-);
 
 const useAuthState = () => {
   const [authState, setAuthState] = useState<AuthState>(option.none);
@@ -21,7 +17,7 @@ const useAuthState = () => {
 
 const useHome = () => {
   const authState = useAuthState();
-  const authStateStr = useMemo(() => mapToAuthStatus(authState), [authState]);
+  const authStateStr = useMemo(() => pipe(authState, option.match(() => 'not signed in', (s) => `email : ${s.uid}`)), [authState]);
   return {
     authStateStr,
   };
