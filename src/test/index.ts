@@ -807,4 +807,29 @@ export const runTests = <ClientEnv>(
       ),
     toResult: either.left({ code: 'ForbiddenError' }),
   });
+
+  test({
+    name: `can upsert doc when user created`,
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployFunctions({
+          detectUserExists: {
+            trigger: 'onAuthCreated',
+            handler: ({ server }) =>
+              server.db.upsertDoc({
+                key: { collection: 'detection', id: '1' },
+                data: { status: 'true' },
+              }),
+          },
+        }),
+        then(() =>
+          client.auth.createUserAndSignInWithEmailAndPassword({
+            email: 'kira@sakurazaka.com',
+            password: 'dorokatsu',
+          })
+        ),
+        then(() => client.db.getDoc({ key: { collection: 'detection', id: '1' } }))
+      ),
+    toResult: either.right(option.some({ status: 'true' })),
+  });
 };
