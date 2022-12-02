@@ -221,6 +221,26 @@ export const runTests = <ClientEnv>(
   });
 
   test({
+    name: 'auth state changes to signed in after sign in when subscribed',
+    expect: ({ client }) =>
+      pipe(
+        fromIO(ioRef.newIORef<AuthState>(option.none)),
+        then((authStateRef) =>
+          pipe(
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            }),
+            then(() => fromIO(client.auth.onAuthStateChanged(authStateRef.write))),
+            then(() => fromIO(authStateRef.read))
+          )
+        ),
+        map(option.isSome)
+      ),
+    toResult: either.right(true),
+  });
+
+  test({
     name: 'auth state changes to signed out after sign in and then sign out',
     expect: ({ client }) =>
       pipe(
@@ -234,6 +254,46 @@ export const runTests = <ClientEnv>(
                 password: 'dorokatsu',
               })
             ),
+            then(() => client.auth.signOut),
+            then(() => fromIO(authStateRef.read))
+          )
+        )
+      ),
+    toResult: either.right(option.none),
+  });
+
+  test({
+    name: 'auth state changes to signed out after sign in and then sign out and subscribe',
+    expect: ({ client }) =>
+      pipe(
+        fromIO(ioRef.newIORef<AuthState>(option.none)),
+        then((authStateRef) =>
+          pipe(
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            }),
+            then(() => client.auth.signOut),
+            then(() => fromIO(client.auth.onAuthStateChanged(authStateRef.write))),
+            then(() => fromIO(authStateRef.read))
+          )
+        )
+      ),
+    toResult: either.right(option.none),
+  });
+
+  test({
+    name: `auth state changes to signed out after sign in and then sign out when subscribed in between`,
+    expect: ({ client }) =>
+      pipe(
+        fromIO(ioRef.newIORef<AuthState>(option.none)),
+        then((authStateRef) =>
+          pipe(
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            }),
+            then(() => fromIO(client.auth.onAuthStateChanged(authStateRef.write))),
             then(() => client.auth.signOut),
             then(() => fromIO(authStateRef.read))
           )
