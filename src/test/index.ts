@@ -1,14 +1,13 @@
 import { apply, either, io, ioRef, option, reader } from 'fp-ts';
 import type { Either } from 'fp-ts/Either';
 import { identity, pipe } from 'fp-ts/function';
-import type { Option } from 'fp-ts/Option';
 import type { TaskEither } from 'fp-ts/TaskEither';
 // eslint-disable-next-line fp-ts/no-module-imports
 import { chainW as then, fromIO, map, right, tryCatch } from 'fp-ts/TaskEither';
 import fetch from 'node-fetch';
 import { describe, expect, test as test_ } from 'vitest';
 
-import type { Stack, StackWithEnv } from '../type';
+import type { AuthState, Stack, StackWithEnv } from '../type';
 
 const readerS = apply.sequenceS(reader.Apply);
 
@@ -187,7 +186,7 @@ export const runTests = <ClientEnv>(
     name: 'initial auth state is signed out',
     expect: ({ client }) =>
       pipe(
-        ioRef.newIORef<Option<{ readonly uid: string }>>(option.none),
+        ioRef.newIORef<AuthState>(option.none),
         io.chain((authStateRef) =>
           pipe(
             client.auth.onAuthStateChanged(authStateRef.write),
@@ -203,7 +202,7 @@ export const runTests = <ClientEnv>(
     name: 'auth state changes to signed in after sign in',
     expect: ({ client }) =>
       pipe(
-        fromIO(ioRef.newIORef<Option<{ readonly uid: string }>>(option.none)),
+        fromIO(ioRef.newIORef<AuthState>(option.none)),
         then((authStateRef) =>
           pipe(
             fromIO(client.auth.onAuthStateChanged(authStateRef.write)),
@@ -225,7 +224,7 @@ export const runTests = <ClientEnv>(
     name: 'auth state changes to signed out after sign in and then sign out',
     expect: ({ client }) =>
       pipe(
-        fromIO(ioRef.newIORef<Option<{ readonly uid: string }>>(option.none)),
+        fromIO(ioRef.newIORef<AuthState>(option.none)),
         then((authStateRef) =>
           pipe(
             fromIO(client.auth.onAuthStateChanged(authStateRef.write)),
@@ -247,7 +246,7 @@ export const runTests = <ClientEnv>(
     name: 'auth state does not change after unsubscribed',
     expect: ({ client }) =>
       pipe(
-        fromIO(ioRef.newIORef<Option<{ readonly uid: string }>>(option.none)),
+        fromIO(ioRef.newIORef<AuthState>(option.none)),
         then((authStateRef) =>
           pipe(
             fromIO(client.auth.onAuthStateChanged(authStateRef.write)),
