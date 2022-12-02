@@ -118,6 +118,50 @@ export const runTests = <ClientEnv>(
     });
   });
 
+  describe('db is independent between tests using server API', () => {
+    test({
+      name: 'a server can create document kira',
+      expect: ({ server, ci }) =>
+        pipe(
+          ci.deployDb({
+            user: {
+              schema: { name: { type: 'StringField' } },
+              securityRule: {
+                create: { type: 'True' },
+                get: { type: 'True' },
+              },
+            },
+          }),
+          then(() =>
+            server.db.upsertDoc({
+              key: { collection: 'user', id: 'kira_id' },
+              data: { name: 'masumoto' },
+            })
+          ),
+          then(() => server.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+        ),
+      toResult: either.right(option.some({ name: 'masumoto' })),
+    });
+
+    test({
+      name: 'another test can not access document kira using server API',
+      expect: ({ server, ci }) =>
+        pipe(
+          ci.deployDb({
+            user: {
+              schema: { name: { type: 'StringField' } },
+              securityRule: {
+                create: { type: 'True' },
+                get: { type: 'True' },
+              },
+            },
+          }),
+          then(() => server.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+        ),
+      toResult: either.right(option.none),
+    });
+  });
+
   describe('user is independent between test', () => {
     test({
       name: 'a test can create user kira for the first time and return error for the second time',
@@ -505,6 +549,109 @@ export const runTests = <ClientEnv>(
   });
 
   test({
+    name: 'server API can upsert and get doc',
+    expect: ({ server, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              create: { type: 'True' },
+              get: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          server.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() => server.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+      ),
+    toResult: either.right(option.some({ name: 'masumoto' })),
+  });
+
+  test({
+    name: 'server db API can get doc even if not allowed by security rule',
+    expect: ({ server, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              create: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          server.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() => server.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+      ),
+    toResult: either.right(option.some({ name: 'masumoto' })),
+  });
+
+  test({
+    name: 'server db API can upsert doc',
+    expect: ({ server, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: { create: { type: 'True' } },
+          },
+        }),
+        then(() =>
+          server.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() => right('upload success'))
+      ),
+    toResult: either.right('upload success'),
+  });
+
+  test({
+    name: 'server db API can upsert doc if not explicitly allowed',
+    expect: ({ server, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: { get: { type: 'True' } },
+          },
+        }),
+        then(() =>
+          server.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() => right('upload success'))
+      ),
+    toResult: either.right('upload success'),
+  });
+
+  test({
+    name: 'server db API can get doc if not allowed, even if the doc does not exists',
+    expect: ({ server, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+          },
+        }),
+        then(() => server.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+      ),
+    toResult: either.right(option.none),
+  });
+
+  test({
     name: 'getAuthState returns signed out after sign in and then sign out',
     expect: ({ client }) =>
       pipe(
@@ -608,6 +755,32 @@ export const runTests = <ClientEnv>(
         )
       ),
     toResult: either.left({ code: 'ForbiddenError' }),
+  });
+
+  test({
+    name: `server db API can create tweet even if not signed in`,
+    expect: ({ server, ci }) =>
+      pipe(
+        ci.deployDb({
+          tweet: {
+            schema: { owner: { type: 'StringField' } },
+            securityRule: {
+              create: {
+                type: 'Equal',
+                compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+              },
+            },
+          },
+        }),
+        then(() =>
+          server.db.upsertDoc({
+            key: { collection: 'tweet', id: '1' },
+            data: { owner: 'random auth user uid' },
+          })
+        ),
+        map(() => 'upsert success')
+      ),
+    toResult: either.right('upsert success'),
   });
 
   test({
