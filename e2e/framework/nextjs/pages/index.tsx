@@ -3,6 +3,7 @@ import { Option } from 'fp-ts/lib/Option';
 import { useEffect, useMemo, useState } from 'react';
 
 import { masmott } from '../masmott';
+import { AuthState } from 'masmott';
 
 const mapToAuthStatus = option.match(
   () => 'not signed in',
@@ -10,7 +11,7 @@ const mapToAuthStatus = option.match(
 );
 
 const useAuthState = () => {
-  const [authState, setAuthState] = useState<Option<string>>(option.none);
+  const [authState, setAuthState] = useState<AuthState>(option.none);
   useEffect(
     () => masmott.auth.onAuthStateChanged((newAuthState) => () => setAuthState(newAuthState))(),
     [setAuthState]
