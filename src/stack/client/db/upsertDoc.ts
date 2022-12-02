@@ -1,4 +1,14 @@
-import { either, io, ioEither, ioOption, option, readonlyRecord, string, taskEither } from 'fp-ts';
+import {
+  apply,
+  either,
+  io,
+  ioEither,
+  ioOption,
+  option,
+  readonlyRecord,
+  string,
+  taskEither,
+} from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 
 import type { AuthState, DocData, Stack as StackType } from '../../../type';
@@ -37,9 +47,8 @@ const validateSecurityRule =
 
 export const upsertDoc: Type = (env) => (param) =>
   pipe(
-    ioEither.Do,
-    ioEither.bindW('config', () =>
-      pipe(
+    {
+      config: pipe(
         env.dbDeployConfig.read,
         io.map(
           either.fromOption(() => ({
@@ -48,15 +57,14 @@ export const upsertDoc: Type = (env) => (param) =>
             value: 'db deploy config not found',
           }))
         )
-      )
-    ),
-    ioEither.bindW('authState', () =>
-      pipe(
+      ),
+      authState: pipe(
         getItem(env.getWindow, authLocalStorageKey),
         ioOption.map((uid) => ({ uid })),
         ioEither.fromIO
-      )
-    ),
+      ),
+    },
+    apply.sequenceS(ioEither.ApplyPar),
     ioEither.chainEitherKW(
       either.fromPredicate(
         ({ config, authState }) =>
