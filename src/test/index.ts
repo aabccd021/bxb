@@ -886,4 +886,33 @@ export const runTests = <ClientEnv>(
       ),
     toResult: either.right(option.some({ status: 'true' })),
   });
+
+  test({
+    name: `function not triggered if not signed in`,
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          detection: {
+            schema: { status: { type: 'StringField' } },
+            securityRule: { get: { type: 'True' } },
+          },
+        }),
+        then(() =>
+          ci.deployFunctions({
+            functions: {
+              detectUserExists: {
+                trigger: 'onAuthCreated',
+                handler: ({ server }) =>
+                  server.db.upsertDoc({
+                    key: { collection: 'detection', id: '1' },
+                    data: { status: 'true' },
+                  }),
+              },
+            },
+          })
+        ),
+        then(() => client.db.getDoc({ key: { collection: 'detection', id: '1' } }))
+      ),
+    toResult: either.right(option.none),
+  });
 };
