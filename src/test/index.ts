@@ -8,20 +8,19 @@ import fetch from 'node-fetch';
 import { describe, expect, test as test_ } from 'vitest';
 
 import type { AuthState, Stack, StackWithEnv } from '../type';
+import * as aab from './aab';
 
 const readerS = apply.sequenceS(reader.Apply);
 
+export type Test<T> = {
+  readonly name: string;
+  readonly expect: (stack: Stack.Type) => TaskEither<unknown, T>;
+  readonly toResult: Either<unknown, T>;
+};
+
 const mkTest =
   <ClientEnv>(stack: StackWithEnv<ClientEnv>, getTestClientEnv: TaskEither<unknown, ClientEnv>) =>
-  <T>({
-    name,
-    expect: fn,
-    toResult,
-  }: {
-    readonly name: string;
-    readonly expect: (stack: Stack.Type) => TaskEither<unknown, T>;
-    readonly toResult: Either<unknown, T>;
-  }) =>
+  <T>({ name, expect: fn, toResult }: Test<T>) =>
     test_(name, async () => {
       const result = pipe(
         getTestClientEnv,
@@ -915,4 +914,6 @@ export const runTests = <ClientEnv>(
       ),
     toResult: either.right(option.none),
   });
+
+  test(aab.test);
 };
