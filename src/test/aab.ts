@@ -38,7 +38,13 @@ export const test: Test<unknown> = {
         )
       ),
       then(ci.deployFunctions),
-      then(() => client.db.getDoc({ key: { collection: 'detection', id: '0' } }))
+      then(() =>
+        client.auth.createUserAndSignInWithEmailAndPassword({
+          email: 'kira@sakurazaka.com',
+          password: 'dorokatsu',
+        })
+      ),
+      then(() => client.db.getDoc({ key: { collection: 'detection', id: '1' } }))
     ),
-  toResult: either.right(option.none),
+  toResult: either.right(option.some({ status: 'true' })),
 };
