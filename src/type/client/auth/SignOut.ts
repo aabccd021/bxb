@@ -4,4 +4,4 @@ import type { ProviderError } from '../..';
 
 export type Error = ProviderError;
 
-export type Fn = TaskEither<Error, void>;
+export type Fn = TaskEither<Error, undefined | void>;

@@ -6,7 +6,7 @@ export type OnAuthCreatedFunction = {
   readonly trigger: 'onAuthCreated';
   readonly handler: (p: {
     readonly authUser: AuthUser;
-  }) => TaskEither<{ readonly code: string }, void>;
+  }) => TaskEither<{ readonly code: string }, undefined | void>;
 };
 
 export type Functions = OnAuthCreatedFunction;

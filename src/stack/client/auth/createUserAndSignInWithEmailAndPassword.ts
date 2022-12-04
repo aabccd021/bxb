@@ -34,8 +34,7 @@ export const createUserAndSignInWithEmailAndPassword: Type = (env) => (param) =>
         ),
         taskEither.bimap(
           (value) => ({ code: 'ProviderError' as const, value }),
-          // eslint-disable-next-line functional/no-return-void
-          (): void => undefined
+          () => undefined
         )
       )
     )

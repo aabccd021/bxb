@@ -2,7 +2,7 @@ import type { IO } from 'fp-ts/IO';
 
 import type { AuthState } from '../..';
 
-export type Param = (authState: AuthState) => IO<void>;
+export type Param = (authState: AuthState) => IO<undefined | void>;
 
 export type Unsubscribe = IO<void>;
 

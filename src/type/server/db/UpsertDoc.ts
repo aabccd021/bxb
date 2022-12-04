@@ -19,4 +19,4 @@ export type ForbiddenError = {
 
 export type Error = ForbiddenError | ProviderError;
 
-export type Fn = (p: Param) => TaskEither<Error, void>;
+export type Fn = (p: Param) => TaskEither<Error, undefined | void>;

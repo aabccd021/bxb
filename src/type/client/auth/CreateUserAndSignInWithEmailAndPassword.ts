@@ -9,4 +9,4 @@ export type Param = {
 
 export type Error = ProviderError | { readonly code: 'EmailAlreadyInUse' };
 
-export type Fn = (p: Param) => TaskEither<Error, void>;
+export type Fn = (p: Param) => TaskEither<Error, undefined | void>;
