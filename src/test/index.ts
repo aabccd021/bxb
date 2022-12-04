@@ -853,7 +853,7 @@ export const runTests = <ClientEnv>(
 
   test({
     name: `can upsert doc when user created`,
-    expect: ({ client, ci }) =>
+    expect: ({ client, ci, server }) =>
       pipe(
         ci.deployDb({
           detection: {
@@ -866,7 +866,7 @@ export const runTests = <ClientEnv>(
             functions: {
               detectUserExists: {
                 trigger: 'onAuthCreated',
-                handler: ({ server }) =>
+                handler: () =>
                   server.db.upsertDoc({
                     key: { collection: 'detection', id: '1' },
                     data: { status: 'true' },
@@ -888,7 +888,7 @@ export const runTests = <ClientEnv>(
 
   test({
     name: `function not triggered if not signed in`,
-    expect: ({ client, ci }) =>
+    expect: ({ client, ci, server }) =>
       pipe(
         ci.deployDb({
           detection: {
@@ -901,7 +901,7 @@ export const runTests = <ClientEnv>(
             functions: {
               detectUserExists: {
                 trigger: 'onAuthCreated',
-                handler: ({ server }) =>
+                handler: () =>
                   server.db.upsertDoc({
                     key: { collection: 'detection', id: '1' },
                     data: { status: 'true' },

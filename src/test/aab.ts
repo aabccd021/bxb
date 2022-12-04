@@ -6,22 +6,24 @@ import { chainW as then, tryCatch } from 'fp-ts/TaskEither';
 import type { Stack } from '../type';
 import type { Test } from '.';
 
-export const functions: Stack.ci.DeployFunctions.Param = {
+type Type = (server: Stack.server.Type) => Stack.ci.DeployFunctions.Param;
+
+export const makeFunctions: Type = (server) => ({
   functions: {
     detectUserExists: {
       trigger: 'onAuthCreated',
-      handler: ({ server }) =>
+      handler: () =>
         server.db.upsertDoc({
           key: { collection: 'detection', id: '1' },
           data: { status: 'true' },
         }),
     },
   },
-};
+});
 
 export const test: Test<unknown> = {
   name: `aabccd`,
-  expect: ({ client, ci }) =>
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
         detection: {
@@ -33,7 +35,7 @@ export const test: Test<unknown> = {
         tryCatch(
           async () =>
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            await import(__filename).then((f) => f.functions as Stack.ci.DeployFunctions.Param),
+            await import(__filename).then((f) => (f.makeFunctions as Type)(server)),
           () => ({ code: 'aabccd' })
         )
       ),
