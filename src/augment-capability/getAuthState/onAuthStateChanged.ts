@@ -1,4 +1,4 @@
-import { io, ioRef, option, taskEither } from 'fp-ts';
+import { ioRef, option, task, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
 import type { AuthState, Stack } from '../..';
@@ -10,12 +10,13 @@ export const fromOnAuthStateChanged =
   (env) =>
     pipe(
       ioRef.newIORef<AuthState>(option.none),
-      io.chain((authStateRef) =>
+      task.fromIO,
+      task.chain((authStateRef) =>
         pipe(
-          onAuthStateChanged(env)(authStateRef.write),
-          io.chain((unsubscribe) => unsubscribe),
-          io.chain(() => authStateRef.read)
+          task.fromIO(onAuthStateChanged(env)(authStateRef.write)),
+          task.chain((unsubscribe) => task.fromIO(unsubscribe)),
+          task.chain(() => task.fromIO(authStateRef.read))
         )
       ),
-      taskEither.fromIO
+      taskEither.fromTask
     );
