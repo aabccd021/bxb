@@ -1,3 +1,4 @@
+import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import type { TaskEither } from 'fp-ts/TaskEither';
 
 export type StringField = {
@@ -34,7 +35,7 @@ export type Equal = {
 
 export type Field = IntField | StringField;
 
-export type Schema = Record<string, Field>;
+export type Schema = ReadonlyRecord<string, Field>;
 
 export type CreateRule = Equal | True;
 
@@ -46,6 +47,6 @@ export type CollectionConfig = {
   };
 };
 
-export type Param = Record<string, CollectionConfig>;
+export type Param = ReadonlyRecord<string, CollectionConfig>;
 
 export type Fn = (c: Param) => TaskEither<{ readonly code: string }, unknown>;
