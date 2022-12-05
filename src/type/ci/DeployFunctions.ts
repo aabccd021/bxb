@@ -1,18 +1,18 @@
 import type { TaskEither } from 'fp-ts/TaskEither';
 
-import type { AuthUser } from '..';
-
-export type OnAuthCreatedFunction = {
-  readonly trigger: 'onAuthCreated';
-  readonly handler: (p: {
-    readonly authUser: AuthUser;
-  }) => TaskEither<{ readonly code: string }, undefined | void>;
-};
-
-export type Functions = OnAuthCreatedFunction;
+import type { Stack } from '..';
 
 export type Param = {
-  readonly functions: Record<string, Functions>;
+  readonly functions: {
+    readonly path: string;
+    readonly exportName: string;
+  };
+  readonly server: Stack.server.Type;
 };
 
-export type Fn = (c: Param) => TaskEither<{ readonly code: string }, unknown>;
+type Error = {
+  readonly code: 'FailedLoadingFunctions';
+  readonly details?: unknown;
+};
+
+export type Fn = (c: Param) => TaskEither<Error, undefined | void>;

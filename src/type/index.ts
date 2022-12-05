@@ -1,4 +1,5 @@
 import type { Option } from 'fp-ts/Option';
+import type { TaskEither } from 'fp-ts/TaskEither';
 
 import type * as Stack from './stack';
 
@@ -34,4 +35,17 @@ export type StackWithEnv<ClientEnv> = {
   readonly ci: ApplyClientEnvScope<ClientEnv, Stack.ci.Type>;
   readonly client: ApplyClientEnv<ClientEnv, Stack.client.Type>;
   readonly server: ApplyClientEnv<ClientEnv, Stack.server.Type>;
+};
+
+export type OnAuthCreatedFunction = {
+  readonly trigger: 'onAuthCreated';
+  readonly handler: (p: {
+    readonly authUser: AuthUser;
+  }) => TaskEither<{ readonly code: string }, undefined | void>;
+};
+
+export type Functions = OnAuthCreatedFunction;
+
+export type DeployFunctionParam = {
+  readonly functions: Record<string, Functions>;
 };
