@@ -438,7 +438,7 @@ export const runTests = <T extends StackType>(
         ci.deployDb({
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: { get: { type: 'True' } },
+            securityRule: { create: { type: 'True' } },
           },
         }),
         then(() =>
@@ -458,7 +458,7 @@ export const runTests = <T extends StackType>(
         ci.deployDb({
           user: {
             schema: { name: { type: 'IntField' } },
-            securityRule: { get: { type: 'True' } },
+            securityRule: { create: { type: 'True' } },
           },
         }),
         then(() =>
@@ -478,7 +478,7 @@ export const runTests = <T extends StackType>(
         ci.deployDb({
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: { get: { type: 'True' } },
+            securityRule: { create: { type: 'True' } },
           },
         }),
         then(() =>
@@ -498,7 +498,7 @@ export const runTests = <T extends StackType>(
         ci.deployDb({
           user: {
             schema: {},
-            securityRule: { get: { type: 'True' } },
+            securityRule: { create: { type: 'True' } },
           },
         }),
         then(() =>
