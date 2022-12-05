@@ -193,6 +193,28 @@ export const runTests = <T extends StackType>(
     });
   });
 
+  describe('sign in state is independent between test', () => {
+    test({
+      name: 'a test can sign in and change state to signed in',
+      expect: ({ client }) =>
+        pipe(
+          client.auth.createUserAndSignInWithEmailAndPassword({
+            email: 'kira@sakurazaka.com',
+            password: 'dorokatsu',
+          }),
+          then(() => client.auth.getAuthState),
+          map(option.isSome)
+        ),
+      toResult: either.right(true),
+    });
+
+    test({
+      name: 'another test should initially signed out',
+      expect: ({ client }) => pipe(client.auth.getAuthState, map(option.isSome)),
+      toResult: either.right(false),
+    });
+  });
+
   test({
     name: 'can upload data url and get download url',
     expect: ({ client, ci }) =>
