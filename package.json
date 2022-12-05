@@ -7,7 +7,6 @@
     "nazna": "^1.14.2",
     "pnpm": "^7.17.0",
     "semantic-release": "^19.0.5",
-    "ts-essentials": "^9.3.0",
     "typescript": "^4.9.3",
     "vitest": "^0.24.5"
   },
@@ -58,6 +57,7 @@
     "make-union-morphic-ts": "^1.0.7",
     "next": "^13.0.4",
     "node-fetch": "^3.3.0",
+    "ts-essentials": "^9.3.0",
     "valid-data-url": "^4.0.1"
   }
 }
