@@ -31,10 +31,18 @@ export type ApplyClientEnv<ClientEnv, K extends Record<string, Record<string, un
   readonly [KK in keyof K]: ApplyClientEnvScope<ClientEnv, K[KK]>;
 };
 
-export type StackWithEnv<ClientEnv> = {
-  readonly ci: ApplyClientEnvScope<ClientEnv, Stack.ci.Type>;
-  readonly client: ApplyClientEnv<ClientEnv, Stack.client.Type>;
-  readonly server: ApplyClientEnv<ClientEnv, Stack.server.Type>;
+export type StackType = {
+  readonly env: {
+    readonly client: unknown;
+    readonly ci: unknown;
+    readonly server: unknown;
+  };
+};
+
+export type StackWithEnv<T extends StackType> = {
+  readonly ci: ApplyClientEnvScope<T['env']['ci'], Stack.ci.Type>;
+  readonly client: ApplyClientEnv<T['env']['client'], Stack.client.Type>;
+  readonly server: ApplyClientEnv<T['env']['server'], Stack.server.Type>;
 };
 
 export type OnAuthCreatedFunction = {

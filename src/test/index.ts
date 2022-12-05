@@ -7,7 +7,7 @@ import { chainEitherKW, chainW as then, fromIO, map, right, tryCatch } from 'fp-
 import fetch from 'node-fetch';
 import { describe, expect, test as test_ } from 'vitest';
 
-import type { AuthState, Stack, StackWithEnv } from '../type';
+import type { AuthState, Stack, StackType, StackWithEnv } from '../type';
 import * as aab from './aab';
 
 const readerS = apply.sequenceS(reader.Apply);
@@ -19,34 +19,32 @@ export type Test<T> = {
 };
 
 const mkTest =
-  <ClientEnv>(stack: StackWithEnv<ClientEnv>, getTestClientEnv: TaskEither<unknown, ClientEnv>) =>
-  <T>({ name, expect: fn, toResult }: Test<T>) =>
+  <T extends StackType>(stack: StackWithEnv<T>, getTestEnv: TaskEither<unknown, T['env']>) =>
+  <R>({ name, expect: fn, toResult }: Test<R>) =>
     test_(name, async () => {
       const result = pipe(
-        getTestClientEnv,
-        map(
-          readerS({
-            client: readerS({
-              auth: readerS(stack.client.auth),
-              db: readerS(stack.client.db),
-              storage: readerS(stack.client.storage),
-            }),
-            ci: readerS(stack.ci),
-            server: readerS({
-              db: readerS(stack.server.db),
-            }),
-          })
-        ),
+        getTestEnv,
+        map(({ client, ci, server }) => ({
+          client: readerS({
+            auth: readerS(stack.client.auth),
+            db: readerS(stack.client.db),
+            storage: readerS(stack.client.storage),
+          })(client),
+          ci: readerS(stack.ci)(ci),
+          server: readerS({
+            db: readerS(stack.server.db),
+          })(server),
+        })),
         then(fn)
       );
       expect(await result()).toEqual(toResult);
     });
 
-export const runTests = <ClientEnv>(
-  realStack: StackWithEnv<ClientEnv>,
-  getTestClientEnv: TaskEither<unknown, ClientEnv>
+export const runTests = <T extends StackType>(
+  realStack: StackWithEnv<T>,
+  getTestEnv: TaskEither<unknown, T['env']>
 ) => {
-  const test = mkTest(realStack, getTestClientEnv);
+  const test = mkTest(realStack, getTestEnv);
 
   describe('storage is independent between tests', () => {
     test({

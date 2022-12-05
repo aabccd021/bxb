@@ -23,4 +23,12 @@ export type Env = {
   readonly getWindow: IO<MockableWindow>;
 };
 
-export type Stack = StackWithEnv<Env>;
+export type StackType = {
+  readonly env: {
+    readonly client: Env;
+    readonly ci: Env;
+    readonly server: Env;
+  };
+};
+
+export type Stack = StackWithEnv<StackType>;

@@ -11,7 +11,8 @@ storage uploadDataUrl 80.3 kB
 EOF
 )
 
-actual=$(pnpm build \
+raw=$(pnpm build)
+actual=$(echo "$raw" \
   | grep treeshaking \
   | sed 's/treeshaking//g' \
   | sed 's/\// /g' \

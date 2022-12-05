@@ -1,5 +1,11 @@
 import type { StackWithEnv } from 'masmott';
 
-type Env = unknown;
+export type StackType = {
+  readonly env: {
+    readonly client: unknown;
+    readonly server: unknown;
+    readonly ci: unknown;
+  };
+};
 
-export type Stack = StackWithEnv<Env>;
+export type Stack = StackWithEnv<StackType>;

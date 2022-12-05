@@ -1,12 +1,12 @@
 import { io, ioRef, option, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import type { AuthState, StackWithEnv } from '../..';
+import type { AuthState, Stack } from '../..';
 
 export const fromOnAuthStateChanged =
   <T>(
-    onAuthStateChanged: StackWithEnv<T>['client']['auth']['onAuthStateChanged']
-  ): StackWithEnv<T>['client']['auth']['getAuthState'] =>
+    onAuthStateChanged: (t: T) => Stack.client.auth.OnAuthStateChanged.Fn
+  ): ((t: T) => Stack.client.auth.GetAuthState.Fn) =>
   (env) =>
     pipe(
       ioRef.newIORef<AuthState>(option.none),

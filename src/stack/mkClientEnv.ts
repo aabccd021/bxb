@@ -3,7 +3,7 @@ import type { IO } from 'fp-ts/IO';
 
 import type { Env, MockableWindow } from './type';
 
-export const mkClientEnvFromWindow = (getGetWindow: IO<IO<MockableWindow>>): IO<Env> =>
+export const mkEnvFromWindow = (getGetWindow: IO<IO<MockableWindow>>): IO<Env> =>
   apply.sequenceS(io.Apply)({
     onAuthStateChangedCallback: ioRef.newIORef(option.none),
     dbDeployConfig: ioRef.newIORef(option.none),
@@ -11,4 +11,4 @@ export const mkClientEnvFromWindow = (getGetWindow: IO<IO<MockableWindow>>): IO<
     getWindow: getGetWindow,
   });
 
-export const mkClientEnv = mkClientEnvFromWindow(() => () => window);
+export const mkClientEnv = mkEnvFromWindow(() => () => window);
