@@ -1,4 +1,5 @@
 import type { Option } from 'fp-ts/Option';
+import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import type { TaskEither } from 'fp-ts/TaskEither';
 
 import type * as Stack from './stack';
@@ -21,13 +22,16 @@ export type AuthUser = {
 
 export type AuthState = Option<AuthUser>;
 
-export type DocData = Record<string, unknown>;
+export type DocData = ReadonlyRecord<string, unknown>;
 
-export type ApplyClientEnvScope<ClientEnv, J extends Record<string, unknown>> = {
+export type ApplyClientEnvScope<ClientEnv, J extends ReadonlyRecord<string, unknown>> = {
   readonly [JJ in keyof J]: (env: ClientEnv) => J[JJ];
 };
 
-export type ApplyClientEnv<ClientEnv, K extends Record<string, Record<string, unknown>>> = {
+export type ApplyClientEnv<
+  ClientEnv,
+  K extends ReadonlyRecord<string, ReadonlyRecord<string, unknown>>
+> = {
   readonly [KK in keyof K]: ApplyClientEnvScope<ClientEnv, K[KK]>;
 };
 
@@ -55,5 +59,5 @@ export type OnAuthCreatedFunction = {
 export type Functions = OnAuthCreatedFunction;
 
 export type DeployFunctionParam = {
-  readonly functions: Record<string, Functions>;
+  readonly functions: ReadonlyRecord<string, Functions>;
 };
