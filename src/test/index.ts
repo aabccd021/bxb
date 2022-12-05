@@ -438,7 +438,6 @@ export const runTests = <T extends StackType>(
         ci.deployDb({
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: { create: { type: 'True' } },
           },
         }),
         then(() =>
