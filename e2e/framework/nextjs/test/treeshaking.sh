@@ -5,13 +5,14 @@ auth onAuthStateChanged 79.2 kB
 auth signInWithGoogleRedirect 80.4 kB
 auth signOut 80.7 kB
 db getDoc 80.4 kB
-db setDoc 80.3 kB
+db upsertDoc 80.3 kB
 storage getDownloadUrl 80.3 kB
 storage uploadDataUrl 80.3 kB
 EOF
 )
 
-actual=$(pnpm build \
+raw=$(pnpm build)
+actual=$(echo "$raw" \
   | grep treeshaking \
   | sed 's/treeshaking//g' \
   | sed 's/\// /g' \

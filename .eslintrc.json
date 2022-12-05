@@ -38,6 +38,7 @@
     "@typescript-eslint/default-param-last": "error",
     "@typescript-eslint/member-ordering": "error",
     "@typescript-eslint/no-array-constructor": "error",
+    "@typescript-eslint/no-invalid-void-type": "off",
     "@typescript-eslint/no-loop-func": "error",
     "@typescript-eslint/no-redundant-type-constituents": "error",
     "@typescript-eslint/no-shadow": "error",
@@ -74,7 +75,8 @@
       {
         "code": 100,
         "ignoreUrls": true,
-        "ignoreTemplateLiterals": true
+        "ignoreTemplateLiterals": true,
+        "ignorePattern": "(^export|^\\s*readonly|^import)"
       }
     ],
     "no-else-return": "error",

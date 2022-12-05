@@ -2,8 +2,8 @@
 
 import { taskEither } from 'fp-ts';
 
-import type { FooClient } from '../env';
-type Type = FooClient['auth']['signOut'];
+import type { Stack } from '../../env';
+type Type = Stack['client']['auth']['signOut'];
 
 export const signOut: Type = (_env) => {
   console.log('QWERTYUIOPASDFGHJKLZXCVBNMQWERTYUIOPASDFGHJKLZXCVBNM');

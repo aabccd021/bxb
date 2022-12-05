@@ -6,6 +6,15 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig = ({
   reactStrictMode: true,
   swcMinify: true,
+  webpack: (config) => {
+    return ({
+      ...config,
+      optimization: {
+        ...config.optimization,
+        innerGraph: true,
+      }
+    });
+  },
 })
 
 module.exports = withMasmott(withBundleAnalyzer(nextConfig))

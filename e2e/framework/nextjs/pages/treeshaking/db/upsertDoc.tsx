@@ -1,6 +1,6 @@
 import { masmott } from '../../../masmott';
 
 export default function Home() {
-  masmott.db.setDoc;
+  masmott.db.upsertDoc;
   return <div> </div>;
 }
