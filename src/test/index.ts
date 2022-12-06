@@ -8,7 +8,7 @@ import fetch from 'node-fetch';
 import { describe, expect, test as test_ } from 'vitest';
 
 import type { AuthState, Stack, StackType, StackWithEnv } from '../type';
-import * as aab from './aab';
+import * as functions from './functions';
 
 const readerS = apply.sequenceS(reader.Apply);
 
@@ -870,7 +870,7 @@ export const runTests = <T extends StackType>(
     toResult: either.right(option.some({ name: 'masumoto' })),
   });
 
-  test(aab.test1);
-  test(aab.test2);
-  test(aab.test3);
+  test(functions.test1);
+  test(functions.test2);
+  test(functions.test3);
 };

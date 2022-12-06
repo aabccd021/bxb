@@ -8,6 +8,8 @@ import type { Test } from '.';
 
 type Type = (server: Stack.server.Type) => DeployFunctionParam;
 
+const path = __filename.replaceAll('masmott/dist/es6', 'masmott/dist/cjs');
+
 export const test1Functions: Type = (server) => ({
   functions: {
     detectUserExists: {
@@ -33,7 +35,7 @@ export const test1: Test<unknown> = {
       }),
       then(() =>
         ci.deployFunctions({
-          functions: { path: __filename, exportName: 'test1Functions' },
+          functions: { path, exportName: 'test1Functions' },
           server,
         })
       ),
@@ -73,7 +75,7 @@ export const test2: Test<unknown> = {
       }),
       then(() =>
         ci.deployFunctions({
-          functions: { path: __filename, exportName: 'test2Functions' },
+          functions: { path, exportName: 'test2Functions' },
           server,
         })
       ),
@@ -113,7 +115,7 @@ export const test3: Test<unknown> = {
       }),
       then(() =>
         ci.deployFunctions({
-          functions: { path: __filename, exportName: 'test3Functions' },
+          functions: { path, exportName: 'test3Functions' },
           server,
         })
       ),
