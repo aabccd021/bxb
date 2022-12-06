@@ -30,6 +30,7 @@ dependencies:
   make-union-morphic-ts: 1.0.7_tkkhkw7abvjyxavu6h6oqh543q
   next: 13.0.4_biqbaboplfbrettd7655fr4n2y
   node-fetch: 3.3.0
+  ts-essentials: 9.3.0_typescript@4.9.3
   valid-data-url: 4.0.1
 
 devDependencies:
@@ -40,7 +41,6 @@ devDependencies:
   nazna: 1.14.2_tojcqitqsej7mw2r2egajeswxu
   pnpm: 7.17.0
   semantic-release: 19.0.5
-  ts-essentials: 9.3.0_typescript@4.9.3
   typescript: 4.9.3
   vitest: 0.24.5_happy-dom@7.7.0
 
@@ -4023,7 +4023,7 @@ packages:
       typescript: '>=4.1.0'
     dependencies:
       typescript: 4.9.3
-    dev: true
+    dev: false
 
   /ts-pattern/4.0.6:
     resolution: {integrity: sha512-sFHQYD4KoysBi7e7a2mzDPvRBeqA4w+vEyRE+P5MU9VLq8eEYxgKCgD9RNEAT+itGRWUTYN+hry94GDPLb1/Yw==}
@@ -4096,7 +4096,6 @@ packages:
     resolution: {integrity: sha512-CIfGzTelbKNEnLpLdGFgdyKhG23CKdKgQPOBc+OUNrkJ2vr+KSzsSV5kq5iWhEQbok+quxgGzrAtGWCyU7tHnA==}
     engines: {node: '>=4.2.0'}
     hasBin: true
-    dev: true
 
   /uglify-js/3.17.4:
     resolution: {integrity: sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==}
