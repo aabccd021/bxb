@@ -3,14 +3,12 @@ import { pipe } from 'fp-ts/function';
 // eslint-disable-next-line fp-ts/no-module-imports
 import { chainW as then } from 'fp-ts/TaskEither';
 
-import type { DeployFunctionParam, Stack } from '../type';
+import type { FunctionsBuilder } from '..';
 import type { Test } from '.';
-
-type Type = (server: Stack.server.Type) => DeployFunctionParam;
 
 const path = __filename.replaceAll('masmott/dist/es6', 'masmott/dist/cjs');
 
-export const test1Functions: Type = (server) => ({
+export const test1Functions: FunctionsBuilder = (server) => ({
   functions: {
     detectUserExists: {
       trigger: 'onAuthCreated',
@@ -50,7 +48,7 @@ export const test1: Test<unknown> = {
   toResult: either.right(option.some({ status: 'true' })),
 };
 
-export const test2Functions: Type = (server) => ({
+export const test2Functions: FunctionsBuilder = (server) => ({
   functions: {
     detectUserExists: {
       trigger: 'onAuthCreated',
@@ -90,7 +88,7 @@ export const test2: Test<unknown> = {
   toResult: either.right(option.some({ status: 'true' })),
 };
 
-export const test3Functions: Type = (server) => ({
+export const test3Functions: FunctionsBuilder = (server) => ({
   functions: {
     detectUserExists: {
       trigger: 'onAuthCreated',
