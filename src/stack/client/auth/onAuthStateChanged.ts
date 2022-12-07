@@ -13,5 +13,6 @@ export const onAuthStateChanged: Type = (env) => (onChangedCallback) =>
     ioOption.map((uid) => ({ uid })),
     io.chain(onChangedCallback),
     io.chain(() => env.onAuthStateChangedCallback.write(option.some(onChangedCallback))),
+    // unsubscribe
     io.map(() => env.onAuthStateChangedCallback.write(option.none))
   );

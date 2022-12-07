@@ -60,7 +60,7 @@ export const test2: Test<unknown> = {
                 ),
                 io.map((_: Either<unknown, unknown>) => undefined)
               ),
-            })
+            })()
           )
       )
     ),

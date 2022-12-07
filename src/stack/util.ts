@@ -4,6 +4,7 @@ import type { IO } from 'fp-ts/IO';
 import type { Refinement } from 'fp-ts/Refinement';
 import * as t from 'io-ts';
 
+import type { DocKey } from '../type';
 import type { MockableWindow } from './type';
 
 export const setItem = (getWindow: IO<MockableWindow>, key: string, value: string) =>
@@ -53,3 +54,5 @@ export const getDb = (getWindow: IO<MockableWindow>) =>
     provider: 'mock',
     value: { message: 'invalid db data loaded', data },
   }));
+
+export const stringifyDocKey = (key: DocKey) => `${key.collection}/${key.id}`;
