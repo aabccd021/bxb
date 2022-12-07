@@ -1,11 +1,11 @@
-import { either, io, ioOption, option } from 'fp-ts';
-import { pipe } from 'fp-ts/function';
+import { either, io, ioEither, ioOption, option, readonlyRecord } from 'fp-ts';
+import { flow, pipe } from 'fp-ts/function';
 import type { IO } from 'fp-ts/IO';
 import type { Refinement } from 'fp-ts/Refinement';
 import * as t from 'io-ts';
 
-import type { DocKey } from '../type';
-import type { MockableWindow } from './type';
+import type { DocKey, Stack } from '../type';
+import type { Env, MockableWindow } from './type';
 
 export const setItem = (getWindow: IO<MockableWindow>, key: string, value: string) =>
   pipe(
@@ -56,3 +56,50 @@ export const getDb = (getWindow: IO<MockableWindow>) =>
   }));
 
 export const stringifyDocKey = (key: DocKey) => `${key.collection}/${key.id}`;
+
+export const notifySubscriberWithOnChanged = (param: {
+  readonly env: Env;
+  readonly key: Pick<DocKey, 'collection'>;
+  readonly onChanged: Stack.client.db.OnSnapshot.OnChangedCallback;
+  readonly docState: Stack.client.db.OnSnapshot.DocState;
+}) =>
+  pipe(
+    param.env.dbDeployConfig.read,
+    io.map(
+      either.fromOption(() => ({
+        code: 'ProviderError' as const,
+        provider: 'mock',
+        value: 'db deploy config not found',
+      }))
+    ),
+    ioEither.chainEitherKW(
+      either.fromPredicate(
+        flow(
+          readonlyRecord.lookup(param.key.collection),
+          option.map((collectionConfig) => collectionConfig.securityRule?.get?.type === 'True'),
+          option.getOrElse(() => false)
+        ),
+        () => ({ code: 'ForbiddenError' as const })
+      )
+    ),
+    ioEither.chainEitherK(() => param.docState),
+    io.chainFirst(param.onChanged)
+  );
+
+export const notifySubscriber = (param: {
+  readonly env: Env;
+  readonly key: DocKey;
+  readonly docState: Stack.client.db.OnSnapshot.DocState;
+}) =>
+  pipe(
+    param.env.onDocChangedCallback.read,
+    io.map(readonlyRecord.lookup(stringifyDocKey(param.key))),
+    ioOption.chainIOK((onChanged) =>
+      notifySubscriberWithOnChanged({
+        env: param.env,
+        key: param.key,
+        onChanged,
+        docState: param.docState,
+      })
+    )
+  );

@@ -13,7 +13,14 @@ import { flow, pipe } from 'fp-ts/function';
 
 import type { AuthState, DocData, Stack as StackType } from '../../../type';
 import type { Stack } from '../../type';
-import { dbLocalStorageKey, getDb, getItem, setObjectItem, stringifyDocKey } from '../../util';
+import {
+  dbLocalStorageKey,
+  getDb,
+  getItem,
+  notifySubscriber,
+  setObjectItem,
+  stringifyDocKey,
+} from '../../util';
 import { authLocalStorageKey } from '../util';
 
 type Type = Stack['client']['db']['upsertDoc'];
@@ -94,34 +101,7 @@ export const upsertDoc: Type = (env) => (param) =>
     ),
     ioEither.chainIOK((dbData) => setObjectItem(env.getWindow, dbLocalStorageKey, dbData)),
     ioEither.chainIOK(() =>
-      pipe(
-        env.dbDeployConfig.read,
-        io.map(
-          either.fromOption(() => ({
-            code: 'ProviderError' as const,
-            provider: 'mock',
-            value: 'db deploy config not found',
-          }))
-        ),
-        ioEither.chainEitherKW(
-          either.fromPredicate(
-            flow(
-              readonlyRecord.lookup(param.key.collection),
-              option.map((collectionConfig) => collectionConfig.securityRule?.get?.type === 'True'),
-              option.getOrElse(() => false)
-            ),
-            () => ({ code: 'ForbiddenError' as const })
-          )
-        ),
-        ioEither.map(() => option.some(param.data)),
-        io.chain((docState) =>
-          pipe(
-            env.onDocChangedCallback.read,
-            io.map(readonlyRecord.lookup(stringifyDocKey(param.key))),
-            ioOption.chainIOK((onDocChangedCallback) => onDocChangedCallback(docState))
-          )
-        )
-      )
+      notifySubscriber({ env, key: param.key, docState: either.right(option.some(param.data)) })
     ),
     ioEither.map(() => undefined),
     taskEither.fromIOEither
