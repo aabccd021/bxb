@@ -57,11 +57,9 @@ export const getDb = (getWindow: IO<MockableWindow>) =>
 
 export const stringifyDocKey = (key: DocKey) => `${key.collection}/${key.id}`;
 
-export const notifySubscriberWithOnChanged = (param: {
+export const validateGetDoc = (param: {
   readonly env: Env;
   readonly key: Pick<DocKey, 'collection'>;
-  readonly onChanged: Stack.client.db.OnSnapshot.OnChangedCallback;
-  readonly docState: Stack.client.db.OnSnapshot.DocState;
 }) =>
   pipe(
     param.env.dbDeployConfig.read,
@@ -81,7 +79,17 @@ export const notifySubscriberWithOnChanged = (param: {
         ),
         () => ({ code: 'ForbiddenError' as const })
       )
-    ),
+    )
+  );
+
+export const notifySubscriberWithOnChanged = (param: {
+  readonly env: Env;
+  readonly key: Pick<DocKey, 'collection'>;
+  readonly onChanged: Stack.client.db.OnSnapshot.OnChangedCallback;
+  readonly docState: Stack.client.db.OnSnapshot.DocState;
+}) =>
+  pipe(
+    validateGetDoc(param),
     ioEither.chainEitherK(() => param.docState),
     io.chainFirst(param.onChanged)
   );
