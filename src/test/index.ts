@@ -24,12 +24,13 @@ export type Test<T> = {
   readonly name: string;
   readonly expect: (stack: Stack.Type) => TaskEither<unknown, T>;
   readonly toResult: Either<unknown, T>;
+  readonly type?: 'fail';
 };
 
 const mkTest =
   <T extends StackType>(stack: StackWithEnv<T>, getTestEnv: TaskEither<unknown, T['env']>) =>
-  <R>({ name, expect: fn, toResult }: Test<R>) =>
-    test_(name, async () => {
+  <R>({ name, expect: fn, toResult, type }: Test<R>) =>
+    (type === 'fail' ? test_.fails : test_)(name, async () => {
       const result = pipe(
         getTestEnv,
         map(({ client, ci, server }) => ({
@@ -221,6 +222,11 @@ export const runTests = <T extends StackType>(
       expect: ({ client }) => pipe(client.auth.getAuthState, map(option.isSome)),
       toResult: either.right(false),
     });
+  });
+
+  describe('functions is independent between test', () => {
+    test(functions.independencyTest1);
+    test(functions.independencyTest2);
   });
 
   test({
@@ -1151,4 +1157,6 @@ export const runTests = <T extends StackType>(
   });
 
   test(functions.test2);
+  test(functions.test3);
+  test(functions.test4);
 };
