@@ -1,11 +1,14 @@
 /* eslint-disable functional/no-conditional-statement */
-import { either, io, ioEither, ioOption } from 'fp-ts';
+import { either, io, ioEither, ioOption, ioRef, option } from 'fp-ts';
 import type { Either } from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/function';
+import type { Option } from 'fp-ts/Option';
 // eslint-disable-next-line fp-ts/no-module-imports
 import { chainTaskK, chainW as then } from 'fp-ts/TaskEither';
+import * as std from 'fp-ts-std';
 
 import type { DocData, FunctionsBuilder } from '..';
+import type { Unsubscribe } from '../type/client/db/OnSnapshot';
 import type { Test } from '.';
 
 const path = __filename.replaceAll('masmott/dist/es6', 'masmott/dist/cjs');
@@ -47,21 +50,36 @@ export const independencyTest1: Test<unknown> = {
       ),
       chainTaskK(
         () => () =>
-          new Promise<DocData>((resolve) =>
-            client.db.onSnapshot({
-              key: { collection: 'detection', id: '1' },
-              onChanged: flow(
-                ioEither.fromEither,
-                ioEither.chainIOK(
-                  flow(
-                    ioOption.fromOption,
-                    ioOption.chainIOK((value) => () => resolve(value))
-                  )
-                ),
-                io.map((_: Either<unknown, unknown>) => undefined)
+          new Promise<DocData>((resolve) => {
+            pipe(
+              ioRef.newIORef<Option<Unsubscribe>>(option.none),
+              io.chain((unsubRef) =>
+                pipe(
+                  client.db.onSnapshot({
+                    key: { collection: 'detection', id: '1' },
+                    onChanged: flow(
+                      ioEither.fromEither,
+                      ioEither.chainIOK(
+                        flow(
+                          ioOption.fromOption,
+                          ioOption.chainIOK((value) =>
+                            pipe(
+                              () => resolve(value),
+                              io.chain(() => unsubRef.read),
+                              ioOption.chainIOK((unsub) => unsub)
+                            )
+                          )
+                        )
+                      ),
+                      io.map((_: Either<unknown, unknown>) => undefined)
+                    ),
+                  }),
+                  io.chain(flow(option.some, unsubRef.write))
+                )
               ),
-            })()
-          )
+              std.io.execute
+            );
+          })
       )
     ),
   toResult: either.right({ status: 'true' }),
@@ -86,21 +104,36 @@ export const independencyTest2: Test<unknown> = {
       ),
       chainTaskK(
         () => () =>
-          new Promise<DocData>((resolve) =>
-            client.db.onSnapshot({
-              key: { collection: 'detection', id: '1' },
-              onChanged: flow(
-                ioEither.fromEither,
-                ioEither.chainIOK(
-                  flow(
-                    ioOption.fromOption,
-                    ioOption.chainIOK((value) => () => resolve(value))
-                  )
-                ),
-                io.map((_: Either<unknown, unknown>) => undefined)
+          new Promise<DocData>((resolve) => {
+            pipe(
+              ioRef.newIORef<Option<Unsubscribe>>(option.none),
+              io.chain((unsubRef) =>
+                pipe(
+                  client.db.onSnapshot({
+                    key: { collection: 'detection', id: '1' },
+                    onChanged: flow(
+                      ioEither.fromEither,
+                      ioEither.chainIOK(
+                        flow(
+                          ioOption.fromOption,
+                          ioOption.chainIOK((value) =>
+                            pipe(
+                              () => resolve(value),
+                              io.chain(() => unsubRef.read),
+                              ioOption.chainIOK((unsub) => unsub)
+                            )
+                          )
+                        )
+                      ),
+                      io.map((_: Either<unknown, unknown>) => undefined)
+                    ),
+                  }),
+                  io.chain(flow(option.some, unsubRef.write))
+                )
               ),
-            })()
-          )
+              std.io.execute
+            );
+          })
       )
     ),
   toResult: either.right({ status: 'true' }),
@@ -143,21 +176,36 @@ export const test2: Test<unknown> = {
       ),
       chainTaskK(
         () => () =>
-          new Promise<DocData>((resolve) =>
-            client.db.onSnapshot({
-              key: { collection: 'detection', id: '1' },
-              onChanged: flow(
-                ioEither.fromEither,
-                ioEither.chainIOK(
-                  flow(
-                    ioOption.fromOption,
-                    ioOption.chainIOK((value) => () => resolve(value))
-                  )
-                ),
-                io.map((_: Either<unknown, unknown>) => undefined)
+          new Promise<DocData>((resolve) => {
+            pipe(
+              ioRef.newIORef<Option<Unsubscribe>>(option.none),
+              io.chain((unsubRef) =>
+                pipe(
+                  client.db.onSnapshot({
+                    key: { collection: 'detection', id: '1' },
+                    onChanged: flow(
+                      ioEither.fromEither,
+                      ioEither.chainIOK(
+                        flow(
+                          ioOption.fromOption,
+                          ioOption.chainIOK((value) =>
+                            pipe(
+                              () => resolve(value),
+                              io.chain(() => unsubRef.read),
+                              ioOption.chainIOK((unsub) => unsub)
+                            )
+                          )
+                        )
+                      ),
+                      io.map((_: Either<unknown, unknown>) => undefined)
+                    ),
+                  }),
+                  io.chain(flow(option.some, unsubRef.write))
+                )
               ),
-            })()
-          )
+              std.io.execute
+            );
+          })
       )
     ),
   toResult: either.right({ status: 'true' }),
@@ -195,21 +243,36 @@ export const test3: Test<unknown> = {
       ),
       chainTaskK(
         () => () =>
-          new Promise<DocData>((resolve) =>
-            client.db.onSnapshot({
-              key: { collection: 'detection', id: '1' },
-              onChanged: flow(
-                ioEither.fromEither,
-                ioEither.chainIOK(
-                  flow(
-                    ioOption.fromOption,
-                    ioOption.chainIOK((value) => () => resolve(value))
-                  )
-                ),
-                io.map((_: Either<unknown, unknown>) => undefined)
+          new Promise<DocData>((resolve) => {
+            pipe(
+              ioRef.newIORef<Option<Unsubscribe>>(option.none),
+              io.chain((unsubRef) =>
+                pipe(
+                  client.db.onSnapshot({
+                    key: { collection: 'detection', id: '1' },
+                    onChanged: flow(
+                      ioEither.fromEither,
+                      ioEither.chainIOK(
+                        flow(
+                          ioOption.fromOption,
+                          ioOption.chainIOK((value) =>
+                            pipe(
+                              () => resolve(value),
+                              io.chain(() => unsubRef.read),
+                              ioOption.chainIOK((unsub) => unsub)
+                            )
+                          )
+                        )
+                      ),
+                      io.map((_: Either<unknown, unknown>) => undefined)
+                    ),
+                  }),
+                  io.chain(flow(option.some, unsubRef.write))
+                )
               ),
-            })()
-          )
+              std.io.execute
+            );
+          })
       )
     ),
   toResult: either.right({ status: 'true' }),
@@ -234,21 +297,36 @@ export const test4: Test<unknown> = {
       ),
       chainTaskK(
         () => () =>
-          new Promise<DocData>((resolve) =>
-            client.db.onSnapshot({
-              key: { collection: 'detection', id: '1' },
-              onChanged: flow(
-                ioEither.fromEither,
-                ioEither.chainIOK(
-                  flow(
-                    ioOption.fromOption,
-                    ioOption.chainIOK((value) => () => resolve(value))
-                  )
-                ),
-                io.map((_: Either<unknown, unknown>) => undefined)
+          new Promise<DocData>((resolve) => {
+            pipe(
+              ioRef.newIORef<Option<Unsubscribe>>(option.none),
+              io.chain((unsubRef) =>
+                pipe(
+                  client.db.onSnapshot({
+                    key: { collection: 'detection', id: '1' },
+                    onChanged: flow(
+                      ioEither.fromEither,
+                      ioEither.chainIOK(
+                        flow(
+                          ioOption.fromOption,
+                          ioOption.chainIOK((value) =>
+                            pipe(
+                              () => resolve(value),
+                              io.chain(() => unsubRef.read),
+                              ioOption.chainIOK((unsub) => unsub)
+                            )
+                          )
+                        )
+                      ),
+                      io.map((_: Either<unknown, unknown>) => undefined)
+                    ),
+                  }),
+                  io.chain(flow(option.some, unsubRef.write))
+                )
               ),
-            })()
-          )
+              std.io.execute
+            );
+          })
       )
     ),
   toResult: either.right({ status: 'true' }),

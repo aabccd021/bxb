@@ -53,6 +53,7 @@
     "@morphic-ts/summoners": "^3.0.0",
     "@types/valid-data-url": "^2.0.0",
     "fp-ts": "^2.13.1",
+    "fp-ts-std": "^0.15.1",
     "io-ts": "^2.2.19",
     "make-union-morphic-ts": "^1.0.7",
     "next": "^13.0.4",

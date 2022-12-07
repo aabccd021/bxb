@@ -1,21 +1,24 @@
 /* eslint-disable fp-ts/no-module-imports */
-import { apply, either, io, ioRef, option, reader } from 'fp-ts';
+import { apply, either, io, ioEither, ioOption, ioRef, option, reader } from 'fp-ts';
 import type { Either } from 'fp-ts/Either';
-import { identity, pipe } from 'fp-ts/function';
+import { flow, identity, pipe } from 'fp-ts/function';
+import type { Option } from 'fp-ts/Option';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import {
   chainEitherKW,
+  chainTaskK,
   chainW as then,
   fromIO,
-  fromIOEither,
   map,
   right,
   tryCatch,
 } from 'fp-ts/TaskEither';
+import * as std from 'fp-ts-std';
 import fetch from 'node-fetch';
 import { describe, expect, test as test_ } from 'vitest';
 
-import type { AuthState, Stack, StackType, StackWithEnv } from '../type';
+import type { AuthState, DocData, Stack, StackType, StackWithEnv } from '../type';
+import type { Unsubscribe } from '../type/client/auth/OnAuthStateChanged';
 import * as functions from './functions';
 
 const readerS = apply.sequenceS(reader.Apply);
@@ -472,25 +475,41 @@ export const runTests = <T extends StackType>(
             data: { name: 'masumoto' },
           })
         ),
-        then(() =>
-          fromIO(
-            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
-              either.left({ code: 'ProviderError' as const, value: 'not saved' })
-            )
-          )
-        ),
-        then((docState) =>
-          pipe(
-            client.db.onSnapshot({
-              key: { collection: 'user', id: 'kira_id' },
-              onChanged: docState.write,
-            }),
-            io.chain(() => docState.read),
-            fromIOEither
-          )
+        chainTaskK(
+          () => () =>
+            new Promise<DocData>((resolve) => {
+              pipe(
+                ioRef.newIORef<Option<Unsubscribe>>(option.none),
+                io.chain((unsubRef) =>
+                  pipe(
+                    client.db.onSnapshot({
+                      key: { collection: 'user', id: 'kira_id' },
+                      onChanged: flow(
+                        ioEither.fromEither,
+                        ioEither.chainIOK(
+                          flow(
+                            ioOption.fromOption,
+                            ioOption.chainIOK((value) =>
+                              pipe(
+                                () => resolve(value),
+                                io.chain(() => unsubRef.read),
+                                ioOption.chainIOK((unsub) => unsub)
+                              )
+                            )
+                          )
+                        ),
+                        io.map((_: Either<unknown, unknown>) => undefined)
+                      ),
+                    }),
+                    io.chain(flow(option.some, unsubRef.write))
+                  )
+                ),
+                std.io.execute
+              );
+            })
         )
       ),
-    toResult: either.right(option.some({ name: 'masumoto' })),
+    toResult: either.right({ name: 'masumoto' }),
   });
 
   test({
@@ -518,25 +537,41 @@ export const runTests = <T extends StackType>(
             data: { name: 'dorokatsu' },
           })
         ),
-        then(() =>
-          fromIO(
-            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
-              either.left({ code: 'ProviderError' as const, value: 'not saved' })
-            )
-          )
-        ),
-        then((docState) =>
-          pipe(
-            client.db.onSnapshot({
-              key: { collection: 'user', id: 'kira_id' },
-              onChanged: docState.write,
-            }),
-            io.chain(() => docState.read),
-            fromIOEither
-          )
+        chainTaskK(
+          () => () =>
+            new Promise<DocData>((resolve) => {
+              pipe(
+                ioRef.newIORef<Option<Unsubscribe>>(option.none),
+                io.chain((unsubRef) =>
+                  pipe(
+                    client.db.onSnapshot({
+                      key: { collection: 'user', id: 'kira_id' },
+                      onChanged: flow(
+                        ioEither.fromEither,
+                        ioEither.chainIOK(
+                          flow(
+                            ioOption.fromOption,
+                            ioOption.chainIOK((value) =>
+                              pipe(
+                                () => resolve(value),
+                                io.chain(() => unsubRef.read),
+                                ioOption.chainIOK((unsub) => unsub)
+                              )
+                            )
+                          )
+                        ),
+                        io.map((_: Either<unknown, unknown>) => undefined)
+                      ),
+                    }),
+                    io.chain(flow(option.some, unsubRef.write))
+                  )
+                ),
+                std.io.execute
+              );
+            })
         )
       ),
-    toResult: either.right(option.some({ name: 'dorokatsu' })),
+    toResult: either.right({ name: 'dorokatsu' }),
   });
 
   test({
@@ -558,33 +593,41 @@ export const runTests = <T extends StackType>(
             data: { name: 'masumoto' },
           })
         ),
-        then(() =>
-          fromIO(
-            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
-              either.left({ code: 'ProviderError' as const, value: 'not saved' })
-            )
-          )
-        ),
-        then((docState) =>
-          pipe(
-            fromIO(
-              client.db.onSnapshot({
-                key: { collection: 'user', id: 'kira_id' },
-                onChanged: docState.write,
-              })
-            ),
-            then((unsubscribe) => fromIO(unsubscribe)),
-            then(() =>
-              client.db.upsertDoc({
-                key: { collection: 'user', id: 'kira_id' },
-                data: { name: 'dorokatsu' },
-              })
-            ),
-            then(() => fromIOEither(docState.read))
-          )
+        chainTaskK(
+          () => () =>
+            new Promise<DocData>((resolve) => {
+              pipe(
+                ioRef.newIORef<Option<Unsubscribe>>(option.none),
+                io.chain((unsubRef) =>
+                  pipe(
+                    client.db.onSnapshot({
+                      key: { collection: 'user', id: 'kira_id' },
+                      onChanged: flow(
+                        ioEither.fromEither,
+                        ioEither.chainIOK(
+                          flow(
+                            ioOption.fromOption,
+                            ioOption.chainIOK((value) =>
+                              pipe(
+                                () => resolve(value),
+                                io.chain(() => unsubRef.read),
+                                ioOption.chainIOK((unsub) => unsub)
+                              )
+                            )
+                          )
+                        ),
+                        io.map((_: Either<unknown, unknown>) => undefined)
+                      ),
+                    }),
+                    io.chain(flow(option.some, unsubRef.write))
+                  )
+                ),
+                std.io.execute
+              );
+            })
         )
       ),
-    toResult: either.right(option.some({ name: 'masumoto' })),
+    toResult: either.right({ name: 'masumoto' }),
   });
 
   test({
@@ -628,22 +671,34 @@ export const runTests = <T extends StackType>(
             data: { name: 'masumoto' },
           })
         ),
-        then(() =>
-          fromIO(
-            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
-              either.left({ code: 'ProviderError' as const, value: 'not saved' })
-            )
-          )
-        ),
-        then((docState) =>
-          pipe(
-            client.db.onSnapshot({
-              key: { collection: 'user', id: 'kira_id' },
-              onChanged: docState.write,
-            }),
-            io.chain(() => docState.read),
-            fromIOEither
-          )
+        then(
+          () => () =>
+            new Promise<Either<unknown, unknown>>((resolve) => {
+              pipe(
+                ioRef.newIORef<Option<Unsubscribe>>(option.none),
+                io.chain((unsubRef) =>
+                  pipe(
+                    client.db.onSnapshot({
+                      key: { collection: 'user', id: 'kira_id' },
+                      onChanged: flow(
+                        ioEither.fromEither,
+                        ioEither.swap,
+                        ioEither.chainIOK((value) =>
+                          pipe(
+                            () => resolve(either.left(value)),
+                            io.chain(() => unsubRef.read),
+                            ioOption.chainIOK((unsub) => unsub)
+                          )
+                        ),
+                        io.map((_: Either<unknown, unknown>) => undefined)
+                      ),
+                    }),
+                    io.chain(flow(option.some, unsubRef.write))
+                  )
+                ),
+                std.io.execute
+              );
+            })
         )
       ),
     toResult: either.left({ code: 'ForbiddenError' }),
@@ -772,22 +827,34 @@ export const runTests = <T extends StackType>(
             schema: { name: { type: 'StringField' } },
           },
         }),
-        then(() =>
-          fromIO(
-            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
-              either.left({ code: 'ProviderError' as const, value: 'not saved' })
-            )
-          )
-        ),
-        then((docState) =>
-          pipe(
-            client.db.onSnapshot({
-              key: { collection: 'user', id: 'kira_id' },
-              onChanged: docState.write,
-            }),
-            io.chain(() => docState.read),
-            fromIOEither
-          )
+        then(
+          () => () =>
+            new Promise<Either<unknown, unknown>>((resolve) => {
+              pipe(
+                ioRef.newIORef<Option<Unsubscribe>>(option.none),
+                io.chain((unsubRef) =>
+                  pipe(
+                    client.db.onSnapshot({
+                      key: { collection: 'user', id: 'kira_id' },
+                      onChanged: flow(
+                        ioEither.fromEither,
+                        ioEither.swap,
+                        ioEither.chainIOK((value) =>
+                          pipe(
+                            () => resolve(either.left(value)),
+                            io.chain(() => unsubRef.read),
+                            ioOption.chainIOK((unsub) => unsub)
+                          )
+                        ),
+                        io.map((_: Either<unknown, unknown>) => undefined)
+                      ),
+                    }),
+                    io.chain(flow(option.some, unsubRef.write))
+                  )
+                ),
+                std.io.execute
+              );
+            })
         )
       ),
     toResult: either.left({ code: 'ForbiddenError' }),
@@ -1114,25 +1181,41 @@ export const runTests = <T extends StackType>(
             data: { name: 'masumoto' },
           })
         ),
-        then(() =>
-          fromIO(
-            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
-              either.left({ code: 'ProviderError' as const, value: 'not saved' })
-            )
-          )
-        ),
-        then((docState) =>
-          pipe(
-            client.db.onSnapshot({
-              key: { collection: 'user', id: 'kira_id' },
-              onChanged: docState.write,
-            }),
-            io.chain(() => docState.read),
-            fromIOEither
-          )
+        chainTaskK(
+          () => () =>
+            new Promise<DocData>((resolve) => {
+              pipe(
+                ioRef.newIORef<Option<Unsubscribe>>(option.none),
+                io.chain((unsubRef) =>
+                  pipe(
+                    client.db.onSnapshot({
+                      key: { collection: 'user', id: 'kira_id' },
+                      onChanged: flow(
+                        ioEither.fromEither,
+                        ioEither.chainIOK(
+                          flow(
+                            ioOption.fromOption,
+                            ioOption.chainIOK((value) =>
+                              pipe(
+                                () => resolve(value),
+                                io.chain(() => unsubRef.read),
+                                ioOption.chainIOK((unsub) => unsub)
+                              )
+                            )
+                          )
+                        ),
+                        io.map((_: Either<unknown, unknown>) => undefined)
+                      ),
+                    }),
+                    io.chain(flow(option.some, unsubRef.write))
+                  )
+                ),
+                std.io.execute
+              );
+            })
         )
       ),
-    toResult: either.right(option.some({ name: 'masumoto' })),
+    toResult: either.right({ name: 'masumoto' }),
   });
 
   test({
