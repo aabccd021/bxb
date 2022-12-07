@@ -870,7 +870,5 @@ export const runTests = <T extends StackType>(
     toResult: either.right(option.some({ name: 'masumoto' })),
   });
 
-  test(functions.test1);
   test(functions.test2);
-  test(functions.test3);
 };
