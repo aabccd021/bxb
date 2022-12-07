@@ -8,6 +8,7 @@ specifiers:
   '@types/valid-data-url': ^2.0.0
   eslint: ^8.28.0
   fp-ts: ^2.13.1
+  fp-ts-std: ^0.15.1
   happy-dom: ^7.7.0
   io-ts: ^2.2.19
   make-union-morphic-ts: ^1.0.7
@@ -26,6 +27,7 @@ dependencies:
   '@morphic-ts/summoners': 3.0.0_4d7wvhfwbxj4u6itqsiiv2wloq
   '@types/valid-data-url': 2.0.0
   fp-ts: 2.13.1
+  fp-ts-std: 0.15.1_sddbbwftoqt3d5g3p7ix53ouca
   io-ts: 2.2.19_fp-ts@2.13.1
   make-union-morphic-ts: 1.0.7_tkkhkw7abvjyxavu6h6oqh543q
   next: 13.0.4_biqbaboplfbrettd7655fr4n2y
@@ -2172,7 +2174,6 @@ packages:
       fp-ts: 2.13.1
       monocle-ts: 2.3.13_fp-ts@2.13.1
       newtype-ts: 0.3.5_y4ecnzjsatnzoei5elwf4wjeqa
-    dev: true
 
   /fp-ts/2.13.1:
     resolution: {integrity: sha512-0eu5ULPS2c/jsa1lGFneEFFEdTbembJv8e4QKXeVJ3lm/5hyve06dlKZrpxmMwJt6rYen7sxmHHK2CLaXvWuWQ==}
