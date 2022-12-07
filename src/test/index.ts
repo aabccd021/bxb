@@ -1,9 +1,17 @@
+/* eslint-disable fp-ts/no-module-imports */
 import { apply, either, io, ioRef, option, reader } from 'fp-ts';
 import type { Either } from 'fp-ts/Either';
 import { identity, pipe } from 'fp-ts/function';
 import type { TaskEither } from 'fp-ts/TaskEither';
-// eslint-disable-next-line fp-ts/no-module-imports
-import { chainEitherKW, chainW as then, fromIO, map, right, tryCatch } from 'fp-ts/TaskEither';
+import {
+  chainEitherKW,
+  chainW as then,
+  fromIO,
+  fromIOEither,
+  map,
+  right,
+  tryCatch,
+} from 'fp-ts/TaskEither';
 import fetch from 'node-fetch';
 import { describe, expect, test as test_ } from 'vitest';
 
@@ -16,12 +24,13 @@ export type Test<T> = {
   readonly name: string;
   readonly expect: (stack: Stack.Type) => TaskEither<unknown, T>;
   readonly toResult: Either<unknown, T>;
+  readonly type?: 'fail';
 };
 
 const mkTest =
   <T extends StackType>(stack: StackWithEnv<T>, getTestEnv: TaskEither<unknown, T['env']>) =>
-  <R>({ name, expect: fn, toResult }: Test<R>) =>
-    test_(name, async () => {
+  <R>({ name, expect: fn, toResult, type }: Test<R>) =>
+    (type === 'fail' ? test_.fails : test_)(name, async () => {
       const result = pipe(
         getTestEnv,
         map(({ client, ci, server }) => ({
@@ -215,6 +224,11 @@ export const runTests = <T extends StackType>(
     });
   });
 
+  describe('functions is independent between test', () => {
+    test(functions.independencyTest1);
+    test(functions.independencyTest2);
+  });
+
   test({
     name: 'can upload data url and get download url',
     expect: ({ client, ci }) =>
@@ -386,7 +400,7 @@ export const runTests = <T extends StackType>(
   });
 
   test({
-    name: 'can upsert and get doc',
+    name: 'can client.db.upsertDoc and client.db.getDoc',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -410,7 +424,171 @@ export const runTests = <T extends StackType>(
   });
 
   test({
-    name: 'can not get doc if not allowed',
+    name: 'client.db.getDoc always returns the latest doc state',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              create: { type: 'True' },
+              get: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'dorokatsu' },
+          })
+        ),
+        then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+      ),
+    toResult: either.right(option.some({ name: 'dorokatsu' })),
+  });
+
+  test({
+    name: 'can client.db.upsertDoc and get doc with client.db.onSnapshot',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              create: { type: 'True' },
+              get: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() =>
+          fromIO(
+            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
+              either.left({ code: 'ProviderError' as const, value: 'not saved' })
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            client.db.onSnapshot({
+              key: { collection: 'user', id: 'kira_id' },
+              onChanged: docState.write,
+            }),
+            io.chain(() => docState.read),
+            fromIOEither
+          )
+        )
+      ),
+    toResult: either.right(option.some({ name: 'masumoto' })),
+  });
+
+  test({
+    name: 'client.db.onSnapshot always returns the latest doc state',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              create: { type: 'True' },
+              get: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'dorokatsu' },
+          })
+        ),
+        then(() =>
+          fromIO(
+            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
+              either.left({ code: 'ProviderError' as const, value: 'not saved' })
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            client.db.onSnapshot({
+              key: { collection: 'user', id: 'kira_id' },
+              onChanged: docState.write,
+            }),
+            io.chain(() => docState.read),
+            fromIOEither
+          )
+        )
+      ),
+    toResult: either.right(option.some({ name: 'dorokatsu' })),
+  });
+
+  test({
+    name: 'client.db.onSnapshot callback does not called after unsubscribed',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              create: { type: 'True' },
+              get: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() =>
+          fromIO(
+            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
+              either.left({ code: 'ProviderError' as const, value: 'not saved' })
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            fromIO(
+              client.db.onSnapshot({
+                key: { collection: 'user', id: 'kira_id' },
+                onChanged: docState.write,
+              })
+            ),
+            then((unsubscribe) => fromIO(unsubscribe)),
+            then(() =>
+              client.db.upsertDoc({
+                key: { collection: 'user', id: 'kira_id' },
+                data: { name: 'dorokatsu' },
+              })
+            ),
+            then(() => fromIOEither(docState.read))
+          )
+        )
+      ),
+    toResult: either.right(option.some({ name: 'masumoto' })),
+  });
+
+  test({
+    name: 'can not get doc if forbidden',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -428,6 +606,45 @@ export const runTests = <T extends StackType>(
           })
         ),
         then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+      ),
+    toResult: either.left({ code: 'ForbiddenError' }),
+  });
+
+  test({
+    name: 'client.db.onSnapshot returns left if forbidden',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              create: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() =>
+          fromIO(
+            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
+              either.left({ code: 'ProviderError' as const, value: 'not saved' })
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            client.db.onSnapshot({
+              key: { collection: 'user', id: 'kira_id' },
+              onChanged: docState.write,
+            }),
+            io.chain(() => docState.read),
+            fromIOEither
+          )
+        )
       ),
     toResult: either.left({ code: 'ForbiddenError' }),
   });
@@ -533,7 +750,7 @@ export const runTests = <T extends StackType>(
   });
 
   test({
-    name: 'can not get doc if not allowed, even if the doc does not exists',
+    name: 'can not get doc if forbidden, even if the doc absent',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -542,6 +759,36 @@ export const runTests = <T extends StackType>(
           },
         }),
         then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+      ),
+    toResult: either.left({ code: 'ForbiddenError' }),
+  });
+
+  test({
+    name: 'client.db.getDoc returns ForbiddenError if forbidden and document absent',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+          },
+        }),
+        then(() =>
+          fromIO(
+            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
+              either.left({ code: 'ProviderError' as const, value: 'not saved' })
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            client.db.onSnapshot({
+              key: { collection: 'user', id: 'kira_id' },
+              onChanged: docState.write,
+            }),
+            io.chain(() => docState.read),
+            fromIOEither
+          )
+        )
       ),
     toResult: either.left({ code: 'ForbiddenError' }),
   });
@@ -591,7 +838,7 @@ export const runTests = <T extends StackType>(
   });
 
   test({
-    name: 'server db API can get doc even if not allowed by security rule',
+    name: 'server db API can get doc even if forbidden by security rule',
     expect: ({ server, ci }) =>
       pipe(
         ci.deployDb({
@@ -656,7 +903,7 @@ export const runTests = <T extends StackType>(
   });
 
   test({
-    name: 'server db API can get doc if not allowed, even if the doc does not exists',
+    name: 'server db API can get doc if forbidden, even if the doc absent',
     expect: ({ server, ci }) =>
       pipe(
         ci.deployDb({
@@ -850,6 +1097,45 @@ export const runTests = <T extends StackType>(
   });
 
   test({
+    name: 'can server.db.upsertDoc then client.db.onSnapshot',
+    expect: ({ client, ci, server }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              get: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          server.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() =>
+          fromIO(
+            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
+              either.left({ code: 'ProviderError' as const, value: 'not saved' })
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            client.db.onSnapshot({
+              key: { collection: 'user', id: 'kira_id' },
+              onChanged: docState.write,
+            }),
+            io.chain(() => docState.read),
+            fromIOEither
+          )
+        )
+      ),
+    toResult: either.right(option.some({ name: 'masumoto' })),
+  });
+
+  test({
     name: 'can upsert on client and get doc on server',
     expect: ({ server, client, ci }) =>
       pipe(
@@ -870,7 +1156,7 @@ export const runTests = <T extends StackType>(
     toResult: either.right(option.some({ name: 'masumoto' })),
   });
 
-  test(functions.test1);
   test(functions.test2);
   test(functions.test3);
+  test(functions.test4);
 };

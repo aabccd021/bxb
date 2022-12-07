@@ -13,7 +13,14 @@ import { flow, pipe } from 'fp-ts/function';
 
 import type { AuthState, DocData, Stack as StackType } from '../../../type';
 import type { Stack } from '../../type';
-import { dbLocalStorageKey, getDb, getItem, setObjectItem } from '../../util';
+import {
+  dbLocalStorageKey,
+  getDb,
+  getItem,
+  notifySubscriber,
+  setObjectItem,
+  stringifyDocKey,
+} from '../../util';
 import { authLocalStorageKey } from '../util';
 
 type Type = Stack['client']['db']['upsertDoc'];
@@ -89,9 +96,13 @@ export const upsertDoc: Type = (env) => (param) =>
     ioEither.map(
       flow(
         option.getOrElse(() => ({})),
-        readonlyRecord.upsertAt(`${param.key.collection}/${param.key.id}`, param.data)
+        readonlyRecord.upsertAt(stringifyDocKey(param.key), param.data)
       )
     ),
-    ioEither.chainIOK((data) => setObjectItem(env.getWindow, dbLocalStorageKey, data)),
+    ioEither.chainIOK((dbData) => setObjectItem(env.getWindow, dbLocalStorageKey, dbData)),
+    ioEither.chainIOK(() =>
+      notifySubscriber({ env, key: param.key, docState: either.right(option.some(param.data)) })
+    ),
+    ioEither.map(() => undefined),
     taskEither.fromIOEither
   );

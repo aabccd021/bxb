@@ -61,3 +61,5 @@ export type Functions = OnAuthCreatedFunction;
 export type DeployFunctionParam = {
   readonly functions: ReadonlyRecord<string, Functions>;
 };
+
+export type FunctionsBuilder = (server: Stack.server.Type) => DeployFunctionParam;

@@ -1,8 +1,8 @@
-import { ioEither, option, readonlyRecord, taskEither } from 'fp-ts';
+import { either, ioEither, option, readonlyRecord, taskEither } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 
 import type { Stack } from '../../type';
-import { dbLocalStorageKey, getDb, setObjectItem } from '../../util';
+import { dbLocalStorageKey, getDb, notifySubscriber, setObjectItem } from '../../util';
 
 type Type = Stack['server']['db']['upsertDoc'];
 
@@ -16,5 +16,9 @@ export const upsertDoc: Type = (env) => (param) =>
       )
     ),
     ioEither.chainIOK((data) => setObjectItem(env.getWindow, dbLocalStorageKey, data)),
+    ioEither.chainIOK(() =>
+      notifySubscriber({ env, key: param.key, docState: either.right(option.some(param.data)) })
+    ),
+    ioEither.map(() => undefined),
     taskEither.fromIOEither
   );
