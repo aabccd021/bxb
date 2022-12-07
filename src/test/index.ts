@@ -467,19 +467,19 @@ export const runTests = <T extends StackType>(
           })
         ),
         then(() =>
-          pipe(
+          fromIO(
             ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
               either.left({ code: 'ProviderError' as const, value: 'not saved' })
-            ),
-            io.chain((authStateRef) =>
-              pipe(
-                client.db.onSnapshot({
-                  key: { collection: 'user', id: 'kira_id' },
-                  onChanged: authStateRef.write,
-                }),
-                io.chain(() => authStateRef.read)
-              )
-            ),
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            client.db.onSnapshot({
+              key: { collection: 'user', id: 'kira_id' },
+              onChanged: docState.write,
+            }),
+            io.chain(() => docState.read),
             fromIOEither
           )
         )
@@ -513,24 +513,72 @@ export const runTests = <T extends StackType>(
           })
         ),
         then(() =>
-          pipe(
+          fromIO(
             ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
               either.left({ code: 'ProviderError' as const, value: 'not saved' })
-            ),
-            io.chain((authStateRef) =>
-              pipe(
-                client.db.onSnapshot({
-                  key: { collection: 'user', id: 'kira_id' },
-                  onChanged: authStateRef.write,
-                }),
-                io.chain(() => authStateRef.read)
-              )
-            ),
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            client.db.onSnapshot({
+              key: { collection: 'user', id: 'kira_id' },
+              onChanged: docState.write,
+            }),
+            io.chain(() => docState.read),
             fromIOEither
           )
         )
       ),
     toResult: either.right(option.some({ name: 'dorokatsu' })),
+  });
+
+  test({
+    name: 'client.db.onSnapshot callback does not called after unsubscribed',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              create: { type: 'True' },
+              get: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() =>
+          fromIO(
+            ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
+              either.left({ code: 'ProviderError' as const, value: 'not saved' })
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            fromIO(
+              client.db.onSnapshot({
+                key: { collection: 'user', id: 'kira_id' },
+                onChanged: docState.write,
+              })
+            ),
+            then((unsubscribe) => fromIO(unsubscribe)),
+            then(() =>
+              client.db.upsertDoc({
+                key: { collection: 'user', id: 'kira_id' },
+                data: { name: 'dorokatsu' },
+              })
+            ),
+            then(() => fromIOEither(docState.read))
+          )
+        )
+      ),
+    toResult: either.right(option.some({ name: 'masumoto' })),
   });
 
   test({
@@ -575,19 +623,19 @@ export const runTests = <T extends StackType>(
           })
         ),
         then(() =>
-          pipe(
+          fromIO(
             ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
               either.left({ code: 'ProviderError' as const, value: 'not saved' })
-            ),
-            io.chain((authStateRef) =>
-              pipe(
-                client.db.onSnapshot({
-                  key: { collection: 'user', id: 'kira_id' },
-                  onChanged: authStateRef.write,
-                }),
-                io.chain(() => authStateRef.read)
-              )
-            ),
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            client.db.onSnapshot({
+              key: { collection: 'user', id: 'kira_id' },
+              onChanged: docState.write,
+            }),
+            io.chain(() => docState.read),
             fromIOEither
           )
         )
@@ -719,19 +767,19 @@ export const runTests = <T extends StackType>(
           },
         }),
         then(() =>
-          pipe(
+          fromIO(
             ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
               either.left({ code: 'ProviderError' as const, value: 'not saved' })
-            ),
-            io.chain((authStateRef) =>
-              pipe(
-                client.db.onSnapshot({
-                  key: { collection: 'user', id: 'kira_id' },
-                  onChanged: authStateRef.write,
-                }),
-                io.chain(() => authStateRef.read)
-              )
-            ),
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            client.db.onSnapshot({
+              key: { collection: 'user', id: 'kira_id' },
+              onChanged: docState.write,
+            }),
+            io.chain(() => docState.read),
             fromIOEither
           )
         )
@@ -1061,19 +1109,19 @@ export const runTests = <T extends StackType>(
           })
         ),
         then(() =>
-          pipe(
+          fromIO(
             ioRef.newIORef<Stack.client.db.OnSnapshot.DocState>(
               either.left({ code: 'ProviderError' as const, value: 'not saved' })
-            ),
-            io.chain((authStateRef) =>
-              pipe(
-                client.db.onSnapshot({
-                  key: { collection: 'user', id: 'kira_id' },
-                  onChanged: authStateRef.write,
-                }),
-                io.chain(() => authStateRef.read)
-              )
-            ),
+            )
+          )
+        ),
+        then((docState) =>
+          pipe(
+            client.db.onSnapshot({
+              key: { collection: 'user', id: 'kira_id' },
+              onChanged: docState.write,
+            }),
+            io.chain(() => docState.read),
             fromIOEither
           )
         )
