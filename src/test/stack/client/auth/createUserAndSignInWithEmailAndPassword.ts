@@ -22,8 +22,8 @@ export const tests = [
             taskEither.chainW(() => taskEither.fromIO(authStateRef.read))
           )
         ),
-        taskEither.map(option.isSome)
+        taskEither.map(option.map(() => 'some user id'))
       ),
-    toResult: either.right(true),
+    toResult: either.right(option.some('some user id')),
   }),
 ];

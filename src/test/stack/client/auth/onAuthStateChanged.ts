@@ -38,9 +38,9 @@ export const tests = [
             taskEither.chainW(() => taskEither.fromIO(authStateRef.read))
           )
         ),
-        taskEither.map(option.isSome)
+        taskEither.map(option.map(() => 'some auth state'))
       ),
-    toResult: either.right(true),
+    toResult: either.right(option.some('some auth state')),
   }),
 
   defineTest({
