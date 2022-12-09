@@ -19,4 +19,6 @@ export type ForbiddenError = {
 
 export type Error = ForbiddenError | ProviderError;
 
-export type Fn = (p: Param) => TaskEither<Error, Option<DocData>>;
+export type Fn = (
+  p: Param
+) => TaskEither<Error & { readonly capability: 'client.db.getDoc' }, Option<DocData>>;

@@ -8,4 +8,6 @@ export type Param = {
 
 export type Error = ProviderError | { readonly code: 'FileNotFound' };
 
-export type Fn = (p: Param) => TaskEither<Error, string>;
+export type Fn = (
+  p: Param
+) => TaskEither<Error & { readonly capability: 'client.storage.getDownloadUrl' }, string>;

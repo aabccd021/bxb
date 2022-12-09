@@ -20,7 +20,7 @@ export const tests = [
           })
         )
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
   }),
 
   defineTest({
@@ -49,7 +49,7 @@ export const tests = [
           })
         )
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
   }),
 
   defineTest({
@@ -90,7 +90,7 @@ export const tests = [
           })
         )
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
   }),
 
   defineTest({
@@ -110,7 +110,7 @@ export const tests = [
           })
         )
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
   }),
 
   defineTest({
@@ -130,7 +130,7 @@ export const tests = [
           })
         )
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
   }),
 
   defineTest({
@@ -197,7 +197,7 @@ export const tests = [
           })
         )
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
   }),
 
   defineTest({
@@ -222,7 +222,7 @@ export const tests = [
           })
         )
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
   }),
 
   defineTest({
@@ -247,6 +247,6 @@ export const tests = [
           })
         )
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
   }),
 ];

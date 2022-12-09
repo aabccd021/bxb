@@ -137,7 +137,7 @@ export const tests = [
         ),
         taskEither.chainW(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.getDoc' }),
   }),
 
   defineTest({
@@ -151,7 +151,7 @@ export const tests = [
         }),
         taskEither.chainW(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.getDoc' }),
   }),
 
   defineTest({

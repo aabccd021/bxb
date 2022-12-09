@@ -37,5 +37,9 @@ export const createUserAndSignInWithEmailAndPassword: Type = (env) => (param) =>
           () => undefined
         )
       )
-    )
+    ),
+    taskEither.mapLeft((err) => ({
+      ...err,
+      capability: 'client.auth.createUserAndSignInWithEmailAndPassword',
+    }))
   );

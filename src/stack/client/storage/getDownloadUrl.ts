@@ -10,5 +10,9 @@ export const getDownloadUrl: Type = (env) => (param) =>
   pipe(
     getItem(env.getWindow, `${storageKey}/${param.key}`),
     io.map(either.fromOption(() => ({ code: 'FileNotFound' as const }))),
-    taskEither.fromIOEither
+    taskEither.fromIOEither,
+    taskEither.mapLeft((err) => ({
+      ...err,
+      capability: 'client.storage.getDownloadUrl',
+    }))
   );

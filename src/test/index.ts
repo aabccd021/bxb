@@ -61,7 +61,7 @@ export const runTests = <T extends StackType>(
           taskEither.chainW(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
           taskEither.chainW(() => taskEither.right('download success'))
         ),
-      toResult: either.left({ code: 'FileNotFound' }),
+      toResult: either.left({ code: 'FileNotFound', capability: 'client.storage.getDownloadUrl' }),
     });
   });
 
@@ -170,7 +170,10 @@ export const runTests = <T extends StackType>(
           ),
           taskEither.chainW(() => taskEither.right('create user kira two times success'))
         ),
-      toResult: either.left({ code: 'EmailAlreadyInUse' }),
+      toResult: either.left({
+        code: 'EmailAlreadyInUse',
+        capability: 'client.auth.createUserAndSignInWithEmailAndPassword',
+      }),
     });
 
     runTest({

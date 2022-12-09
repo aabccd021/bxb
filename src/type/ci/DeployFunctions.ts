@@ -15,4 +15,6 @@ type Error = {
   readonly details?: unknown;
 };
 
-export type Fn = (c: Param) => TaskEither<Error, undefined | void>;
+export type Fn = (
+  c: Param
+) => TaskEither<Error & { readonly capability: 'ci.deployFunctions' }, undefined | void>;

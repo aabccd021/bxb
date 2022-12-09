@@ -90,7 +90,7 @@ export const notifySubscriberWithOnChanged = (param: {
 }) =>
   pipe(
     validateGetDoc(param),
-    ioEither.chainEitherK(() => param.docState),
+    ioEither.chainEitherKW(() => param.docState),
     io.chainFirst(param.onChanged)
   );
 

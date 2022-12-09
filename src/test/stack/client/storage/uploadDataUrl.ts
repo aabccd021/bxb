@@ -13,6 +13,9 @@ export const tests = [
           client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'invalidDataUrl' })
         )
       ),
-    toResult: either.left({ code: 'InvalidDataUrlFormat' }),
+    toResult: either.left({
+      code: 'InvalidDataUrlFormat',
+      capability: 'client.storage.uploadDataUrl',
+    }),
   }),
 ];

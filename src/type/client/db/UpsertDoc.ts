@@ -19,4 +19,6 @@ export type ForbiddenError = {
 
 export type Error = ForbiddenError | ProviderError;
 
-export type Fn = (p: Param) => TaskEither<Error, undefined | void>;
+export type Fn = (
+  p: Param
+) => TaskEither<Error & { readonly capability: 'client.db.upsertDoc' }, undefined | void>;

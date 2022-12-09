@@ -4,4 +4,5 @@ import type { Stack } from '../../env';
 
 type Type = Stack['client']['auth']['getAuthState'];
 
-export const getAuthState: Type = (_env) => taskEither.left({ code: 'not implemented' });
+export const getAuthState: Type = (_env) =>
+  taskEither.left({ code: 'not implemented', capability: 'client.auth.getAuthState' });

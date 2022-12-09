@@ -6,4 +6,6 @@ export type Param = {
   };
 };
 
-export type Fn = (p: Param) => TaskEither<{ readonly code: string }, unknown>;
+export type Fn = (
+  p: Param
+) => TaskEither<{ readonly capability: 'ci.DeployStorage' } & { readonly code: string }, unknown>;
