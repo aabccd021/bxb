@@ -19,9 +19,9 @@ export const tests = [
           password: 'dorokatsu',
         }),
         taskEither.chainW(() => client.auth.getAuthState),
-        taskEither.map(option.isSome)
+        taskEither.map(option.map(() => 'some auth state'))
       ),
-    toResult: either.right(true),
+    toResult: either.right(option.some('some auth state')),
   }),
 
   defineTest({

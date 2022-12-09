@@ -200,15 +200,15 @@ export const runTests = <T extends StackType>(
             password: 'dorokatsu',
           }),
           taskEither.chainW(() => client.auth.getAuthState),
-          taskEither.map(option.isSome)
+          taskEither.map(option.map(() => 'some auth state'))
         ),
-      toResult: either.right(true),
+      toResult: either.right(option.some('some auth state')),
     });
 
     runTest({
       name: 'another test should initially signed out',
-      expect: ({ client }) => pipe(client.auth.getAuthState, taskEither.map(option.isSome)),
-      toResult: either.right(false),
+      expect: ({ client }) => client.auth.getAuthState,
+      toResult: either.right(option.none),
     });
   });
 
