@@ -237,6 +237,9 @@ export const runTests = <T extends StackType>(
   describe('client.db.onSnapshot', () => {
     stackTests.client.db.onSnapshot.tests.forEach(runTest);
   });
+  describe('client.db.getDocWhen', () => {
+    stackTests.client.db.getDocWhen.tests.forEach(runTest);
+  });
   describe('client.auth.getAuthState', () => {
     stackTests.client.auth.getAuthState.tests.forEach(runTest);
   });
