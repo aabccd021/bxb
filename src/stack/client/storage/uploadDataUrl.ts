@@ -13,5 +13,9 @@ export const uploadDataUrl: Type = (env) => (param) =>
     either.fromPredicate(isValidDataUrl, () => ({ code: 'InvalidDataUrlFormat' as const })),
     ioEither.fromEither,
     ioEither.chainIOK((data) => setItem(env.getWindow, `${storageKey}/${param.key}`, data)),
-    taskEither.fromIOEither
+    taskEither.fromIOEither,
+    taskEither.mapLeft((err) => ({
+      ...err,
+      capability: 'client.storage.uploadDataUrl',
+    }))
   );

@@ -121,5 +121,9 @@ export const upsertDoc: Type = (env) => (param) =>
       notifySubscriber({ env, key: param.key, docState: either.right(option.some(param.data)) })
     ),
     ioEither.map(() => undefined),
-    taskEither.fromIOEither
+    taskEither.fromIOEither,
+    taskEither.mapLeft((err) => ({
+      ...err,
+      capability: 'client.db.upsertDoc',
+    }))
   );

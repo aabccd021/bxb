@@ -4,4 +4,7 @@ import type { ProviderError } from '../..';
 
 export type Error = ProviderError;
 
-export type Fn = TaskEither<Error, undefined | void>;
+export type Fn = TaskEither<
+  Error & { readonly capability: 'client.auth.signOut' },
+  undefined | void
+>;

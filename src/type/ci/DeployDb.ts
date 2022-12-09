@@ -52,4 +52,6 @@ export type CollectionConfig = {
 
 export type Param = ReadonlyRecord<string, CollectionConfig>;
 
-export type Fn = (c: Param) => TaskEither<{ readonly code: string }, unknown>;
+export type Fn = (
+  c: Param
+) => TaskEither<{ readonly capability: 'ci.DeployDb' } & { readonly code: string }, unknown>;

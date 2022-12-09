@@ -9,4 +9,6 @@ export type Param = {
 
 export type Error = ProviderError | { readonly code: 'InvalidDataUrlFormat' };
 
-export type Fn = (p: Param) => TaskEither<Error, undefined | void>;
+export type Fn = (
+  p: Param
+) => TaskEither<Error & { readonly capability: 'client.storage.uploadDataUrl' }, undefined | void>;
