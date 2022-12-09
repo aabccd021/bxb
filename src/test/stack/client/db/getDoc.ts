@@ -149,4 +149,31 @@ export const tests = [
       ),
     toResult: either.right(option.some({ name: 'masumoto' })),
   }),
+
+  defineTest({
+    name: 'client.db.upsertDoc fails to create doc if not explicitly allowed',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            securityRule: {
+              get: { type: 'True' },
+            },
+            schema: { name: { type: 'StringField' } },
+          },
+        }),
+        taskEither.chainW(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        task.chain(() =>
+          client.db.getDoc({
+            key: { collection: 'user', id: 'kira_id' },
+          })
+        )
+      ),
+    toResult: either.right(option.none),
+  }),
 ];
