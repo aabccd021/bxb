@@ -18,6 +18,7 @@ specifiers:
   pnpm: ^7.17.0
   semantic-release: ^19.0.5
   ts-essentials: ^9.3.0
+  ts-pattern: ^4.0.6
   typescript: ^4.9.3
   valid-data-url: ^4.0.1
   vitest: ^0.24.5
@@ -33,6 +34,7 @@ dependencies:
   next: 13.0.4_biqbaboplfbrettd7655fr4n2y
   node-fetch: 3.3.0
   ts-essentials: 9.3.0_typescript@4.9.3
+  ts-pattern: 4.0.6
   valid-data-url: 4.0.1
 
 devDependencies:
@@ -4028,7 +4030,6 @@ packages:
 
   /ts-pattern/4.0.6:
     resolution: {integrity: sha512-sFHQYD4KoysBi7e7a2mzDPvRBeqA4w+vEyRE+P5MU9VLq8eEYxgKCgD9RNEAT+itGRWUTYN+hry94GDPLb1/Yw==}
-    dev: true
 
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}

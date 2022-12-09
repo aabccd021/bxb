@@ -1,12 +1,11 @@
 /* eslint-disable fp-ts/no-module-imports */
-import { apply, either, io, ioEither, ioOption, ioRef, option, reader } from 'fp-ts';
+import { apply, either, io, ioEither, ioOption, ioRef, option, reader, task } from 'fp-ts';
 import type { Either } from 'fp-ts/Either';
 import { flow, identity, pipe } from 'fp-ts/function';
 import type { Option } from 'fp-ts/Option';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import {
   chainEitherKW,
-  chainFirstW,
   chainTaskK,
   chainW as then,
   fromIO,
@@ -506,13 +505,13 @@ export const runTests = <T extends StackType>(
             data: { name: 'masumoto' },
           })
         ),
-        chainFirstW(() =>
+        then(() =>
           client.db.upsertDoc({
             key: { collection: 'user', id: 'kira_id' },
             data: { name: 'dorokatsu' },
           })
         ),
-        then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+        task.chain(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
       ),
     toResult: either.right(option.some({ name: 'masumoto' })),
   });
@@ -812,22 +811,25 @@ export const runTests = <T extends StackType>(
       pipe(
         ci.deployDb({
           user: {
+            securityRule: {
+              get: { type: 'True' },
+            },
             schema: { name: { type: 'StringField' } },
           },
         }),
-        chainFirstW(() =>
+        then(() =>
           client.db.upsertDoc({
             key: { collection: 'user', id: 'kira_id' },
             data: { name: 'masumoto' },
           })
         ),
-        then(() =>
+        task.chain(() =>
           client.db.getDoc({
             key: { collection: 'user', id: 'kira_id' },
           })
         )
       ),
-    toResult: either.right(option.some({ name: 'masumoto' })),
+    toResult: either.right(option.none),
   });
 
   test({

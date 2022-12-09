@@ -1,15 +1,6 @@
-import {
-  apply,
-  either,
-  io,
-  ioEither,
-  ioOption,
-  option,
-  readonlyRecord,
-  string,
-  taskEither,
-} from 'fp-ts';
+import { either, io, ioEither, ioOption, option, readonlyRecord, string, taskEither } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
+import { match } from 'ts-pattern';
 
 import type { AuthState, DocData, Stack as StackType } from '../../../type';
 import type { Stack } from '../../type';
@@ -37,25 +28,38 @@ const compare = (
     option.getOrElse(() => false)
   );
 
-const validateEqual = (
-  docData: DocData,
-  authState: AuthState,
-  { compare: [lhs, rhs] }: StackType.ci.DeployDb.Equal
-): boolean =>
-  (lhs.type === 'AuthUid' &&
-    rhs.type === 'DocumentField' &&
-    compare(docData, authState, lhs, rhs)) ||
-  (rhs.type === 'AuthUid' && lhs.type === 'DocumentField' && compare(docData, authState, rhs, lhs));
+const validateEqual =
+  (docData: DocData, authState: AuthState) =>
+  ({ compare: comparationPair }: StackType.ci.DeployDb.Equal): boolean =>
+    match(comparationPair)
+      .with([{ type: 'AuthUid' }, { type: 'DocumentField' }], ([lhs, rhs]) =>
+        compare(docData, authState, lhs, rhs)
+      )
+      .with([{ type: 'DocumentField' }, { type: 'AuthUid' }], ([lhs, rhs]) =>
+        compare(docData, authState, rhs, lhs)
+      )
+      .exhaustive();
 
-const validateSecurityRule =
+const validateCreateAccessRule =
   (docData: DocData, authState: AuthState) =>
   (rule: StackType.ci.DeployDb.CreateRule): boolean =>
-    rule.type === 'True' || validateEqual(docData, authState, rule);
+    match(rule)
+      .with({ type: 'True' }, () => true)
+      .with({ type: 'Equal' }, validateEqual(docData, authState))
+      .exhaustive();
+
+const validateUpdateAccessRule =
+  (_docData: DocData, _authState: AuthState) =>
+  (rule: StackType.ci.DeployDb.UpdateRule): boolean =>
+    match(rule)
+      .with({ type: 'True' }, () => true)
+      .exhaustive();
 
 export const upsertDoc: Type = (env) => (param) =>
   pipe(
-    {
-      config: pipe(
+    ioEither.Do,
+    ioEither.bindW('config', () =>
+      pipe(
         env.dbDeployConfig.read,
         io.map(
           either.fromOption(() => ({
@@ -64,22 +68,35 @@ export const upsertDoc: Type = (env) => (param) =>
             value: 'db deploy config not found',
           }))
         )
-      ),
-      authState: pipe(
+      )
+    ),
+    ioEither.bindW('authState', () =>
+      pipe(
         getItem(env.getWindow, authLocalStorageKey),
         ioOption.map((uid) => ({ uid })),
         ioEither.fromIO
-      ),
-    },
-    apply.sequenceS(ioEither.ApplyPar),
+      )
+    ),
+    ioEither.bindW('resourceDoc', () =>
+      pipe(
+        getDb(env.getWindow),
+        ioEither.map(option.chain(readonlyRecord.lookup(stringifyDocKey(param.key))))
+      )
+    ),
     ioEither.chainEitherKW(
       either.fromPredicate(
-        ({ config, authState }) =>
-          pipe(
-            option.fromNullable(config[param.key.collection]?.securityRule?.create),
-            option.map(validateSecurityRule(param.data, authState)),
-            option.getOrElse(() => false)
-          ) &&
+        ({ config, authState, resourceDoc }) =>
+          (option.isSome(resourceDoc)
+            ? pipe(
+                option.fromNullable(config[param.key.collection]?.securityRule?.update),
+                option.map(validateUpdateAccessRule(param.data, authState)),
+                option.getOrElse(() => false)
+              )
+            : pipe(
+                option.fromNullable(config[param.key.collection]?.securityRule?.create),
+                option.map(validateCreateAccessRule(param.data, authState)),
+                option.getOrElse(() => false)
+              )) &&
           pipe(
             param.data,
             readonlyRecord.mapWithIndex(
