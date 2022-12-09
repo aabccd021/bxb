@@ -1,10 +1,10 @@
 import { task } from 'fp-ts';
 
-import type { Param } from '../../../type/client/db/GetDocWhen';
-import type { Stack } from '../../type';
+import type { Stack, StackT } from '../../env';
 type Type = Stack['client']['db']['getDocWhen'];
+import type { Stack as StackType } from 'masmott';
 
 export const getDocWhen: Type =
-  (_env) =>
-  <T>(_param: Param<T>) =>
+  (_env: StackT['env']['client']) =>
+  <T>(_param: StackType.client.db.GetDocWhen.Param<T>) =>
     task.of(undefined as T);

@@ -119,14 +119,14 @@ export const tests = [
             data: { name: 'masumoto' },
           })
         ),
-        taskEither.chainTaskK(() =>
+        taskEither.chainW(() =>
           client.db.getDocWhen({
             key: { collection: 'user', id: 'kira_id' },
-            select: either.match(option.some, () => option.none),
+            select: option.some,
           })
         )
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.getDocWhen' }),
   }),
 
   defineTest({
@@ -138,14 +138,14 @@ export const tests = [
             schema: { name: { type: 'StringField' } },
           },
         }),
-        taskEither.chainTaskK(() =>
+        taskEither.chainW(() =>
           client.db.getDocWhen({
             key: { collection: 'user', id: 'kira_id' },
-            select: either.match(option.some, () => option.none),
+            select: option.some,
           })
         )
       ),
-    toResult: either.left({ code: 'ForbiddenError' }),
+    toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.getDocWhen' }),
   }),
 
   defineTest({

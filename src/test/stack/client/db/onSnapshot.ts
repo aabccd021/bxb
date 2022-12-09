@@ -11,7 +11,7 @@ import type { Option } from 'fp-ts/Option';
 import * as std from 'fp-ts-std';
 
 import type { DocData } from '../../../../type';
-import type { Unsubscribe } from '../../../../type/client/auth/OnAuthStateChanged';
+import type { Unsubscribe } from '../../../../type/client/db/OnSnapshot';
 import { defineTest } from '../../../util';
 
 export const tests = [

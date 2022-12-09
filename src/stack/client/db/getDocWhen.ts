@@ -1,10 +1,6 @@
-import { task } from 'fp-ts';
-
-import type { Param } from '../../../type/client/db/GetDocWhen';
+import { augmentCapability } from '../../..';
 import type { Stack } from '../../type';
+import { onSnapshot } from './onSnapshot';
 type Type = Stack['client']['db']['getDocWhen'];
 
-export const getDocWhen: Type =
-  (_env) =>
-  <T>(_param: Param<T>) =>
-    task.of(undefined as T);
+export const getDocWhen: Type = augmentCapability.getDocWhen.fromOnSnapshot(onSnapshot);
