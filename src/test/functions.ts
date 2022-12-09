@@ -1,15 +1,14 @@
 /* eslint-disable functional/no-conditional-statement */
-import { either, io, ioEither, ioOption, ioRef, option } from 'fp-ts';
+import { either, io, ioEither, ioOption, ioRef, option, taskEither } from 'fp-ts';
 import type { Either } from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/function';
 import type { Option } from 'fp-ts/Option';
 // eslint-disable-next-line fp-ts/no-module-imports
-import { chainTaskK, chainW as then } from 'fp-ts/TaskEither';
 import * as std from 'fp-ts-std';
 
 import type { DocData, FunctionsBuilder } from '..';
 import type { Unsubscribe } from '../type/client/db/OnSnapshot';
-import type { Test } from '.';
+import type { Test } from './util';
 
 const path = __filename.replaceAll('masmott/dist/es6', 'masmott/dist/cjs');
 
@@ -36,19 +35,19 @@ export const independencyTest1: Test<unknown> = {
           securityRule: { get: { type: 'True' } },
         },
       }),
-      then(() =>
+      taskEither.chainW(() =>
         ci.deployFunctions({
           functions: { path, exportName: 'independencyFunctions' },
           server,
         })
       ),
-      then(() =>
+      taskEither.chainW(() =>
         client.auth.createUserAndSignInWithEmailAndPassword({
           email: 'kira@sakurazaka.com',
           password: 'dorokatsu',
         })
       ),
-      chainTaskK(
+      taskEither.chainTaskK(
         () => () =>
           new Promise<DocData>((resolve) => {
             pipe(
@@ -96,13 +95,13 @@ export const independencyTest2: Test<unknown> = {
           securityRule: { get: { type: 'True' } },
         },
       }),
-      then(() =>
+      taskEither.chainW(() =>
         client.auth.createUserAndSignInWithEmailAndPassword({
           email: 'kira@sakurazaka.com',
           password: 'dorokatsu',
         })
       ),
-      chainTaskK(
+      taskEither.chainTaskK(
         () => () =>
           new Promise<DocData>((resolve) => {
             pipe(
@@ -162,19 +161,19 @@ export const test2: Test<unknown> = {
           securityRule: { get: { type: 'True' } },
         },
       }),
-      then(() =>
+      taskEither.chainW(() =>
         ci.deployFunctions({
           functions: { path, exportName: 'test2Functions' },
           server,
         })
       ),
-      then(() =>
+      taskEither.chainW(() =>
         client.auth.createUserAndSignInWithEmailAndPassword({
           email: 'kira@sakurazaka.com',
           password: 'dorokatsu',
         })
       ),
-      chainTaskK(
+      taskEither.chainTaskK(
         () => () =>
           new Promise<DocData>((resolve) => {
             pipe(
@@ -235,13 +234,13 @@ export const test3: Test<unknown> = {
           securityRule: { get: { type: 'True' } },
         },
       }),
-      then(() =>
+      taskEither.chainW(() =>
         ci.deployFunctions({
           functions: { path, exportName: 'test3Functions' },
           server,
         })
       ),
-      chainTaskK(
+      taskEither.chainTaskK(
         () => () =>
           new Promise<DocData>((resolve) => {
             pipe(
@@ -289,13 +288,13 @@ export const test4: Test<unknown> = {
           securityRule: { get: { type: 'True' } },
         },
       }),
-      then(() =>
+      taskEither.chainW(() =>
         client.auth.createUserAndSignInWithEmailAndPassword({
           email: 'kira@sakurazaka.com',
           password: 'dorokatsu',
         })
       ),
-      chainTaskK(
+      taskEither.chainTaskK(
         () => () =>
           new Promise<DocData>((resolve) => {
             pipe(
