@@ -7,7 +7,7 @@ import { defineTest } from '../../../util';
 
 export const tests = [
   defineTest({
-    name: 'can client.db.upsertDoc and client.db.getDoc',
+    name: 'can get doc created with client.db.upsertDoc',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -30,7 +30,7 @@ export const tests = [
     toResult: either.right(option.some({ name: 'masumoto' })),
   }),
   defineTest({
-    name: 'client.db.getDoc always returns the latest doc state',
+    name: 'always returns the latest doc state',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -61,7 +61,34 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'client.db.upsertDoc does not update doc if update rule is not specified',
+    name: 'does not returns doc made by forbidden create doc request done with client.db.upsertDoc',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            securityRule: {
+              get: { type: 'True' },
+            },
+            schema: { name: { type: 'StringField' } },
+          },
+        }),
+        taskEither.chainW(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        task.chain(() =>
+          client.db.getDoc({
+            key: { collection: 'user', id: 'kira_id' },
+          })
+        )
+      ),
+    toResult: either.right(option.none),
+  }),
+
+  defineTest({
+    name: 'does not returns doc made by forbidden update doc request done with client.db.upsertDoc',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -91,7 +118,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'client.db.getDoc can not get doc if forbidden',
+    name: 'returns ForbiddedError if forbidden',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -114,7 +141,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'can not get doc if forbidden, even if the doc absent',
+    name: 'returns ForbiddedError if forbidden, even if the doc absent',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -128,7 +155,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'can upsert on server and get doc on client',
+    name: 'can get doc created by server.db.upsertDoc',
     expect: ({ server, client, ci }) =>
       pipe(
         ci.deployDb({
@@ -151,29 +178,31 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'client.db.upsertDoc fails to create doc if not explicitly allowed',
-    expect: ({ client, ci }) =>
+    name: 'can get doc updated by server.db.upsertDoc',
+    expect: ({ server, client, ci }) =>
       pipe(
         ci.deployDb({
           user: {
+            schema: { name: { type: 'StringField' } },
             securityRule: {
               get: { type: 'True' },
             },
-            schema: { name: { type: 'StringField' } },
           },
         }),
         taskEither.chainW(() =>
-          client.db.upsertDoc({
+          server.db.upsertDoc({
             key: { collection: 'user', id: 'kira_id' },
             data: { name: 'masumoto' },
           })
         ),
-        task.chain(() =>
-          client.db.getDoc({
+        taskEither.chainW(() =>
+          server.db.upsertDoc({
             key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'kira' },
           })
-        )
+        ),
+        taskEither.chainW(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
       ),
-    toResult: either.right(option.none),
+    toResult: either.right(option.some({ name: 'kira' })),
   }),
 ];

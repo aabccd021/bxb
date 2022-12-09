@@ -5,7 +5,7 @@ import { defineTest } from '../../../util';
 
 export const tests = [
   defineTest({
-    name: 'return left on invalid dataUrl upload',
+    name: 'returns InvalidDataUrlFormat when invalid data url is uploaded',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployStorage({ securityRule: { type: 'allowAll' } }),

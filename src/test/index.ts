@@ -218,50 +218,36 @@ export const runTests = <T extends StackType>(
   runTest(functions.test3);
   runTest(functions.test4);
 
-  describe('server', () => {
-    describe('db', () => {
-      describe('upsertDoc', () => {
-        stackTests.server.db.upsertDoc.tests.forEach(runTest);
-      });
-      describe('getDoc', () => {
-        stackTests.server.db.getDoc.tests.forEach(runTest);
-      });
-    });
+  describe('server.db.upsertDoc', () => {
+    stackTests.server.db.upsertDoc.tests.forEach(runTest);
+  });
+  describe('server.db.getDoc', () => {
+    stackTests.server.db.getDoc.tests.forEach(runTest);
   });
 
-  describe('client', () => {
-    describe('db', () => {
-      describe('upsertDoc', () => {
-        stackTests.client.db.upsertDoc.tests.forEach(runTest);
-      });
-      describe('getDoc', () => {
-        stackTests.client.db.getDoc.tests.forEach(runTest);
-      });
-      describe('onSnapshot', () => {
-        stackTests.client.db.onSnapshot.tests.forEach(runTest);
-      });
-    });
-    describe('auth', () => {
-      describe('upsertDoc', () => {
-        stackTests.client.auth.signOut.tests.forEach(runTest);
-      });
-      describe('getDoc', () => {
-        stackTests.client.auth.getAuthState.tests.forEach(runTest);
-      });
-      describe('getDoc', () => {
-        stackTests.client.auth.onAuthStateChanged.tests.forEach(runTest);
-      });
-      describe('getDoc', () => {
-        stackTests.client.auth.createUserAndSignInWithEmailAndPassword.tests.forEach(runTest);
-      });
-    });
-    describe('storage', () => {
-      describe('upsertDoc', () => {
-        stackTests.client.storage.uploadDataUrl.tests.forEach(runTest);
-      });
-      describe('getDoc', () => {
-        stackTests.client.storage.getDownloadUrl.tests.forEach(runTest);
-      });
-    });
+  describe('client.db.upsertDoc', () => {
+    stackTests.client.db.upsertDoc.tests.forEach(runTest);
+  });
+  describe('client.db.getDoc', () => {
+    stackTests.client.db.getDoc.tests.forEach(runTest);
+  });
+  describe('client.db.onSnapshot', () => {
+    stackTests.client.db.onSnapshot.tests.forEach(runTest);
+  });
+  describe('client.auth.getAuthState', () => {
+    stackTests.client.auth.getAuthState.tests.forEach(runTest);
+  });
+  describe('client.auth.onAuthStateChanged', () => {
+    stackTests.client.auth.onAuthStateChanged.tests.forEach(runTest);
+  });
+  describe('client.auth.createUserAndSignInWithEmailAndPassword', () => {
+    stackTests.client.auth.createUserAndSignInWithEmailAndPassword.tests.forEach(runTest);
+  });
+
+  describe('client.storage.uploadDataUrl', () => {
+    stackTests.client.storage.uploadDataUrl.tests.forEach(runTest);
+  });
+  describe('client.storage.getDownloadUrl', () => {
+    stackTests.client.storage.getDownloadUrl.tests.forEach(runTest);
   });
 };

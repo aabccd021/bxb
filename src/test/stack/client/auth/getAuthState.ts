@@ -5,13 +5,13 @@ import { defineTest } from '../../../util';
 
 export const tests = [
   defineTest({
-    name: 'initial result of getAuthState is signed out',
+    name: 'returns signed out as default auth state',
     expect: ({ client }) => client.auth.getAuthState,
     toResult: either.right(option.none),
   }),
 
   defineTest({
-    name: 'getAuthState returns signed in after sign in',
+    name: 'returns singed in state after client.auth.createUserAndSignInWithEmailAndPassword',
     expect: ({ client }) =>
       pipe(
         client.auth.createUserAndSignInWithEmailAndPassword({
@@ -25,7 +25,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'getAuthState returns signed out after sign in and then sign out',
+    name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut`,
     expect: ({ client }) =>
       pipe(
         client.auth.createUserAndSignInWithEmailAndPassword({

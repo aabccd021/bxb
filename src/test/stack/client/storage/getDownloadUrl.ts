@@ -6,7 +6,7 @@ import { defineTest } from '../../../util';
 
 export const tests = [
   defineTest({
-    name: 'can upload data url and get download url',
+    name: 'can get download url of object uploaded with client.storage.getDownloadUrl',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployStorage({ securityRule: { type: 'allowAll' } }),

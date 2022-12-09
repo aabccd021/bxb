@@ -16,7 +16,7 @@ import { defineTest } from '../../../util';
 
 export const tests = [
   defineTest({
-    name: 'can client.db.upsertDoc and get doc with client.db.onSnapshot',
+    name: 'can return doc after a doc is created with client.db.upsertDoc',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -57,7 +57,7 @@ export const tests = [
                             )
                           )
                         ),
-                        io.map((_: Either<unknown, unknown>) => undefined)
+                        io.map(() => undefined)
                       ),
                     }),
                     io.chain(flow(option.some, unsubRef.write))
@@ -72,7 +72,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'client.db.onSnapshot always returns the latest doc state',
+    name: 'can return doc after a doc is updated with client.db.upsertDoc',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -120,7 +120,7 @@ export const tests = [
                             )
                           )
                         ),
-                        io.map((_: Either<unknown, unknown>) => undefined)
+                        io.map(() => undefined)
                       ),
                     }),
                     io.chain(flow(option.some, unsubRef.write))
@@ -135,7 +135,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'client.db.onSnapshot callback does not called after unsubscribed',
+    name: `callback doesn't called after unsubscribed`,
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -176,7 +176,7 @@ export const tests = [
                             )
                           )
                         ),
-                        io.map((_: Either<unknown, unknown>) => undefined)
+                        io.map(() => undefined)
                       ),
                     }),
                     io.chain(flow(option.some, unsubRef.write))
@@ -191,7 +191,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'client.db.onSnapshot returns left if forbidden',
+    name: 'returns ForbiddedError if forbidden',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -227,7 +227,7 @@ export const tests = [
                             ioOption.chainIOK((unsub) => unsub)
                           )
                         ),
-                        io.map((_: Either<unknown, unknown>) => undefined)
+                        io.map(() => undefined)
                       ),
                     }),
                     io.chain(flow(option.some, unsubRef.write))
@@ -269,7 +269,7 @@ export const tests = [
                             ioOption.chainIOK((unsub) => unsub)
                           )
                         ),
-                        io.map((_: Either<unknown, unknown>) => undefined)
+                        io.map(() => undefined)
                       ),
                     }),
                     io.chain(flow(option.some, unsubRef.write))
@@ -284,7 +284,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'can server.db.upsertDoc then client.db.onSnapshot',
+    name: 'can return doc after a doc is created with server.db.upsertDoc',
     expect: ({ client, ci, server }) =>
       pipe(
         ci.deployDb({
@@ -324,7 +324,7 @@ export const tests = [
                             )
                           )
                         ),
-                        io.map((_: Either<unknown, unknown>) => undefined)
+                        io.map(() => undefined)
                       ),
                     }),
                     io.chain(flow(option.some, unsubRef.write))

@@ -5,7 +5,26 @@ import { defineTest } from '../../../util';
 
 export const tests = [
   defineTest({
-    name: 'client.db.upsertDoc returns ForbiddenError if update rule is not specified',
+    name: 'returns ForbiddenError when creating doc if create rule is not specified',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+          },
+        }),
+        taskEither.chainW(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        )
+      ),
+    toResult: either.left({ code: 'ForbiddenError' }),
+  }),
+
+  defineTest({
+    name: 'returns ForbiddenError when updating doc if update rule is not specified',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -34,7 +53,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'client.db.upsertDoc can create doc',
+    name: 'can create doc',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -55,26 +74,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'client.db.upsertDoc fails to upsert doc if not explicitly allowed',
-    expect: ({ client, ci }) =>
-      pipe(
-        ci.deployDb({
-          user: {
-            schema: { name: { type: 'StringField' } },
-          },
-        }),
-        taskEither.chainW(() =>
-          client.db.upsertDoc({
-            key: { collection: 'user', id: 'kira_id' },
-            data: { name: 'masumoto' },
-          })
-        )
-      ),
-    toResult: either.left({ code: 'ForbiddenError' }),
-  }),
-
-  defineTest({
-    name: 'fail upsert doc if string given when int field required',
+    name: 'returns ForbiddenError when creating doc if string given when int field required',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -94,7 +94,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'fail upsert doc if int given when string field required',
+    name: 'returns ForbiddenError when creating doc if int given when string field required',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -114,7 +114,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'fail upsert doc if schema not specified',
+    name: 'returns ForbiddenError when creating doc if schema not specified',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -134,7 +134,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: `can create tweet if owner field value is owner's auth uid`,
+    name: `can create doc if owner field value is owner's auth uid`,
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -168,7 +168,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: `can not create tweet if owner field value is not owner's auth uid, even if signed in`,
+    name: `returns ForbidenError if owner field value is not owner's auth uid, even if signed in`,
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -201,7 +201,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: `can not create tweet if not signed in`,
+    name: `returns ForbiddenError if not signed in`,
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -226,7 +226,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: `can not create tweet if not signed in, swap comparation`,
+    name: `returns ForbiddenError if not signed in, swap comparation`,
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({

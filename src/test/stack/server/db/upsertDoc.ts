@@ -27,7 +27,7 @@ export const tests = [
   }),
 
   defineTest({
-    name: 'can upsert doc even if forbidden by security rule',
+    name: 'can upsert doc even if client.db.upserDoc is forbidden by security rule',
     expect: ({ server, ci }) =>
       pipe(
         ci.deployDb({
