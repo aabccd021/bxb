@@ -6,6 +6,7 @@ import type { Option } from 'fp-ts/Option';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import {
   chainEitherKW,
+  chainFirstW,
   chainTaskK,
   chainW as then,
   fromIO,
@@ -435,6 +436,7 @@ export const runTests = <T extends StackType>(
             schema: { name: { type: 'StringField' } },
             securityRule: {
               create: { type: 'True' },
+              update: { type: 'True' },
               get: { type: 'True' },
             },
           },
@@ -454,6 +456,65 @@ export const runTests = <T extends StackType>(
         then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
       ),
     toResult: either.right(option.some({ name: 'dorokatsu' })),
+  });
+
+  test({
+    name: 'client.db.upsertDoc returns ForbiddenError if update rule is not specified',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              create: { type: 'True' },
+              get: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'dorokatsu' },
+          })
+        )
+      ),
+    toResult: either.left({ code: 'ForbiddenError' }),
+  });
+
+  test({
+    name: 'client.db.upsertDoc does not update doc if update rule is not specified',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+            securityRule: {
+              create: { type: 'True' },
+              get: { type: 'True' },
+            },
+          },
+        }),
+        then(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        chainFirstW(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'dorokatsu' },
+          })
+        ),
+        then(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
+      ),
+    toResult: either.right(option.some({ name: 'masumoto' })),
   });
 
   test({
@@ -521,6 +582,7 @@ export const runTests = <T extends StackType>(
             schema: { name: { type: 'StringField' } },
             securityRule: {
               create: { type: 'True' },
+              update: { type: 'True' },
               get: { type: 'True' },
             },
           },
@@ -631,7 +693,7 @@ export const runTests = <T extends StackType>(
   });
 
   test({
-    name: 'can not get doc if forbidden',
+    name: 'client.db.getDoc can not get doc if forbidden',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -705,7 +767,7 @@ export const runTests = <T extends StackType>(
   });
 
   test({
-    name: 'can upsert doc',
+    name: 'client.db.upsertDoc can create doc',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -726,7 +788,7 @@ export const runTests = <T extends StackType>(
   });
 
   test({
-    name: 'fail upsert doc if not explicitly allowed',
+    name: 'client.db.upsertDoc fails to upsert doc if not explicitly allowed',
     expect: ({ client, ci }) =>
       pipe(
         ci.deployDb({
@@ -742,6 +804,30 @@ export const runTests = <T extends StackType>(
         )
       ),
     toResult: either.left({ code: 'ForbiddenError' }),
+  });
+
+  test({
+    name: 'client.db.upsertDoc fails to create doc if not explicitly allowed',
+    expect: ({ client, ci }) =>
+      pipe(
+        ci.deployDb({
+          user: {
+            schema: { name: { type: 'StringField' } },
+          },
+        }),
+        chainFirstW(() =>
+          client.db.upsertDoc({
+            key: { collection: 'user', id: 'kira_id' },
+            data: { name: 'masumoto' },
+          })
+        ),
+        then(() =>
+          client.db.getDoc({
+            key: { collection: 'user', id: 'kira_id' },
+          })
+        )
+      ),
+    toResult: either.right(option.some({ name: 'masumoto' })),
   });
 
   test({

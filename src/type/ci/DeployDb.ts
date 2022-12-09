@@ -39,11 +39,14 @@ export type Schema = ReadonlyRecord<string, Field>;
 
 export type CreateRule = Equal | True;
 
+export type UpdateRule = True;
+
 export type CollectionConfig = {
   readonly schema: Schema;
   readonly securityRule?: {
     readonly get?: True;
     readonly create?: CreateRule;
+    readonly update?: UpdateRule;
   };
 };
 
