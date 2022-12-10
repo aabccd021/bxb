@@ -64,7 +64,7 @@ export const suite: Suite = {
     }),
 
     defineTest({
-      name: 'does not returns doc made by forbidden create doc request done with client.db.upsertDoc',
+      name: `does not returns doc made by forbidden create doc request done with client.db.upsertDoc`,
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
@@ -91,7 +91,7 @@ export const suite: Suite = {
     }),
 
     defineTest({
-      name: 'does not returns doc made by forbidden update doc request done with client.db.upsertDoc',
+      name: `does not returns doc made by forbidden update doc request done with client.db.upsertDoc`,
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
