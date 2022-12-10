@@ -1,84 +1,11 @@
-/* eslint-disable functional/no-conditional-statement */
 import { either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
-// eslint-disable-next-line fp-ts/no-module-imports
-import type { FunctionsBuilder } from '..';
-import type { Test } from './util';
+import type { FunctionsBuilder } from '../..';
+import type { Suite } from '../util';
+import { defineTest } from '../util';
 
-const path = __filename.replaceAll('masmott/dist/es6', 'masmott/dist/cjs');
-
-export const independencyFunctions: FunctionsBuilder = (server) => ({
-  functions: {
-    createDocOnAuthCreated: {
-      trigger: 'onAuthCreated',
-      handler: () =>
-        server.db.upsertDoc({
-          key: { collection: 'detection', id: '1' },
-          data: { status: 'true' },
-        }),
-    },
-  },
-});
-
-export const independencyTest1: Test<unknown> = {
-  name: `a test can deploy trigger`,
-  expect: ({ client, ci, server }) =>
-    pipe(
-      ci.deployDb({
-        detection: {
-          schema: { status: { type: 'StringField' } },
-          securityRule: { get: { type: 'True' } },
-        },
-      }),
-      taskEither.chainW(() =>
-        ci.deployFunctions({
-          functions: { path, exportName: 'independencyFunctions' },
-          server,
-        })
-      ),
-      taskEither.chainW(() =>
-        client.auth.createUserAndSignInWithEmailAndPassword({
-          email: 'kira@sakurazaka.com',
-          password: 'dorokatsu',
-        })
-      ),
-      taskEither.chainTaskK(() =>
-        client.db.getDocWhen({
-          key: { collection: 'detection', id: '1' },
-          select: either.match(() => option.none, identity),
-        })
-      )
-    ),
-  toResult: either.right({ status: 'true' }),
-};
-
-export const independencyTest2: Test<unknown> = {
-  name: `another test shouldn't be affected by trigger from another test`,
-  type: 'fail',
-  expect: ({ client, ci }) =>
-    pipe(
-      ci.deployDb({
-        detection: {
-          schema: { status: { type: 'StringField' } },
-          securityRule: { get: { type: 'True' } },
-        },
-      }),
-      taskEither.chainW(() =>
-        client.auth.createUserAndSignInWithEmailAndPassword({
-          email: 'kira@sakurazaka.com',
-          password: 'dorokatsu',
-        })
-      ),
-      taskEither.chainTaskK(() =>
-        client.db.getDocWhen({
-          key: { collection: 'detection', id: '1' },
-          select: either.match(() => option.none, identity),
-        })
-      )
-    ),
-  toResult: either.right({ status: 'true' }),
-};
+const functionsPath = __filename.replaceAll('masmott/dist/es6', 'masmott/dist/cjs');
 
 export const test2Functions: FunctionsBuilder = (server) => ({
   functions: {
@@ -93,7 +20,7 @@ export const test2Functions: FunctionsBuilder = (server) => ({
   },
 });
 
-export const test2: Test<unknown> = {
+const test2 = defineTest({
   name: `onAuthCreated trigger can upsert doc`,
   expect: ({ client, ci, server }) =>
     pipe(
@@ -105,7 +32,7 @@ export const test2: Test<unknown> = {
       }),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: { path, exportName: 'test2Functions' },
+          functions: { path: functionsPath, exportName: 'test2Functions' },
           server,
         })
       ),
@@ -123,7 +50,7 @@ export const test2: Test<unknown> = {
       )
     ),
   toResult: either.right({ status: 'true' }),
-};
+});
 
 export const test3Functions: FunctionsBuilder = (server) => ({
   functions: {
@@ -138,7 +65,7 @@ export const test3Functions: FunctionsBuilder = (server) => ({
   },
 });
 
-export const test3: Test<unknown> = {
+const test3 = defineTest({
   name: `onAuthCreated trigger should not be called if not triggered`,
   type: 'fail',
   expect: ({ client, ci, server }) =>
@@ -151,7 +78,7 @@ export const test3: Test<unknown> = {
       }),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: { path, exportName: 'test3Functions' },
+          functions: { path: functionsPath, exportName: 'test3Functions' },
           server,
         })
       ),
@@ -163,9 +90,9 @@ export const test3: Test<unknown> = {
       )
     ),
   toResult: either.right({ status: 'true' }),
-};
+});
 
-export const test4: Test<unknown> = {
+const test4 = defineTest({
   name: `document should not be created if trigger not deployed`,
   type: 'fail',
   expect: ({ client, ci }) =>
@@ -190,4 +117,9 @@ export const test4: Test<unknown> = {
       )
     ),
   toResult: either.right({ status: 'true' }),
+});
+
+export const suite: Suite = {
+  name: 'onAuthCreated functions',
+  tests: [test2, test3, test4],
 };

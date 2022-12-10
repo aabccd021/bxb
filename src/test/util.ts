@@ -10,4 +10,10 @@ export type Test<T> = {
   readonly type?: 'fail';
 };
 
+export type Suite = {
+  readonly name: string;
+  readonly tests: readonly Test<unknown>[];
+  readonly concurrent?: boolean;
+};
+
 export const defineTest = <T>(t: Test<T>) => t;

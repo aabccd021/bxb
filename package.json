@@ -22,7 +22,11 @@
     "test:provider:foo": "cd e2e/provider/foo && pnpm install && pnpm test && pnpm build",
     "test:framework:nextjs": "cd e2e/framework/nextjs && pnpm install && pnpm generate && pnpm test:treeshaking && pnpm test:e2e",
     "test:types": "tsc --noEmit",
-    "test": "pnpm test:types && vitest --run && pnpm test:provider:foo && pnpm test:framework:nextjs"
+    "test:independence": "vitest --run independence.test.ts",
+    "test:capability": "vitest --run capability.test.ts",
+    "test:functions": "vitest --run functions.test.ts",
+    "test:unit": "pnpm test:independence && pnpm test:capability && pnpm test:functions",
+    "test": "pnpm test:types && pnpm test:unit && pnpm test:provider:foo && pnpm test:framework:nextjs"
   },
   "sideEffects": false,
   "name": "masmott",
