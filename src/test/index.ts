@@ -17,23 +17,29 @@ export const runSuiteWithConfig =
     readonly getTestEnv: TaskEither<{ readonly capability: 'test.getTestEnv' }, T['env']>;
   }) =>
   ({ suite }: { readonly suite: Suite }) => {
-    (suite.concurrent ?? false ? describe.concurrent : describe)(suite.name, () =>
-      suite.tests.forEach(({ name, expect: fn, toResult: expectedResult, type }) => {
-        (type === 'fail' ? test_.fails : test_)(name, () =>
-          expect(
-            pipe(
-              getTestEnv,
-              taskEither.map((env) => ({
-                client: applyClientEnv({ stack: stack.client, env: env.client }),
-                ci: applyCiEnv({ stack: stack.ci, env: env.ci }),
-                server: applyServerEnv({ stack: stack.server, env: env.server }),
-              })),
-              taskEither.chainW(fn),
-              std.task.execute
-            )
-          ).resolves.toEqual(expectedResult)
-        );
-      })
+    (suite.concurrent ?? false ? describe.concurrent : describe)(
+      suite.name,
+      () =>
+        suite.tests.forEach((test) => {
+          (test.type === 'fail' ? test_.fails : test_)(
+            test.name,
+            () =>
+              expect(
+                pipe(
+                  getTestEnv,
+                  taskEither.map((env) => ({
+                    client: applyClientEnv({ stack: stack.client, env: env.client }),
+                    ci: applyCiEnv({ stack: stack.ci, env: env.ci }),
+                    server: applyServerEnv({ stack: stack.server, env: env.server }),
+                  })),
+                  taskEither.chainW(test.expect),
+                  std.task.execute
+                )
+              ).resolves.toEqual(test.toResult),
+            { timeout: test.timeOut, retry: test.retry }
+          );
+        }),
+      { timeout: suite.timeOut, retry: suite.retry }
     );
   };
 
