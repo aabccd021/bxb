@@ -1,10 +1,10 @@
 import type { Option } from 'fp-ts/Option';
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
-import type { TaskEither } from 'fp-ts/TaskEither';
 
+import type * as Functions from './functions';
 import type * as Stack from './stack';
 
-export { Stack };
+export { Functions, Stack };
 
 export type ProviderError = {
   readonly code: 'ProviderError';
@@ -49,17 +49,8 @@ export type StackWithEnv<T extends StackType> = {
   readonly server: ApplyClientEnv<T['env']['server'], Stack.server.Type>;
 };
 
-export type OnAuthCreatedFunction = {
-  readonly trigger: 'onAuthCreated';
-  readonly handler: (p: {
-    readonly authUser: AuthUser;
-  }) => TaskEither<{ readonly code: string }, undefined | void>;
-};
-
-export type Functions = OnAuthCreatedFunction;
-
 export type DeployFunctionParam = {
-  readonly functions: ReadonlyRecord<string, Functions>;
+  readonly functions: ReadonlyRecord<string, Functions.Type>;
 };
 
 export type FunctionsBuilder = (server: Stack.server.Type) => DeployFunctionParam;

@@ -10,7 +10,7 @@ const functionsPath = __filename.replaceAll('masmott/dist/es6', 'masmott/dist/cj
 export const test2Functions: FunctionsBuilder = (server) => ({
   functions: {
     detectUserExists: {
-      trigger: 'onAuthCreated',
+      trigger: 'onAuthUserCreated',
       handler: () =>
         server.db.upsertDoc({
           key: { collection: 'detection', id: '1' },
@@ -21,7 +21,7 @@ export const test2Functions: FunctionsBuilder = (server) => ({
 });
 
 const test2 = defineTest({
-  name: `onAuthCreated trigger can upsert doc`,
+  name: `onAuthUserCreated trigger can upsert doc`,
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
@@ -55,7 +55,7 @@ const test2 = defineTest({
 export const test3Functions: FunctionsBuilder = (server) => ({
   functions: {
     detectUserExists: {
-      trigger: 'onAuthCreated',
+      trigger: 'onAuthUserCreated',
       handler: () =>
         server.db.upsertDoc({
           key: { collection: 'detection', id: '1' },
@@ -66,7 +66,7 @@ export const test3Functions: FunctionsBuilder = (server) => ({
 });
 
 const test3 = defineTest({
-  name: `onAuthCreated trigger should not be called if not triggered`,
+  name: `onAuthUserCreated trigger should not be called if not triggered`,
   type: 'fail',
   expect: ({ client, ci, server }) =>
     pipe(
@@ -120,6 +120,6 @@ const test4 = defineTest({
 });
 
 export const suite: Suite = {
-  name: 'onAuthCreated functions',
+  name: 'onAuthUserCreated functions',
   tests: [test2, test3, test4],
 };

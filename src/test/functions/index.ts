@@ -1,5 +1,5 @@
-import * as onAuthCreated from './onAuthCreated';
+import * as onAuthUserCreated from './onAuthUserCreated';
 
-export { onAuthCreated };
+export { onAuthUserCreated };
 
-export const allSuites = [onAuthCreated.suite];
+export const allSuites = [onAuthUserCreated.suite];
