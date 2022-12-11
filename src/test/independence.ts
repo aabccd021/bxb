@@ -197,7 +197,7 @@ export const authState: Suite = {
 export const independencyFunctions: FunctionsBuilder = (server) => ({
   functions: {
     createDocOnAuthCreated: {
-      trigger: 'onAuthCreated',
+      trigger: 'onAuthUserCreated',
       handler: () =>
         server.db.upsertDoc({
           key: { collection: 'detection', id: '1' },
