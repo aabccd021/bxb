@@ -14,7 +14,7 @@ export const runSuiteWithConfig =
     getTestEnv,
   }: {
     readonly stack: StackWithEnv<T>;
-    readonly getTestEnv: TaskEither<unknown, T['env']>;
+    readonly getTestEnv: TaskEither<{ readonly capability: 'test.getTestEnv' }, T['env']>;
   }) =>
   ({ suite }: { readonly suite: Suite }) => {
     (suite.concurrent ?? false ? describe.concurrent : describe)(suite.name, () =>
