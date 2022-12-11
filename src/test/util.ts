@@ -8,12 +8,16 @@ export type Test<T> = {
   readonly expect: (stack: Stack.Type) => TaskEither<unknown, T>;
   readonly toResult: Either<unknown, T>;
   readonly type?: 'fail';
+  readonly timeOut?: number;
+  readonly retry?: number;
 };
 
 export type Suite = {
   readonly name: string;
   readonly tests: readonly Test<unknown>[];
   readonly concurrent?: boolean;
+  readonly timeOut?: number;
+  readonly retry?: number;
 };
 
 export const defineTest = <T>(t: Test<T>) => t;
