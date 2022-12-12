@@ -1,4 +1,4 @@
-import { either, io, ioRef, option, taskEither } from 'fp-ts';
+import { either, ioRef, option, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
 import type { AuthState } from '../../../..';
@@ -12,14 +12,13 @@ export const suite: Suite = {
       name: 'returns signed out as default auth state',
       expect: ({ client }) =>
         pipe(
-          ioRef.newIORef<AuthState>(option.none),
-          io.chain((authStateRef) =>
-            pipe(
-              client.auth.onAuthStateChanged(authStateRef.write),
-              io.chain(() => authStateRef.read)
-            )
+          taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
+          taskEither.bindTo('authStateRef'),
+          taskEither.bind('unsubscribe', ({ authStateRef }) =>
+            taskEither.fromIO(client.auth.onAuthStateChanged(authStateRef.write))
           ),
-          taskEither.fromIO
+          taskEither.chainFirstW(({ unsubscribe }) => taskEither.fromIO(unsubscribe)),
+          taskEither.chainW(({ authStateRef }) => taskEither.fromIO(authStateRef.read))
         ),
       toResult: either.right(option.none),
     }),
@@ -29,18 +28,18 @@ export const suite: Suite = {
       expect: ({ client }) =>
         pipe(
           taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
-          taskEither.chainW((authStateRef) =>
-            pipe(
-              client.auth.createUserAndSignInWithEmailAndPassword({
-                email: 'kira@sakurazaka.com',
-                password: 'dorokatsu',
-              }),
-              taskEither.chainW(() =>
-                taskEither.fromIO(client.auth.onAuthStateChanged(authStateRef.write))
-              ),
-              taskEither.chainW(() => taskEither.fromIO(authStateRef.read))
-            )
+          taskEither.bindTo('authStateRef'),
+          taskEither.chainFirstW(() =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
           ),
+          taskEither.bind('unsubscribe', ({ authStateRef }) =>
+            taskEither.fromIO(client.auth.onAuthStateChanged(authStateRef.write))
+          ),
+          taskEither.chainFirstW(({ unsubscribe }) => taskEither.fromIO(unsubscribe)),
+          taskEither.chainW(({ authStateRef }) => taskEither.fromIO(authStateRef.read)),
           taskEither.map(option.map(() => 'some auth state'))
         ),
       toResult: either.right(option.some('some auth state')),
@@ -51,19 +50,19 @@ export const suite: Suite = {
       expect: ({ client }) =>
         pipe(
           taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
-          taskEither.chainW((authStateRef) =>
-            pipe(
-              client.auth.createUserAndSignInWithEmailAndPassword({
-                email: 'kira@sakurazaka.com',
-                password: 'dorokatsu',
-              }),
-              taskEither.chainW(() => client.auth.signOut),
-              taskEither.chainW(() =>
-                taskEither.fromIO(client.auth.onAuthStateChanged(authStateRef.write))
-              ),
-              taskEither.chainW(() => taskEither.fromIO(authStateRef.read))
-            )
-          )
+          taskEither.bindTo('authStateRef'),
+          taskEither.chainFirstW(() =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
+          ),
+          taskEither.chainFirstW(() => client.auth.signOut),
+          taskEither.bind('unsubscribe', ({ authStateRef }) =>
+            taskEither.fromIO(client.auth.onAuthStateChanged(authStateRef.write))
+          ),
+          taskEither.chainFirstW(({ unsubscribe }) => taskEither.fromIO(unsubscribe)),
+          taskEither.chainW(({ authStateRef }) => taskEither.fromIO(authStateRef.read))
         ),
       toResult: either.right(option.none),
     }),
@@ -73,19 +72,19 @@ export const suite: Suite = {
       expect: ({ client }) =>
         pipe(
           taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
-          taskEither.chainW((authStateRef) =>
-            pipe(
-              taskEither.fromIO(client.auth.onAuthStateChanged(authStateRef.write)),
-              taskEither.chainW(() =>
-                client.auth.createUserAndSignInWithEmailAndPassword({
-                  email: 'kira@sakurazaka.com',
-                  password: 'dorokatsu',
-                })
-              ),
-              taskEither.chainW(() => client.auth.signOut),
-              taskEither.chainW(() => taskEither.fromIO(authStateRef.read))
-            )
-          )
+          taskEither.bindTo('authStateRef'),
+          taskEither.bind('unsubscribe', ({ authStateRef }) =>
+            taskEither.fromIO(client.auth.onAuthStateChanged(authStateRef.write))
+          ),
+          taskEither.chainFirstW(() =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
+          ),
+          taskEither.chainFirstW(() => client.auth.signOut),
+          taskEither.chainFirstW(({ unsubscribe }) => taskEither.fromIO(unsubscribe)),
+          taskEither.chainW(({ authStateRef }) => taskEither.fromIO(authStateRef.read))
         ),
       toResult: either.right(option.none),
     }),
@@ -95,19 +94,19 @@ export const suite: Suite = {
       expect: ({ client }) =>
         pipe(
           taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
-          taskEither.chainW((authStateRef) =>
-            pipe(
-              client.auth.createUserAndSignInWithEmailAndPassword({
-                email: 'kira@sakurazaka.com',
-                password: 'dorokatsu',
-              }),
-              taskEither.chainW(() =>
-                taskEither.fromIO(client.auth.onAuthStateChanged(authStateRef.write))
-              ),
-              taskEither.chainW(() => client.auth.signOut),
-              taskEither.chainW(() => taskEither.fromIO(authStateRef.read))
-            )
-          )
+          taskEither.bindTo('authStateRef'),
+          taskEither.chainFirstW(() =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
+          ),
+          taskEither.bind('unsubscribe', ({ authStateRef }) =>
+            taskEither.fromIO(client.auth.onAuthStateChanged(authStateRef.write))
+          ),
+          taskEither.chainFirstW(() => client.auth.signOut),
+          taskEither.chainFirstW(({ unsubscribe }) => taskEither.fromIO(unsubscribe)),
+          taskEither.chainW(({ authStateRef }) => taskEither.fromIO(authStateRef.read))
         ),
       toResult: either.right(option.none),
     }),
@@ -117,19 +116,18 @@ export const suite: Suite = {
       expect: ({ client }) =>
         pipe(
           taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
-          taskEither.chainW((authStateRef) =>
-            pipe(
-              taskEither.fromIO(client.auth.onAuthStateChanged(authStateRef.write)),
-              taskEither.chainW((unsubscribe) => taskEither.fromIO(unsubscribe)),
-              taskEither.chainW(() =>
-                client.auth.createUserAndSignInWithEmailAndPassword({
-                  email: 'kira@sakurazaka.com',
-                  password: 'dorokatsu',
-                })
-              ),
-              taskEither.chainW(() => taskEither.fromIO(authStateRef.read))
-            )
-          )
+          taskEither.bindTo('authStateRef'),
+          taskEither.bind('unsubscribe', ({ authStateRef }) =>
+            taskEither.fromIO(client.auth.onAuthStateChanged(authStateRef.write))
+          ),
+          taskEither.chainFirstW(({ unsubscribe }) => taskEither.fromIO(unsubscribe)),
+          taskEither.chainFirstW(() =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
+          ),
+          taskEither.chainW(({ authStateRef }) => taskEither.fromIO(authStateRef.read))
         ),
       toResult: either.right(option.none),
     }),
