@@ -26,7 +26,7 @@ const test2 = defineTest({
     pipe(
       ci.deployDb({
         storageObject: {
-          schema: { status: { type: 'StringField' } },
+          schema: { exists: { type: 'StringField' } },
           securityRule: { get: { type: 'True' } },
         },
       }),
@@ -49,7 +49,7 @@ const test2 = defineTest({
         })
       )
     ),
-  toResult: either.right({ status: 'true' }),
+  toResult: either.right({ exists: 'true' }),
 });
 
 export const test3Functions: FunctionsBuilder = (server) => ({
@@ -72,7 +72,7 @@ const test3 = defineTest({
     pipe(
       ci.deployDb({
         detection: {
-          schema: { status: { type: 'StringField' } },
+          schema: { exists: { type: 'StringField' } },
           securityRule: { get: { type: 'True' } },
         },
       }),
@@ -89,7 +89,7 @@ const test3 = defineTest({
         })
       )
     ),
-  toResult: either.right({ status: 'true' }),
+  toResult: either.right({ exists: 'true' }),
 });
 
 const test4 = defineTest({
@@ -99,7 +99,7 @@ const test4 = defineTest({
     pipe(
       ci.deployDb({
         storageObject: {
-          schema: { status: { type: 'StringField' } },
+          schema: { exists: { type: 'StringField' } },
           securityRule: { get: { type: 'True' } },
         },
       }),
@@ -116,7 +116,7 @@ const test4 = defineTest({
         })
       )
     ),
-  toResult: either.right({ status: 'true' }),
+  toResult: either.right({ exists: 'true' }),
 });
 
 export const suite: Suite = {
