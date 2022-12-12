@@ -9,4 +9,13 @@ export type OnAuthUserCreated = {
   }) => TaskEither<{ readonly code: string }, undefined | void>;
 };
 
-export type Type = OnAuthUserCreated;
+export type OnObjectCreated = {
+  readonly trigger: 'onObjectCreated';
+  readonly handler: (p: {
+    readonly object: {
+      readonly key: string;
+    };
+  }) => TaskEither<{ readonly code: string }, undefined | void>;
+};
+
+export type Type = OnAuthUserCreated | OnObjectCreated;
