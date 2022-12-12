@@ -29,12 +29,11 @@ export const createUserAndSignInWithEmailAndPassword: Type = (env) => (param) =>
       flow(
         option.map(({ functions }) => functions),
         option.getOrElseW(() => ({})),
-        readonlyRecord.filterMap((fn) =>
+        readonlyRecord.traverse(taskEither.ApplicativeSeq)((fn) =>
           fn.trigger === 'onAuthUserCreated'
-            ? option.some(fn.handler({ authUser: { uid: param.email } }))
-            : option.none
+            ? fn.handler({ authUser: { uid: param.email } })
+            : taskEither.of(undefined)
         ),
-        readonlyRecord.sequence(taskEither.ApplicativeSeq),
         taskEither.bimap(
           (value) => ({ code: 'ProviderError' as const, value }),
           () => undefined
