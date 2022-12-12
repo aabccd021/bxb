@@ -19,11 +19,12 @@ export const uploadDataUrl: Type = (env) => (param) =>
       flow(
         option.map(({ functions }) => functions),
         option.getOrElseW(() => ({})),
-        readonlyRecord.traverse(taskEither.ApplicativeSeq)((fn) =>
+        readonlyRecord.filterMap((fn) =>
           fn.trigger === 'onObjectCreated'
-            ? fn.handler({ object: { key: param.key } })
-            : taskEither.of(undefined)
+            ? option.some(fn.handler({ object: { key: param.key } }))
+            : option.none
         ),
+        readonlyRecord.sequence(taskEither.ApplicativeSeq),
         taskEither.bimap(
           (value) => ({ code: 'ProviderError' as const, value }),
           () => undefined
