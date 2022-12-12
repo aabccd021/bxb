@@ -1,4 +1,4 @@
-import { either, option, taskEither } from 'fp-ts';
+import { either, option, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
 import type { FunctionsBuilder } from '../..';
@@ -9,12 +9,12 @@ const functionsPath = __filename.replaceAll('masmott/dist/es6', 'masmott/dist/cj
 
 export const test2Functions: FunctionsBuilder = (server) => ({
   functions: {
-    detectUserExists: {
+    saveLatestCreatedUser: {
       trigger: 'onAuthUserCreated',
-      handler: () =>
+      handler: ({ authUser }) =>
         server.db.upsertDoc({
-          key: { collection: 'detection', id: '1' },
-          data: { status: 'true' },
+          key: { collection: 'authUser', id: 'latestCreated' },
+          data: { uid: authUser.uid },
         }),
     },
   },
@@ -25,8 +25,8 @@ const test2 = defineTest({
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
-        detection: {
-          schema: { status: { type: 'StringField' } },
+        authUser: {
+          schema: { created: { type: 'StringField' } },
           securityRule: { get: { type: 'True' } },
         },
       }),
@@ -42,24 +42,29 @@ const test2 = defineTest({
           password: 'dorokatsu',
         })
       ),
-      taskEither.chainTaskK(() =>
-        client.db.getDocWhen({
-          key: { collection: 'detection', id: '1' },
-          select: either.match(() => option.none, identity),
-        })
+      taskEither.chainTaskK((signInResult) =>
+        pipe(
+          client.db.getDocWhen({
+            key: { collection: 'authUser', id: 'latestCreated' },
+            select: either.match(() => option.none, identity),
+          }),
+          task.map(
+            (latestCreatedUserDoc) => latestCreatedUserDoc['uid'] === signInResult.authUser.uid
+          )
+        )
       )
     ),
-  toResult: either.right({ status: 'true' }),
+  toResult: either.right(true),
 });
 
 export const test3Functions: FunctionsBuilder = (server) => ({
   functions: {
-    detectUserExists: {
+    saveLatestCreatedUser: {
       trigger: 'onAuthUserCreated',
-      handler: () =>
+      handler: ({ authUser }) =>
         server.db.upsertDoc({
-          key: { collection: 'detection', id: '1' },
-          data: { status: 'true' },
+          key: { collection: 'authUser', id: 'latestCreated' },
+          data: { uid: authUser.uid },
         }),
     },
   },
@@ -71,8 +76,8 @@ const test3 = defineTest({
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
-        detection: {
-          schema: { status: { type: 'StringField' } },
+        authUser: {
+          schema: { created: { type: 'StringField' } },
           securityRule: { get: { type: 'True' } },
         },
       }),
@@ -84,12 +89,12 @@ const test3 = defineTest({
       ),
       taskEither.chainTaskK(() =>
         client.db.getDocWhen({
-          key: { collection: 'detection', id: '1' },
+          key: { collection: 'authUser', id: 'latestCreated' },
           select: either.match(() => option.none, identity),
         })
       )
     ),
-  toResult: either.right({ status: 'true' }),
+  toResult: either.right({ created: 'true' }),
 });
 
 const test4 = defineTest({
@@ -98,8 +103,8 @@ const test4 = defineTest({
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
-        detection: {
-          schema: { status: { type: 'StringField' } },
+        authUser: {
+          schema: { created: { type: 'StringField' } },
           securityRule: { get: { type: 'True' } },
         },
       }),
@@ -111,12 +116,12 @@ const test4 = defineTest({
       ),
       taskEither.chainTaskK(() =>
         client.db.getDocWhen({
-          key: { collection: 'detection', id: '1' },
+          key: { collection: 'authUser', id: 'latestCreated' },
           select: either.match(() => option.none, identity),
         })
       )
     ),
-  toResult: either.right({ status: 'true' }),
+  toResult: either.right({ created: 'true' }),
 });
 
 export const suite: Suite = {

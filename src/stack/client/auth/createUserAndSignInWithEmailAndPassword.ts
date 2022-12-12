@@ -35,14 +35,14 @@ export const createUserAndSignInWithEmailAndPassword: Type = (env) => (param) =>
             : option.none
         ),
         readonlyRecord.sequence(taskEither.ApplicativeSeq),
-        taskEither.bimap(
-          (value) => ({ code: 'ProviderError' as const, value }),
-          () => undefined
-        )
+        taskEither.mapLeft((value) => ({ code: 'ProviderError' as const, value }))
       )
     ),
-    taskEither.mapLeft((err) => ({
-      ...err,
-      capability: 'client.auth.createUserAndSignInWithEmailAndPassword',
-    }))
+    taskEither.bimap(
+      (err) => ({
+        ...err,
+        capability: 'client.auth.createUserAndSignInWithEmailAndPassword',
+      }),
+      () => ({ authUser: { uid: param.email } })
+    )
   );

@@ -157,12 +157,10 @@ export const suite: Suite = {
               password: 'dorokatsu',
             })
           ),
-          taskEither.chainW(() => client.auth.getAuthState),
-          taskEither.chainEitherKW(either.fromOption(() => ({ code: 'user not signed in' }))),
-          taskEither.chainW((authUser) =>
+          taskEither.chainW((signInResult) =>
             client.db.upsertDoc({
               key: { collection: 'tweet', id: '1' },
-              data: { owner: authUser.uid },
+              data: { owner: signInResult.authUser.uid },
             })
           ),
           taskEither.map(() => 'upsert success')
@@ -191,8 +189,6 @@ export const suite: Suite = {
               password: 'dorokatsu',
             })
           ),
-          taskEither.chainW(() => client.auth.getAuthState),
-          taskEither.chainEitherKW(either.fromOption(() => ({ code: 'user not signed in' }))),
           taskEither.chainW(() =>
             client.db.upsertDoc({
               key: { collection: 'tweet', id: '1' },
