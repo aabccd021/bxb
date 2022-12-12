@@ -1,4 +1,4 @@
-import { either, option, task, taskEither } from 'fp-ts';
+import { either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
 import type { FunctionsBuilder } from '../..';
@@ -42,16 +42,18 @@ const test2 = defineTest({
           password: 'dorokatsu',
         })
       ),
-      taskEither.chainTaskK((signInResult) =>
-        pipe(
+      taskEither.bindTo('signInResult'),
+      taskEither.bind('latestCreatedUserDoc', () =>
+        taskEither.fromTask(
           client.db.getDocWhen({
             key: { collection: 'authUser', id: 'latestCreated' },
             select: either.match(() => option.none, identity),
-          }),
-          task.map(
-            (latestCreatedUserDoc) => latestCreatedUserDoc['uid'] === signInResult.authUser.uid
-          )
+          })
         )
+      ),
+      taskEither.map(
+        ({ signInResult, latestCreatedUserDoc }) =>
+          latestCreatedUserDoc['uid'] === signInResult.authUser.uid
       )
     ),
   toResult: either.right(true),
