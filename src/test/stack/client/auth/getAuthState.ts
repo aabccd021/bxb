@@ -28,6 +28,28 @@ export const suite: Suite = {
     }),
 
     defineTest({
+      name: `returns authUser uid same as the one returned from client.auth.createUserAndSignInWithEmailAndPassword`,
+      expect: ({ client }) =>
+        pipe(
+          taskEither.Do,
+          taskEither.bind('signInResult', () =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
+          ),
+          taskEither.bindW('getAuthStateResult', () => client.auth.getAuthState),
+          taskEither.map(({ signInResult, getAuthStateResult }) =>
+            pipe(
+              getAuthStateResult,
+              option.map((authUser) => authUser.uid === signInResult.authUser.uid)
+            )
+          )
+        ),
+      toResult: either.right(option.some(true)),
+    }),
+
+    defineTest({
       name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut`,
       expect: ({ client }) =>
         pipe(
