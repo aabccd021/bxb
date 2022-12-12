@@ -30,7 +30,9 @@ export const createUserAndSignInWithEmailAndPassword: Type = (env) => (param) =>
         option.map(({ functions }) => functions),
         option.getOrElseW(() => ({})),
         readonlyRecord.traverse(taskEither.ApplicativeSeq)((fn) =>
-          fn.handler({ authUser: { uid: param.email } })
+          fn.trigger === 'onAuthUserCreated'
+            ? fn.handler({ authUser: { uid: param.email } })
+            : taskEither.of(undefined)
         ),
         taskEither.bimap(
           (value) => ({ code: 'ProviderError' as const, value }),
