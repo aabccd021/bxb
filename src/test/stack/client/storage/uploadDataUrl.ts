@@ -55,7 +55,7 @@ export const suite: Suite = {
     }),
 
     defineTest({
-      name: 'returns Forbidden error when create security rule not specified',
+      name: 'returns Forbidden when create security rule not specified',
       expect: ({ client, ci }) =>
         pipe(
           ci.deployStorage({ securityRule: {} }),
@@ -101,7 +101,7 @@ export const suite: Suite = {
     }),
 
     defineTest({
-      name: 'returns Forbidden if uploaded a base64 data url larger than constraint',
+      name: 'returns Forbidden error if uploaded a base64 data url larger than constraint',
       expect: ({ client, ci }) =>
         pipe(
           ci.deployStorage({
@@ -159,7 +159,7 @@ export const suite: Suite = {
     }),
 
     defineTest({
-      name: 'returns Forbidden if uploaded a plain text data url larger than constraint',
+      name: 'returns Forbidden error if uploaded a plain text data url larger than constraint',
       expect: ({ client, ci }) =>
         pipe(
           ci.deployStorage({
@@ -237,7 +237,7 @@ export const suite: Suite = {
     }),
 
     defineTest({
-      name: 'returns Forbidden if not signed in but required in rule',
+      name: 'returns Forbidden error if not signed in but required in rule',
       expect: ({ client, ci, server }) =>
         pipe(
           ci.deployStorage({
@@ -279,8 +279,151 @@ export const suite: Suite = {
               key: 'kira_id',
               dataUrl: `data:,kira masumoto`,
             })
+          )
+        ),
+      toResult: either.left({
+        code: 'Forbidden',
+        capability: 'client.storage.uploadDataUrl',
+      }),
+    }),
+
+    defineTest({
+      name: 'returns Forbidden error if object document does not exists',
+      expect: ({ client, ci }) =>
+        pipe(
+          ci.deployStorage({
+            securityRule: {
+              create: [
+                {
+                  type: 'Equal',
+                  compare: {
+                    lhs: { type: 'AuthUid' },
+                    rhs: {
+                      type: 'DocumentField',
+                      fieldName: { type: 'StringConstant', value: 'ownerUid' },
+                      document: {
+                        type: 'Document',
+                        collection: { type: 'StringConstant', value: 'storageObject' },
+                        id: { type: 'ObjectId' },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          }),
+          taskEither.chainW(() =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
           ),
-          taskEither.map(() => 'upload success')
+          taskEither.chainW(() =>
+            client.storage.uploadDataUrl({
+              key: 'kira_id',
+              dataUrl: `data:,kira masumoto`,
+            })
+          )
+        ),
+      toResult: either.left({
+        code: 'Forbidden',
+        capability: 'client.storage.uploadDataUrl',
+      }),
+    }),
+
+    defineTest({
+      name: 'returns Forbidden error if object document field does not exists',
+      expect: ({ client, ci, server }) =>
+        pipe(
+          ci.deployStorage({
+            securityRule: {
+              create: [
+                {
+                  type: 'Equal',
+                  compare: {
+                    lhs: { type: 'AuthUid' },
+                    rhs: {
+                      type: 'DocumentField',
+                      fieldName: { type: 'StringConstant', value: 'ownerUid' },
+                      document: {
+                        type: 'Document',
+                        collection: { type: 'StringConstant', value: 'storageObject' },
+                        id: { type: 'ObjectId' },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          }),
+          taskEither.chainW(() =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
+          ),
+          taskEither.chainW(() =>
+            server.db.upsertDoc({
+              key: { collection: 'storageObject', id: 'kira_id' },
+              data: {},
+            })
+          ),
+          taskEither.chainW(() =>
+            client.storage.uploadDataUrl({
+              key: 'kira_id',
+              dataUrl: `data:,kira masumoto`,
+            })
+          )
+        ),
+      toResult: either.left({
+        code: 'Forbidden',
+        capability: 'client.storage.uploadDataUrl',
+      }),
+    }),
+
+    defineTest({
+      name: 'returns Forbidden error if object document field value is not auth uid',
+      expect: ({ client, ci, server }) =>
+        pipe(
+          ci.deployStorage({
+            securityRule: {
+              create: [
+                {
+                  type: 'Equal',
+                  compare: {
+                    lhs: { type: 'AuthUid' },
+                    rhs: {
+                      type: 'DocumentField',
+                      fieldName: { type: 'StringConstant', value: 'ownerUid' },
+                      document: {
+                        type: 'Document',
+                        collection: { type: 'StringConstant', value: 'storageObject' },
+                        id: { type: 'ObjectId' },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          }),
+          taskEither.chainW(() =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
+          ),
+          taskEither.chainW(() =>
+            server.db.upsertDoc({
+              key: { collection: 'storageObject', id: 'kira_id' },
+              data: { ownerUid: 'randomAuthUid' },
+            })
+          ),
+          taskEither.chainW(() =>
+            client.storage.uploadDataUrl({
+              key: 'kira_id',
+              dataUrl: `data:,kira masumoto`,
+            })
+          )
         ),
       toResult: either.left({
         code: 'Forbidden',
