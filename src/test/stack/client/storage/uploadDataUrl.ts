@@ -11,7 +11,7 @@ export const suite: Suite = {
       name: 'returns InvalidDataUrlFormat when invalid data url is uploaded',
       expect: ({ client, ci }) =>
         pipe(
-          ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+          ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
           taskEither.chainW(() =>
             client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'invalidDataUrl' })
           )

@@ -12,7 +12,7 @@ export const storage: Suite = {
       name: 'a server can upload file kira',
       expect: ({ client, ci }) =>
         pipe(
-          ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+          ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
           taskEither.chainW(() =>
             client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: 'data:,foo' })
           ),
@@ -26,7 +26,7 @@ export const storage: Suite = {
       name: 'server from another test can not access file kira',
       expect: ({ client, ci }) =>
         pipe(
-          ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+          ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
           taskEither.chainW(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
           taskEither.chainW(() => taskEither.right('download success'))
         ),

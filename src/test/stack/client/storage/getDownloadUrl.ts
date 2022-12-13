@@ -12,7 +12,7 @@ export const suite: Suite = {
       name: 'can get download url of object uploaded with client.storage.getDownloadUrl',
       expect: ({ client, ci }) =>
         pipe(
-          ci.deployStorage({ securityRule: { type: 'allowAll' } }),
+          ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
           taskEither.chainW(() =>
             client.storage.uploadDataUrl({
               key: 'kira_key',
