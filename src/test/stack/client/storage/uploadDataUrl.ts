@@ -187,5 +187,105 @@ export const suite: Suite = {
         capability: 'client.storage.uploadDataUrl',
       }),
     }),
+
+    defineTest({
+      name: 'can upload if auth uid equals to document field which document id equals to object id',
+      expect: ({ client, ci, server }) =>
+        pipe(
+          ci.deployStorage({
+            securityRule: {
+              create: [
+                {
+                  type: 'Equal',
+                  compare: {
+                    lhs: { type: 'AuthUid' },
+                    rhs: {
+                      type: 'DocumentField',
+                      fieldName: { type: 'StringConstant', value: 'ownerUid' },
+                      document: {
+                        type: 'Document',
+                        collection: { type: 'StringConstant', value: 'storageObject' },
+                        id: { type: 'ObjectId' },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          }),
+          taskEither.chainW(() =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
+          ),
+          taskEither.chainW((authState) =>
+            server.db.upsertDoc({
+              key: { collection: 'storageObject', id: 'kira_id' },
+              data: { ownerUid: authState.authUser.uid },
+            })
+          ),
+          taskEither.chainW(() =>
+            client.storage.uploadDataUrl({
+              key: 'kira_id',
+              dataUrl: `data:,kira masumoto`,
+            })
+          ),
+          taskEither.map(() => 'upload success')
+        ),
+      toResult: either.right('upload success'),
+    }),
+
+    defineTest({
+      name: 'returns Forbidden if not signed in but required in rule',
+      expect: ({ client, ci, server }) =>
+        pipe(
+          ci.deployStorage({
+            securityRule: {
+              create: [
+                {
+                  type: 'Equal',
+                  compare: {
+                    lhs: { type: 'AuthUid' },
+                    rhs: {
+                      type: 'DocumentField',
+                      fieldName: { type: 'StringConstant', value: 'ownerUid' },
+                      document: {
+                        type: 'Document',
+                        collection: { type: 'StringConstant', value: 'storageObject' },
+                        id: { type: 'ObjectId' },
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          }),
+          taskEither.chainW(() =>
+            client.auth.createUserAndSignInWithEmailAndPassword({
+              email: 'kira@sakurazaka.com',
+              password: 'dorokatsu',
+            })
+          ),
+          taskEither.chainW((authState) =>
+            server.db.upsertDoc({
+              key: { collection: 'storageObject', id: 'kira_id' },
+              data: { ownerUid: authState.authUser.uid },
+            })
+          ),
+          taskEither.chainW(() => client.auth.signOut),
+          taskEither.chainW(() =>
+            client.storage.uploadDataUrl({
+              key: 'kira_id',
+              dataUrl: `data:,kira masumoto`,
+            })
+          ),
+          taskEither.map(() => 'upload success')
+        ),
+      toResult: either.left({
+        code: 'Forbidden',
+        capability: 'client.storage.uploadDataUrl',
+      }),
+    }),
   ],
 };
