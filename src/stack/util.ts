@@ -66,20 +66,23 @@ export const validateGetDoc = (param: {
   pipe(
     param.env.dbDeployConfig.read,
     io.map(
-      either.fromOption(() => ({
-        code: 'ProviderError' as const,
-        provider: 'mock',
-        value: 'db deploy config not found',
-      }))
-    ),
-    ioEither.chainEitherKW(
-      either.fromPredicate(
-        flow(
-          readonlyRecord.lookup(param.key.collection),
-          option.map((collectionConfig) => collectionConfig.securityRule?.get?.type === 'True'),
-          option.getOrElse(() => false)
-        ),
-        () => ({ code: 'ForbiddenError' as const })
+      flow(
+        either.fromOption(() => ({
+          code: 'ProviderError' as const,
+          provider: 'mock',
+          value: 'db deploy config not found',
+        })),
+        either.map((deployConfig) => deployConfig.collections),
+        either.chainW(
+          either.fromPredicate(
+            flow(
+              readonlyRecord.lookup(param.key.collection),
+              option.map((collectionConfig) => collectionConfig.securityRule?.get?.type === 'True'),
+              option.getOrElse(() => false)
+            ),
+            () => ({ code: 'ForbiddenError' as const })
+          )
+        )
       )
     )
   );

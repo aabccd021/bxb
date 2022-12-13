@@ -13,9 +13,12 @@ export const suite: Suite = {
       expect: ({ server, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'StringField' } },
-              securityRule: { create: { type: 'True' } },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'StringField' } },
+                securityRule: { create: { type: 'True' } },
+              },
             },
           }),
           taskEither.chainW(() =>
@@ -34,9 +37,12 @@ export const suite: Suite = {
       expect: ({ server, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'StringField' } },
-              securityRule: { get: { type: 'True' } },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'StringField' } },
+                securityRule: { get: { type: 'True' } },
+              },
             },
           }),
           taskEither.chainW(() =>
@@ -55,12 +61,15 @@ export const suite: Suite = {
       expect: ({ server, ci }) =>
         pipe(
           ci.deployDb({
-            tweet: {
-              schema: { owner: { type: 'StringField' } },
-              securityRule: {
-                create: {
-                  type: 'Equal',
-                  compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+            type: 'deploy',
+            collections: {
+              tweet: {
+                schema: { owner: { type: 'StringField' } },
+                securityRule: {
+                  create: {
+                    type: 'Equal',
+                    compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+                  },
                 },
               },
             },
