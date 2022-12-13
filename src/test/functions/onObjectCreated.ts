@@ -24,12 +24,19 @@ const test2 = defineTest({
   name: `onObjectCreated trigger params contains object id`,
   expect: ({ client, ci, server }) =>
     pipe(
-      ci.deployDb({
-        storageObject: {
-          schema: { exists: { type: 'StringField' } },
-          securityRule: { get: { type: 'True' } },
+      ci.deployStorage({
+        securityRule: {
+          create: [{ type: 'True' }],
         },
       }),
+      taskEither.chainW(() =>
+        ci.deployDb({
+          storageObject: {
+            schema: { exists: { type: 'StringField' } },
+            securityRule: { get: { type: 'True' } },
+          },
+        })
+      ),
       taskEither.chainW(() =>
         ci.deployFunctions({
           functions: { path: functionsPath, exportName: 'test2Functions' },
