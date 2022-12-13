@@ -44,7 +44,9 @@ export const getObjectItem = <T, K>(
 export const setObjectItem = <T>(getWindow: IO<MockableWindow>, key: string, data: T) =>
   pipe(data, JSON.stringify, (typeSafeData) => setItem(getWindow, key, typeSafeData));
 
-const DB = t.record(t.string, t.record(t.string, t.unknown));
+export const DB = t.record(t.string, t.record(t.string, t.unknown));
+
+export type DB = t.TypeOf<typeof DB>;
 
 export const dbLocalStorageKey = 'db';
 
