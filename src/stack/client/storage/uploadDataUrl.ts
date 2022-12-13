@@ -9,6 +9,7 @@ import {
   taskEither,
 } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
+import type { Option } from 'fp-ts/Option';
 import { match } from 'ts-pattern';
 import isValidDataUrl from 'valid-data-url';
 
@@ -41,7 +42,7 @@ const getLessThanNumber = ({
     .with({ type: 'NumberConstant' as const }, (numberConstant) => numberConstant.value)
     .exhaustive();
 
-const validate =
+const isValid =
   (param: S.client.storage.UploadDataUrl.Param) =>
   (deployConfig: S.ci.DeployStorage.Param): boolean =>
     pipe(
@@ -66,27 +67,33 @@ const validate =
       option.getOrElse(() => false)
     );
 
+const validate = ({
+  param,
+  deployConfig,
+}: {
+  readonly param: S.client.storage.UploadDataUrl.Param;
+  readonly deployConfig: Option<S.ci.DeployStorage.Param>;
+}) =>
+  pipe(
+    param.dataUrl,
+    either.fromPredicate(isValidDataUrl, () => ({ code: 'InvalidDataUrlFormat' as const })),
+    either.chainW(() =>
+      pipe(
+        deployConfig,
+        either.fromOption(() => ({
+          code: 'ProviderError' as const,
+          provider: 'mock',
+          value: 'db deploy config not found',
+        })),
+        either.chainW(either.fromPredicate(isValid(param), () => ({ code: 'Forbidden' as const })))
+      )
+    )
+  );
+
 export const uploadDataUrl: Type = (env) => (param) =>
   pipe(
-    either.fromPredicate(isValidDataUrl, () => ({ code: 'InvalidDataUrlFormat' as const }))(
-      param.dataUrl
-    ),
-    ioEither.fromEither,
-    ioEither.chainW(() =>
-      pipe(
-        env.storageDeployConfig.read,
-        io.map(
-          either.fromOption(() => ({
-            code: 'ProviderError' as const,
-            provider: 'mock',
-            value: 'db deploy config not found',
-          }))
-        )
-      )
-    ),
-    ioEither.chainEitherKW(
-      either.fromPredicate(validate(param), () => ({ code: 'Forbidden' as const }))
-    ),
+    env.storageDeployConfig.read,
+    io.map((deployConfig) => validate({ deployConfig, param })),
     ioEither.chainIOK(() => setItem(env.getWindow, `${storageKey}/${param.key}`, param.dataUrl)),
     taskEither.fromIOEither,
     taskEither.chainIOK(() => env.functions.read),
