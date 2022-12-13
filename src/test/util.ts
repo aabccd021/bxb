@@ -17,7 +17,6 @@ export type Suite = {
   readonly tests: readonly Test<unknown>[];
   readonly concurrent?: boolean;
   readonly timeOut?: number;
-  readonly retry?: number;
 };
 
 export const defineTest = <T>(t: Test<T>) => t;

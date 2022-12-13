@@ -39,7 +39,7 @@ export const runSuiteWithConfig =
             { timeout: test.timeOut, retry: test.retry }
           );
         }),
-      { timeout: suite.timeOut, retry: suite.retry }
+      { timeout: suite.timeOut }
     );
   };
 
