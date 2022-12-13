@@ -7,7 +7,10 @@ export type Param = {
   readonly dataUrl: string;
 };
 
-export type Error = ProviderError | { readonly code: 'InvalidDataUrlFormat' };
+export type Error =
+  | ProviderError
+  | { readonly code: 'Forbidden' }
+  | { readonly code: 'InvalidDataUrlFormat' };
 
 export type Fn = (
   p: Param
