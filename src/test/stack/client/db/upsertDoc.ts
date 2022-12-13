@@ -12,8 +12,11 @@ export const suite: Suite = {
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'StringField' } },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'StringField' } },
+              },
             },
           }),
           taskEither.chainW(() =>
@@ -31,11 +34,14 @@ export const suite: Suite = {
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'StringField' } },
-              securityRule: {
-                create: { type: 'True' },
-                get: { type: 'True' },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'StringField' } },
+                securityRule: {
+                  create: { type: 'True' },
+                  get: { type: 'True' },
+                },
               },
             },
           }),
@@ -60,9 +66,12 @@ export const suite: Suite = {
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'StringField' } },
-              securityRule: { create: { type: 'True' } },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'StringField' } },
+                securityRule: { create: { type: 'True' } },
+              },
             },
           }),
           taskEither.chainW(() =>
@@ -81,9 +90,12 @@ export const suite: Suite = {
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'IntField' } },
-              securityRule: { create: { type: 'True' } },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'IntField' } },
+                securityRule: { create: { type: 'True' } },
+              },
             },
           }),
           taskEither.chainW(() =>
@@ -101,9 +113,12 @@ export const suite: Suite = {
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'StringField' } },
-              securityRule: { create: { type: 'True' } },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'StringField' } },
+                securityRule: { create: { type: 'True' } },
+              },
             },
           }),
           taskEither.chainW(() =>
@@ -121,9 +136,12 @@ export const suite: Suite = {
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: {},
-              securityRule: { create: { type: 'True' } },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: {},
+                securityRule: { create: { type: 'True' } },
+              },
             },
           }),
           taskEither.chainW(() =>
@@ -141,12 +159,15 @@ export const suite: Suite = {
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
-            tweet: {
-              schema: { owner: { type: 'StringField' } },
-              securityRule: {
-                create: {
-                  type: 'Equal',
-                  compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+            type: 'deploy',
+            collections: {
+              tweet: {
+                schema: { owner: { type: 'StringField' } },
+                securityRule: {
+                  create: {
+                    type: 'Equal',
+                    compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+                  },
                 },
               },
             },
@@ -173,12 +194,15 @@ export const suite: Suite = {
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
-            tweet: {
-              schema: { owner: { type: 'StringField' } },
-              securityRule: {
-                create: {
-                  type: 'Equal',
-                  compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+            type: 'deploy',
+            collections: {
+              tweet: {
+                schema: { owner: { type: 'StringField' } },
+                securityRule: {
+                  create: {
+                    type: 'Equal',
+                    compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+                  },
                 },
               },
             },
@@ -204,12 +228,15 @@ export const suite: Suite = {
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
-            tweet: {
-              schema: { owner: { type: 'StringField' } },
-              securityRule: {
-                create: {
-                  type: 'Equal',
-                  compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+            type: 'deploy',
+            collections: {
+              tweet: {
+                schema: { owner: { type: 'StringField' } },
+                securityRule: {
+                  create: {
+                    type: 'Equal',
+                    compare: [{ type: 'AuthUid' }, { type: 'DocumentField', fieldName: 'owner' }],
+                  },
                 },
               },
             },
@@ -229,12 +256,15 @@ export const suite: Suite = {
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
-            tweet: {
-              schema: { owner: { type: 'StringField' } },
-              securityRule: {
-                create: {
-                  type: 'Equal',
-                  compare: [{ type: 'DocumentField', fieldName: 'owner' }, { type: 'AuthUid' }],
+            type: 'deploy',
+            collections: {
+              tweet: {
+                schema: { owner: { type: 'StringField' } },
+                securityRule: {
+                  create: {
+                    type: 'Equal',
+                    compare: [{ type: 'DocumentField', fieldName: 'owner' }, { type: 'AuthUid' }],
+                  },
                 },
               },
             },

@@ -31,9 +31,12 @@ const test2 = defineTest({
       }),
       taskEither.chainW(() =>
         ci.deployDb({
-          storageObject: {
-            schema: { exists: { type: 'StringField' } },
-            securityRule: { get: { type: 'True' } },
+          type: 'deploy',
+          collections: {
+            storageObject: {
+              schema: { exists: { type: 'StringField' } },
+              securityRule: { get: { type: 'True' } },
+            },
           },
         })
       ),
@@ -78,9 +81,12 @@ const test3 = defineTest({
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
-        detection: {
-          schema: { exists: { type: 'StringField' } },
-          securityRule: { get: { type: 'True' } },
+        type: 'deploy',
+        collections: {
+          detection: {
+            schema: { exists: { type: 'StringField' } },
+            securityRule: { get: { type: 'True' } },
+          },
         },
       }),
       taskEither.chainW(() =>
@@ -105,9 +111,12 @@ const test4 = defineTest({
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
-        storageObject: {
-          schema: { exists: { type: 'StringField' } },
-          securityRule: { get: { type: 'True' } },
+        type: 'deploy',
+        collections: {
+          storageObject: {
+            schema: { exists: { type: 'StringField' } },
+            securityRule: { get: { type: 'True' } },
+          },
         },
       }),
       taskEither.chainW(() =>

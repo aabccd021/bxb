@@ -25,9 +25,12 @@ const test2 = defineTest({
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
-        authUser: {
-          schema: { created: { type: 'StringField' } },
-          securityRule: { get: { type: 'True' } },
+        type: 'deploy',
+        collections: {
+          authUser: {
+            schema: { created: { type: 'StringField' } },
+            securityRule: { get: { type: 'True' } },
+          },
         },
       }),
       taskEither.chainW(() =>
@@ -78,9 +81,12 @@ const test3 = defineTest({
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
-        authUser: {
-          schema: { created: { type: 'StringField' } },
-          securityRule: { get: { type: 'True' } },
+        type: 'deploy',
+        collections: {
+          authUser: {
+            schema: { created: { type: 'StringField' } },
+            securityRule: { get: { type: 'True' } },
+          },
         },
       }),
       taskEither.chainW(() =>
@@ -105,9 +111,12 @@ const test4 = defineTest({
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
-        authUser: {
-          schema: { created: { type: 'StringField' } },
-          securityRule: { get: { type: 'True' } },
+        type: 'deploy',
+        collections: {
+          authUser: {
+            schema: { created: { type: 'StringField' } },
+            securityRule: { get: { type: 'True' } },
+          },
         },
       }),
       taskEither.chainW(() =>

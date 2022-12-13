@@ -88,12 +88,12 @@ export const upsertDoc: Type = (env) => (param) =>
         ({ config, authState, resourceDoc }) =>
           (option.isSome(resourceDoc)
             ? pipe(
-                option.fromNullable(config[param.key.collection]?.securityRule?.update),
+                option.fromNullable(config.collections[param.key.collection]?.securityRule?.update),
                 option.map(validateUpdateAccessRule(param.data, authState)),
                 option.getOrElse(() => false)
               )
             : pipe(
-                option.fromNullable(config[param.key.collection]?.securityRule?.create),
+                option.fromNullable(config.collections[param.key.collection]?.securityRule?.create),
                 option.map(validateCreateAccessRule(param.data, authState)),
                 option.getOrElse(() => false)
               )) &&
@@ -101,8 +101,8 @@ export const upsertDoc: Type = (env) => (param) =>
             param.data,
             readonlyRecord.mapWithIndex(
               (fieldName, fieldValue) =>
-                config[param.key.collection]?.schema[fieldName]?.type === 'StringField' &&
-                typeof fieldValue === 'string'
+                config.collections[param.key.collection]?.schema[fieldName]?.type ===
+                  'StringField' && typeof fieldValue === 'string'
             ),
             readonlyRecord.reduce(string.Ord)(true, (a, b) => a && b)
           ),

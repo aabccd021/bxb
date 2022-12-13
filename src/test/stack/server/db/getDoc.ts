@@ -13,11 +13,14 @@ export const suite: Suite = {
       expect: ({ server, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'StringField' } },
-              securityRule: {
-                create: { type: 'True' },
-                get: { type: 'True' },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'StringField' } },
+                securityRule: {
+                  create: { type: 'True' },
+                  get: { type: 'True' },
+                },
               },
             },
           }),
@@ -37,10 +40,13 @@ export const suite: Suite = {
       expect: ({ server, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'StringField' } },
-              securityRule: {
-                create: { type: 'True' },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'StringField' } },
+                securityRule: {
+                  create: { type: 'True' },
+                },
               },
             },
           }),
@@ -60,8 +66,11 @@ export const suite: Suite = {
       expect: ({ server, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'StringField' } },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'StringField' } },
+              },
             },
           }),
           taskEither.chainW(() => server.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
@@ -74,9 +83,12 @@ export const suite: Suite = {
       expect: ({ server, client, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'StringField' } },
-              securityRule: { create: { type: 'True' } },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'StringField' } },
+                securityRule: { create: { type: 'True' } },
+              },
             },
           }),
           taskEither.chainW(() =>
@@ -95,11 +107,14 @@ export const suite: Suite = {
       expect: ({ server, client, ci }) =>
         pipe(
           ci.deployDb({
-            user: {
-              schema: { name: { type: 'StringField' } },
-              securityRule: {
-                create: { type: 'True' },
-                update: { type: 'True' },
+            type: 'deploy',
+            collections: {
+              user: {
+                schema: { name: { type: 'StringField' } },
+                securityRule: {
+                  create: { type: 'True' },
+                  update: { type: 'True' },
+                },
               },
             },
           }),

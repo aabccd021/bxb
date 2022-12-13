@@ -50,7 +50,10 @@ export type CollectionConfig = {
   };
 };
 
-export type Param = ReadonlyRecord<string, CollectionConfig>;
+export type Param = {
+  readonly type: 'deploy';
+  readonly collections: ReadonlyRecord<string, CollectionConfig>;
+};
 
 export type Fn = (
   c: Param
