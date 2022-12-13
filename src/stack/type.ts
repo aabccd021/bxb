@@ -23,6 +23,7 @@ export type Env = {
     ReadonlyRecord<string, Stack.client.db.OnSnapshot.OnChangedCallback>
   >;
   readonly dbDeployConfig: IORef<Option<Stack.ci.DeployDb.Param>>;
+  readonly storageDeployConfig: IORef<Option<Stack.ci.DeployStorage.Param>>;
   readonly functions: IORef<Option<DeployFunctionParam>>;
   readonly getWindow: IO<MockableWindow>;
 };

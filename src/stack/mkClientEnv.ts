@@ -7,6 +7,7 @@ export const mkEnvFromWindow = (getGetWindow: IO<IO<MockableWindow>>): IO<Env> =
   apply.sequenceS(io.Apply)({
     onAuthStateChangedCallback: ioRef.newIORef(option.none),
     dbDeployConfig: ioRef.newIORef(option.none),
+    storageDeployConfig: ioRef.newIORef(option.none),
     onDocChangedCallback: ioRef.newIORef({}),
     functions: ioRef.newIORef(option.none),
     getWindow: getGetWindow,
