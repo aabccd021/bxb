@@ -43,17 +43,21 @@ type Commutative<T> = T extends { readonly lhs: infer A; readonly rhs: infer B }
   ? T | { readonly lhs: B; readonly rhs: A }
   : never;
 
-export type Comparable = Commutative<
-  | { readonly lhs: DocumentField; readonly rhs: AuthUid }
-  | { readonly lhs: ObjectSize; readonly rhs: ObjectSize }
->;
+export type Equalable = Commutative<{ readonly lhs: DocumentField; readonly rhs: AuthUid }>;
 
 export type Equal = {
   readonly type: 'Equal';
-  readonly compare: Comparable;
+  readonly compare: Equalable;
 };
 
-export type CreateRule = ReadonlyNonEmptyArray<Equal | True>;
+export type LessThanAble = Commutative<{ readonly lhs: ObjectSize; readonly rhs: NumberContant }>;
+
+export type LessThan = {
+  readonly type: 'LessThan';
+  readonly compare: LessThanAble;
+};
+
+export type CreateRule = ReadonlyNonEmptyArray<Equal | LessThan | True>;
 
 export type Param = {
   readonly securityRule?: {
