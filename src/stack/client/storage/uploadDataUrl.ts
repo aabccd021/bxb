@@ -107,7 +107,7 @@ const isValid =
                 pipe(
                   {
                     lhs: getEqualValue({ param, authState, db, value: equalRule.compare.lhs }),
-                    rhs: getEqualValue({ param, authState, db, value: equalRule.compare.lhs }),
+                    rhs: getEqualValue({ param, authState, db, value: equalRule.compare.rhs }),
                   },
                   apply.sequenceS(option.Apply),
                   option.map(({ lhs, rhs }) => lhs === rhs),
