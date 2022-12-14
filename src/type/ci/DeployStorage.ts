@@ -57,14 +57,14 @@ export type LessThan = {
   readonly compare: LessThanAble;
 };
 
-export type CreateRule = ReadonlyNonEmptyArray<Equal | LessThan | True>;
+export type CreateRule = Equal | LessThan | True;
 
-export type GetRule = ReadonlyNonEmptyArray<True>;
+export type GetRule = True;
 
 export type Param = {
   readonly securityRule?: {
-    readonly get?: GetRule;
-    readonly create?: CreateRule;
+    readonly get?: ReadonlyNonEmptyArray<GetRule>;
+    readonly create?: ReadonlyNonEmptyArray<CreateRule>;
   };
 };
 

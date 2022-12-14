@@ -1,5 +1,6 @@
 import {
   apply,
+  boolean,
   either,
   io,
   ioEither,
@@ -18,8 +19,7 @@ import isValidDataUrl from 'valid-data-url';
 import type { Stack as S } from '../../../type';
 import type { Stack } from '../../type';
 import type { DB } from '../../util';
-import { stringifyDocKey } from '../../util';
-import { getDb, getItem, setItem } from '../../util';
+import { getDb, getItem, setItem, stringifyDocKey } from '../../util';
 import { authLocalStorageKey } from '../util';
 import { storageKey } from './util';
 type Type = Stack['client']['storage']['uploadDataUrl'];
@@ -37,9 +37,16 @@ const getLessThanNumber = ({
         pipe(
           option.fromNullable(nullableData),
           option.map((data) =>
-            string.includes(';base64')(prefix) ? Buffer.from(data, 'base64') : data
+            pipe(
+              prefix,
+              string.includes(';base64'),
+              boolean.matchW(
+                () => data,
+                () => Buffer.from(data, 'base64')
+              ),
+              (s) => s.length
+            )
           ),
-          option.map((s) => s.length),
           option.getOrElse(() => 0)
         )
       )
@@ -51,31 +58,44 @@ const getEqualValue = ({
   value,
   param,
   authState,
-  db,
+  db: dbEither,
 }: {
   readonly param: S.client.storage.UploadDataUrl.Param;
   readonly value: S.ci.DeployStorage.AuthUid | S.ci.DeployStorage.DocumentField;
   readonly authState: Option<string>;
   readonly db: Either<unknown, Option<DB>>;
-}): Option<string> =>
+}): Either<unknown, string> =>
   match(value)
-    .with({ type: 'AuthUid' }, () => authState)
+    .with({ type: 'AuthUid' }, () =>
+      pipe(
+        authState,
+        either.fromOption(() => 'authstate not found')
+      )
+    )
     .with({ type: 'DocumentField' }, (documentField) =>
       pipe(
-        option.fromEither(db),
-        option.flatten,
-        option.chain(
-          readonlyRecord.lookup(
-            stringifyDocKey({
-              collection: documentField.document.collection.value,
-              id: match(documentField.document.id)
-                .with({ type: 'ObjectId' }, () => param.key)
-                .exhaustive(),
-            })
+        dbEither,
+        either.chainW(either.fromOption(() => 'db not found')),
+        either.chainW(
+          flow(
+            readonlyRecord.lookup(
+              stringifyDocKey({
+                collection: documentField.document.collection.value,
+                id: match(documentField.document.id)
+                  .with({ type: 'ObjectId' }, () => param.key)
+                  .exhaustive(),
+              })
+            ),
+            either.fromOption(() => 'doc not found')
           )
         ),
-        option.chain(readonlyRecord.lookup(documentField.fieldName.value)),
-        option.chain(option.fromPredicate(string.isString))
+        either.chainW(
+          flow(
+            readonlyRecord.lookup(documentField.fieldName.value),
+            either.fromOption(() => 'fieldName not found')
+          )
+        ),
+        either.chainW(either.fromPredicate(string.isString, () => 'field is not a string'))
       )
     )
     .exhaustive();
@@ -90,42 +110,36 @@ const isValid =
     readonly authState: Option<string>;
     readonly db: Either<unknown, Option<DB>>;
   }) =>
-  (deployConfig: S.ci.DeployStorage.Param): boolean =>
-    pipe(
-      option.fromNullable(deployConfig.securityRule?.create),
-      option.map(
-        flow(
-          readonlyNonEmptyArray.map((rule) =>
-            match(rule)
-              .with(
-                { type: 'LessThan' },
-                (lessThanRule) =>
-                  getLessThanNumber({ param, value: lessThanRule.compare.lhs }) <
-                  getLessThanNumber({ param, value: lessThanRule.compare.rhs })
-              )
-              .with({ type: 'Equal' }, (equalRule) =>
-                pipe(
-                  {
-                    lhs: getEqualValue({ param, authState, db, value: equalRule.compare.lhs }),
-                    rhs: getEqualValue({ param, authState, db, value: equalRule.compare.rhs }),
-                  },
-                  apply.sequenceS(option.Apply),
-                  option.map(({ lhs, rhs }) => lhs === rhs),
-                  option.getOrElse(() => false)
-                )
-              )
-              .with({ type: 'True' }, () => true)
-              .exhaustive()
-          ),
-          readonlyNonEmptyArray.reduce(true, (a, b) => a && b)
+  (rule: S.ci.DeployStorage.CreateRule): Either<unknown, undefined> =>
+    match(rule)
+      .with({ type: 'LessThan' }, (lessThanRule) =>
+        pipe(
+          {
+            lhs: getLessThanNumber({ param, value: lessThanRule.compare.lhs }),
+            rhs: getLessThanNumber({ param, value: lessThanRule.compare.rhs }),
+          },
+          ({ lhs, rhs }) =>
+            lhs < rhs ? either.right(undefined) : either.left({ code: 'does not satisfy', rule })
         )
-      ),
-      option.getOrElse(() => false)
-    );
+      )
+      .with({ type: 'Equal' }, (equalRule) =>
+        pipe(
+          {
+            lhs: getEqualValue({ param, authState, db, value: equalRule.compare.lhs }),
+            rhs: getEqualValue({ param, authState, db, value: equalRule.compare.rhs }),
+          },
+          apply.sequenceS(either.Applicative),
+          either.chainW(({ lhs, rhs }) =>
+            lhs === rhs ? either.right(undefined) : either.left({ code: 'does not satisfy', rule })
+          )
+        )
+      )
+      .with({ type: 'True' }, () => either.right(undefined))
+      .exhaustive();
 
 const validate = ({
   param,
-  deployConfig,
+  deployConfig: deployConfigOption,
   authState,
   db,
 }: {
@@ -139,16 +153,25 @@ const validate = ({
     either.fromPredicate(isValidDataUrl, () => ({ code: 'InvalidDataUrlFormat' as const })),
     either.chainW(() =>
       pipe(
-        deployConfig,
+        deployConfigOption,
         either.fromOption(() => ({
           code: 'ProviderError' as const,
           provider: 'mock',
           value: 'db deploy config not found',
         })),
-        either.chainW(
-          either.fromPredicate(isValid({ param, authState, db }), () => ({
-            code: 'Forbidden' as const,
-          }))
+        either.chainW((deployConfig) =>
+          pipe(
+            deployConfig.securityRule,
+            either.fromNullable(() => 'storageDeployConfig.securityRule not found'),
+            either.map((securityRule) => securityRule.create),
+            either.chainW(
+              either.fromNullable(() => 'storageDeployConfig.securityRule.create not found')
+            ),
+            either.chainW(
+              readonlyNonEmptyArray.traverse(either.Applicative)(isValid({ param, authState, db }))
+            ),
+            either.mapLeft(() => ({ code: 'Forbidden' as const }))
+          )
         )
       )
     )
