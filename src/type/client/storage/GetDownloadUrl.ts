@@ -6,7 +6,10 @@ export type Param = {
   readonly key: string;
 };
 
-export type Error = ProviderError | { readonly code: 'FileNotFound' };
+export type Error =
+  | ProviderError
+  | { readonly code: 'FileNotFound' }
+  | { readonly code: 'Forbidden' };
 
 export type Fn = (
   p: Param

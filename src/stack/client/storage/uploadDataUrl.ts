@@ -44,7 +44,7 @@ const getLessThanNumber = ({
         )
       )
     )
-    .with({ type: 'NumberConstant' as const }, (numberConstant) => numberConstant.value)
+    .with({ type: 'NumberConstant' }, (numberConstant) => numberConstant.value)
     .exhaustive();
 
 const getEqualValue = ({
