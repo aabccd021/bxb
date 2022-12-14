@@ -36,7 +36,7 @@ export const getDownloadUrl: Type = (env) => (param) =>
       pipe(
         deployConfig,
         either.fromOption(() => ({
-          code: 'ProviderError' as const,
+          code: 'Provider' as const,
           provider: 'mock',
           value: 'db deploy config not found',
         })),

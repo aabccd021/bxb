@@ -63,7 +63,7 @@ export const upsertDoc: Type = (env) => (param) =>
         env.dbDeployConfig.read,
         io.map(
           either.fromOption(() => ({
-            code: 'ProviderError' as const,
+            code: 'Provider' as const,
             provider: 'mock',
             value: 'db deploy config not found',
           }))
@@ -106,7 +106,7 @@ export const upsertDoc: Type = (env) => (param) =>
             ),
             readonlyRecord.reduce(string.Ord)(true, (a, b) => a && b)
           ),
-        () => ({ code: 'ForbiddenError' as const })
+        () => ({ code: 'Forbidden' as const })
       )
     ),
     ioEither.chainW(() => getDb(env.getWindow)),

@@ -52,7 +52,7 @@ export const dbLocalStorageKey = 'db';
 
 export const getDb = (getWindow: IO<MockableWindow>) =>
   getObjectItem(getWindow, dbLocalStorageKey, DB.is, (data) => ({
-    code: 'ProviderError' as const,
+    code: 'Provider' as const,
     provider: 'mock',
     value: { message: 'invalid db data loaded', data },
   }));
@@ -68,7 +68,7 @@ export const validateGetDoc = (param: {
     io.map(
       flow(
         either.fromOption(() => ({
-          code: 'ProviderError' as const,
+          code: 'Provider' as const,
           provider: 'mock',
           value: 'db deploy config not found',
         })),
@@ -80,7 +80,7 @@ export const validateGetDoc = (param: {
               option.map((collectionConfig) => collectionConfig.securityRule?.get?.type === 'True'),
               option.getOrElse(() => false)
             ),
-            () => ({ code: 'ForbiddenError' as const })
+            () => ({ code: 'Forbidden' as const })
           )
         )
       )

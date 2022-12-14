@@ -4,16 +4,16 @@ import type { Option } from 'fp-ts/Option';
 
 import type { DocData, DocKey } from '../..';
 
-export type ProviderError = {
-  readonly code: 'ProviderError';
+export type Provider = {
+  readonly code: 'Provider';
   readonly value: unknown;
 };
 
-export type ForbiddenError = {
-  readonly code: 'ForbiddenError';
+export type Forbidden = {
+  readonly code: 'Forbidden';
 };
 
-export type Error = ForbiddenError | ProviderError;
+export type Error = Forbidden | Provider;
 
 export type DocState = Either<Error, Option<DocData>>;
 

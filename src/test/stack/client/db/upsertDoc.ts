@@ -8,7 +8,7 @@ export const suite: Suite = {
   name: 'client.db.upsertDoc',
   tests: [
     defineTest({
-      name: 'returns ForbiddenError when creating doc if create rule is not specified',
+      name: 'returns Forbidden when creating doc if create rule is not specified',
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
@@ -26,11 +26,11 @@ export const suite: Suite = {
             })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
     }),
 
     defineTest({
-      name: 'returns ForbiddenError when updating doc if update rule is not specified',
+      name: 'returns Forbidden when updating doc if update rule is not specified',
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
@@ -58,7 +58,7 @@ export const suite: Suite = {
             })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
     }),
 
     defineTest({
@@ -86,7 +86,7 @@ export const suite: Suite = {
     }),
 
     defineTest({
-      name: 'returns ForbiddenError when creating doc if string given when int field required',
+      name: 'returns Forbidden when creating doc if string given when int field required',
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
@@ -105,11 +105,11 @@ export const suite: Suite = {
             })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
     }),
 
     defineTest({
-      name: 'returns ForbiddenError when creating doc if int given when string field required',
+      name: 'returns Forbidden when creating doc if int given when string field required',
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
@@ -128,11 +128,11 @@ export const suite: Suite = {
             })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
     }),
 
     defineTest({
-      name: 'returns ForbiddenError when creating doc if schema not specified',
+      name: 'returns Forbidden when creating doc if schema not specified',
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
@@ -151,7 +151,7 @@ export const suite: Suite = {
             })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
     }),
 
     defineTest({
@@ -220,11 +220,11 @@ export const suite: Suite = {
             })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
     }),
 
     defineTest({
-      name: `returns ForbiddenError if not signed in`,
+      name: `returns Forbidden if not signed in`,
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
@@ -248,11 +248,11 @@ export const suite: Suite = {
             })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
     }),
 
     defineTest({
-      name: `returns ForbiddenError if not signed in, swap comparation`,
+      name: `returns Forbidden if not signed in, swap comparation`,
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
@@ -276,7 +276,7 @@ export const suite: Suite = {
             })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.upsertDoc' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
     }),
   ],
 };

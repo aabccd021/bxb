@@ -137,11 +137,11 @@ export const suite: Suite = {
               })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError' }),
+      toResult: either.left({ code: 'Forbidden' }),
     }),
 
     defineTest({
-      name: 'returns ForbiddenError if forbidden and document absent',
+      name: 'returns Forbidden if forbidden and document absent',
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
@@ -167,7 +167,7 @@ export const suite: Suite = {
               })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError' }),
+      toResult: either.left({ code: 'Forbidden' }),
     }),
 
     defineTest({
