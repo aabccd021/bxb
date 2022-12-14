@@ -2,13 +2,13 @@ import { taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import * as std from 'fp-ts-std';
-import { describe, expect, test as test_ } from 'vitest';
+import { expect, test as test_ } from 'vitest';
 
 import { applyCiEnv, applyClientEnv, applyServerEnv } from '../helper';
 import type { StackType, StackWithEnv } from '../type';
 import type { Suite } from './util';
 
-export const runSuiteWithConfig =
+export const runTest =
   <T extends StackType>({
     stack,
     getTestEnv,
@@ -17,8 +17,7 @@ export const runSuiteWithConfig =
     readonly getTestEnv: TaskEither<{ readonly capability: 'test.getTestEnv' }, T['env']>;
   }) =>
   ({ suite }: { readonly suite: Suite }) => {
-    (suite.concurrent ?? false ? describe.concurrent : describe)(
-      suite.name,
+    suite.name,
       () =>
         suite.tests.forEach((test) => {
           (test.type === 'fail' ? test_.fails : test_)(
@@ -39,8 +38,7 @@ export const runSuiteWithConfig =
             { timeout: test.timeOut, retry: test.retry }
           );
         }),
-      { timeout: suite.timeOut }
-    );
+      { timeout: suite.timeOut };
   };
 
 export * as functions from './functions';
