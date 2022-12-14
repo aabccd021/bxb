@@ -59,9 +59,11 @@ export type LessThan = {
 
 export type CreateRule = ReadonlyNonEmptyArray<Equal | LessThan | True>;
 
+export type GetRule = ReadonlyNonEmptyArray<True>;
+
 export type Param = {
   readonly securityRule?: {
-    readonly get?: True;
+    readonly get?: GetRule;
     readonly create?: CreateRule;
   };
 };

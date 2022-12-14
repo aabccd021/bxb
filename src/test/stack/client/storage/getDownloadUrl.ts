@@ -12,7 +12,9 @@ export const suite: Suite = {
       name: 'can get download url of base64 uploaded with client.storage.getDownloadUrl',
       expect: ({ client, ci }) =>
         pipe(
-          ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
+          ci.deployStorage({
+            securityRule: { create: [{ type: 'True' }], get: [{ type: 'True' }] },
+          }),
           taskEither.chainW(() =>
             client.storage.uploadDataUrl({
               key: 'kira_key',
@@ -32,7 +34,9 @@ export const suite: Suite = {
       name: 'can get download url of plain text uploaded with client.storage.getDownloadUrl',
       expect: ({ client, ci }) =>
         pipe(
-          ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
+          ci.deployStorage({
+            securityRule: { create: [{ type: 'True' }], get: [{ type: 'True' }] },
+          }),
           taskEither.chainW(() =>
             client.storage.uploadDataUrl({
               key: 'kira_key',
