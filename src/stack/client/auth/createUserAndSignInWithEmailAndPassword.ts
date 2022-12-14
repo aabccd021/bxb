@@ -35,7 +35,7 @@ export const createUserAndSignInWithEmailAndPassword: Type = (env) => (param) =>
             : option.none
         ),
         readonlyRecord.sequence(taskEither.ApplicativeSeq),
-        taskEither.mapLeft((value) => ({ code: 'ProviderError' as const, value }))
+        taskEither.mapLeft((value) => ({ code: 'Provider' as const, value }))
       )
     ),
     taskEither.bimap(

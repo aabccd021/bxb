@@ -155,7 +155,7 @@ export const suite: Suite = {
           ),
           taskEither.chainW(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.getDoc' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.getDoc' }),
     }),
 
     defineTest({
@@ -172,7 +172,7 @@ export const suite: Suite = {
           }),
           taskEither.chainW(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.getDoc' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.getDoc' }),
     }),
 
     defineTest({

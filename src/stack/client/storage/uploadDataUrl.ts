@@ -155,7 +155,7 @@ const validate = ({
       pipe(
         deployConfigOption,
         either.fromOption(() => ({
-          code: 'ProviderError' as const,
+          code: 'Provider' as const,
           provider: 'mock',
           value: 'db deploy config not found',
         })),
@@ -200,7 +200,7 @@ export const uploadDataUrl: Type = (env) => (param) =>
         ),
         readonlyRecord.sequence(taskEither.ApplicativeSeq),
         taskEither.bimap(
-          (value) => ({ code: 'ProviderError' as const, value }),
+          (value) => ({ code: 'Provider' as const, value }),
           () => undefined
         )
       )

@@ -8,16 +8,16 @@ export type Param = {
   readonly data: DocData;
 };
 
-export type ProviderError = {
-  readonly code: 'ProviderError';
+export type Provider = {
+  readonly code: 'Provider';
   readonly value: unknown;
 };
 
-export type ForbiddenError = {
-  readonly code: 'ForbiddenError';
+export type Forbidden = {
+  readonly code: 'Forbidden';
 };
 
-export type Error = ForbiddenError | ProviderError;
+export type Error = Forbidden | Provider;
 
 export type Fn = (
   p: Param

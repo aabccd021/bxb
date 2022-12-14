@@ -141,11 +141,11 @@ export const suite: Suite = {
             })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.getDocWhen' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.getDocWhen' }),
     }),
 
     defineTest({
-      name: 'client.db.getDoc returns ForbiddenError if forbidden and document absent',
+      name: 'client.db.getDoc returns Forbidden if forbidden and document absent',
       expect: ({ client, ci }) =>
         pipe(
           ci.deployDb({
@@ -163,7 +163,7 @@ export const suite: Suite = {
             })
           )
         ),
-      toResult: either.left({ code: 'ForbiddenError', capability: 'client.db.getDocWhen' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.db.getDocWhen' }),
     }),
 
     defineTest({

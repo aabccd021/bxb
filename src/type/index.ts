@@ -6,8 +6,8 @@ import type * as Stack from './stack';
 
 export { Functions, Stack };
 
-export type ProviderError = {
-  readonly code: 'ProviderError';
+export type Provider = {
+  readonly code: 'Provider';
   readonly value: unknown;
 };
 
