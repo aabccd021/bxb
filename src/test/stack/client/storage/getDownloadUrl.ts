@@ -51,5 +51,27 @@ export const suite: Suite = {
         ),
       toResult: either.right('kira masumoto'),
     }),
+
+    defineTest({
+      name: 'returns Forbidden if not allowed',
+      expect: ({ client, ci }) =>
+        pipe(
+          ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
+          taskEither.chainW(() =>
+            client.storage.uploadDataUrl({
+              key: 'kira_key',
+              dataUrl: `data:,kira masumoto`,
+            })
+          ),
+          taskEither.chainW(() => client.storage.getDownloadUrl({ key: 'kira_key' }))
+        ),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.storage.getDownloadUrl' }),
+    }),
+
+    defineTest({
+      name: 'returns Forbidden if not allowed even if the object is absent',
+      expect: ({ client }) => client.storage.getDownloadUrl({ key: 'kira_key' }),
+      toResult: either.left({ code: 'Forbidden', capability: 'client.storage.getDownloadUrl' }),
+    }),
   ],
 };
