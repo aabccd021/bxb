@@ -23,7 +23,7 @@ export const test1Functions: FunctionsBuilder = (server) => ({
 });
 
 const test1 = defineTest({
-  name: `onObjectCreated trigger params contains object id`,
+  name: `onObjectCreated trigger params contains object id with client.storage.uploadDataUrlAwaitFunctions`,
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({
@@ -80,7 +80,7 @@ export const test14Functions: FunctionsBuilder = (server) => ({
 });
 
 const test14 = defineTest({
-  name: `uploadDataUrl should wait all functions to be finised`,
+  name: `uploadDataUrl should wait all functions to be finised with client.storage.uploadDataUrlAwaitFunctions`,
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({
@@ -163,13 +163,13 @@ const test2 = defineTest({
       ),
       taskEither.chainW(() =>
         client.storage.uploadDataUrl({
-          key: 'kira_object_id',
+          key: 'masumoto_object_id',
           dataUrl: `data:;base64,${Buffer.from('kira masumoto').toString('base64')}`,
         })
       ),
       taskEither.chainTaskK(() =>
         client.db.getDocWhen({
-          key: { collection: 'storageObject', id: 'kira_object_id' },
+          key: { collection: 'storageObject', id: 'masumoto_object_id' },
           select: either.match(() => option.none, identity),
         })
       )

@@ -13,6 +13,7 @@ import {
 import type { Either } from 'fp-ts/Either';
 import { flow, pipe } from 'fp-ts/function';
 import type { Option } from 'fp-ts/Option';
+import type { Task } from 'fp-ts/Task';
 import { match } from 'ts-pattern';
 import isValidDataUrl from 'valid-data-url';
 
@@ -177,6 +178,13 @@ const validate = ({
     )
   );
 
+// eslint-disable-next-line @typescript-eslint/require-await
+const runAsync = (t: Task<unknown>) => async () => {
+  // eslint-disable-next-line max-len
+  // eslint-disable-next-line functional/no-expression-statement, @typescript-eslint/no-floating-promises
+  t();
+};
+
 export const uploadDataUrl: Type = (env) => (param) =>
   pipe(
     {
@@ -189,7 +197,7 @@ export const uploadDataUrl: Type = (env) => (param) =>
     ioEither.chainIOK(() => setItem(env.getWindow, `${storageKey}/${param.key}`, param.dataUrl)),
     taskEither.fromIOEither,
     taskEither.chainIOK(() => env.functions.read),
-    taskEither.chainW(
+    taskEither.chainFirstTaskK(
       flow(
         option.map(({ functions }) => functions),
         option.getOrElseW(() => ({})),
@@ -199,14 +207,14 @@ export const uploadDataUrl: Type = (env) => (param) =>
             : option.none
         ),
         readonlyRecord.sequence(taskEither.ApplicativeSeq),
-        taskEither.bimap(
-          (value) => ({ code: 'Provider' as const, value }),
-          () => undefined
-        )
+        runAsync
       )
     ),
-    taskEither.mapLeft((err) => ({
-      ...err,
-      capability: 'client.storage.uploadDataUrl',
-    }))
+    taskEither.bimap(
+      (err) => ({
+        ...err,
+        capability: 'client.storage.uploadDataUrl',
+      }),
+      () => undefined
+    )
   );
