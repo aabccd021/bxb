@@ -15,7 +15,8 @@ export const onSnapshot: Type = (env) => (param) =>
     ioEither.chainIOK(() =>
       pipe(
         env.onDocChangedCallback.read,
-        io.map(readonlyRecord.upsertAt(stringifyDocKey(param.key), param.onChanged))
+        io.map(readonlyRecord.upsertAt(stringifyDocKey(param.key), param.onChanged)),
+        io.chain(env.onDocChangedCallback.write)
       )
     ),
     // unsubscribe
