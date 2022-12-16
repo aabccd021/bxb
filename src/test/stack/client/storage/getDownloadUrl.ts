@@ -23,9 +23,7 @@ export const test0001 = defineTest({
     }
   >) =>
     pipe(
-      ci.deployStorage({
-        securityRule: { create: [{ type: 'True' }], get: [{ type: 'True' }] },
-      }),
+      ci.deployStorage({ securityRule: { create: [{ type: 'True' }], get: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
         client.storage.uploadDataUrl({
           key: 'kira_key',
@@ -56,14 +54,9 @@ export const test0002 = defineTest({
     }
   >) =>
     pipe(
-      ci.deployStorage({
-        securityRule: { create: [{ type: 'True' }], get: [{ type: 'True' }] },
-      }),
+      ci.deployStorage({ securityRule: { create: [{ type: 'True' }], get: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrl({
-          key: 'kira_key',
-          dataUrl: `data:,kira masumoto`,
-        })
+        client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: `data:,kira masumoto` })
       ),
       taskEither.chainW(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
       taskEither.chainW((url) => taskEither.tryCatch(() => fetch(url), either.toError)),
@@ -91,10 +84,7 @@ export const test0003 = defineTest({
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrl({
-          key: 'kira_key',
-          dataUrl: `data:,kira masumoto`,
-        })
+        client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: `data:,kira masumoto` })
       ),
       taskEither.chainW(() => client.storage.getDownloadUrl({ key: 'kira_key' }))
     ),
@@ -138,9 +128,7 @@ export const test0005 = defineTest({
     }
   >) =>
     pipe(
-      ci.deployStorage({
-        securityRule: { create: [{ type: 'True' }], get: [{ type: 'True' }] },
-      }),
+      ci.deployStorage({ securityRule: { create: [{ type: 'True' }], get: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
         client.storage.uploadDataUrlAwaitFunctions({
           key: 'kira_key',
@@ -174,9 +162,7 @@ export const test0006 = defineTest({
     }
   >) =>
     pipe(
-      ci.deployStorage({
-        securityRule: { create: [{ type: 'True' }], get: [{ type: 'True' }] },
-      }),
+      ci.deployStorage({ securityRule: { create: [{ type: 'True' }], get: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
         client.storage.uploadDataUrlAwaitFunctions({
           key: 'kira_key',

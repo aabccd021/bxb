@@ -24,10 +24,7 @@ export const test0001 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-              get: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' }, get: { type: 'True' } },
           },
         },
       }),
@@ -113,9 +110,7 @@ export const test0003 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' } },
           },
         },
       }),
@@ -126,10 +121,7 @@ export const test0003 = defineTest({
         })
       ),
       taskEither.chainW(() =>
-        client.db.getDocWhen({
-          key: { collection: 'user', id: 'kira_id' },
-          select: option.some,
-        })
+        client.db.getDocWhen({ key: { collection: 'user', id: 'kira_id' }, select: option.some })
       )
     ),
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.getDocWhen' }),
@@ -150,17 +142,10 @@ export const test0004 = defineTest({
     pipe(
       ci.deployDb({
         type: 'deploy',
-        collections: {
-          user: {
-            schema: { name: { type: 'StringField' } },
-          },
-        },
+        collections: { user: { schema: { name: { type: 'StringField' } } } },
       }),
       taskEither.chainW(() =>
-        client.db.getDocWhen({
-          key: { collection: 'user', id: 'kira_id' },
-          select: option.some,
-        })
+        client.db.getDocWhen({ key: { collection: 'user', id: 'kira_id' }, select: option.some })
       )
     ),
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.getDocWhen' }),
@@ -186,9 +171,7 @@ export const test0005 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              get: { type: 'True' },
-            },
+            securityRule: { get: { type: 'True' } },
           },
         },
       }),
@@ -226,10 +209,7 @@ export const test0006 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-              get: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' }, get: { type: 'True' } },
           },
         },
       }),

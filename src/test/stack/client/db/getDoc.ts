@@ -23,10 +23,7 @@ export const test0001 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-              get: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' }, get: { type: 'True' } },
           },
         },
       }),
@@ -100,9 +97,7 @@ export const test0003 = defineTest({
         type: 'deploy',
         collections: {
           user: {
-            securityRule: {
-              get: { type: 'True' },
-            },
+            securityRule: { get: { type: 'True' } },
             schema: { name: { type: 'StringField' } },
           },
         },
@@ -113,11 +108,7 @@ export const test0003 = defineTest({
           data: { name: 'masumoto' },
         })
       ),
-      task.chain(() =>
-        client.db.getDoc({
-          key: { collection: 'user', id: 'kira_id' },
-        })
-      )
+      task.chain(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
     ),
   toResult: either.right(option.none),
 });
@@ -139,10 +130,7 @@ export const test0004 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-              get: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' }, get: { type: 'True' } },
           },
         },
       }),
@@ -180,9 +168,7 @@ export const test0005 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' } },
           },
         },
       }),
@@ -211,11 +197,7 @@ export const test0006 = defineTest({
     pipe(
       ci.deployDb({
         type: 'deploy',
-        collections: {
-          user: {
-            schema: { name: { type: 'StringField' } },
-          },
-        },
+        collections: { user: { schema: { name: { type: 'StringField' } } } },
       }),
       taskEither.chainW(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
     ),
@@ -241,9 +223,7 @@ export const test0007 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              get: { type: 'True' },
-            },
+            securityRule: { get: { type: 'True' } },
           },
         },
       }),
@@ -277,9 +257,7 @@ export const test0008 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              get: { type: 'True' },
-            },
+            securityRule: { get: { type: 'True' } },
           },
         },
       }),
@@ -290,10 +268,7 @@ export const test0008 = defineTest({
         })
       ),
       taskEither.chainW(() =>
-        server.db.upsertDoc({
-          key: { collection: 'user', id: 'kira_id' },
-          data: { name: 'kira' },
-        })
+        server.db.upsertDoc({ key: { collection: 'user', id: 'kira_id' }, data: { name: 'kira' } })
       ),
       taskEither.chainW(() => client.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
     ),

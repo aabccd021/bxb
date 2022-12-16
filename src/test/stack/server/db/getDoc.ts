@@ -23,10 +23,7 @@ export const test0002 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-              get: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' }, get: { type: 'True' } },
           },
         },
       }),
@@ -59,9 +56,7 @@ export const test0003 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' } },
           },
         },
       }),
@@ -91,11 +86,7 @@ export const test0004 = defineTest({
     pipe(
       ci.deployDb({
         type: 'deploy',
-        collections: {
-          user: {
-            schema: { name: { type: 'StringField' } },
-          },
-        },
+        collections: { user: { schema: { name: { type: 'StringField' } } } },
       }),
       taskEither.chainW(() => server.db.getDoc({ key: { collection: 'user', id: 'kira_id' } }))
     ),
@@ -157,10 +148,7 @@ export const test0006 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-              update: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' }, update: { type: 'True' } },
           },
         },
       }),

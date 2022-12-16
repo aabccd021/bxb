@@ -8,10 +8,7 @@ export type Param = {
   readonly server: unknown;
 };
 
-type Error = {
-  readonly code: 'FailedLoadingFunctions';
-  readonly details?: unknown;
-};
+type Error = { readonly code: 'FailedLoadingFunctions'; readonly details?: unknown };
 
 export type Fn = (
   c: Param

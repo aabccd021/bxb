@@ -9,10 +9,7 @@ import type { DeployFunctionParam, Stack, StackWithEnv } from '../type';
 export type MockableWindow = DeepPick<
   typeof window,
   {
-    readonly location: {
-      readonly origin: never;
-      readonly href: never;
-    };
+    readonly location: { readonly origin: never; readonly href: never };
     readonly localStorage: never;
   }
 >;
@@ -29,11 +26,7 @@ export type Env = {
 };
 
 export type StackType = {
-  readonly env: {
-    readonly client: Env;
-    readonly ci: Env;
-    readonly server: Env;
-  };
+  readonly env: { readonly client: Env; readonly ci: Env; readonly server: Env };
 };
 
 export type Stack = StackWithEnv<StackType>;

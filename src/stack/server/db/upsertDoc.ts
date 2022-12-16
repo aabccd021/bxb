@@ -21,8 +21,5 @@ export const upsertDoc: Type = (env) => (param) =>
     ),
     ioEither.map(() => undefined),
     taskEither.fromIOEither,
-    taskEither.mapLeft((err) => ({
-      ...err,
-      capability: 'server.db.upsertDoc',
-    }))
+    taskEither.mapLeft((err) => ({ ...err, capability: 'server.db.upsertDoc' }))
   );

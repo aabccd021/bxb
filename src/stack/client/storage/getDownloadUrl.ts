@@ -40,17 +40,10 @@ export const getDownloadUrl: Type = (env) => (param) =>
           provider: 'mock',
           value: 'db deploy config not found',
         })),
-        either.chainW(
-          either.fromPredicate(isValid, () => ({
-            code: 'Forbidden' as const,
-          }))
-        ),
+        either.chainW(either.fromPredicate(isValid, () => ({ code: 'Forbidden' as const }))),
         either.chainW(() => either.fromOption(() => ({ code: 'FileNotFound' as const }))(object))
       )
     ),
     taskEither.fromIOEither,
-    taskEither.mapLeft((err) => ({
-      ...err,
-      capability: 'client.storage.getDownloadUrl',
-    }))
+    taskEither.mapLeft((err) => ({ ...err, capability: 'client.storage.getDownloadUrl' }))
   );

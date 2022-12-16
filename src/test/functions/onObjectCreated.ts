@@ -43,11 +43,7 @@ export const test1 = defineTest({
     }
   >) =>
     pipe(
-      ci.deployStorage({
-        securityRule: {
-          create: [{ type: 'True' }],
-        },
-      }),
+      ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
         ci.deployDb({
           type: 'deploy',
@@ -122,11 +118,7 @@ export const test14 = defineTest({
     }
   >) =>
     pipe(
-      ci.deployStorage({
-        securityRule: {
-          create: [{ type: 'True' }],
-        },
-      }),
+      ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
         ci.deployDb({
           type: 'deploy',
@@ -154,9 +146,7 @@ export const test14 = defineTest({
         })
       ),
       taskEither.chainW(() =>
-        client.db.getDoc({
-          key: { collection: 'storageObject', id: 'kira_object_id' },
-        })
+        client.db.getDoc({ key: { collection: 'storageObject', id: 'kira_object_id' } })
       )
     ),
   toResult: either.right(option.some({ exists: 'true' })),
@@ -200,11 +190,7 @@ export const test2 = defineTest({
     }
   >) =>
     pipe(
-      ci.deployStorage({
-        securityRule: {
-          create: [{ type: 'True' }],
-        },
-      }),
+      ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
         ci.deployDb({
           type: 'deploy',
@@ -279,11 +265,7 @@ export const test24 = defineTest({
     }
   >) =>
     pipe(
-      ci.deployStorage({
-        securityRule: {
-          create: [{ type: 'True' }],
-        },
-      }),
+      ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
         ci.deployDb({
           type: 'deploy',
@@ -311,9 +293,7 @@ export const test24 = defineTest({
         })
       ),
       taskEither.chainW(() =>
-        client.db.getDoc({
-          key: { collection: 'storageObject', id: 'kira_object_id' },
-        })
+        client.db.getDoc({ key: { collection: 'storageObject', id: 'kira_object_id' } })
       )
     ),
   toResult: either.right(option.none),

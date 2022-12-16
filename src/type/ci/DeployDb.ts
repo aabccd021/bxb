@@ -1,26 +1,15 @@
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import type { TaskEither } from 'fp-ts/TaskEither';
 
-export type StringField = {
-  readonly type: 'StringField';
-};
+export type StringField = { readonly type: 'StringField' };
 
-export type IntField = {
-  readonly type: 'IntField';
-};
+export type IntField = { readonly type: 'IntField' };
 
-export type True = {
-  readonly type: 'True';
-};
+export type True = { readonly type: 'True' };
 
-export type DocumentField = {
-  readonly type: 'DocumentField';
-  readonly fieldName: string;
-};
+export type DocumentField = { readonly type: 'DocumentField'; readonly fieldName: string };
 
-export type AuthUid = {
-  readonly type: 'AuthUid';
-};
+export type AuthUid = { readonly type: 'AuthUid' };
 
 type Commutative<T> = T extends readonly [infer A, infer B]
   ? readonly [A, B] | readonly [B, A]
@@ -28,10 +17,7 @@ type Commutative<T> = T extends readonly [infer A, infer B]
 
 export type Comparable = Commutative<readonly [DocumentField, AuthUid]>;
 
-export type Equal = {
-  readonly type: 'Equal';
-  readonly compare: Comparable;
-};
+export type Equal = { readonly type: 'Equal'; readonly compare: Comparable };
 
 export type Field = IntField | StringField;
 

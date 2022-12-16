@@ -10,8 +10,5 @@ export const deployFunctions: Type = (env) => (params) =>
   pipe(
     getFunctionsDeployParam(params),
     taskEither.chainIOK((a) => env.functions.write(option.some(a))),
-    taskEither.mapLeft((err) => ({
-      ...err,
-      capability: 'ci.deployFunctions',
-    }))
+    taskEither.mapLeft((err) => ({ ...err, capability: 'ci.deployFunctions' }))
   );

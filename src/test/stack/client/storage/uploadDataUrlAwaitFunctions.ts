@@ -70,10 +70,7 @@ export const test0002 = defineTest({
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrlAwaitFunctions({
-          key: 'kira_key',
-          dataUrl: 'invalidDataUrl',
-        })
+        client.storage.uploadDataUrlAwaitFunctions({ key: 'kira_key', dataUrl: 'invalidDataUrl' })
       )
     ),
   toResult: either.left({
@@ -127,10 +124,7 @@ export const test0004 = defineTest({
           create: [
             {
               type: 'LessThan',
-              compare: {
-                lhs: { type: 'ObjectSize' },
-                rhs: { type: 'NumberConstant', value: 2 },
-              },
+              compare: { lhs: { type: 'ObjectSize' }, rhs: { type: 'NumberConstant', value: 2 } },
             },
           ],
         },
@@ -164,10 +158,7 @@ export const test0005 = defineTest({
           create: [
             {
               type: 'LessThan',
-              compare: {
-                lhs: { type: 'ObjectSize' },
-                rhs: { type: 'NumberConstant', value: 2 },
-              },
+              compare: { lhs: { type: 'ObjectSize' }, rhs: { type: 'NumberConstant', value: 2 } },
             },
           ],
         },
@@ -203,19 +194,13 @@ export const test0006 = defineTest({
           create: [
             {
               type: 'LessThan',
-              compare: {
-                lhs: { type: 'ObjectSize' },
-                rhs: { type: 'NumberConstant', value: 2 },
-              },
+              compare: { lhs: { type: 'ObjectSize' }, rhs: { type: 'NumberConstant', value: 2 } },
             },
           ],
         },
       }),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrlAwaitFunctions({
-          key: 'kira_key',
-          dataUrl: `data:,a`,
-        })
+        client.storage.uploadDataUrlAwaitFunctions({ key: 'kira_key', dataUrl: `data:,a` })
       ),
       taskEither.map(() => 'upload success')
     ),
@@ -240,19 +225,13 @@ export const test0007 = defineTest({
           create: [
             {
               type: 'LessThan',
-              compare: {
-                lhs: { type: 'ObjectSize' },
-                rhs: { type: 'NumberConstant', value: 2 },
-              },
+              compare: { lhs: { type: 'ObjectSize' }, rhs: { type: 'NumberConstant', value: 2 } },
             },
           ],
         },
       }),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrlAwaitFunctions({
-          key: 'kira_key',
-          dataUrl: `data:,aa`,
-        })
+        client.storage.uploadDataUrlAwaitFunctions({ key: 'kira_key', dataUrl: `data:,aa` })
       )
     ),
   toResult: either.left({
@@ -493,10 +472,7 @@ export const test0011 = defineTest({
         })
       ),
       taskEither.chainW(() =>
-        server.db.upsertDoc({
-          key: { collection: 'storageObject', id: 'kira_id' },
-          data: {},
-        })
+        server.db.upsertDoc({ key: { collection: 'storageObject', id: 'kira_id' }, data: {} })
       ),
       taskEither.chainW(() =>
         client.storage.uploadDataUrlAwaitFunctions({
