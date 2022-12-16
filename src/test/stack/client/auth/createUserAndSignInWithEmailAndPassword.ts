@@ -1,12 +1,25 @@
 import { either, ioRef, option, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import type { DeepPick } from 'ts-essentials';
 
-import type { AuthState } from '../../../../type';
+import type { AuthState, Stack } from '../../../../type';
 import { defineTest } from '../../../util';
 
 export const test0001 = defineTest({
   name: 'changes auth state to signed',
-  expect: ({ client }) =>
+  expect: ({
+    client,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: {
+        readonly auth: {
+          readonly createUserAndSignInWithEmailAndPassword: never;
+          readonly onAuthStateChanged: never;
+        };
+      };
+    }
+  >) =>
     pipe(
       taskEither.Do,
       taskEither.bindW('authStateRef', () =>

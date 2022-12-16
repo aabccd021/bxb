@@ -2,7 +2,7 @@ import { either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 import type { DeepPick } from 'ts-essentials';
 
-import type { Stack as S } from '../../type';
+import type { Stack } from '../../type';
 import { defineTest, toFunctionsPath } from '../util';
 
 export const test2 = defineTest({
@@ -26,7 +26,7 @@ export const test2 = defineTest({
     ci,
     server,
   }: DeepPick<
-    S.Type,
+    Stack.Type,
     {
       readonly client: {
         readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };
@@ -100,7 +100,7 @@ export const test3 = defineTest({
     ci,
     server,
   }: DeepPick<
-    S.Type,
+    Stack.Type,
     {
       readonly client: {
         readonly db: { readonly getDocWhen: never };
@@ -145,7 +145,7 @@ export const test4 = defineTest({
     client,
     ci,
   }: DeepPick<
-    S.Type,
+    Stack.Type,
     {
       readonly client: {
         readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };

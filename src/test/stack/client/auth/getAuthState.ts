@@ -1,17 +1,36 @@
 import { either, option, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import type { DeepPick } from 'ts-essentials/dist/types';
 
+import type { Stack } from '../../../..';
 import { defineTest } from '../../../util';
 
 export const test0001 = defineTest({
   name: 'returns signed out as default auth state',
-  expect: ({ client }) => client.auth.getAuthState,
+  expect: ({
+    client,
+  }: DeepPick<
+    Stack.Type,
+    { readonly client: { readonly auth: { readonly getAuthState: never } } }
+  >) => client.auth.getAuthState,
   toResult: either.right(option.none),
 });
 
 export const test0002 = defineTest({
   name: 'returns singed in state after client.auth.createUserAndSignInWithEmailAndPassword',
-  expect: ({ client }) =>
+  expect: ({
+    client,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: {
+        readonly auth: {
+          readonly createUserAndSignInWithEmailAndPassword: never;
+          readonly getAuthState: never;
+        };
+      };
+    }
+  >) =>
     pipe(
       client.auth.createUserAndSignInWithEmailAndPassword({
         email: 'kira@sakurazaka.com',
@@ -25,7 +44,19 @@ export const test0002 = defineTest({
 
 export const test0003 = defineTest({
   name: `returns authUser uid same as the one returned from client.auth.createUserAndSignInWithEmailAndPassword`,
-  expect: ({ client }) =>
+  expect: ({
+    client,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: {
+        readonly auth: {
+          readonly createUserAndSignInWithEmailAndPassword: never;
+          readonly getAuthState: never;
+        };
+      };
+    }
+  >) =>
     pipe(
       taskEither.Do,
       taskEither.bind('signInResult', () =>
@@ -47,7 +78,20 @@ export const test0003 = defineTest({
 
 export const test0004 = defineTest({
   name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut`,
-  expect: ({ client }) =>
+  expect: ({
+    client,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: {
+        readonly auth: {
+          readonly signOut: never;
+          readonly readonly: never;
+          readonly createUserAndSignInWithEmailAndPassword: never;
+        };
+      };
+    }
+  >) =>
     pipe(
       client.auth.createUserAndSignInWithEmailAndPassword({
         email: 'kira@sakurazaka.com',

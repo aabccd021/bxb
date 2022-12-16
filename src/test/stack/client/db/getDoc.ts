@@ -1,11 +1,22 @@
 import { either, option, task, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import type { DeepPick } from 'ts-essentials/dist/types';
 
+import type { Stack } from '../../../..';
 import { defineTest } from '../../../util';
 
 export const test0001 = defineTest({
   name: 'can get doc created with client.db.upsertDoc',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: { readonly db: { readonly upsertDoc: never; readonly getDoc: never } };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -32,7 +43,16 @@ export const test0001 = defineTest({
 
 export const test0002 = defineTest({
   name: 'always returns the latest doc state',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: { readonly db: { readonly upsertDoc: never; readonly getDoc: never } };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -65,7 +85,16 @@ export const test0002 = defineTest({
 });
 export const test0003 = defineTest({
   name: `does not returns doc made by forbidden create doc request done with client.db.upsertDoc`,
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: { readonly db: { readonly upsertDoc: never; readonly getDoc: never } };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -94,7 +123,16 @@ export const test0003 = defineTest({
 });
 export const test0004 = defineTest({
   name: `does not returns doc made by forbidden update doc request done with client.db.upsertDoc`,
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: { readonly db: { readonly upsertDoc: never; readonly getDoc: never } };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -126,7 +164,16 @@ export const test0004 = defineTest({
 });
 export const test0005 = defineTest({
   name: 'returns ForbiddedError if forbidden',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: { readonly db: { readonly upsertDoc: never; readonly getDoc: never } };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -151,7 +198,16 @@ export const test0005 = defineTest({
 });
 export const test0006 = defineTest({
   name: 'returns ForbiddedError if forbidden, even if the doc absent',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: { readonly db: { readonly getDoc: never } };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -167,7 +223,18 @@ export const test0006 = defineTest({
 });
 export const test0007 = defineTest({
   name: 'can get doc created by server.db.upsertDoc',
-  expect: ({ server, client, ci }) =>
+  expect: ({
+    server,
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+      readonly client: { readonly db: { readonly getDoc: never } };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -192,7 +259,18 @@ export const test0007 = defineTest({
 });
 export const test0008 = defineTest({
   name: 'can get doc updated by server.db.upsertDoc',
-  expect: ({ server, client, ci }) =>
+  expect: ({
+    server,
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+      readonly client: { readonly db: { readonly getDoc: never } };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
