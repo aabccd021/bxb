@@ -88,4 +88,3 @@ export const tests: Record<string, Test> = {
   "stackTests > server > db > upsertDoc > can upsert doc even if client.db.upserDoc is forbidden by security rule": masmottTests.stackTests.server.db.upsertDoc.test0002,
   "stackTests > server > db > upsertDoc > can create doc even if not signed in": masmottTests.stackTests.server.db.upsertDoc.test0003,
 };
-  
