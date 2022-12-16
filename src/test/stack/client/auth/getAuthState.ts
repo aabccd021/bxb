@@ -86,7 +86,7 @@ export const test0004 = defineTest({
       readonly client: {
         readonly auth: {
           readonly signOut: never;
-          readonly readonly: never;
+          readonly getAuthState: never;
           readonly createUserAndSignInWithEmailAndPassword: never;
         };
       };
