@@ -2,7 +2,7 @@ import { either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 import type { DeepPick } from 'ts-essentials';
 
-import type { DeployFunctionParam, Stack as S } from '../../type';
+import type { Stack as S } from '../../type';
 import { defineTest, toFunctionsPath } from '../util';
 
 export const test2 = defineTest({
@@ -82,7 +82,7 @@ export const test3 = defineTest({
   name: `onAuthUserCreated trigger should not be called if not triggered`,
   type: 'fail',
   functionsBuilders: {
-    fn1: (server: S.server.Type): DeployFunctionParam => ({
+    fn1: (server) => ({
       functions: {
         saveLatestCreatedUser: {
           trigger: 'onAuthUserCreated',
@@ -95,7 +95,20 @@ export const test3 = defineTest({
       },
     }),
   },
-  expect: ({ client, ci, server }) =>
+  expect: ({
+    client,
+    ci,
+    server,
+  }: DeepPick<
+    S.Type,
+    {
+      readonly client: {
+        readonly db: { readonly getDocWhen: never };
+      };
+      readonly ci: { readonly deployDb: never; readonly deployFunctions: never };
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -128,7 +141,19 @@ export const test3 = defineTest({
 export const test4 = defineTest({
   name: `document should not be created if trigger not deployed`,
   type: 'fail',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    S.Type,
+    {
+      readonly client: {
+        readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };
+        readonly db: { readonly getDocWhen: never };
+      };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',

@@ -1,13 +1,14 @@
 import { either, option, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
+import type { DeepPick } from 'ts-essentials';
 
-import type { DeployFunctionParam, Stack as S } from '../../type';
+import type { Stack as S } from '../../type';
 import { defineTest, toFunctionsPath } from '../util';
 
 export const test1 = defineTest({
   name: `onObjectCreated trigger params contains object id with client.storage.uploadDataUrlAwaitFunctions`,
   functionsBuilders: {
-    fn1: (server: S.server.Type): DeployFunctionParam => ({
+    fn1: (server) => ({
       functions: {
         saveCreatedObjects: {
           trigger: 'onObjectCreated',
@@ -22,7 +23,25 @@ export const test1 = defineTest({
       },
     }),
   },
-  expect: ({ client, ci, server }) =>
+  expect: ({
+    client,
+    ci,
+    server,
+  }: DeepPick<
+    S.Type,
+    {
+      readonly client: {
+        readonly db: { readonly getDocWhen: never };
+        readonly storage: { readonly uploadDataUrlAwaitFunctions: never };
+      };
+      readonly ci: {
+        readonly deployDb: never;
+        readonly deployStorage: never;
+        readonly deployFunctions: never;
+      };
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployStorage({
         securityRule: {
@@ -68,7 +87,7 @@ export const test1 = defineTest({
 export const test14 = defineTest({
   name: `uploadDataUrl should wait all functions to be finised with client.storage.uploadDataUrlAwaitFunctions`,
   functionsBuilders: {
-    fn1: (server: S.server.Type): DeployFunctionParam => ({
+    fn1: (server) => ({
       functions: {
         saveCreatedObjects: {
           trigger: 'onObjectCreated',
@@ -83,7 +102,25 @@ export const test14 = defineTest({
       },
     }),
   },
-  expect: ({ client, ci, server }) =>
+  expect: ({
+    client,
+    ci,
+    server,
+  }: DeepPick<
+    S.Type,
+    {
+      readonly ci: {
+        readonly deployStorage: never;
+        readonly deployDb: never;
+        readonly deployFunctions: never;
+      };
+      readonly client: {
+        readonly storage: { readonly uploadDataUrlAwaitFunctions: never };
+        readonly db: { readonly getDoc: never };
+      };
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployStorage({
         securityRule: {
@@ -128,7 +165,7 @@ export const test14 = defineTest({
 export const test2 = defineTest({
   name: `onObjectCreated trigger params contains object id`,
   functionsBuilders: {
-    fn1: (server: S.server.Type): DeployFunctionParam => ({
+    fn1: (server) => ({
       functions: {
         saveCreatedObjects: {
           trigger: 'onObjectCreated',
@@ -143,7 +180,25 @@ export const test2 = defineTest({
       },
     }),
   },
-  expect: ({ client, ci, server }) =>
+  expect: ({
+    client,
+    ci,
+    server,
+  }: DeepPick<
+    S.Type,
+    {
+      readonly ci: {
+        readonly deployStorage: never;
+        readonly deployDb: never;
+        readonly deployFunctions: never;
+      };
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+      readonly client: {
+        readonly storage: { readonly uploadDataUrl: never };
+        readonly db: { readonly getDocWhen: never };
+      };
+    }
+  >) =>
     pipe(
       ci.deployStorage({
         securityRule: {
@@ -189,7 +244,7 @@ export const test2 = defineTest({
 export const test24 = defineTest({
   name: `uploadDataUrl should not wait functions to be finished`,
   functionsBuilders: {
-    fn1: (server: S.server.Type): DeployFunctionParam => ({
+    fn1: (server) => ({
       functions: {
         saveCreatedObjects: {
           trigger: 'onObjectCreated',
@@ -204,7 +259,6 @@ export const test24 = defineTest({
       },
     }),
   },
-
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({
@@ -251,7 +305,7 @@ export const test3 = defineTest({
   name: `onObjectCreated trigger should not be called if not triggered`,
   type: 'fail',
   functionsBuilders: {
-    fn1: (server: S.server.Type): DeployFunctionParam => ({
+    fn1: (server) => ({
       functions: {
         saveCreatedObjects: {
           trigger: 'onObjectCreated',
