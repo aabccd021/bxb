@@ -1,11 +1,22 @@
 import { either, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import type { DeepPick } from 'ts-essentials';
 
+import type { Stack } from '../../../../type';
 import { defineTest } from '../../../util';
 
 export const test0001 = defineTest({
   name: 'returns Forbidden when creating doc if create rule is not specified',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployDb: never };
+      readonly client: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -27,7 +38,16 @@ export const test0001 = defineTest({
 
 export const test0002 = defineTest({
   name: 'returns Forbidden when updating doc if update rule is not specified',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployDb: never };
+      readonly client: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -59,7 +79,16 @@ export const test0002 = defineTest({
 
 export const test0003 = defineTest({
   name: 'can create doc',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployDb: never };
+      readonly client: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -83,7 +112,16 @@ export const test0003 = defineTest({
 
 export const test0004 = defineTest({
   name: 'returns Forbidden when creating doc if string given when int field required',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployDb: never };
+      readonly client: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -106,7 +144,16 @@ export const test0004 = defineTest({
 
 export const test0005 = defineTest({
   name: 'returns Forbidden when creating doc if int given when string field required',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployDb: never };
+      readonly client: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -129,7 +176,16 @@ export const test0005 = defineTest({
 
 export const test0006 = defineTest({
   name: 'returns Forbidden when creating doc if schema not specified',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployDb: never };
+      readonly client: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -152,7 +208,19 @@ export const test0006 = defineTest({
 
 export const test0007 = defineTest({
   name: `can create doc if owner field value is owner's auth uid`,
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployDb: never };
+      readonly client: {
+        readonly db: { readonly upsertDoc: never };
+        readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };
+      };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -187,7 +255,19 @@ export const test0007 = defineTest({
 
 export const test0008 = defineTest({
   name: `returns ForbidenError if owner field value is not owner's auth uid, even if signed in`,
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployDb: never };
+      readonly client: {
+        readonly db: { readonly upsertDoc: never };
+        readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };
+      };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -221,7 +301,16 @@ export const test0008 = defineTest({
 
 export const test0009 = defineTest({
   name: `returns Forbidden if not signed in`,
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployDb: never };
+      readonly client: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -249,7 +338,16 @@ export const test0009 = defineTest({
 
 export const test0010 = defineTest({
   name: `returns Forbidden if not signed in, swap comparation`,
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployDb: never };
+      readonly client: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
