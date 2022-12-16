@@ -45,6 +45,7 @@ const flattenedTests = pipe(
   join('\n'),
   (x) => `/* eslint-disable max-len */
 /* eslint-disable prettier/prettier */
+import type { Test} from '../src/test';
 import { tests as masmottTests } from '../src/test';
 export const tests = {\n${x}\n};
   `
