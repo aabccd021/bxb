@@ -1,6 +1,2 @@
-import * as onAuthUserCreated from './onAuthUserCreated';
-import * as onObjectCreated from './onObjectCreated';
-
-export { onAuthUserCreated, onObjectCreated };
-
-export const allSuites = [onAuthUserCreated.suite, onObjectCreated.suite];
+export * as onAuthUserCreated from './onAuthUserCreated';
+export * as onObjectCreated from './onObjectCreated';

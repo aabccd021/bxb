@@ -1,66 +1,60 @@
 import { either, option, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import type { Suite } from '../../../util';
-import { defineTest } from '../../../util';
+import { defineTest } from '../../..';
 
-export const suite: Suite = {
-  name: 'client.auth.getAuthState',
-  tests: [
-    defineTest({
-      name: 'returns signed out as default auth state',
-      expect: ({ client }) => client.auth.getAuthState,
-      toResult: either.right(option.none),
-    }),
+export const test0001 = defineTest({
+  name: 'returns signed out as default auth state',
+  expect: ({ client }) => client.auth.getAuthState,
+  toResult: either.right(option.none),
+});
 
-    defineTest({
-      name: 'returns singed in state after client.auth.createUserAndSignInWithEmailAndPassword',
-      expect: ({ client }) =>
+export const test0002 = defineTest({
+  name: 'returns singed in state after client.auth.createUserAndSignInWithEmailAndPassword',
+  expect: ({ client }) =>
+    pipe(
+      client.auth.createUserAndSignInWithEmailAndPassword({
+        email: 'kira@sakurazaka.com',
+        password: 'dorokatsu',
+      }),
+      taskEither.chainW(() => client.auth.getAuthState),
+      taskEither.map(option.map(() => 'some auth state'))
+    ),
+  toResult: either.right(option.some('some auth state')),
+});
+
+export const test0003 = defineTest({
+  name: `returns authUser uid same as the one returned from client.auth.createUserAndSignInWithEmailAndPassword`,
+  expect: ({ client }) =>
+    pipe(
+      taskEither.Do,
+      taskEither.bind('signInResult', () =>
+        client.auth.createUserAndSignInWithEmailAndPassword({
+          email: 'kira@sakurazaka.com',
+          password: 'dorokatsu',
+        })
+      ),
+      taskEither.bindW('getAuthStateResult', () => client.auth.getAuthState),
+      taskEither.map(({ signInResult, getAuthStateResult }) =>
         pipe(
-          client.auth.createUserAndSignInWithEmailAndPassword({
-            email: 'kira@sakurazaka.com',
-            password: 'dorokatsu',
-          }),
-          taskEither.chainW(() => client.auth.getAuthState),
-          taskEither.map(option.map(() => 'some auth state'))
-        ),
-      toResult: either.right(option.some('some auth state')),
-    }),
+          getAuthStateResult,
+          option.map((authUser) => authUser.uid === signInResult.authUser.uid)
+        )
+      )
+    ),
+  toResult: either.right(option.some(true)),
+});
 
-    defineTest({
-      name: `returns authUser uid same as the one returned from client.auth.createUserAndSignInWithEmailAndPassword`,
-      expect: ({ client }) =>
-        pipe(
-          taskEither.Do,
-          taskEither.bind('signInResult', () =>
-            client.auth.createUserAndSignInWithEmailAndPassword({
-              email: 'kira@sakurazaka.com',
-              password: 'dorokatsu',
-            })
-          ),
-          taskEither.bindW('getAuthStateResult', () => client.auth.getAuthState),
-          taskEither.map(({ signInResult, getAuthStateResult }) =>
-            pipe(
-              getAuthStateResult,
-              option.map((authUser) => authUser.uid === signInResult.authUser.uid)
-            )
-          )
-        ),
-      toResult: either.right(option.some(true)),
-    }),
-
-    defineTest({
-      name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut`,
-      expect: ({ client }) =>
-        pipe(
-          client.auth.createUserAndSignInWithEmailAndPassword({
-            email: 'kira@sakurazaka.com',
-            password: 'dorokatsu',
-          }),
-          taskEither.chainW(() => client.auth.signOut),
-          taskEither.chainW(() => client.auth.getAuthState)
-        ),
-      toResult: either.right(option.none),
-    }),
-  ],
-};
+export const test0004 = defineTest({
+  name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut`,
+  expect: ({ client }) =>
+    pipe(
+      client.auth.createUserAndSignInWithEmailAndPassword({
+        email: 'kira@sakurazaka.com',
+        password: 'dorokatsu',
+      }),
+      taskEither.chainW(() => client.auth.signOut),
+      taskEither.chainW(() => client.auth.getAuthState)
+    ),
+  toResult: either.right(option.none),
+});
