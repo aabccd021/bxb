@@ -48,7 +48,7 @@ const flattenedTests = pipe(
 import type { Test} from '../src/test';
 import { tests as masmottTests } from '../src/test';
 export const tests = {\n${x}\n};
-  `
+`
 );
 
 const main = () => fs.writeFile('test/tests.ts', flattenedTests);
