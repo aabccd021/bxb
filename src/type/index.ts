@@ -53,4 +53,4 @@ export type DeployFunctionParam = {
   readonly functions: ReadonlyRecord<string, Functions.Type>;
 };
 
-export type FunctionsBuilder = (server: Stack.server.Type) => DeployFunctionParam;
+export type FunctionsBuilder<S> = (server: S) => DeployFunctionParam;

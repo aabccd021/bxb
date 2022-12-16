@@ -1,13 +1,11 @@
 import type { TaskEither } from 'fp-ts/TaskEither';
 
-import type { Stack } from '..';
-
 export type Param = {
   readonly functions: {
     readonly filePath: string;
     readonly exportPath: readonly (number | string)[];
   };
-  readonly server: Stack.server.Type;
+  readonly server: unknown;
 };
 
 type Error = {

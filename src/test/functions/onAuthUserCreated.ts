@@ -1,5 +1,6 @@
 import { either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
+import type { DeepPick } from 'ts-essentials';
 
 import type { DeployFunctionParam, Stack as S } from '../../type';
 import { defineTest, toFunctionsPath } from '../util';
@@ -7,7 +8,7 @@ import { defineTest, toFunctionsPath } from '../util';
 export const test2 = defineTest({
   name: `onAuthUserCreated trigger can upsert doc`,
   functionsBuilders: {
-    fn1: (server: S.server.Type): DeployFunctionParam => ({
+    fn1: (server) => ({
       functions: {
         saveLatestCreatedUser: {
           trigger: 'onAuthUserCreated',
@@ -20,7 +21,21 @@ export const test2 = defineTest({
       },
     }),
   },
-  expect: ({ client, ci, server }) =>
+  expect: ({
+    client,
+    ci,
+    server,
+  }: DeepPick<
+    S.Type,
+    {
+      readonly client: {
+        readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };
+        readonly db: { readonly getDocWhen: never };
+      };
+      readonly ci: { readonly deployDb: never; readonly deployFunctions: never };
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
