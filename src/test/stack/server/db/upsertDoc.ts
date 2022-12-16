@@ -1,11 +1,22 @@
 import { either, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import type { DeepPick } from 'ts-essentials/dist/types';
 
+import type { Stack } from '../../../../type';
 import { defineTest } from '../../../util';
 
 export const test0001 = defineTest({
   name: 'can upsert doc',
-  expect: ({ server, ci }) =>
+  expect: ({
+    server,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -29,7 +40,16 @@ export const test0001 = defineTest({
 
 export const test0002 = defineTest({
   name: 'can upsert doc even if client.db.upserDoc is forbidden by security rule',
-  expect: ({ server, ci }) =>
+  expect: ({
+    server,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -53,7 +73,16 @@ export const test0002 = defineTest({
 
 export const test0003 = defineTest({
   name: `can create doc even if not signed in`,
-  expect: ({ server, ci }) =>
+  expect: ({
+    server,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+      readonly ci: { readonly deployDb: never };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
