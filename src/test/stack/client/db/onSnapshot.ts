@@ -6,7 +6,7 @@ import type { Either } from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 
 import type { DocData } from '../../../../type';
-import { defineTest } from '../../..';
+import { defineTest } from '../../../util';
 
 export const test0010 = defineTest({
   name: 'can return a doc is created with client.db.upsertDoc',

@@ -1,4 +1,6 @@
-import { capability } from '../src/test';
-import { runSuiteConcurrent } from './util';
+import { tests } from './tests';
+import { runTest } from './util';
 
-capability.allSuites.forEach((suite) => runSuiteConcurrent({ suite }));
+Object.entries(tests)
+  .map(([name, test]) => ({ ...test, name, concurrent: true }))
+  .forEach((test) => runTest({ test }));

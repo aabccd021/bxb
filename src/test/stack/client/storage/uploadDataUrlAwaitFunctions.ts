@@ -1,7 +1,7 @@
 import { either, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import { defineTest } from '../../..';
+import { defineTest } from '../../../util';
 
 export const test0000 = defineTest({
   name: 'can upload base64 data url',
