@@ -5,10 +5,10 @@ import { string } from 'fp-ts-std';
 
 import type { FunctionsBuilder, Stack } from '../type';
 
-export type Test<T> = {
+export type Test<E = unknown, T = unknown> = {
   readonly name: string;
-  readonly expect: (stack: Stack.Type) => TaskEither<unknown, T>;
-  readonly toResult: Either<unknown, T>;
+  readonly expect: (stack: Stack.Type) => TaskEither<E, T>;
+  readonly toResult: Either<E, T>;
   readonly type?: 'fail';
   readonly timeOut?: number;
   readonly functionsBuilders?: ReadonlyRecord<string, FunctionsBuilder>;
@@ -17,7 +17,7 @@ export type Test<T> = {
 
 export type Suite = {
   readonly name: string;
-  readonly tests: readonly Test<unknown>[];
+  readonly tests: readonly Test[];
   readonly concurrent?: boolean;
   readonly timeOut?: number;
 };

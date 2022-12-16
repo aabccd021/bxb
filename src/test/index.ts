@@ -20,7 +20,7 @@ export const runTestWithConfig =
     readonly stack: StackWithEnv<T>;
     readonly getTestEnv: TaskEither<{ readonly capability: 'test.getTestEnv' }, T['env']>;
   }) =>
-  ({ test }: { readonly test: Test<unknown> }) =>
+  ({ test }: { readonly test: Test }) =>
     (test.type === 'fail' ? test_.fails : test_)(
       test.name,
       () =>
