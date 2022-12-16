@@ -2,7 +2,7 @@ import { either, option, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 import type { DeepPick } from 'ts-essentials';
 
-import type { Stack as S } from '../../type';
+import type { Stack } from '../../type';
 import { defineTest, toFunctionsPath } from '../util';
 
 export const test1 = defineTest({
@@ -28,7 +28,7 @@ export const test1 = defineTest({
     ci,
     server,
   }: DeepPick<
-    S.Type,
+    Stack.Type,
     {
       readonly client: {
         readonly db: { readonly getDocWhen: never };
@@ -107,7 +107,7 @@ export const test14 = defineTest({
     ci,
     server,
   }: DeepPick<
-    S.Type,
+    Stack.Type,
     {
       readonly ci: {
         readonly deployStorage: never;
@@ -185,7 +185,7 @@ export const test2 = defineTest({
     ci,
     server,
   }: DeepPick<
-    S.Type,
+    Stack.Type,
     {
       readonly ci: {
         readonly deployStorage: never;
@@ -264,7 +264,7 @@ export const test24 = defineTest({
     ci,
     server,
   }: DeepPick<
-    S.Type,
+    Stack.Type,
     {
       readonly client: {
         readonly storage: { readonly uploadDataUrl: never };
@@ -338,7 +338,18 @@ export const test3 = defineTest({
       },
     }),
   },
-  expect: ({ client, ci, server }) =>
+  expect: ({
+    client,
+    ci,
+    server,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: { readonly db: { readonly getDocWhen: never } };
+      readonly ci: { readonly deployFunctions: never; readonly deployDb: never };
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -371,7 +382,19 @@ export const test3 = defineTest({
 export const test4 = defineTest({
   name: `document should not be created if trigger not deployed`,
   type: 'fail',
-  expect: ({ client, ci }) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployDb: never };
+      readonly client: {
+        readonly storage: { readonly uploadDataUrl: never };
+        readonly db: { readonly getDocWhen: never };
+      };
+    }
+  >) =>
     pipe(
       ci.deployDb({
         type: 'deploy',

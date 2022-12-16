@@ -1,12 +1,18 @@
 import { either, ioRef, option, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import type { DeepPick } from 'ts-essentials/dist/types';
 
-import type { AuthState } from '../../../..';
+import type { AuthState, Stack } from '../../../..';
 import { defineTest } from '../../../util';
 
 export const test0001 = defineTest({
   name: 'returns signed out as default auth state',
-  expect: ({ client }) =>
+  expect: ({
+    client,
+  }: DeepPick<
+    Stack.Type,
+    { readonly client: { readonly auth: { readonly onAuthStateChanged: never } } }
+  >) =>
     pipe(
       taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
       taskEither.bindTo('authStateRef'),
@@ -21,7 +27,19 @@ export const test0001 = defineTest({
 
 export const test0002 = defineTest({
   name: 'returns singed in state after client.auth.createUserAndSignInWithEmailAndPassword',
-  expect: ({ client }) =>
+  expect: ({
+    client,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: {
+        readonly auth: {
+          readonly createUserAndSignInWithEmailAndPassword: never;
+          readonly onAuthStateChanged: never;
+        };
+      };
+    }
+  >) =>
     pipe(
       taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
       taskEither.bindTo('authStateRef'),
@@ -43,7 +61,20 @@ export const test0002 = defineTest({
 
 export const test0003 = defineTest({
   name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut then subscribe`,
-  expect: ({ client }) =>
+  expect: ({
+    client,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: {
+        readonly auth: {
+          readonly createUserAndSignInWithEmailAndPassword: never;
+          readonly onAuthStateChanged: never;
+          readonly signOut: never;
+        };
+      };
+    }
+  >) =>
     pipe(
       taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
       taskEither.bindTo('authStateRef'),
@@ -65,7 +96,20 @@ export const test0003 = defineTest({
 
 export const test0004 = defineTest({
   name: `returns singed out state after subscribe and client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut`,
-  expect: ({ client }) =>
+  expect: ({
+    client,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: {
+        readonly auth: {
+          readonly createUserAndSignInWithEmailAndPassword: never;
+          readonly onAuthStateChanged: never;
+          readonly signOut: never;
+        };
+      };
+    }
+  >) =>
     pipe(
       taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
       taskEither.bindTo('authStateRef'),
@@ -87,7 +131,20 @@ export const test0004 = defineTest({
 
 export const test0005 = defineTest({
   name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then subscribe then client.auth.signOut`,
-  expect: ({ client }) =>
+  expect: ({
+    client,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: {
+        readonly auth: {
+          readonly createUserAndSignInWithEmailAndPassword: never;
+          readonly onAuthStateChanged: never;
+          readonly signOut: never;
+        };
+      };
+    }
+  >) =>
     pipe(
       taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
       taskEither.bindTo('authStateRef'),
@@ -109,7 +166,19 @@ export const test0005 = defineTest({
 
 export const test0006 = defineTest({
   name: 'does not call onAuthStateChanged callback after unsubscribed',
-  expect: ({ client }) =>
+  expect: ({
+    client,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly client: {
+        readonly auth: {
+          readonly createUserAndSignInWithEmailAndPassword: never;
+          readonly onAuthStateChanged: never;
+        };
+      };
+    }
+  >) =>
     pipe(
       taskEither.fromIO(ioRef.newIORef<AuthState>(option.none)),
       taskEither.bindTo('authStateRef'),
