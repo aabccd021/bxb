@@ -7,7 +7,16 @@ import { defineTest } from '../../../util';
 
 export const test0001 = defineTest({
   name: 'can upload base64 data url',
-  expect: ({ client, ci, }: DeepPick< Stack.Type, { readonly ci: { readonly deployStorage: never }; readonly client: { readonly storage: { readonly uploadDataUrl: never } }; } >) =>
+  expect: ({
+    client,
+    ci,
+  }: DeepPick<
+    Stack.Type,
+    {
+      readonly ci: { readonly deployStorage: never };
+      readonly client: { readonly storage: { readonly uploadDataUrl: never } };
+    }
+  >) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
