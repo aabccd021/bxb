@@ -1,7 +1,8 @@
 /* eslint-disable max-len */
 /* eslint-disable prettier/prettier */
+import type { Test} from '../src/test';
 import { tests as masmottTests } from '../src/test';
-export const tests = {
+export const tests: Record<string, Test> = {
   "functions > onAuthUserCreated > onAuthUserCreated trigger can upsert doc": masmottTests.functions.onAuthUserCreated.test2,
   "functions > onAuthUserCreated > onAuthUserCreated trigger should not be called if not triggered": masmottTests.functions.onAuthUserCreated.test3,
   "functions > onAuthUserCreated > document should not be created if trigger not deployed": masmottTests.functions.onAuthUserCreated.test4,
