@@ -47,7 +47,7 @@ const flattenedTests = pipe(
 /* eslint-disable prettier/prettier */
 import type { Test} from '../src/test';
 import { tests as masmottTests } from '../src/test';
-export const tests = {\n${x}\n};
+export const tests: Record<string, Test> = {\n${x}\n};
 `
 );
 

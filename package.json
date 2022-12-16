@@ -26,7 +26,7 @@
     "test:parallel": "vitest --run parallel.test.ts",
     "test:unit": "pnpm test:independence && pnpm test:parallel",
     "gentest": "node dist/cjs/gentest.js",
-    "test": "pnpm test:types && pnpm gentest && pnpm test:unit && pnpm test:provider:foo && pnpm test:framework:nextjs"
+    "test": "pnpm gentest && pnpm test:types && pnpm test:unit && pnpm test:provider:foo && pnpm test:framework:nextjs"
   },
   "sideEffects": false,
   "name": "masmott",
