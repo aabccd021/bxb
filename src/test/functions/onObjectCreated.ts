@@ -1,29 +1,28 @@
 import { either, option, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
-import type { FunctionsBuilder } from '../..';
+import type { DeployFunctionParam, Stack as S } from '../../type';
 import type { Suite } from '../util';
-import { defineTest } from '../util';
+import { defineTest, toFunctionsPath } from '../util';
 
-const functionsPath = __filename.replaceAll('masmott/dist/es6', 'masmott/dist/cjs');
-
-export const test1Functions: FunctionsBuilder = (server) => ({
-  functions: {
-    saveCreatedObjects: {
-      trigger: 'onObjectCreated',
-      handler: (params) =>
-        task.delay(1000)(
-          server.db.upsertDoc({
-            key: { collection: 'storageObject', id: params.object.key },
-            data: { exists: 'true' },
-          })
-        ),
-    },
-  },
-});
-
-const test1 = defineTest({
+export const test1 = defineTest({
   name: `onObjectCreated trigger params contains object id with client.storage.uploadDataUrlAwaitFunctions`,
+  functionsBuilders: {
+    fn1: (server: S.server.Type): DeployFunctionParam => ({
+      functions: {
+        saveCreatedObjects: {
+          trigger: 'onObjectCreated',
+          handler: (params) =>
+            task.delay(1000)(
+              server.db.upsertDoc({
+                key: { collection: 'storageObject', id: params.object.key },
+                data: { exists: 'true' },
+              })
+            ),
+        },
+      },
+    }),
+  },
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({
@@ -44,7 +43,10 @@ const test1 = defineTest({
       ),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: { path: functionsPath, exportName: 'test1Functions' },
+          functions: {
+            filePath: toFunctionsPath(__filename),
+            exportPath: ['test1', 'functionsBuilders', 'fn1'],
+          },
           server,
         })
       ),
@@ -64,23 +66,24 @@ const test1 = defineTest({
   toResult: either.right({ exists: 'true' }),
 });
 
-export const test14Functions: FunctionsBuilder = (server) => ({
-  functions: {
-    saveCreatedObjects: {
-      trigger: 'onObjectCreated',
-      handler: (params) =>
-        task.delay(1000)(
-          server.db.upsertDoc({
-            key: { collection: 'storageObject', id: params.object.key },
-            data: { exists: 'true' },
-          })
-        ),
-    },
-  },
-});
-
-const test14 = defineTest({
+export const test14 = defineTest({
   name: `uploadDataUrl should wait all functions to be finised with client.storage.uploadDataUrlAwaitFunctions`,
+  functionsBuilders: {
+    fn1: (server: S.server.Type): DeployFunctionParam => ({
+      functions: {
+        saveCreatedObjects: {
+          trigger: 'onObjectCreated',
+          handler: (params) =>
+            task.delay(1000)(
+              server.db.upsertDoc({
+                key: { collection: 'storageObject', id: params.object.key },
+                data: { exists: 'true' },
+              })
+            ),
+        },
+      },
+    }),
+  },
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({
@@ -101,7 +104,10 @@ const test14 = defineTest({
       ),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: { path: functionsPath, exportName: 'test14Functions' },
+          functions: {
+            filePath: toFunctionsPath(__filename),
+            exportPath: ['test14', 'functionsBuilders', 'fn1'],
+          },
           server,
         })
       ),
@@ -120,23 +126,24 @@ const test14 = defineTest({
   toResult: either.right(option.some({ exists: 'true' })),
 });
 
-export const test2Functions: FunctionsBuilder = (server) => ({
-  functions: {
-    saveCreatedObjects: {
-      trigger: 'onObjectCreated',
-      handler: (params) =>
-        task.delay(1000)(
-          server.db.upsertDoc({
-            key: { collection: 'storageObject', id: params.object.key },
-            data: { exists: 'true' },
-          })
-        ),
-    },
-  },
-});
-
-const test2 = defineTest({
+export const test2 = defineTest({
   name: `onObjectCreated trigger params contains object id`,
+  functionsBuilders: {
+    fn1: (server: S.server.Type): DeployFunctionParam => ({
+      functions: {
+        saveCreatedObjects: {
+          trigger: 'onObjectCreated',
+          handler: (params) =>
+            task.delay(1000)(
+              server.db.upsertDoc({
+                key: { collection: 'storageObject', id: params.object.key },
+                data: { exists: 'true' },
+              })
+            ),
+        },
+      },
+    }),
+  },
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({
@@ -157,7 +164,10 @@ const test2 = defineTest({
       ),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: { path: functionsPath, exportName: 'test2Functions' },
+          functions: {
+            filePath: toFunctionsPath(__filename),
+            exportPath: ['test2', 'functionsBuilders', 'fn1'],
+          },
           server,
         })
       ),
@@ -177,23 +187,25 @@ const test2 = defineTest({
   toResult: either.right({ exists: 'true' }),
 });
 
-export const test24Functions: FunctionsBuilder = (server) => ({
-  functions: {
-    saveCreatedObjects: {
-      trigger: 'onObjectCreated',
-      handler: (params) =>
-        task.delay(1000)(
-          server.db.upsertDoc({
-            key: { collection: 'storageObject', id: params.object.key },
-            data: { exists: 'true' },
-          })
-        ),
-    },
-  },
-});
-
-const test24 = defineTest({
+export const test24 = defineTest({
   name: `uploadDataUrl should not wait functions to be finished`,
+  functionsBuilders: {
+    fn1: (server: S.server.Type): DeployFunctionParam => ({
+      functions: {
+        saveCreatedObjects: {
+          trigger: 'onObjectCreated',
+          handler: (params) =>
+            task.delay(1000)(
+              server.db.upsertDoc({
+                key: { collection: 'storageObject', id: params.object.key },
+                data: { exists: 'true' },
+              })
+            ),
+        },
+      },
+    }),
+  },
+
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({
@@ -214,7 +226,10 @@ const test24 = defineTest({
       ),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: { path: functionsPath, exportName: 'test24Functions' },
+          functions: {
+            filePath: toFunctionsPath(__filename),
+            exportPath: ['test24', 'functionsBuilders', 'fn1'],
+          },
           server,
         })
       ),
@@ -233,24 +248,25 @@ const test24 = defineTest({
   toResult: either.right(option.none),
 });
 
-export const test3Functions: FunctionsBuilder = (server) => ({
-  functions: {
-    saveCreatedObjects: {
-      trigger: 'onObjectCreated',
-      handler: (params) =>
-        task.delay(1000)(
-          server.db.upsertDoc({
-            key: { collection: 'storageObject', id: params.object.key },
-            data: { exists: 'true' },
-          })
-        ),
-    },
-  },
-});
-
-const test3 = defineTest({
+export const test3 = defineTest({
   name: `onObjectCreated trigger should not be called if not triggered`,
   type: 'fail',
+  functionsBuilders: {
+    fn1: (server: S.server.Type): DeployFunctionParam => ({
+      functions: {
+        saveCreatedObjects: {
+          trigger: 'onObjectCreated',
+          handler: (params) =>
+            task.delay(1000)(
+              server.db.upsertDoc({
+                key: { collection: 'storageObject', id: params.object.key },
+                data: { exists: 'true' },
+              })
+            ),
+        },
+      },
+    }),
+  },
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
@@ -264,7 +280,10 @@ const test3 = defineTest({
       }),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: { path: functionsPath, exportName: 'test3Functions' },
+          functions: {
+            filePath: toFunctionsPath(__filename),
+            exportPath: ['test3', 'functionsBuilders', 'fn1'],
+          },
           server,
         })
       ),
@@ -278,7 +297,7 @@ const test3 = defineTest({
   toResult: either.right({ exists: 'true' }),
 });
 
-const test4 = defineTest({
+export const test4 = defineTest({
   name: `document should not be created if trigger not deployed`,
   type: 'fail',
   expect: ({ client, ci }) =>

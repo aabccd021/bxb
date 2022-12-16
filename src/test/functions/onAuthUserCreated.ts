@@ -1,27 +1,26 @@
 import { either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
-import type { FunctionsBuilder } from '../..';
+import type { DeployFunctionParam, Stack as S } from '../../type';
 import type { Suite } from '../util';
-import { defineTest } from '../util';
+import { defineTest, toFunctionsPath } from '../util';
 
-const functionsPath = __filename.replaceAll('masmott/dist/es6', 'masmott/dist/cjs');
-
-export const test2Functions: FunctionsBuilder = (server) => ({
-  functions: {
-    saveLatestCreatedUser: {
-      trigger: 'onAuthUserCreated',
-      handler: ({ authUser }) =>
-        server.db.upsertDoc({
-          key: { collection: 'authUser', id: 'latestCreated' },
-          data: { uid: authUser.uid },
-        }),
-    },
-  },
-});
-
-const test2 = defineTest({
+export const test2 = defineTest({
   name: `onAuthUserCreated trigger can upsert doc`,
+  functionsBuilders: {
+    fn1: (server: S.server.Type): DeployFunctionParam => ({
+      functions: {
+        saveLatestCreatedUser: {
+          trigger: 'onAuthUserCreated',
+          handler: ({ authUser }) =>
+            server.db.upsertDoc({
+              key: { collection: 'authUser', id: 'latestCreated' },
+              data: { uid: authUser.uid },
+            }),
+        },
+      },
+    }),
+  },
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
@@ -35,7 +34,10 @@ const test2 = defineTest({
       }),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: { path: functionsPath, exportName: 'test2Functions' },
+          functions: {
+            filePath: toFunctionsPath(__filename),
+            exportPath: ['test2', 'functionsBuilders', 'fn1'],
+          },
           server,
         })
       ),
@@ -62,22 +64,23 @@ const test2 = defineTest({
   toResult: either.right(true),
 });
 
-export const test3Functions: FunctionsBuilder = (server) => ({
-  functions: {
-    saveLatestCreatedUser: {
-      trigger: 'onAuthUserCreated',
-      handler: ({ authUser }) =>
-        server.db.upsertDoc({
-          key: { collection: 'authUser', id: 'latestCreated' },
-          data: { uid: authUser.uid },
-        }),
-    },
-  },
-});
-
 const test3 = defineTest({
   name: `onAuthUserCreated trigger should not be called if not triggered`,
   type: 'fail',
+  functionsBuilders: {
+    fn1: (server: S.server.Type): DeployFunctionParam => ({
+      functions: {
+        saveLatestCreatedUser: {
+          trigger: 'onAuthUserCreated',
+          handler: ({ authUser }) =>
+            server.db.upsertDoc({
+              key: { collection: 'authUser', id: 'latestCreated' },
+              data: { uid: authUser.uid },
+            }),
+        },
+      },
+    }),
+  },
   expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
@@ -91,7 +94,10 @@ const test3 = defineTest({
       }),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: { path: functionsPath, exportName: 'test3Functions' },
+          functions: {
+            filePath: toFunctionsPath(__filename),
+            exportPath: ['test3', 'functionsBuilders', 'fn1'],
+          },
           server,
         })
       ),

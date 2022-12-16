@@ -1,8 +1,9 @@
 import { either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
-import type { FunctionsBuilder } from '../type';
+import type { DeployFunctionParam, Stack as S } from '../type';
 import type { Suite } from './util';
+import { toFunctionsPath } from './util';
 import { defineTest } from './util';
 
 export const storage: Suite = {
@@ -210,26 +211,25 @@ export const authState: Suite = {
   ],
 };
 
-export const independencyFunctions: FunctionsBuilder = (server) => ({
-  functions: {
-    createDocOnAuthCreated: {
-      trigger: 'onAuthUserCreated',
-      handler: () =>
-        server.db.upsertDoc({
-          key: { collection: 'detection', id: '1' },
-          data: { status: 'true' },
-        }),
-    },
-  },
-});
-
-const functionsPath = __filename.replaceAll('masmott/dist/es6', 'masmott/dist/cjs');
-
 export const functions: Suite = {
   name: 'functions is independent between test',
   tests: [
     {
       name: `a test can deploy trigger`,
+      functionsBuilders: {
+        fn1: (server: S.server.Type): DeployFunctionParam => ({
+          functions: {
+            createDocOnAuthCreated: {
+              trigger: 'onAuthUserCreated',
+              handler: () =>
+                server.db.upsertDoc({
+                  key: { collection: 'detection', id: '1' },
+                  data: { status: 'true' },
+                }),
+            },
+          },
+        }),
+      },
       expect: ({ client, ci, server }) =>
         pipe(
           ci.deployDb({
@@ -243,7 +243,10 @@ export const functions: Suite = {
           }),
           taskEither.chainW(() =>
             ci.deployFunctions({
-              functions: { path: functionsPath, exportName: 'independencyFunctions' },
+              functions: {
+                filePath: toFunctionsPath(__filename),
+                exportPath: ['functions', 'tests', 0, 'functionsBuilders', 'fn1'],
+              },
               server,
             })
           ),
