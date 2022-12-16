@@ -259,7 +259,25 @@ export const test24 = defineTest({
       },
     }),
   },
-  expect: ({ client, ci, server }) =>
+  expect: ({
+    client,
+    ci,
+    server,
+  }: DeepPick<
+    S.Type,
+    {
+      readonly client: {
+        readonly storage: { readonly uploadDataUrl: never };
+        readonly db: { readonly getDoc: never };
+      };
+      readonly ci: {
+        readonly deployFunctions: never;
+        readonly deployDb: never;
+        readonly deployStorage: never;
+      };
+      readonly server: { readonly db: { readonly upsertDoc: never } };
+    }
+  >) =>
     pipe(
       ci.deployStorage({
         securityRule: {
