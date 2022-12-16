@@ -6,19 +6,11 @@ import type * as Stack from './stack';
 
 export { Functions, Stack };
 
-export type Provider = {
-  readonly code: 'Provider';
-  readonly value: unknown;
-};
+export type Provider = { readonly code: 'Provider'; readonly value: unknown };
 
-export type DocKey = {
-  readonly collection: string;
-  readonly id: string;
-};
+export type DocKey = { readonly collection: string; readonly id: string };
 
-export type AuthUser = {
-  readonly uid: string;
-};
+export type AuthUser = { readonly uid: string };
 
 export type AuthState = Option<AuthUser>;
 
@@ -36,11 +28,7 @@ export type ApplyClientEnv<
 };
 
 export type StackType = {
-  readonly env: {
-    readonly client: unknown;
-    readonly ci: unknown;
-    readonly server: unknown;
-  };
+  readonly env: { readonly client: unknown; readonly ci: unknown; readonly server: unknown };
 };
 
 export type StackWithEnv<T extends StackType> = {
@@ -49,8 +37,6 @@ export type StackWithEnv<T extends StackType> = {
   readonly server: ApplyClientEnv<T['env']['server'], Stack.server.Type>;
 };
 
-export type DeployFunctionParam = {
-  readonly functions: ReadonlyRecord<string, Functions.Type>;
-};
+export type DeployFunctionParam = { readonly functions: ReadonlyRecord<string, Functions.Type> };
 
 export type FunctionsBuilder<S> = (server: S) => DeployFunctionParam;

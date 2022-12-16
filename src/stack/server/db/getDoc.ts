@@ -10,8 +10,5 @@ export const getDoc: Type = (env) => (param) =>
     getDb(env.getWindow),
     ioEither.map(option.chain(readonlyRecord.lookup(`${param.key.collection}/${param.key.id}`))),
     taskEither.fromIOEither,
-    taskEither.mapLeft((err) => ({
-      ...err,
-      capability: 'server.db.getDoc',
-    }))
+    taskEither.mapLeft((err) => ({ ...err, capability: 'server.db.getDoc' }))
   );

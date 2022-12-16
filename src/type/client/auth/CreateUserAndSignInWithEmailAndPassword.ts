@@ -2,10 +2,7 @@ import type { TaskEither } from 'fp-ts/TaskEither';
 
 import type { AuthUser, Provider } from '../../..';
 
-export type Param = {
-  readonly email: string;
-  readonly password: string;
-};
+export type Param = { readonly email: string; readonly password: string };
 
 export type Error = Provider | { readonly code: 'EmailAlreadyInUse' };
 

@@ -20,11 +20,7 @@ export const test0001 = defineTest({
     pipe(
       ci.deployDb({
         type: 'deploy',
-        collections: {
-          user: {
-            schema: { name: { type: 'StringField' } },
-          },
-        },
+        collections: { user: { schema: { name: { type: 'StringField' } } } },
       }),
       taskEither.chainW(() =>
         client.db.upsertDoc({
@@ -54,10 +50,7 @@ export const test0002 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-              get: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' }, get: { type: 'True' } },
           },
         },
       }),
@@ -165,10 +158,7 @@ export const test0005 = defineTest({
         },
       }),
       taskEither.chainW(() =>
-        client.db.upsertDoc({
-          key: { collection: 'user', id: 'kira_id' },
-          data: { name: 46 },
-        })
+        client.db.upsertDoc({ key: { collection: 'user', id: 'kira_id' }, data: { name: 46 } })
       )
     ),
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
@@ -189,12 +179,7 @@ export const test0006 = defineTest({
     pipe(
       ci.deployDb({
         type: 'deploy',
-        collections: {
-          user: {
-            schema: {},
-            securityRule: { create: { type: 'True' } },
-          },
-        },
+        collections: { user: { schema: {}, securityRule: { create: { type: 'True' } } } },
       }),
       taskEither.chainW(() =>
         client.db.upsertDoc({

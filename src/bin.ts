@@ -11,12 +11,7 @@ import * as path from 'path';
 const { summon } = summonFor({});
 
 const PackageJson = summon((F) =>
-  F.interface(
-    {
-      dependencies: F.strMap(F.string()),
-    },
-    'PackageJson'
-  )
+  F.interface({ dependencies: F.strMap(F.string()) }, 'PackageJson')
 );
 
 const methodStr = (scope: string, method: string, provider: string) => `
@@ -75,8 +70,7 @@ fs.writeFileSync(
 
 fs.writeFileSync(
   'masmott/package.json',
-  `{
-  "sideEffects": false
+  `{  "sideEffects": false
 }`
 );
 

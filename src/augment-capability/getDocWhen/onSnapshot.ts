@@ -21,10 +21,7 @@ export const fromOnSnapshot =
             onSnapshot(env)({
               key: param.key,
               onChanged: flow(
-                either.mapLeft((err) => ({
-                  ...err,
-                  capability: 'client.db.getDocWhen' as const,
-                })),
+                either.mapLeft((err) => ({ ...err, capability: 'client.db.getDocWhen' as const })),
                 param.select,
                 ioOption.fromOption,
                 ioOption.chainIOK((value) =>

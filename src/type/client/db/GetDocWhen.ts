@@ -4,14 +4,9 @@ import type { Task } from 'fp-ts/Task';
 
 import type { DocData, DocKey } from '../..';
 
-export type Provider = {
-  readonly code: 'Provider';
-  readonly value: unknown;
-};
+export type Provider = { readonly code: 'Provider'; readonly value: unknown };
 
-export type Forbidden = {
-  readonly code: 'Forbidden';
-};
+export type Forbidden = { readonly code: 'Forbidden' };
 
 export type Error = Forbidden | Provider;
 
@@ -20,9 +15,6 @@ export type DocState = Either<
   Option<DocData>
 >;
 
-export type Param<T> = {
-  readonly key: DocKey;
-  readonly select: (docState: DocState) => Option<T>;
-};
+export type Param<T> = { readonly key: DocKey; readonly select: (docState: DocState) => Option<T> };
 
 export type Fn = <T>(p: Param<T>) => Task<T>;

@@ -27,10 +27,7 @@ export const test0010 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-              get: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' }, get: { type: 'True' } },
           },
         },
       }),
@@ -132,9 +129,7 @@ export const test0002 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' } },
           },
         },
       }),
@@ -177,11 +172,7 @@ export const test0003 = defineTest({
     pipe(
       ci.deployDb({
         type: 'deploy',
-        collections: {
-          user: {
-            schema: { name: { type: 'StringField' } },
-          },
-        },
+        collections: { user: { schema: { name: { type: 'StringField' } } } },
       }),
       taskEither.chainW(
         () => () =>
@@ -221,9 +212,7 @@ export const test0004 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              get: { type: 'True' },
-            },
+            securityRule: { get: { type: 'True' } },
           },
         },
       }),
@@ -271,9 +260,7 @@ export const test0005 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              get: { type: 'True' },
-            },
+            securityRule: { get: { type: 'True' } },
           },
         },
       }),
@@ -325,10 +312,7 @@ export const test0006 = defineTest({
         collections: {
           user: {
             schema: { name: { type: 'StringField' } },
-            securityRule: {
-              create: { type: 'True' },
-              get: { type: 'True' },
-            },
+            securityRule: { create: { type: 'True' }, get: { type: 'True' } },
           },
         },
       }),

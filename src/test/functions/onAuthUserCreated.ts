@@ -102,9 +102,7 @@ export const test3 = defineTest({
   }: DeepPick<
     Stack.Type,
     {
-      readonly client: {
-        readonly db: { readonly getDocWhen: never };
-      };
+      readonly client: { readonly db: { readonly getDocWhen: never } };
       readonly ci: { readonly deployDb: never; readonly deployFunctions: never };
       readonly server: { readonly db: { readonly upsertDoc: never } };
     }

@@ -45,10 +45,7 @@ export const test0002 = defineTest({
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrl({
-          key: 'kira_key',
-          dataUrl: `data:,kira masumoto`,
-        })
+        client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: `data:,kira masumoto` })
       ),
       taskEither.map(() => 'upload success')
     ),
@@ -100,10 +97,7 @@ export const test0004 = defineTest({
         })
       )
     ),
-  toResult: either.left({
-    code: 'Forbidden',
-    capability: 'client.storage.uploadDataUrl',
-  }),
+  toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
 export const test0005 = defineTest({
@@ -124,10 +118,7 @@ export const test0005 = defineTest({
           create: [
             {
               type: 'LessThan',
-              compare: {
-                lhs: { type: 'ObjectSize' },
-                rhs: { type: 'NumberConstant', value: 2 },
-              },
+              compare: { lhs: { type: 'ObjectSize' }, rhs: { type: 'NumberConstant', value: 2 } },
             },
           ],
         },
@@ -161,10 +152,7 @@ export const test0006 = defineTest({
           create: [
             {
               type: 'LessThan',
-              compare: {
-                lhs: { type: 'ObjectSize' },
-                rhs: { type: 'NumberConstant', value: 2 },
-              },
+              compare: { lhs: { type: 'ObjectSize' }, rhs: { type: 'NumberConstant', value: 2 } },
             },
           ],
         },
@@ -176,10 +164,7 @@ export const test0006 = defineTest({
         })
       )
     ),
-  toResult: either.left({
-    code: 'Forbidden',
-    capability: 'client.storage.uploadDataUrl',
-  }),
+  toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
 export const test0007 = defineTest({
@@ -200,19 +185,13 @@ export const test0007 = defineTest({
           create: [
             {
               type: 'LessThan',
-              compare: {
-                lhs: { type: 'ObjectSize' },
-                rhs: { type: 'NumberConstant', value: 2 },
-              },
+              compare: { lhs: { type: 'ObjectSize' }, rhs: { type: 'NumberConstant', value: 2 } },
             },
           ],
         },
       }),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrl({
-          key: 'kira_key',
-          dataUrl: `data:,a`,
-        })
+        client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: `data:,a` })
       ),
       taskEither.map(() => 'upload success')
     ),
@@ -237,25 +216,16 @@ export const test0008 = defineTest({
           create: [
             {
               type: 'LessThan',
-              compare: {
-                lhs: { type: 'ObjectSize' },
-                rhs: { type: 'NumberConstant', value: 2 },
-              },
+              compare: { lhs: { type: 'ObjectSize' }, rhs: { type: 'NumberConstant', value: 2 } },
             },
           ],
         },
       }),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrl({
-          key: 'kira_key',
-          dataUrl: `data:,aa`,
-        })
+        client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: `data:,aa` })
       )
     ),
-  toResult: either.left({
-    code: 'Forbidden',
-    capability: 'client.storage.uploadDataUrl',
-  }),
+  toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
 export const test0009 = defineTest({
@@ -310,10 +280,7 @@ export const test0009 = defineTest({
         })
       ),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrl({
-          key: 'kira_id',
-          dataUrl: `data:,kira masumoto`,
-        })
+        client.storage.uploadDataUrl({ key: 'kira_id', dataUrl: `data:,kira masumoto` })
       ),
       taskEither.map(() => 'upload success')
     ),
@@ -376,16 +343,10 @@ export const test0010 = defineTest({
       ),
       taskEither.chainW(() => client.auth.signOut),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrl({
-          key: 'kira_id',
-          dataUrl: `data:,kira masumoto`,
-        })
+        client.storage.uploadDataUrl({ key: 'kira_id', dataUrl: `data:,kira masumoto` })
       )
     ),
-  toResult: either.left({
-    code: 'Forbidden',
-    capability: 'client.storage.uploadDataUrl',
-  }),
+  toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
 export const test0011 = defineTest({
@@ -432,16 +393,10 @@ export const test0011 = defineTest({
         })
       ),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrl({
-          key: 'kira_id',
-          dataUrl: `data:,kira masumoto`,
-        })
+        client.storage.uploadDataUrl({ key: 'kira_id', dataUrl: `data:,kira masumoto` })
       )
     ),
-  toResult: either.left({
-    code: 'Forbidden',
-    capability: 'client.storage.uploadDataUrl',
-  }),
+  toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
 export const test0012 = defineTest({
@@ -490,22 +445,13 @@ export const test0012 = defineTest({
         })
       ),
       taskEither.chainW(() =>
-        server.db.upsertDoc({
-          key: { collection: 'storageObject', id: 'kira_id' },
-          data: {},
-        })
+        server.db.upsertDoc({ key: { collection: 'storageObject', id: 'kira_id' }, data: {} })
       ),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrl({
-          key: 'kira_id',
-          dataUrl: `data:,kira masumoto`,
-        })
+        client.storage.uploadDataUrl({ key: 'kira_id', dataUrl: `data:,kira masumoto` })
       )
     ),
-  toResult: either.left({
-    code: 'Forbidden',
-    capability: 'client.storage.uploadDataUrl',
-  }),
+  toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
 export const test0013 = defineTest({
@@ -560,14 +506,8 @@ export const test0013 = defineTest({
         })
       ),
       taskEither.chainW(() =>
-        client.storage.uploadDataUrl({
-          key: 'kira_id',
-          dataUrl: `data:,kira masumoto`,
-        })
+        client.storage.uploadDataUrl({ key: 'kira_id', dataUrl: `data:,kira masumoto` })
       )
     ),
-  toResult: either.left({
-    code: 'Forbidden',
-    capability: 'client.storage.uploadDataUrl',
-  }),
+  toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });

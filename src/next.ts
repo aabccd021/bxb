@@ -20,9 +20,6 @@ export const withMasmott =
         ? newRewrites
         : Array.isArray(oldRewrites)
         ? [...oldRewrites, ...newRewrites]
-        : {
-            ...oldRewrites,
-            beforeFiles: [...oldRewrites.beforeFiles, ...newRewrites],
-          };
+        : { ...oldRewrites, beforeFiles: [...oldRewrites.beforeFiles, ...newRewrites] };
     },
   });

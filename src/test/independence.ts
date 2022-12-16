@@ -52,10 +52,7 @@ export const db: Suite = {
             collections: {
               user: {
                 schema: { name: { type: 'StringField' } },
-                securityRule: {
-                  create: { type: 'True' },
-                  get: { type: 'True' },
-                },
+                securityRule: { create: { type: 'True' }, get: { type: 'True' } },
               },
             },
           }),
@@ -79,10 +76,7 @@ export const db: Suite = {
             collections: {
               user: {
                 schema: { name: { type: 'StringField' } },
-                securityRule: {
-                  create: { type: 'True' },
-                  get: { type: 'True' },
-                },
+                securityRule: { create: { type: 'True' }, get: { type: 'True' } },
               },
             },
           }),
@@ -105,10 +99,7 @@ export const serverDb: Suite = {
             collections: {
               user: {
                 schema: { name: { type: 'StringField' } },
-                securityRule: {
-                  create: { type: 'True' },
-                  get: { type: 'True' },
-                },
+                securityRule: { create: { type: 'True' }, get: { type: 'True' } },
               },
             },
           }),
@@ -132,10 +123,7 @@ export const serverDb: Suite = {
             collections: {
               user: {
                 schema: { name: { type: 'StringField' } },
-                securityRule: {
-                  create: { type: 'True' },
-                  get: { type: 'True' },
-                },
+                securityRule: { create: { type: 'True' }, get: { type: 'True' } },
               },
             },
           }),

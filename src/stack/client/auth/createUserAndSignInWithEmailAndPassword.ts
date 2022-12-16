@@ -39,10 +39,7 @@ export const createUserAndSignInWithEmailAndPassword: Type = (env) => (param) =>
       )
     ),
     taskEither.bimap(
-      (err) => ({
-        ...err,
-        capability: 'client.auth.createUserAndSignInWithEmailAndPassword',
-      }),
+      (err) => ({ ...err, capability: 'client.auth.createUserAndSignInWithEmailAndPassword' }),
       () => ({ authUser: { uid: param.email } })
     )
   );

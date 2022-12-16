@@ -211,10 +211,7 @@ export const uploadDataUrl: Type = (env) => (param) =>
       )
     ),
     taskEither.bimap(
-      (err) => ({
-        ...err,
-        capability: 'client.storage.uploadDataUrl',
-      }),
+      (err) => ({ ...err, capability: 'client.storage.uploadDataUrl' }),
       () => undefined
     )
   );
