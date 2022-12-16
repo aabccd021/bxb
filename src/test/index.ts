@@ -8,9 +8,36 @@ import { applyCiEnv, applyClientEnv, applyServerEnv } from '../helper';
 import type { StackType, StackWithEnv } from '../type';
 import * as functions from './functions';
 import * as stackTests from './stack';
-import type { Suite } from './util';
+import type { Suite, Test } from './util';
 
 export const tests = { functions, stackTests };
+
+export const runTestWithConfig =
+  <T extends StackType>({
+    stack,
+    getTestEnv,
+  }: {
+    readonly stack: StackWithEnv<T>;
+    readonly getTestEnv: TaskEither<{ readonly capability: 'test.getTestEnv' }, T['env']>;
+  }) =>
+  ({ test }: { readonly test: Test<unknown> }) =>
+    (test.type === 'fail' ? test_.fails : test_)(
+      test.name,
+      () =>
+        expect(
+          pipe(
+            getTestEnv,
+            taskEither.map((env) => ({
+              client: applyClientEnv({ stack: stack.client, env: env.client }),
+              ci: applyCiEnv({ stack: stack.ci, env: env.ci }),
+              server: applyServerEnv({ stack: stack.server, env: env.server }),
+            })),
+            taskEither.chainW(test.expect),
+            std.task.execute
+          )
+        ).resolves.toEqual(test.toResult),
+      { timeout: test.timeOut, retry: test.retry }
+    );
 
 export const runSuiteWithConfig =
   <T extends StackType>({

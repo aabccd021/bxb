@@ -1,9 +1,8 @@
 import { either, ioRef, option, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
-import { defineTest } from '../../..';
 
 import type { AuthState } from '../../../..';
-
+import { defineTest } from '../../../util';
 
 export const test0001 = defineTest({
   name: 'returns signed out as default auth state',

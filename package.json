@@ -13,7 +13,7 @@
   "scripts": {
     "build": "rm -rf dist && pnpm build:es6 && pnpm build:cjs && pnpm build:types",
     "build:cjs": "swc src --out-dir dist/cjs --source-maps --config module.type=commonjs",
-    "build:es6": "swc src --out-dir dist/es6 --source-maps",
+    "build:es6": "swc src --out-dir dist/es6 --source-maps --config module.type=es6",
     "build:types": "tsc --project tsconfig.dist.json",
     "fix": "eslint --max-warnings=0 . --fix",
     "lint": "eslint --max-warnings=0 .",
@@ -23,10 +23,10 @@
     "test:framework:nextjs": "cd e2e/framework/nextjs && pnpm install && pnpm generate && pnpm test:treeshaking && pnpm test:e2e",
     "test:types": "tsc --noEmit",
     "test:independence": "vitest --run independence.test.ts",
-    "test:capability": "vitest --run capability.test.ts",
-    "test:functions": "vitest --run functions.test.ts",
-    "test:unit": "pnpm test:independence && pnpm test:capability && pnpm test:functions",
-    "test": "pnpm test:types && pnpm test:unit && pnpm test:provider:foo && pnpm test:framework:nextjs"
+    "test:parallel": "vitest --run parallel.test.ts",
+    "test:unit": "pnpm test:independence && pnpm test:parallel",
+    "gentest": "node dist/cjs/gentest.js",
+    "test": "pnpm test:types && pnpm gentest && pnpm test:unit && pnpm test:provider:foo && pnpm test:framework:nextjs"
   },
   "sideEffects": false,
   "name": "masmott",
