@@ -2,7 +2,6 @@ import { either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
 import type { DeployFunctionParam, Stack as S } from '../../type';
-import type { Suite } from '../util';
 import { defineTest, toFunctionsPath } from '../util';
 
 export const test2 = defineTest({
@@ -64,7 +63,7 @@ export const test2 = defineTest({
   toResult: either.right(true),
 });
 
-const test3 = defineTest({
+export const test3 = defineTest({
   name: `onAuthUserCreated trigger should not be called if not triggered`,
   type: 'fail',
   functionsBuilders: {
@@ -111,7 +110,7 @@ const test3 = defineTest({
   toResult: either.right({ created: 'true' }),
 });
 
-const test4 = defineTest({
+export const test4 = defineTest({
   name: `document should not be created if trigger not deployed`,
   type: 'fail',
   expect: ({ client, ci }) =>
@@ -140,8 +139,3 @@ const test4 = defineTest({
     ),
   toResult: either.right({ created: 'true' }),
 });
-
-export const suite: Suite = {
-  name: 'onAuthUserCreated functions',
-  tests: [test2, test3, test4],
-};

@@ -2,7 +2,6 @@ import { either, option, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
 import type { DeployFunctionParam, Stack as S } from '../../type';
-import type { Suite } from '../util';
 import { defineTest, toFunctionsPath } from '../util';
 
 export const test1 = defineTest({
@@ -326,8 +325,3 @@ export const test4 = defineTest({
     ),
   toResult: either.right({ exists: 'true' }),
 });
-
-export const suite: Suite = {
-  name: 'onObjectCreated functions',
-  tests: [test1, test14, test2, test24, test3, test4],
-};

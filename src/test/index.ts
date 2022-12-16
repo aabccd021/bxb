@@ -6,7 +6,11 @@ import { describe, expect, test as test_ } from 'vitest';
 
 import { applyCiEnv, applyClientEnv, applyServerEnv } from '../helper';
 import type { StackType, StackWithEnv } from '../type';
+import * as functions from './functions';
+import * as stackTests from './stack';
 import type { Suite } from './util';
+
+export const tests = { functions, stackTests };
 
 export const runSuiteWithConfig =
   <T extends StackType>({
