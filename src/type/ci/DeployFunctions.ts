@@ -4,8 +4,8 @@ import type { Stack } from '..';
 
 export type Param = {
   readonly functions: {
-    readonly path: string;
-    readonly exportName: string;
+    readonly filePath: string;
+    readonly exportPath: readonly (number | string)[];
   };
   readonly server: Stack.server.Type;
 };
