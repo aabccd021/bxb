@@ -1,80 +1,27 @@
 import { taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import * as std from 'fp-ts-std';
-import { describe, expect, test as test_ } from 'vitest';
+import { expect, test as test_ } from 'vitest';
 
-import { applyCiEnv, applyClientEnv, applyServerEnv } from '../helper';
-import type { StackType, StackWithEnv } from '../type';
+import type { Stack } from '../type';
 import * as functions from './functions';
 import * as stackTests from './stack';
-import type { Suite, Test } from './util';
+import type { Test } from './util';
 
-export const tests = { functions, stackTests };
+export const masmottTests = { functions, stackTests };
 
-export const runTestWithConfig =
-  <T extends StackType>({
-    stack,
-    getTestEnv,
-  }: {
-    readonly stack: StackWithEnv<T>;
-    readonly getTestEnv: TaskEither<{ readonly capability: 'test.getTestEnv' }, T['env']>;
-  }) =>
-  ({ test }: { readonly test: Test }) =>
-    (test.type === 'fail' ? test_.fails : test_)(
-      test.name,
-      () =>
-        expect(
-          pipe(
-            getTestEnv,
-            taskEither.map((env) => ({
-              client: applyClientEnv({ stack: stack.client, env: env.client }),
-              ci: applyCiEnv({ stack: stack.ci, env: env.ci }),
-              server: applyServerEnv({ stack: stack.server, env: env.server }),
-            })),
-            taskEither.chainW(test.expect),
-            std.task.execute
-          )
-        ).resolves.toEqual(test.toResult),
-      { timeout: test.timeOut, retry: test.retry }
+export const runTestsWithConfig =
+  <S = Stack.Type>({ stack }: { readonly stack: TaskEither<unknown, S> }) =>
+  ({ tests }: { readonly tests: ReadonlyRecord<string, Test<S>> }) =>
+    Object.entries(tests).forEach(([name, test]) =>
+      (test.type === 'fail' ? test_.fails : test_)(
+        name,
+        () =>
+          expect(pipe(stack, taskEither.chainW(test.expect), std.task.execute)).resolves.toEqual(
+            test.toResult
+          ),
+        { timeout: test.timeOut, retry: test.retry }
+      )
     );
-
-export const runSuiteWithConfig =
-  <T extends StackType>({
-    stack,
-    getTestEnv,
-  }: {
-    readonly stack: StackWithEnv<T>;
-    readonly getTestEnv: TaskEither<{ readonly capability: 'test.getTestEnv' }, T['env']>;
-  }) =>
-  ({ suite }: { readonly suite: Suite }) => {
-    (suite.concurrent ?? false ? describe.concurrent : describe)(
-      suite.name,
-      () =>
-        suite.tests.forEach((test) => {
-          (test.type === 'fail' ? test_.fails : test_)(
-            test.name,
-            () =>
-              expect(
-                pipe(
-                  getTestEnv,
-                  taskEither.map((env) => ({
-                    client: applyClientEnv({ stack: stack.client, env: env.client }),
-                    ci: applyCiEnv({ stack: stack.ci, env: env.ci }),
-                    server: applyServerEnv({ stack: stack.server, env: env.server }),
-                  })),
-                  taskEither.chainW(test.expect),
-                  std.task.execute
-                )
-              ).resolves.toEqual(test.toResult),
-            { timeout: test.timeOut, retry: test.retry }
-          );
-        }),
-      { timeout: suite.timeOut }
-    );
-  };
-
-export * as functions from './functions';
-export * as independence from './independence';
-export * as capability from './stack';
-export * from './util';
