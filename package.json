@@ -10,6 +10,7 @@
     "pre-push:dirty": "pnpm install && pnpm build && pnpm lint && pnpm test",
     "test:codegen-app-nextjs": "cd test/codegen-app-nextjs && pnpm test",
     "test:codegen-stack-tests": "echo b",
+    "test:codegen-custom": "echo b",
     "test:treeshaking-nextjs": "echo c",
     "test:unit-test": "echo d",
     "gentest": "node dist/cjs/gentest.js",
