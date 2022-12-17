@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 import { PHASE_DEVELOPMENT_SERVER } from 'next/constants';
 
-export const withMasmott =
+export const withbxb =
   (conf: NextConfig) =>
   (phase: string): NextConfig => ({
     ...conf,
@@ -11,8 +11,8 @@ export const withMasmott =
         phase === PHASE_DEVELOPMENT_SERVER
           ? [
               {
-                source: '/__masmott__/signInWithRedirect',
-                destination: '/masmott/signInWithRedirect.html',
+                source: '/__bxb__/signInWithRedirect',
+                destination: '/bxb/signInWithRedirect.html',
               },
             ]
           : [];

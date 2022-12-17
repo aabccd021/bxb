@@ -10,7 +10,7 @@ import * as functions from './functions';
 import * as stackTests from './stack';
 import type { Test } from './util';
 
-export const masmottTests = { functions, stackTests };
+export const bxbTests = { functions, stackTests };
 
 export const runTestsWithConfig =
   <S = Stack.Type>({ stack }: { readonly stack: TaskEither<unknown, S> }) =>

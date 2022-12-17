@@ -5,7 +5,7 @@ import { join } from 'fp-ts-std/ReadonlyArray';
 import * as fs from 'fs/promises';
 import * as t from 'io-ts';
 
-import { masmottTests } from './test';
+import { bxbTests } from './test';
 
 type W = { readonly key: readonly string[]; readonly value: string };
 
@@ -35,18 +35,18 @@ const flattenTests = (scope: readonly string[], obj: unknown): readonly W[] =>
   );
 
 const flattenedTests = pipe(
-  flattenTests([], masmottTests),
+  flattenTests([], bxbTests),
   readonlyArray.map(({ key, value }) =>
     pipe(
       { left: pipe(key, readonlyArray.dropRight(1), join(' > ')), right: pipe(key, join('.')) },
-      ({ left, right }) => `  "${left} > ${value}": masmottTests.${right},`
+      ({ left, right }) => `  "${left} > ${value}": bxbTests.${right},`
     )
   ),
   join('\n'),
   (x) => `/* eslint-disable max-len */
 /* eslint-disable prettier/prettier */
-import type { Test } from 'masmott';
-import { tests as masmottTests } from 'masmott';
+import type { Test } from 'bxb';
+import { tests as bxbTests } from 'bxb';
 import type { Stack } from '../src'
 export const tests: Record<string, Test<Stack>> = {\n${x}\n};
 `
