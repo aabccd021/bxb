@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "emitDeclarationOnly": true
-  },
-  "extends": "./tsconfig",
-  "include": [
-    "src"
-  ]
-}

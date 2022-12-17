@@ -27,4 +27,4 @@ export type Suite = {
 
 export const defineTest = <S = Stack.Type, E = unknown, T = unknown>(t: Test<S, E, T>) => t;
 
-export const toFunctionsPath = string.replaceAll('masmott/dist/es6')('masmott/dist/cjs');
+export const toFunctionsPath = string.replaceAll('bxb/dist/es6')('bxb/dist/cjs');
