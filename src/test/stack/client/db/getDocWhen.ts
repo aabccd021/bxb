@@ -1,4 +1,3 @@
-/* eslint-disable functional/no-return-void */
 import { apply, either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 import type { DeepPick } from 'ts-essentials';

@@ -43,8 +43,7 @@ const flattenedTests = pipe(
     )
   ),
   join('\n'),
-  (x) => `/* eslint-disable max-len */
-/* eslint-disable prettier/prettier */
+  (x) => `
 import type { Test } from 'bxb';
 import { tests as bxbTests } from 'bxb';
 import type { Stack } from '../src'
