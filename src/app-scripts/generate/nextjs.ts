@@ -1,6 +1,5 @@
 import {
   console,
-  ioEither,
   option,
   readonlyArray,
   readonlyNonEmptyArray,
@@ -13,7 +12,7 @@ import { flow, identity, pipe } from 'fp-ts/function';
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import { fs, path } from 'fp-ts-node';
 import * as std from 'fp-ts-std';
-import * as fsSync from 'fs';
+import * as realFs from 'fs/promises';
 import type { DeepPartial } from 'ts-essentials';
 
 import type { StackWithEnv } from '../../type';
@@ -147,13 +146,7 @@ const getWriteFiles = (param: Param) =>
 
 export const main = (param: Param) => (_args: readonly string[]) =>
   pipe(
-    taskEither.fromIO(
-      ioEither.tryCatch(
-        // eslint-disable-next-line functional/no-return-void
-        () => fsSync.rmSync('modules/bxb', { force: true, recursive: true }),
-        identity
-      )
-    ),
+    taskEither.tryCatch(() => realFs.rm('modules/bxb', { force: true, recursive: true }), identity),
     taskEither.chainW(() => pipe(param, getWriteFiles, writeFiles)),
     taskEither.swap,
     taskEither.chainIOK(console.error)
