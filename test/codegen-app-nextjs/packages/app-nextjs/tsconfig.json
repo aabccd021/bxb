@@ -26,5 +26,11 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "ts-node": {
+    "compilerOptions": {
+      "isolatedModules": false,
+      "module": "commonjs"
+    }
+  }
 }

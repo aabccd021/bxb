@@ -31,7 +31,7 @@ export type StackType = {
   readonly env: { readonly client: unknown; readonly ci: unknown; readonly server: unknown };
 };
 
-export type StackWithEnv<T extends StackType> = {
+export type StackWithEnv<T extends StackType = StackType> = {
   readonly ci: ApplyClientEnvScope<T['env']['ci'], Stack.ci.Type>;
   readonly client: ApplyClientEnv<T['env']['client'], Stack.client.Type>;
   readonly server: ApplyClientEnv<T['env']['server'], Stack.server.Type>;
