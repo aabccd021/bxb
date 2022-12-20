@@ -5,28 +5,31 @@ on:
   pull_request:
     branches: main
 jobs:
-  release:
-    name: Release
+  test-codegen-app-nextjs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - uses: chimeraant/dev@v1.3.3
-
-      - run: pnpm build:es6
-
-      - run: pnpm build:cjs
-
-      - run: pnpm build:types
-
-      - run: pnpm test:types
-
-      - run: pnpm lint
-
+      - run: pnpm build
       - run: pnpm test:codegen-app-nextjs
 
-      - name: Release
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: chimeraant/dev@v1.3.3
+      - run: pnpm build
+      - run: pnpm lint
+
+  release:
+    needs: [lint, test-codegen-app-nextjs]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: chimeraant/dev@v1.3.3
+      - run: pnpm build
+      - run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm semantic-release
+        
