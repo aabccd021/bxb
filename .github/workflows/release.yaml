@@ -5,13 +5,21 @@ on:
   pull_request:
     branches: main
 jobs:
-  test-codegen-app-nextjs:
+  test-app-nextjs-treeshaking-capability:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: chimeraant/dev@v1.3.3
       - run: pnpm build
-      - run: pnpm test:codegen-app-nextjs
+      - run: pnpm test-app-nextjs-treeshaking-capability
+
+  test-app-nextjs-treeshaking-stack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: chimeraant/dev@v1.3.3
+      - run: pnpm build
+      - run: pnpm test-app-nextjs-treeshaking-stack
 
   lint:
     runs-on: ubuntu-latest
@@ -22,7 +30,11 @@ jobs:
       - run: pnpm lint
 
   release:
-    needs: [lint, test-codegen-app-nextjs]
+    needs: [
+      lint, 
+      test-app-nextjs-treeshaking-capability,
+      test-app-nextjs-treeshaking-stack,
+    ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

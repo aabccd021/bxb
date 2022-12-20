@@ -29,10 +29,18 @@ test(
 );
 
 test(
+  'pnpm install on app',
+  async () => {
+    await exec('pnpm install', { cwd: `${__dirname}/packages/app`, encoding: 'utf8' });
+  },
+  { timeout: 20000 }
+);
+
+test(
   'can generate for nextjs app',
   async () => {
     await exec('pnpm ts-node ./scripts/bxb.ts generate nextjs', {
-      cwd: `${__dirname}/packages/app-nextjs`,
+      cwd: `${__dirname}/packages/app`,
       encoding: 'utf8',
     });
   },
@@ -42,7 +50,7 @@ test(
 test(
   'can build nextjs app',
   async () => {
-    await exec('pnpm next build', { cwd: `${__dirname}/packages/app-nextjs`, encoding: 'utf8' });
+    await exec('pnpm next build', { cwd: `${__dirname}/packages/app`, encoding: 'utf8' });
   },
   { timeout: 30000 }
 );
