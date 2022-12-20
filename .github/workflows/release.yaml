@@ -21,33 +21,9 @@ jobs:
 
       - run: pnpm test:types
 
-      - run: vitest
-
-      - run: pnpm install
-        working-directory: e2e/provider/foo
-
-      - run: pnpm test
-        working-directory: e2e/provider/foo
-
-      - run: pnpm build
-        working-directory: e2e/provider/foo
-
-      - run: pnpm install
-        working-directory: e2e/framework/nextjs
-
-      - run: pnpm generate
-        working-directory: e2e/framework/nextjs
-
-      - run: pnpm test:treeshaking
-        working-directory: e2e/framework/nextjs
-
-      - run: pnpm test:e2e
-        working-directory: e2e/framework/nextjs
-
       - run: pnpm lint
-        working-directory: e2e/framework/nextjs
 
-      - run: pnpm lint
+      - run: pnpm test:codegen-app-nextjs
 
       - name: Release
         env:
