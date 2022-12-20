@@ -1,6 +1,6 @@
 import cp from 'child_process';
 import util from 'util';
-import { test } from 'vitest';
+import { expect, test } from 'vitest';
 
 const exec = util.promisify(cp.exec);
 
@@ -12,26 +12,6 @@ test(
   'stack-foo can build packages',
   async () => {
     await exec('pnpm build', { cwd: `${__dirname}/packages/bxb-stack-foo`, encoding: 'utf8' });
-  },
-  { timeout: 20000 }
-);
-
-test('stack-bar can install packages', async () => {
-  await exec('pnpm install', { cwd: `${__dirname}/packages/bxb-stack-bar`, encoding: 'utf8' });
-});
-
-test(
-  'stack-bar can build packages',
-  async () => {
-    await exec('pnpm build', { cwd: `${__dirname}/packages/bxb-stack-bar`, encoding: 'utf8' });
-  },
-  { timeout: 20000 }
-);
-
-test(
-  'pnpm install on app',
-  async () => {
-    await exec('pnpm install', { cwd: `${__dirname}/packages/app`, encoding: 'utf8' });
   },
   { timeout: 20000 }
 );
@@ -50,7 +30,17 @@ test(
 test(
   'can build nextjs app',
   async () => {
-    await exec('pnpm next build', { cwd: `${__dirname}/packages/app`, encoding: 'utf8' });
+    const { stdout } = await exec('pnpm next build', {
+      cwd: `${__dirname}/packages/app`,
+      encoding: 'utf8',
+    });
+    const sizes = stdout.split('\n').filter((s) => s.endsWith('kB') && s.includes('○ '));
+    expect(sizes).toEqual([
+      '┌ ○ /404                                   214 B          78.9 kB',
+      '├ ○ /both                                  552 B          82.5 kB',
+      '├ ○ /getDoc                                542 B            81 kB',
+      '└ ○ /upsertDoc                             431 B          81.8 kB',
+    ]);
   },
   { timeout: 30000 }
 );

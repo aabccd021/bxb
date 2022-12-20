@@ -20,10 +20,11 @@ import type { Param } from '../type';
 
 const getAllStacks = (param: Param) =>
   pipe(
-    param.envStacks,
+    option.fromNullable(param.stacks.env),
+    option.getOrElseW(() => ({})),
     readonlyRecord.toReadonlyArray,
     readonlyArray.map(readonlyTuple.snd),
-    readonlyArray.append(param.defaultStack)
+    readonlyArray.append(param.stacks.default)
   );
 
 const methodStr = (scope: string, method: string, param: Param) =>
@@ -45,7 +46,8 @@ const methodStr = (scope: string, method: string, param: Param) =>
         std.readonlyArray.join('\n')
       ),
       methods: pipe(
-        param.envStacks,
+        option.fromNullable(param.stacks.env),
+        option.getOrElseW(() => ({})),
         readonlyRecord.toReadonlyArray,
         readonlyArray.map(
           ([nodeEnv, stack]) =>
@@ -57,7 +59,7 @@ const methodStr = (scope: string, method: string, param: Param) =>
     },
     ({ stackImports, envImports, methods }) =>
       `${stackImports}\n${envImports}\nexport const ${method}` +
-      ` = ${methods} ${param.defaultStack.name}Stack.client.${scope}.${method}(${param.defaultStack.name}ClientEnv);`
+      ` = ${methods} ${param.stacks.default.name}Stack.client.${scope}.${method}(${param.stacks.default.name}ClientEnv);`
   );
 
 type Scopes = ReadonlyRecord<string, readonly string[]>;
