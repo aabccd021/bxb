@@ -110,7 +110,7 @@
   "overrides": [
     {
       "files": [
-        "**/test/**.ts"
+        "test/**/*.ts"
       ],
       "rules": {
         "functional/no-return-void": "off",

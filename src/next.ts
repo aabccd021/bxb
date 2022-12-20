@@ -9,12 +9,7 @@ export const withbxb =
       const oldRewrites = await conf.rewrites?.();
       const newRewrites =
         phase === PHASE_DEVELOPMENT_SERVER
-          ? [
-              {
-                source: '/__bxb__/signInWithRedirect',
-                destination: '/bxb/signInWithRedirect.html',
-              },
-            ]
+          ? [{ source: '/__bxb__/signInWithRedirect', destination: '/bxb/signInWithRedirect.html' }]
           : [];
       return oldRewrites === undefined
         ? newRewrites

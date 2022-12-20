@@ -14,7 +14,9 @@ export const bxbTests = { functions, stackTests };
 
 export const runTestsWithConfig =
   <S = Stack.Type>({ stack }: { readonly stack: TaskEither<unknown, S> }) =>
+  // eslint-disable-next-line functional/no-return-void
   ({ tests }: { readonly tests: ReadonlyRecord<string, Test<S>> }) =>
+    // eslint-disable-next-line functional/no-return-void
     Object.entries(tests).forEach(([name, test]) =>
       (test.type === 'fail' ? test_.fails : test_)(
         name,
