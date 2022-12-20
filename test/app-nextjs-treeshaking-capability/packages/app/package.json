@@ -4,7 +4,6 @@
   "dependencies": {
     "@types/react-dom": "18.0.9",
     "bxb": "link:../../../..",
-    "bxb-stack-bar": "link:../bxb-stack-bar",
     "bxb-stack-foo": "link:../bxb-stack-foo",
     "eslint": "8.27.0",
     "eslint-config-next": "13.0.3",
