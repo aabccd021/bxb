@@ -34,13 +34,23 @@ test(
       cwd: `${__dirname}/packages/app`,
       encoding: 'utf8',
     });
-    const sizes = stdout.split('\n').filter((s) => s.endsWith('kB') && s.includes('○ '));
-    expect(sizes).toEqual([
-      '┌ ○ /404                                   214 B          78.9 kB',
-      '├ ○ /both                                  552 B          82.5 kB',
-      '├ ○ /getDoc                                542 B            81 kB',
-      '└ ○ /upsertDoc                             431 B          81.8 kB',
-    ]);
+    const getSizeOfPage = (page: string) => {
+      const sizeStr = stdout
+        .split('\n')
+        .filter((s) => s.includes(page))
+        .at(0)
+        ?.split(' ')
+        .filter((s) => s !== '')?.[5];
+      // eslint-disable-next-line functional/no-conditional-statement
+      if (sizeStr === undefined) {
+        // eslint-disable-next-line functional/no-throw-statement
+        throw new Error(`page ${page} does not exists`);
+      }
+      return parseFloat(sizeStr);
+    };
+    expect(getSizeOfPage('/getDoc'))
+      .lessThan(getSizeOfPage('/upsertDoc'))
+      .lessThan(getSizeOfPage('/both'));
   },
   { timeout: 30000 }
 );
