@@ -1,12 +1,18 @@
 import { either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
-import type { DeepPick } from 'ts-essentials';
 
-import type { Stack } from '../../type';
 import { defineTest, toFunctionsPath } from '../util';
 
 export const test2 = defineTest({
   name: `onAuthUserCreated trigger can upsert doc`,
+  stack: {
+    client: {
+      auth: { createUserAndSignInWithEmailAndPassword: true },
+      db: { getDocWhen: true },
+    },
+    ci: { deployDb: true, deployFunctions: true },
+    server: { db: { upsertDoc: true } },
+  },
   functionsBuilders: {
     fn1: (server) => ({
       functions: {
@@ -21,21 +27,7 @@ export const test2 = defineTest({
       },
     }),
   },
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: {
-        readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };
-        readonly db: { readonly getDocWhen: never };
-      };
-      readonly ci: { readonly deployDb: never; readonly deployFunctions: never };
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-    }
-  >) =>
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -80,6 +72,11 @@ export const test2 = defineTest({
 
 export const test3 = defineTest({
   name: `onAuthUserCreated trigger should not be called if not triggered`,
+  stack: {
+    client: { db: { getDocWhen: true } },
+    ci: { deployDb: true, deployFunctions: true },
+    server: { db: { upsertDoc: true } },
+  },
   type: 'fail',
   functionsBuilders: {
     fn1: (server) => ({
@@ -95,18 +92,7 @@ export const test3 = defineTest({
       },
     }),
   },
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly getDocWhen: never } };
-      readonly ci: { readonly deployDb: never; readonly deployFunctions: never };
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-    }
-  >) =>
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -138,20 +124,15 @@ export const test3 = defineTest({
 
 export const test4 = defineTest({
   name: `document should not be created if trigger not deployed`,
+  stack: {
+    client: {
+      auth: { createUserAndSignInWithEmailAndPassword: true },
+      db: { getDocWhen: true },
+    },
+    ci: { deployDb: true },
+  },
   type: 'fail',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: {
-        readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };
-        readonly db: { readonly getDocWhen: never };
-      };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',

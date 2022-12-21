@@ -1,12 +1,22 @@
 import { either, option, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
-import type { DeepPick } from 'ts-essentials';
 
-import type { Stack } from '../../type';
 import { defineTest, toFunctionsPath } from '../util';
 
 export const test1 = defineTest({
   name: `onObjectCreated trigger params contains object id with client.storage.uploadDataUrlAwaitFunctions`,
+  stack: {
+    client: {
+      db: { getDocWhen: true },
+      storage: { uploadDataUrlAwaitFunctions: true },
+    },
+    ci: {
+      deployDb: true,
+      deployStorage: true,
+      deployFunctions: true,
+    },
+    server: { db: { upsertDoc: true } },
+  },
   functionsBuilders: {
     fn1: (server) => ({
       functions: {
@@ -23,25 +33,7 @@ export const test1 = defineTest({
       },
     }),
   },
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: {
-        readonly db: { readonly getDocWhen: never };
-        readonly storage: { readonly uploadDataUrlAwaitFunctions: never };
-      };
-      readonly ci: {
-        readonly deployDb: never;
-        readonly deployStorage: never;
-        readonly deployFunctions: never;
-      };
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-    }
-  >) =>
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
@@ -82,6 +74,18 @@ export const test1 = defineTest({
 
 export const test14 = defineTest({
   name: `uploadDataUrl should wait all functions to be finised with client.storage.uploadDataUrlAwaitFunctions`,
+  stack: {
+    ci: {
+      deployStorage: true,
+      deployDb: true,
+      deployFunctions: true,
+    },
+    client: {
+      storage: { uploadDataUrlAwaitFunctions: true },
+      db: { getDoc: true },
+    },
+    server: { db: { upsertDoc: true } },
+  },
   functionsBuilders: {
     fn1: (server) => ({
       functions: {
@@ -98,25 +102,7 @@ export const test14 = defineTest({
       },
     }),
   },
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: {
-        readonly deployStorage: never;
-        readonly deployDb: never;
-        readonly deployFunctions: never;
-      };
-      readonly client: {
-        readonly storage: { readonly uploadDataUrlAwaitFunctions: never };
-        readonly db: { readonly getDoc: never };
-      };
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-    }
-  >) =>
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
@@ -154,6 +140,18 @@ export const test14 = defineTest({
 
 export const test2 = defineTest({
   name: `onObjectCreated trigger params contains object id`,
+  stack: {
+    ci: {
+      deployStorage: true,
+      deployDb: true,
+      deployFunctions: true,
+    },
+    server: { db: { upsertDoc: true } },
+    client: {
+      storage: { uploadDataUrl: true },
+      db: { getDocWhen: true },
+    },
+  },
   functionsBuilders: {
     fn1: (server) => ({
       functions: {
@@ -170,25 +168,7 @@ export const test2 = defineTest({
       },
     }),
   },
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: {
-        readonly deployStorage: never;
-        readonly deployDb: never;
-        readonly deployFunctions: never;
-      };
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-      readonly client: {
-        readonly storage: { readonly uploadDataUrl: never };
-        readonly db: { readonly getDocWhen: never };
-      };
-    }
-  >) =>
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
@@ -229,6 +209,18 @@ export const test2 = defineTest({
 
 export const test24 = defineTest({
   name: `uploadDataUrl should not wait functions to be finished`,
+  stack: {
+    client: {
+      storage: { uploadDataUrl: true },
+      db: { getDoc: true },
+    },
+    ci: {
+      deployFunctions: true,
+      deployDb: true,
+      deployStorage: true,
+    },
+    server: { db: { upsertDoc: true } },
+  },
   functionsBuilders: {
     fn1: (server) => ({
       functions: {
@@ -245,25 +237,7 @@ export const test24 = defineTest({
       },
     }),
   },
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: {
-        readonly storage: { readonly uploadDataUrl: never };
-        readonly db: { readonly getDoc: never };
-      };
-      readonly ci: {
-        readonly deployFunctions: never;
-        readonly deployDb: never;
-        readonly deployStorage: never;
-      };
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-    }
-  >) =>
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
@@ -301,6 +275,11 @@ export const test24 = defineTest({
 
 export const test3 = defineTest({
   name: `onObjectCreated trigger should not be called if not triggered`,
+  stack: {
+    client: { db: { getDocWhen: true } },
+    ci: { deployFunctions: true, deployDb: true },
+    server: { db: { upsertDoc: true } },
+  },
   type: 'fail',
   functionsBuilders: {
     fn1: (server) => ({
@@ -318,18 +297,7 @@ export const test3 = defineTest({
       },
     }),
   },
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly getDocWhen: never } };
-      readonly ci: { readonly deployFunctions: never; readonly deployDb: never };
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-    }
-  >) =>
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -361,20 +329,15 @@ export const test3 = defineTest({
 
 export const test4 = defineTest({
   name: `document should not be created if trigger not deployed`,
+  stack: {
+    ci: { deployDb: true },
+    client: {
+      storage: { uploadDataUrl: true },
+      db: { getDocWhen: true },
+    },
+  },
   type: 'fail',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: { readonly deployDb: never };
-      readonly client: {
-        readonly storage: { readonly uploadDataUrl: never };
-        readonly db: { readonly getDocWhen: never };
-      };
-    }
-  >) =>
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',

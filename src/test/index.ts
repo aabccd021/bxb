@@ -5,15 +5,18 @@ import type { TaskEither } from 'fp-ts/TaskEither';
 import * as std from 'fp-ts-std';
 import { expect, test as test_ } from 'vitest';
 
-import type { Stack } from '../type';
 import * as functions from './functions';
 import * as stackTests from './stack';
-import type { Test } from './util';
+import type { PartialStack, Test } from './util';
 
 export const bxbTests = { functions, stackTests };
 
 export const runTestsWithConfig =
-  <S = Stack.Type>({ stack }: { readonly stack: TaskEither<unknown, S> }) =>
+  <S extends object = Record<string, never>>({
+    stack,
+  }: {
+    readonly stack: TaskEither<unknown, PartialStack<S>>;
+  }) =>
   // eslint-disable-next-line functional/no-return-void
   ({ tests }: { readonly tests: ReadonlyRecord<string, Test<S>> }) =>
     // eslint-disable-next-line functional/no-return-void

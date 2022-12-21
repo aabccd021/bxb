@@ -4,23 +4,17 @@
 import { apply, either, option, taskEither } from 'fp-ts';
 import type { Either } from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
-import type { DeepPick } from 'ts-essentials';
 
-import type { DocData, Stack } from '../../../../type';
+import type { DocData } from '../../../../type';
 import { defineTest } from '../../../util';
 
 export const test0010 = defineTest({
   name: 'can return a doc is created with client.db.upsertDoc',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly upsertDoc: never; readonly onSnapshot: never } };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  stack: {
+    client: { db: { upsertDoc: true, onSnapshot: true } },
+    ci: { deployDb: true },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -57,16 +51,11 @@ export const test0010 = defineTest({
 
 export const test0001 = defineTest({
   name: 'can return a doc updated with client.db.upsertDoc',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly upsertDoc: never; readonly onSnapshot: never } };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  stack: {
+    client: { db: { upsertDoc: true, onSnapshot: true } },
+    ci: { deployDb: true },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -113,16 +102,11 @@ export const test0001 = defineTest({
 
 export const test0002 = defineTest({
   name: 'returns ForbiddedError if forbidden',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly upsertDoc: never; readonly onSnapshot: never } };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  stack: {
+    client: { db: { upsertDoc: true, onSnapshot: true } },
+    ci: { deployDb: true },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -159,16 +143,11 @@ export const test0002 = defineTest({
 
 export const test0003 = defineTest({
   name: 'returns Forbidden if forbidden and document absent',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly onSnapshot: never } };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  stack: {
+    client: { db: { onSnapshot: true } },
+    ci: { deployDb: true },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -194,18 +173,12 @@ export const test0003 = defineTest({
 
 export const test0004 = defineTest({
   name: 'can return a doc created with server.db.upsertDoc',
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly onSnapshot: never } };
-      readonly ci: { readonly deployDb: never };
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-    }
-  >) =>
+  stack: {
+    client: { db: { onSnapshot: true } },
+    ci: { deployDb: true },
+    server: { db: { upsertDoc: true } },
+  },
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -242,18 +215,12 @@ export const test0004 = defineTest({
 
 export const test0005 = defineTest({
   name: 'can return a doc updated with server.db.upsertDoc',
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly onSnapshot: never } };
-      readonly ci: { readonly deployDb: never };
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-    }
-  >) =>
+  stack: {
+    client: { db: { onSnapshot: true } },
+    ci: { deployDb: true },
+    server: { db: { upsertDoc: true } },
+  },
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -296,16 +263,11 @@ export const test0005 = defineTest({
 
 export const test0006 = defineTest({
   name: 'can return a doc is created with async client.db.upsertDoc',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly upsertDoc: never; readonly onSnapshot: never } };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  stack: {
+    client: { db: { upsertDoc: true, onSnapshot: true } },
+    ci: { deployDb: true },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -345,16 +307,11 @@ export const test0006 = defineTest({
 
 export const test0007 = defineTest({
   name: 'can return a doc updated with async client.db.upsertDoc',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly upsertDoc: never; readonly onSnapshot: never } };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  stack: {
+    client: { db: { upsertDoc: true, onSnapshot: true } },
+    ci: { deployDb: true },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -410,18 +367,12 @@ export const test0007 = defineTest({
 
 export const test0008 = defineTest({
   name: 'can return a doc is created with async server.db.upsertDoc',
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly onSnapshot: never } };
-      readonly ci: { readonly deployDb: never };
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-    }
-  >) =>
+  stack: {
+    client: { db: { onSnapshot: true } },
+    ci: { deployDb: true },
+    server: { db: { upsertDoc: true } },
+  },
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -461,18 +412,12 @@ export const test0008 = defineTest({
 
 export const test0009 = defineTest({
   name: 'can return a doc updated with async server.db.upsertDoc',
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly client: { readonly db: { readonly onSnapshot: never } };
-      readonly ci: { readonly deployDb: never };
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-    }
-  >) =>
+  stack: {
+    client: { db: { onSnapshot: true } },
+    ci: { deployDb: true },
+    server: { db: { upsertDoc: true } },
+  },
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
