@@ -2,13 +2,19 @@ import type { Either } from 'fp-ts/Either';
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import { string } from 'fp-ts-std';
-import type { O } from 'ts-toolbelt';
+import type { DeepPartial, DeepPick } from 'ts-essentials';
 
 import type { FunctionsBuilder, Stack } from '../type';
 
-export type PartialStack<S extends object = Record<string, never>> = O.Intersect<Stack.Type, S>
+export type MakeDeepFilter<T> = T extends Record<string, unknown>
+  ? { readonly [TT in keyof T]: MakeDeepFilter<T[TT]> }
+  : boolean;
 
-export type Test<S extends object = Record<string, never>, E = unknown, T = unknown> = {
+export type StackFilter = DeepPartial<MakeDeepFilter<Stack.Type>>;
+
+export type PartialStack<S extends StackFilter> = DeepPick<Stack.Type, S>;
+
+export type Test<S extends StackFilter, E = unknown, T = unknown> = {
   readonly stack: S;
   readonly name: string;
   readonly expect: (stack: PartialStack<S>) => TaskEither<E, T>;
@@ -22,15 +28,6 @@ export type Test<S extends object = Record<string, never>, E = unknown, T = unkn
   readonly retry?: number;
 };
 
-export type Suite = {
-  readonly name: string;
-  readonly tests: readonly Test[];
-  readonly concurrent?: boolean;
-  readonly timeOut?: number;
-};
-
-export const defineTest = <S extends object = Record<string, never>, E = unknown, T = unknown>(
-  t: Test<S, E, T>
-) => t;
+export const defineTest = <S extends StackFilter, E = unknown, T = unknown>(t: Test<S, E, T>) => t;
 
 export const toFunctionsPath = string.replaceAll('bxb/dist/es6')('bxb/dist/cjs');
