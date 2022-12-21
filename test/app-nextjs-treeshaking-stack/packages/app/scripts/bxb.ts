@@ -1,12 +1,10 @@
 import {appScripts} from 'bxb';
-import * as foo from 'bxb-stack-foo';
-import * as bar from 'bxb-stack-bar';
-
+import * as smaller from 'bxb-stack-smaller';
+import * as larger from 'bxb-stack-larger';
 const main = appScripts({  
   stacks: {
-    env: { production: foo },
-    default: bar
+    env: { production: larger },
+    default: smaller
   }
 })
-
 void main()

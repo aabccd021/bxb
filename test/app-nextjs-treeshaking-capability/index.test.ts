@@ -28,7 +28,7 @@ test(
 );
 
 test(
-  'can build nextjs app',
+  'page size is different depends on capabilities used',
   async () => {
     const { stdout } = await exec('pnpm next build', {
       cwd: `${__dirname}/packages/app`,
@@ -40,7 +40,7 @@ test(
         .filter((s) => s.includes(page))
         .at(0)
         ?.split(' ')
-        .filter((s) => s !== '')?.[5];
+        ?.at(-2);
       // eslint-disable-next-line functional/no-conditional-statement
       if (sizeStr === undefined) {
         // eslint-disable-next-line functional/no-throw-statement
