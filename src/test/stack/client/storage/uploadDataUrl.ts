@@ -1,22 +1,15 @@
 import { either, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
-import type { DeepPick } from 'ts-essentials';
 
-import type { Stack } from '../../../../type';
 import { defineTest } from '../../../util';
 
 export const test0001 = defineTest({
   name: 'can upload base64 data url',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: { readonly deployStorage: never };
-      readonly client: { readonly storage: { readonly uploadDataUrl: never } };
-    }
-  >) =>
+  stack: {
+    ci: { deployStorage: true },
+    client: { storage: { uploadDataUrl: true } },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
@@ -32,16 +25,11 @@ export const test0001 = defineTest({
 
 export const test0002 = defineTest({
   name: 'can plain text data url',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: { readonly deployStorage: never };
-      readonly client: { readonly storage: { readonly uploadDataUrl: never } };
-    }
-  >) =>
+  stack: {
+    ci: { deployStorage: true },
+    client: { storage: { uploadDataUrl: true } },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
@@ -54,16 +42,11 @@ export const test0002 = defineTest({
 
 export const test0003 = defineTest({
   name: 'returns InvalidDataUrlFormat when invalid data url is uploaded',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: { readonly deployStorage: never };
-      readonly client: { readonly storage: { readonly uploadDataUrl: never } };
-    }
-  >) =>
+  stack: {
+    ci: { deployStorage: true },
+    client: { storage: { uploadDataUrl: true } },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
       taskEither.chainW(() =>
@@ -78,16 +61,11 @@ export const test0003 = defineTest({
 
 export const test0004 = defineTest({
   name: 'returns Forbidden when create security rule not specified',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: { readonly deployStorage: never };
-      readonly client: { readonly storage: { readonly uploadDataUrl: never } };
-    }
-  >) =>
+  stack: {
+    ci: { deployStorage: true },
+    client: { storage: { uploadDataUrl: true } },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({ securityRule: {} }),
       taskEither.chainW(() =>
@@ -102,16 +80,11 @@ export const test0004 = defineTest({
 
 export const test0005 = defineTest({
   name: 'can upload base64 data url less than constraint',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: { readonly deployStorage: never };
-      readonly client: { readonly storage: { readonly uploadDataUrl: never } };
-    }
-  >) =>
+  stack: {
+    ci: { deployStorage: true },
+    client: { storage: { uploadDataUrl: true } },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({
         securityRule: {
@@ -136,16 +109,11 @@ export const test0005 = defineTest({
 
 export const test0006 = defineTest({
   name: 'returns Forbidden error if uploaded a base64 data url larger than constraint',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: { readonly deployStorage: never };
-      readonly client: { readonly storage: { readonly uploadDataUrl: never } };
-    }
-  >) =>
+  stack: {
+    ci: { deployStorage: true },
+    client: { storage: { uploadDataUrl: true } },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({
         securityRule: {
@@ -169,16 +137,11 @@ export const test0006 = defineTest({
 
 export const test0007 = defineTest({
   name: 'can upload plain text data url less than constraint',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: { readonly deployStorage: never };
-      readonly client: { readonly storage: { readonly uploadDataUrl: never } };
-    }
-  >) =>
+  stack: {
+    ci: { deployStorage: true },
+    client: { storage: { uploadDataUrl: true } },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({
         securityRule: {
@@ -200,16 +163,11 @@ export const test0007 = defineTest({
 
 export const test0008 = defineTest({
   name: 'returns Forbidden error if uploaded a plain text data url larger than constraint',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: { readonly deployStorage: never };
-      readonly client: { readonly storage: { readonly uploadDataUrl: never } };
-    }
-  >) =>
+  stack: {
+    ci: { deployStorage: true },
+    client: { storage: { uploadDataUrl: true } },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({
         securityRule: {
@@ -230,21 +188,15 @@ export const test0008 = defineTest({
 
 export const test0009 = defineTest({
   name: 'can upload if auth uid equals to document field which document id equals to object id',
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-      readonly ci: { readonly deployStorage: never };
-      readonly client: {
-        readonly storage: { readonly uploadDataUrl: never };
-        readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };
-      };
-    }
-  >) =>
+  stack: {
+    server: { db: { upsertDoc: true } },
+    ci: { deployStorage: true },
+    client: {
+      storage: { uploadDataUrl: true },
+      auth: { createUserAndSignInWithEmailAndPassword: true },
+    },
+  },
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({
         securityRule: {
@@ -289,24 +241,18 @@ export const test0009 = defineTest({
 
 export const test0010 = defineTest({
   name: 'returns Forbidden error if not signed in but required in rule',
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-      readonly ci: { readonly deployStorage: never };
-      readonly client: {
-        readonly storage: { readonly uploadDataUrl: never };
-        readonly auth: {
-          readonly createUserAndSignInWithEmailAndPassword: never;
-          readonly signOut: never;
-        };
-      };
-    }
-  >) =>
+  stack: {
+    server: { db: { upsertDoc: true } },
+    ci: { deployStorage: true },
+    client: {
+      storage: { uploadDataUrl: true },
+      auth: {
+        createUserAndSignInWithEmailAndPassword: true,
+        signOut: true,
+      },
+    },
+  },
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({
         securityRule: {
@@ -351,19 +297,14 @@ export const test0010 = defineTest({
 
 export const test0011 = defineTest({
   name: 'returns Forbidden error if object document does not exists',
-  expect: ({
-    client,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly ci: { readonly deployStorage: never };
-      readonly client: {
-        readonly storage: { readonly uploadDataUrl: never };
-        readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };
-      };
-    }
-  >) =>
+  stack: {
+    ci: { deployStorage: true },
+    client: {
+      storage: { uploadDataUrl: true },
+      auth: { createUserAndSignInWithEmailAndPassword: true },
+    },
+  },
+  expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({
         securityRule: {
@@ -401,21 +342,15 @@ export const test0011 = defineTest({
 
 export const test0012 = defineTest({
   name: 'returns Forbidden error if object document field does not exists',
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-      readonly ci: { readonly deployStorage: never };
-      readonly client: {
-        readonly storage: { readonly uploadDataUrl: never };
-        readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };
-      };
-    }
-  >) =>
+  stack: {
+    server: { db: { upsertDoc: true } },
+    ci: { deployStorage: true },
+    client: {
+      storage: { uploadDataUrl: true },
+      auth: { createUserAndSignInWithEmailAndPassword: true },
+    },
+  },
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({
         securityRule: {
@@ -456,21 +391,15 @@ export const test0012 = defineTest({
 
 export const test0013 = defineTest({
   name: 'returns Forbidden error if object document field value is not auth uid',
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly server: { readonly db: { readonly upsertDoc: never } };
-      readonly ci: { readonly deployStorage: never };
-      readonly client: {
-        readonly storage: { readonly uploadDataUrl: never };
-        readonly auth: { readonly createUserAndSignInWithEmailAndPassword: never };
-      };
-    }
-  >) =>
+  stack: {
+    server: { db: { upsertDoc: true } },
+    ci: { deployStorage: true },
+    client: {
+      storage: { uploadDataUrl: true },
+      auth: { createUserAndSignInWithEmailAndPassword: true },
+    },
+  },
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployStorage({
         securityRule: {

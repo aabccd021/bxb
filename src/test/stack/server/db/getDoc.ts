@@ -1,22 +1,15 @@
 import { either, option, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
-import type { DeepPick } from 'ts-essentials/dist/types';
 
-import type { Stack } from '../../../..';
 import { defineTest } from '../../../util';
 
 export const test0002 = defineTest({
   name: 'can upsert and get doc',
-  expect: ({
-    server,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly server: { readonly db: { readonly upsertDoc: never; readonly getDoc: never } };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  stack: {
+    server: { db: { upsertDoc: true, getDoc: true } },
+    ci: { deployDb: true },
+  },
+  expect: ({ server, ci }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -40,16 +33,11 @@ export const test0002 = defineTest({
 
 export const test0003 = defineTest({
   name: 'can get doc even if client.db.getDoc is forbidden by security rule',
-  expect: ({
-    server,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly server: { readonly db: { readonly upsertDoc: never; readonly getDoc: never } };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  stack: {
+    server: { db: { upsertDoc: true, getDoc: true } },
+    ci: { deployDb: true },
+  },
+  expect: ({ server, ci }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -73,16 +61,11 @@ export const test0003 = defineTest({
 
 export const test0004 = defineTest({
   name: 'can get doc if forbidden, even if client.db.getDoc is the doc absent',
-  expect: ({
-    server,
-    ci,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly server: { readonly db: { readonly getDoc: never } };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  stack: {
+    server: { db: { getDoc: true } },
+    ci: { deployDb: true },
+  },
+  expect: ({ server, ci }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -95,18 +78,12 @@ export const test0004 = defineTest({
 
 export const test0005 = defineTest({
   name: 'can get doc created with client.db.usertDoc',
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly server: { readonly db: { readonly getDoc: never } };
-      readonly client: { readonly db: { readonly upsertDoc: never } };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  stack: {
+    server: { db: { getDoc: true } },
+    client: { db: { upsertDoc: true } },
+    ci: { deployDb: true },
+  },
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',
@@ -130,18 +107,12 @@ export const test0005 = defineTest({
 
 export const test0006 = defineTest({
   name: 'can get doc updated with client.db.upsertDoc',
-  expect: ({
-    client,
-    ci,
-    server,
-  }: DeepPick<
-    Stack.Type,
-    {
-      readonly server: { readonly db: { readonly getDoc: never } };
-      readonly client: { readonly db: { readonly upsertDoc: never } };
-      readonly ci: { readonly deployDb: never };
-    }
-  >) =>
+  stack: {
+    server: { db: { getDoc: true } },
+    client: { db: { upsertDoc: true } },
+    ci: { deployDb: true },
+  },
+  expect: ({ client, ci, server }) =>
     pipe(
       ci.deployDb({
         type: 'deploy',

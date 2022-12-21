@@ -5,7 +5,7 @@
     "build:es6": "swc src --out-dir dist/es6 --source-maps --config module.type=es6",
     "build:types": "tsc --project tsconfig.dist.json",
     "fix": "eslint --max-warnings=0 . --fix",
-    "fix:compress": "find ./src -type f -exec sed -i -z 's/{\\n/{/g' {} \\; && pnpm fix",
+    "fix:compress": "fd --extension .ts --exec sed -i -z 's/{\\n/{/g' {} \\; && pnpm fix",
     "lint": "eslint --max-warnings=0 .",
     "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
     "pre-push:dirty": "pnpm install && pnpm build && pnpm lint && pnpm test",
@@ -54,6 +54,7 @@
     "node-fetch": "^3.3.0",
     "ts-essentials": "^9.3.0",
     "ts-pattern": "^4.0.6",
+    "ts-toolbelt": "^9.6.0",
     "valid-data-url": "^4.0.1"
   },
   "devDependencies": {
