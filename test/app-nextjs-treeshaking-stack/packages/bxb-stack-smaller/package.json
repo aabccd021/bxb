@@ -1,5 +1,5 @@
 {
-  "name": "bxb-stack-bar",
+  "name": "bxb-stack-smaller",
   "main": "dist/index.js",
   "sideEffects": false,
   "files": [

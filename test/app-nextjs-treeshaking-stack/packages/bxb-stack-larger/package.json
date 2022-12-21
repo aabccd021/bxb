@@ -1,5 +1,5 @@
 {
-  "name": "bxb-stack-foo",
+  "name": "bxb-stack-larger",
   "main": "dist/index.js",
   "sideEffects": false,
   "files": [
