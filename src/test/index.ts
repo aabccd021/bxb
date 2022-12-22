@@ -8,7 +8,7 @@ import { expect, test as test_ } from 'vitest';
 
 import * as functions from './functions';
 import * as stackTests from './stack';
-import type { AnyFilter, AnyStack, StackFilter, StackSet, Test } from './util';
+import type { AnyFilter, AnyStack, CapabilitySet, StackFilter, Test } from './util';
 import { flattenTests } from './util';
 
 const runSimpleTest = <T>({
@@ -48,7 +48,7 @@ export const runTest: RunTest = (getStack) => (test) =>
     ),
   });
 
-const stackToFilter = (stack: StackSet): StackFilter =>
+const stackToFilter = (stack: CapabilitySet): StackFilter =>
   pipe(
     stack,
     readonlyRecord.map((stackOrCapability) =>
@@ -71,5 +71,5 @@ export const getTestsByStack = (stack: AnyStack) =>
   pipe(
     { functions, stackTests },
     flattenTests,
-    readonlyArray.filter((test) => isSubRecord(test.stack, stackToFilter(stack)))
+    readonlyArray.filter((test) => isSubRecord(stackToFilter(stack), test.stack))
   );

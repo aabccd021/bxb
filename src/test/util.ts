@@ -8,24 +8,25 @@ import type { DeepPartial, DeepPick } from 'ts-essentials';
 
 import type { FunctionsBuilder, Stack } from '../type';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Capability = (...p: readonly any[]) => any;
 
 // eslint-disable-next-line no-use-before-define
-export type StackOrCapability = Capability | StackSet;
+export type StackOrCapability = Capability | CapabilitySet;
 
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-export type StackSet = {
+export type CapabilitySet = {
   readonly [key: string]: StackOrCapability;
 };
 
 export type MakeStackOrCapabilityFilter<T extends StackOrCapability> = T extends Capability
   ? true
-  : T extends StackSet
+  : T extends CapabilitySet
   ? // eslint-disable-next-line no-use-before-define
     MakeStackFilter<T>
   : never;
 
-export type MakeStackFilter<T extends StackSet> = {
+export type MakeStackFilter<T extends CapabilitySet> = {
   readonly [KK in keyof T]?: MakeStackOrCapabilityFilter<T[KK]>;
 };
 
