@@ -11,28 +11,33 @@ import type { FunctionsBuilder, Stack } from '../type';
 export type Capability = (...p: readonly any[]) => any;
 
 // eslint-disable-next-line no-use-before-define
-export type MayCapability = AnyStack | Capability;
+export type StackOrCapability = Capability | StackSet;
 
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-export type AnyStack = {
-  readonly [key: string]: MayCapability;
+export type StackSet = {
+  readonly [key: string]: StackOrCapability;
 };
 
-export type MakeCapabilitiesFilter<T extends MayCapability> = T extends Capability
+export type MakeStackOrCapabilityFilter<T extends StackOrCapability> = T extends Capability
   ? true
-  : T extends AnyStack
-  ? { readonly [TT in keyof T]?: MakeCapabilitiesFilter<T[TT]> }
+  : T extends StackSet
+  ? // eslint-disable-next-line no-use-before-define
+    MakeStackFilter<T>
   : never;
 
-export type MakeStackFilter<T extends AnyStack> = {
-  readonly [TT in keyof T]?: MakeCapabilitiesFilter<T[TT]>;
+export type MakeStackFilter<T extends StackSet> = {
+  readonly [KK in keyof T]?: MakeStackOrCapabilityFilter<T[KK]>;
 };
 
-export type StackFilter = MakeStackFilter<Stack.Type>;
+export type AnyFilter = {
+  readonly [key: string]: AnyFilter | true;
+};
 
-export type StackFromFilter<S extends StackFilter = StackFilter> = DeepPick<Stack.Type, S>;
+export type StackFilter = AnyFilter & MakeStackFilter<Stack.Type>;
 
-export type PartialStack = DeepPartial<Stack.Type>;
+export type StackFromFilter<S extends StackFilter> = DeepPick<Stack.Type, S>;
+
+export type AnyStack = DeepPartial<Stack.Type>;
 
 export type Test<S extends StackFilter = StackFilter, E = unknown, T = unknown> = {
   readonly stack: S;
