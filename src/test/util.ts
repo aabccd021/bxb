@@ -1,33 +1,90 @@
+import { readonlyArray, readonlyRecord, readonlyTuple } from 'fp-ts';
 import type { Either } from 'fp-ts/Either';
+import { pipe } from 'fp-ts/function';
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import type { TaskEither } from 'fp-ts/TaskEither';
-import { string } from 'fp-ts-std';
+import * as std from 'fp-ts-std';
 import type { DeepPartial, DeepPick } from 'ts-essentials';
 
 import type { FunctionsBuilder, Stack } from '../type';
 
-export type MakeDeepFilter<T> = T extends Record<string, unknown>
-  ? { readonly [TT in keyof T]: MakeDeepFilter<T[TT]> }
-  : boolean;
+export type Capability = (...p: readonly any[]) => any;
 
-export type StackFilter = DeepPartial<MakeDeepFilter<Stack.Type>>;
+// eslint-disable-next-line no-use-before-define
+export type MayCapability = AnyStack | Capability;
 
-export type PartialStack<S extends StackFilter> = DeepPick<Stack.Type, S>;
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
+export type AnyStack = {
+  readonly [key: string]: MayCapability;
+};
 
-export type Test<S extends StackFilter, E = unknown, T = unknown> = {
+export type MakeCapabilitiesFilter<T extends MayCapability> = T extends Capability
+  ? true
+  : T extends AnyStack
+  ? { readonly [TT in keyof T]?: MakeCapabilitiesFilter<T[TT]> }
+  : never;
+
+export type MakeStackFilter<T extends AnyStack> = {
+  readonly [TT in keyof T]?: MakeCapabilitiesFilter<T[TT]>;
+};
+
+export type StackFilter = MakeStackFilter<Stack.Type>;
+
+export type StackFromFilter<S extends StackFilter = StackFilter> = DeepPick<Stack.Type, S>;
+
+export type PartialStack = DeepPartial<Stack.Type>;
+
+export type Test<S extends StackFilter = StackFilter, E = unknown, T = unknown> = {
   readonly stack: S;
   readonly name: string;
-  readonly expect: (stack: PartialStack<S>) => TaskEither<E, T>;
+  readonly expect: (stack: StackFromFilter<S>) => TaskEither<E, T>;
   readonly toResult: Either<E, T>;
   readonly type?: 'fail';
   readonly timeOut?: number;
   readonly functionsBuilders?: ReadonlyRecord<
     string,
-    FunctionsBuilder<PartialStack<S> extends { readonly server: infer SE } ? SE : never>
+    FunctionsBuilder<StackFromFilter<S> extends { readonly server: infer SE } ? SE : never>
   >;
   readonly retry?: number;
 };
 
-export const defineTest = <S extends StackFilter, E = unknown, T = unknown>(t: Test<S, E, T>) => t;
+export const defineTest = <S extends StackFilter = StackFilter, E = unknown, T = unknown>(
+  t: Test<S, E, T>
+) => t;
 
-export const toFunctionsPath = string.replaceAll('bxb/dist/es6')('bxb/dist/cjs');
+export const toFunctionsPath = std.string.replaceAll('bxb/dist/es6')('bxb/dist/cjs');
+
+export type ScopeTests = ReadonlyRecord<string, ReadonlyRecord<string, Test>>;
+
+export const exportScopeTests = (scopeTests: ScopeTests) =>
+  pipe(
+    scopeTests,
+    readonlyRecord.mapWithIndex((capabilityName, capabilityTests) =>
+      pipe(
+        capabilityTests,
+        readonlyRecord.map((test) => ({ ...test, name: `${capabilityName} > ${test.name}` })),
+        readonlyRecord.toReadonlyArray,
+        readonlyArray.map(readonlyTuple.snd)
+      )
+    ),
+    readonlyRecord.toReadonlyArray,
+    readonlyArray.chain(readonlyTuple.snd)
+  );
+
+export const flattenTests = (
+  tests: ReadonlyRecord<string, { readonly tests: readonly Test[] }>
+): readonly Test[] =>
+  pipe(
+    tests,
+    readonlyRecord.mapWithIndex((scopeName, scopeTests) =>
+      pipe(
+        scopeTests.tests,
+        readonlyArray.map((test) => ({
+          ...test,
+          name: `${scopeName} > ${test.name}`,
+        }))
+      )
+    ),
+    readonlyRecord.toReadonlyArray,
+    readonlyArray.chain(readonlyTuple.snd)
+  );

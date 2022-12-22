@@ -1,1 +1,4 @@
-export * as db from './db';
+import { flattenTests } from '../../util';
+import * as db from './db';
+
+export const tests = flattenTests({ db });

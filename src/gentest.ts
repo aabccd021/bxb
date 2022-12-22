@@ -47,7 +47,8 @@ const flattenedTests = pipe(
 import type { Test } from 'bxb';
 import { tests as bxbTests } from 'bxb';
 import type { Stack } from '../src'
-export const tests: Record<string, Test<Stack>> = {\n${x}\n};
+export const tests: ReadonlyRecord<string, Test<Stack>> = {\n${x}\n};
+  readon
 `
 );
 
