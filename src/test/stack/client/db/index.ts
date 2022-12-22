@@ -1,4 +1,13 @@
-export * as getDoc from './getDoc';
-export * as getDocWhen from './getDocWhen';
-export * as onSnapshot from './onSnapshot';
-export * as upsertDoc from './upsertDoc';
+import type { ScopeTests } from '../../../util';
+import { exportScopeTests } from '../../../util';
+import * as getDoc from './getDoc';
+import * as getDocWhen from './getDocWhen';
+import * as onSnapshot from './onSnapshot';
+import * as upsertDoc from './upsertDoc';
+
+export const tests = exportScopeTests({
+  getDoc,
+  getDocWhen,
+  onSnapshot,
+  upsertDoc,
+} as ScopeTests);
