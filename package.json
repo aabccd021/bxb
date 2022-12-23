@@ -9,12 +9,10 @@
     "lint": "eslint --max-warnings=0 .",
     "pre-push": "pnpm pre-push:dirty && pnpm publish --dry-run",
     "pre-push:dirty": "pnpm install && pnpm build && pnpm lint && pnpm test",
-    "test-codegen-stack-tests": "echo b",
     "test-codegen-custom": "echo b",
     "test-app-nextjs-treeshaking-capability": "vitest --run test/app-nextjs-treeshaking-capability",
     "test-app-nextjs-treeshaking-stack": "vitest --run test/app-nextjs-treeshaking-stack",
-    "test-unit": "vitest --run test/unit",
-    "gentest": "node dist/cjs/gentest.js"
+    "test-unit": "vitest --run test/unit"
   },
   "sideEffects": false,
   "name": "bxb",
