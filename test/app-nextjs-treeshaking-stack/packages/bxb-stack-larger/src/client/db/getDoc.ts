@@ -3,7 +3,6 @@ import { either, option } from 'fp-ts';
 import type { Stack } from '../../env';
 type Type = Stack['client']['db']['getDoc'];
 
-// eslint-disable-next-line @typescript-eslint/require-await
 export const getDoc: Type = (_env) => (_p) => async () => {
   console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
   console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');

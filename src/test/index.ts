@@ -11,21 +11,23 @@ import * as stackTests from './stack';
 import type { AnyFilter, AnyStack, CapabilitySet, StackFilter, Test } from './util';
 import { flattenTests } from './util';
 
-const runSimpleTest = <T>({
+type SimpleTest<T> = {
+  readonly name: string;
+  readonly expect: Task<T>;
+  readonly type?: 'fail';
+  readonly toResult: T;
+  readonly timeout?: number;
+  readonly retry?: number;
+};
+
+export const runSimpleTest = <T>({
   type,
   name,
   timeout,
   retry,
   expect: task,
   toResult: result,
-}: {
-  readonly name: string;
-  readonly type?: 'fail';
-  readonly expect: Task<T>;
-  readonly toResult?: T;
-  readonly timeout?: number;
-  readonly retry?: number;
-}) =>
+}: SimpleTest<T>): IO<void> =>
   pipe(
     match(type)
       .with('fail', () => test_.fails)
@@ -35,6 +37,8 @@ const runSimpleTest = <T>({
     (runner) => () =>
       runner(name, () => expect(task()).resolves.toEqual(result), { timeout, retry })
   );
+
+export const simpleTest = <T>(t: SimpleTest<T>) => t;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type RunTest = (getStack: TaskEither<unknown, AnyStack>) => (test: Test<{}>) => IO<void>;
@@ -67,9 +71,14 @@ const isSubRecord = (a: AnyFilter, b: AnyFilter): boolean =>
     readonlyRecord.foldMap(string.Ord)(boolean.MonoidAll)(identity)
   );
 
-export const getTestsByStack = (stack: AnyStack) =>
-  pipe(
-    { functions, stackTests },
-    flattenTests,
-    readonlyArray.filter((test) => isSubRecord(stackToFilter(stack), test.stack))
+export const filterStackWithTests = (tests: readonly Test[]) => (stack: AnyStack) =>
+  pipe(stack, stackToFilter, (filter) =>
+    pipe(
+      tests,
+      readonlyArray.filter((test) => isSubRecord(filter, test.stack))
+    )
   );
+
+const allTests = flattenTests({ functions, stackTests });
+
+export const getTestsOfStack = filterStackWithTests(allTests);

@@ -78,10 +78,10 @@ export const exportScopeTests = (scopeTests: ScopeTests) =>
   );
 
 export const flattenTests = (
-  tests: ReadonlyRecord<string, { readonly tests: readonly Test[] }>
+  testsModules: ReadonlyRecord<string, { readonly tests: readonly Test[] }>
 ): readonly Test[] =>
   pipe(
-    tests,
+    testsModules,
     readonlyRecord.mapWithIndex((scopeName, scopeTests) =>
       pipe(
         scopeTests.tests,
