@@ -1,7 +1,8 @@
 import { either, io, option, readonlyArray, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import { filterStackWithTests, runSimpleTest, simpleTest } from '../../src/test';
+import { runSimpleTest, simpleTest } from '../../src/simple-test';
+import { filterStackWithTests } from '../../src/test';
 import type { Test } from '../../src/test/util';
 import { defineTest, exportScopeTests, flattenTests } from '../../src/test/util';
 
