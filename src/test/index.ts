@@ -1,39 +1,45 @@
-import { boolean, io, readonlyArray, readonlyRecord, string, taskEither } from 'fp-ts';
+import { boolean, readonlyArray, readonlyRecord, readonlyTuple, string, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
-import type { IO } from 'fp-ts/IO';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import { match } from 'ts-pattern';
 
-import { runSimpleTest } from '../simple-test';
+import type { RunTests } from '../simple-test';
+import { runTests as realRunTests } from '../simple-test';
 import * as functions from './functions';
 import * as stackTests from './stack';
 import type { AnyFilter, AnyStack, CapabilitySet, StackFilter, Test } from './util';
 import { flattenTests } from './util';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type RunTest = (getStack: TaskEither<unknown, AnyStack>) => (test: Test) => IO<void>;
+export const runTestsWithRunner =
+  (runTests: RunTests) => (getStack: TaskEither<unknown, AnyStack>) => (tests: readonly Test[]) =>
+    pipe(
+      tests,
+      readonlyArray.chain((test) =>
+        match(test)
+          .with({ type: 'single' }, (singleTest) => [
+            {
+              ...singleTest,
+              expect: pipe(getStack, taskEither.chainW(singleTest.expect)),
+            },
+          ])
+          .with({ type: 'sequential' }, (sequentialTests) =>
+            pipe(
+              sequentialTests.tests,
+              readonlyRecord.mapWithIndex((testName, sequentialTest) => ({
+                ...sequentialTest,
+                name: `${sequentialTests.name} > ${testName}`,
+                expect: pipe(getStack, taskEither.chainW(sequentialTest.expect)),
+              })),
+              readonlyRecord.toReadonlyArray,
+              readonlyArray.map(readonlyTuple.snd)
+            )
+          )
+          .exhaustive()
+      ),
+      runTests
+    );
 
-export const runTest: RunTest = (getStack) => (test) =>
-  match(test)
-    .with({ type: 'single' }, (singleTest) =>
-      runSimpleTest({
-        ...singleTest,
-        expect: pipe(getStack, taskEither.chainW(singleTest.expect)),
-      })
-    )
-    .with({ type: 'sequential' }, (sequentialTests) =>
-      pipe(
-        sequentialTests.tests,
-        readonlyRecord.traverseWithIndex(io.Applicative)((testName, sequentialTest) =>
-          runSimpleTest({
-            ...sequentialTest,
-            name: `${sequentialTests.name} > ${testName}`,
-            expect: pipe(getStack, taskEither.chainW(sequentialTest.expect)),
-          })
-        )
-      )
-    )
-    .exhaustive();
+export const runTests = runTestsWithRunner(realRunTests);
 
 const stackToFilter = (stack: CapabilitySet): StackFilter =>
   pipe(
