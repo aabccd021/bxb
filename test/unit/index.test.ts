@@ -3,7 +3,12 @@ import { pipe } from 'fp-ts/function';
 
 import { runSimpleTest, simpleTest as test } from '../../src/simple-test';
 import { filterStackWithTests } from '../../src/test';
-import { exportScopeTests, flattenTests, test as bxbTest } from '../../src/test/util';
+import {
+  defineSequentialTest,
+  exportScopeTests,
+  flattenTests,
+  test as singleTest,
+} from '../../src/test/util';
 
 const tests = [
   test({
@@ -12,7 +17,7 @@ const tests = [
       pipe(
         exportScopeTests({
           foo: {
-            test001: bxbTest({
+            test001: singleTest({
               name: 'bar',
               stack: {},
               expect: () => taskEither.of('result'),
@@ -32,7 +37,7 @@ const tests = [
         flattenTests({
           fooModule: {
             tests: [
-              bxbTest({
+              singleTest({
                 name: 'bar',
                 stack: {},
                 expect: () => taskEither.of('result'),
@@ -47,7 +52,7 @@ const tests = [
   }),
 
   test({
-    name: 'filterStackWithTests includes tests with exact same stack',
+    name: 'filterStackWithTests includes single tests with exact same stack',
     expect: async () =>
       pipe(
         {
@@ -59,7 +64,7 @@ const tests = [
           },
         },
         filterStackWithTests([
-          bxbTest({
+          singleTest({
             name: 'getDoc & upsertDoc',
             stack: { client: { db: { getDoc: true, upsertDoc: true } } },
             expect: () => taskEither.of('result'),
@@ -72,7 +77,7 @@ const tests = [
   }),
 
   test({
-    name: 'filterStackWithTests includes tests which stack is subset',
+    name: 'filterStackWithTests includes single tests which stack is subset',
     expect: async () =>
       pipe(
         {
@@ -84,7 +89,7 @@ const tests = [
           },
         },
         filterStackWithTests([
-          bxbTest({
+          singleTest({
             name: 'getDoc',
             stack: { client: { db: { getDoc: true } } },
             expect: () => taskEither.of('result'),
@@ -97,7 +102,7 @@ const tests = [
   }),
 
   test({
-    name: 'filterStackWithTests does not includes tests which stack is superset',
+    name: 'filterStackWithTests does not includes single tests which stack is superset',
     expect: async () =>
       pipe(
         {
@@ -109,11 +114,98 @@ const tests = [
           },
         },
         filterStackWithTests([
-          bxbTest({
+          singleTest({
             name: 'getDoc & upsertDoc & getDocWhen',
             stack: { client: { db: { getDoc: true, upsertDoc: true, getDocWhen: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
+          }),
+        ]),
+        readonlyArray.map((t) => t.name)
+      ),
+    toResult: [],
+  }),
+
+  test({
+    name: 'filterStackWithTests includes sequential tests with exact same stack',
+    expect: async () =>
+      pipe(
+        {
+          client: {
+            db: {
+              getDoc: () => taskEither.of(option.none),
+              upsertDoc: () => taskEither.right(undefined),
+            },
+          },
+        },
+        filterStackWithTests([
+          defineSequentialTest({
+            stack: { client: { db: { getDoc: true, upsertDoc: true } } },
+            name: 'getDoc & upsertDoc',
+            tests: {
+              first: {
+                expect: () => taskEither.of('result'),
+                toResult: either.right('result'),
+              },
+            },
+          }),
+        ]),
+        readonlyArray.map((t) => t.name)
+      ),
+    toResult: ['getDoc & upsertDoc'],
+  }),
+
+  test({
+    name: 'filterStackWithTests includes sequential tests which stack is subset',
+    expect: async () =>
+      pipe(
+        {
+          client: {
+            db: {
+              getDoc: () => taskEither.of(option.none),
+              upsertDoc: () => taskEither.right(undefined),
+            },
+          },
+        },
+        filterStackWithTests([
+          defineSequentialTest({
+            stack: { client: { db: { getDoc: true } } },
+            name: 'getDoc',
+            tests: {
+              first: {
+                expect: () => taskEither.of('result'),
+                toResult: either.right('result'),
+              },
+            },
+          }),
+        ]),
+        readonlyArray.map((t) => t.name)
+      ),
+    toResult: ['getDoc'],
+  }),
+
+  test({
+    name: 'filterStackWithTests does not includes sequential tests which stack is superset',
+    expect: async () =>
+      pipe(
+        {
+          client: {
+            db: {
+              getDoc: () => taskEither.of(option.none),
+              upsertDoc: () => taskEither.right(undefined),
+            },
+          },
+        },
+        filterStackWithTests([
+          defineSequentialTest({
+            stack: { client: { db: { getDoc: true, upsertDoc: true, getDocWhen: true } } },
+            name: 'getDoc & upsertDoc & getDocWhen',
+            tests: {
+              first: {
+                expect: () => taskEither.of('result'),
+                toResult: either.right('result'),
+              },
+            },
           }),
         ]),
         readonlyArray.map((t) => t.name)
@@ -134,28 +226,58 @@ const tests = [
           },
         },
         filterStackWithTests([
-          bxbTest({
+          singleTest({
             name: 'getDoc',
             stack: { client: { db: { getDoc: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-          bxbTest({
+          singleTest({
             name: 'getDoc & upsertDoc',
             stack: { client: { db: { getDoc: true, upsertDoc: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-          bxbTest({
+          singleTest({
             name: 'getDoc & upsertDoc & getDocWhen',
             stack: { client: { db: { getDoc: true, upsertDoc: true, getDocWhen: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
+          defineSequentialTest({
+            stack: { client: { db: { getDoc: true } } },
+            name: 'seq getDoc',
+            tests: {
+              first: {
+                expect: () => taskEither.of('result'),
+                toResult: either.right('result'),
+              },
+            },
+          }),
+          defineSequentialTest({
+            stack: { client: { db: { getDoc: true, upsertDoc: true } } },
+            name: 'seq getDoc & upsertDoc',
+            tests: {
+              first: {
+                expect: () => taskEither.of('result'),
+                toResult: either.right('result'),
+              },
+            },
+          }),
+          defineSequentialTest({
+            stack: { client: { db: { getDoc: true, upsertDoc: true, getDocWhen: true } } },
+            name: 'seq getDoc & upsertDoc & getDocWhen',
+            tests: {
+              first: {
+                expect: () => taskEither.of('result'),
+                toResult: either.right('result'),
+              },
+            },
+          }),
         ]),
         readonlyArray.map((t) => t.name)
       ),
-    toResult: ['getDoc', 'getDoc & upsertDoc'],
+    toResult: ['getDoc', 'getDoc & upsertDoc', 'seq getDoc', 'seq getDoc & upsertDoc'],
   }),
 ];
 
