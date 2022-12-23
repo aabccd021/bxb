@@ -3,7 +3,6 @@ import { pipe } from 'fp-ts/function';
 
 import { runSimpleTest, simpleTest } from '../../src/simple-test';
 import { filterStackWithTests } from '../../src/test';
-import type { Test } from '../../src/test/util';
 import { defineTest, exportScopeTests, flattenTests } from '../../src/test/util';
 
 const tests = [
@@ -58,7 +57,7 @@ const tests = [
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-        ] as readonly Test[])({
+        ])({
           client: {
             db: {
               getDoc: () => taskEither.of(option.none),
@@ -82,7 +81,7 @@ const tests = [
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-        ] as readonly Test[])({
+        ])({
           client: {
             db: {
               getDoc: () => taskEither.of(option.none),
@@ -106,7 +105,7 @@ const tests = [
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-        ] as readonly Test[])({
+        ])({
           client: {
             db: {
               getDoc: () => taskEither.of(option.none),
@@ -142,7 +141,7 @@ const tests = [
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-        ] as readonly Test[])({
+        ])({
           client: {
             db: {
               getDoc: () => taskEither.of(option.none),
