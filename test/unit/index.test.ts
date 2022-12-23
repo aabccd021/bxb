@@ -50,6 +50,14 @@ const tests = [
     name: 'filterStackWithTests includes tests with exact same stack',
     expect: async () =>
       pipe(
+        {
+          client: {
+            db: {
+              getDoc: () => taskEither.of(option.none),
+              upsertDoc: () => taskEither.right(undefined),
+            },
+          },
+        },
         filterStackWithTests([
           defineTest({
             name: 'getDoc & upsertDoc',
@@ -57,14 +65,7 @@ const tests = [
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-        ])({
-          client: {
-            db: {
-              getDoc: () => taskEither.of(option.none),
-              upsertDoc: () => taskEither.right(undefined),
-            },
-          },
-        }),
+        ]),
         readonlyArray.map((test) => test.name)
       ),
     toResult: ['getDoc & upsertDoc'],
@@ -74,6 +75,14 @@ const tests = [
     name: 'filterStackWithTests includes tests which stack is subset',
     expect: async () =>
       pipe(
+        {
+          client: {
+            db: {
+              getDoc: () => taskEither.of(option.none),
+              upsertDoc: () => taskEither.right(undefined),
+            },
+          },
+        },
         filterStackWithTests([
           defineTest({
             name: 'getDoc',
@@ -81,14 +90,7 @@ const tests = [
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-        ])({
-          client: {
-            db: {
-              getDoc: () => taskEither.of(option.none),
-              upsertDoc: () => taskEither.right(undefined),
-            },
-          },
-        }),
+        ]),
         readonlyArray.map((test) => test.name)
       ),
     toResult: ['getDoc'],
@@ -98,6 +100,14 @@ const tests = [
     name: 'filterStackWithTests does not includes tests which stack is superset',
     expect: async () =>
       pipe(
+        {
+          client: {
+            db: {
+              getDoc: () => taskEither.of(option.none),
+              upsertDoc: () => taskEither.right(undefined),
+            },
+          },
+        },
         filterStackWithTests([
           defineTest({
             name: 'getDoc & upsertDoc & getDocWhen',
@@ -105,14 +115,7 @@ const tests = [
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-        ])({
-          client: {
-            db: {
-              getDoc: () => taskEither.of(option.none),
-              upsertDoc: () => taskEither.right(undefined),
-            },
-          },
-        }),
+        ]),
         readonlyArray.map((test) => test.name)
       ),
     toResult: [],
@@ -122,6 +125,14 @@ const tests = [
     name: 'filterStackWithTests filters out tests which stack is not equal nor subset',
     expect: async () =>
       pipe(
+        {
+          client: {
+            db: {
+              getDoc: () => taskEither.of(option.none),
+              upsertDoc: () => taskEither.right(undefined),
+            },
+          },
+        },
         filterStackWithTests([
           defineTest({
             name: 'getDoc',
@@ -141,14 +152,7 @@ const tests = [
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-        ])({
-          client: {
-            db: {
-              getDoc: () => taskEither.of(option.none),
-              upsertDoc: () => taskEither.right(undefined),
-            },
-          },
-        }),
+        ]),
         readonlyArray.map((test) => test.name)
       ),
     toResult: ['getDoc', 'getDoc & upsertDoc'],
