@@ -1,4 +1,3 @@
-import type { ScopeTests } from '../../../util';
 import { exportScopeTests } from '../../../util';
 import * as getDoc from './getDoc';
 import * as getDocWhen from './getDocWhen';
@@ -10,4 +9,4 @@ export const tests = exportScopeTests({
   getDocWhen,
   onSnapshot,
   upsertDoc,
-} as ScopeTests);
+});
