@@ -40,7 +40,45 @@ export type StackFromFilter<S extends StackFilter> = DeepPick<Stack.Type, S>;
 
 export type AnyStack = DeepPartial<Stack.Type>;
 
-export type Test = {
+export type SequentialTest = {
+  readonly type: 'sequential';
+  readonly stack: AnyFilter;
+  readonly name: string;
+  readonly tests: Record<
+    string,
+    {
+      readonly expect: (stack: unknown) => TaskEither<unknown, unknown>;
+      readonly toResult: Either<unknown, unknown>;
+      readonly shouldTimeout?: true;
+      readonly timeOut?: number;
+      readonly functionsBuilders?: ReadonlyRecord<string, unknown>;
+    }
+  >;
+};
+
+export type DefineSequentialTest = <S extends StackFilter, E, T>(t: {
+  readonly stack: AnyFilter;
+  readonly name: string;
+  readonly tests: Record<
+    string,
+    {
+      readonly expect: (stack: StackFromFilter<S>) => TaskEither<E, T>;
+      readonly toResult: Either<E, T>;
+      readonly shouldTimeout?: true;
+      readonly timeOut?: number;
+      readonly functionsBuilders?: ReadonlyRecord<
+        string,
+        FunctionsBuilder<StackFromFilter<S> extends { readonly server: infer SE } ? SE : never>
+      >;
+    }
+  >;
+}) => SequentialTest;
+
+export const defineSequentialTest: DefineSequentialTest = (t) =>
+  ({ ...t, type: 'sequential' } as SequentialTest);
+
+export type SingleTest = {
+  readonly type: 'single';
   readonly stack: AnyFilter;
   readonly name: string;
   readonly expect: (stack: unknown) => TaskEither<unknown, unknown>;
@@ -51,7 +89,7 @@ export type Test = {
   readonly retry?: number;
 };
 
-export type DefineTest = <S extends StackFilter, E, T>(t: {
+export type DefineSingleTest = <S extends StackFilter, E, T>(t: {
   readonly stack: S;
   readonly name: string;
   readonly expect: (stack: StackFromFilter<S>) => TaskEither<E, T>;
@@ -63,15 +101,17 @@ export type DefineTest = <S extends StackFilter, E, T>(t: {
     FunctionsBuilder<StackFromFilter<S> extends { readonly server: infer SE } ? SE : never>
   >;
   readonly retry?: number;
-}) => Test;
+}) => SingleTest;
 
-export const defineTest: DefineTest = (t) => t as Test;
+export const defineTest: DefineSingleTest = (t) => ({ ...t, type: 'single' } as SingleTest);
 
 export const toFunctionsPath = std.string.replaceAll('bxb/dist/es6')('bxb/dist/cjs');
 
+export type Test = SequentialTest | SingleTest;
+
 export type ScopeTests = ReadonlyRecord<string, ReadonlyRecord<string, Test>>;
 
-export const exportScopeTests = (scopeTests: ScopeTests) =>
+export const exportScopeTests = (scopeTests: ScopeTests): readonly Test[] =>
   pipe(
     scopeTests,
     readonlyRecord.mapWithIndex((capabilityName, capabilityTests) =>

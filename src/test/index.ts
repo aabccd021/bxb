@@ -1,7 +1,8 @@
-import { boolean, readonlyArray, readonlyRecord, string, taskEither } from 'fp-ts';
+import { boolean, io, readonlyArray, readonlyRecord, string, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 import type { IO } from 'fp-ts/IO';
 import type { TaskEither } from 'fp-ts/TaskEither';
+import { match } from 'ts-pattern';
 
 import { runSimpleTest } from '../simple-test';
 import * as functions from './functions';
@@ -13,13 +14,26 @@ import { flattenTests } from './util';
 type RunTest = (getStack: TaskEither<unknown, AnyStack>) => (test: Test) => IO<void>;
 
 export const runTest: RunTest = (getStack) => (test) =>
-  runSimpleTest({
-    ...test,
-    expect: pipe(
-      getStack,
-      taskEither.chainW((k) => test.expect(k))
-    ),
-  });
+  match(test)
+    .with({ type: 'single' }, (singleTest) =>
+      runSimpleTest({
+        ...singleTest,
+        expect: pipe(getStack, taskEither.chainW(singleTest.expect)),
+      })
+    )
+    .with({ type: 'sequential' }, (sequentialTests) =>
+      pipe(
+        sequentialTests.tests,
+        readonlyRecord.traverseWithIndex(io.Applicative)((testName, sequentialTest) =>
+          runSimpleTest({
+            ...sequentialTest,
+            name: `${sequentialTests.name} > ${testName}`,
+            expect: pipe(getStack, taskEither.chainW(sequentialTest.expect)),
+          })
+        )
+      )
+    )
+    .exhaustive();
 
 const stackToFilter = (stack: CapabilitySet): StackFilter =>
   pipe(

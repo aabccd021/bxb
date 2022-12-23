@@ -10,6 +10,7 @@
   "ignorePatterns": [
     "dist/",
     "node_modules",
+    "coverage",
     "test/app-nextjs-treeshaking-capability",
     "test/app-nextjs-treeshaking-stack"
   ],
