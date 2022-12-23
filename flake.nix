@@ -8,9 +8,6 @@
       buildInputs = [
         nodejs-16_x
         nodePackages.pnpm
-        playwright
-        playwright.browsers-chromium
-        actionlint
       ];
       shellHook = ''
         export PLAYWRIGHT_BROWSERS_PATH=${playwright.browsers-chromium}
