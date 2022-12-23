@@ -1,7 +1,7 @@
-import { either, io, option, readonlyArray, taskEither } from 'fp-ts';
+import { either, option, readonlyArray, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import { runSimpleTest, simpleTest as test } from '../../src/simple-test';
+import { runTests, simpleTest as test } from '../../src/simple-test';
 import { filterStackWithTests } from '../../src/test';
 import {
   defineSequentialTest,
@@ -281,6 +281,6 @@ const tests = [
   }),
 ];
 
-const main = readonlyArray.traverse(io.Applicative)(runSimpleTest)(tests);
+const main = runTests(tests);
 
 void main();
