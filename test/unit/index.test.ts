@@ -1,18 +1,18 @@
 import { either, io, option, readonlyArray, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import { runSimpleTest, simpleTest } from '../../src/simple-test';
+import { runSimpleTest, simpleTest as test } from '../../src/simple-test';
 import { filterStackWithTests } from '../../src/test';
-import { test, exportScopeTests, flattenTests } from '../../src/test/util';
+import { exportScopeTests, flattenTests, test as bxbTest } from '../../src/test/util';
 
 const tests = [
-  simpleTest({
+  test({
     name: 'exportScopeTests adds prefix to test name',
     expect: async () =>
       pipe(
         exportScopeTests({
           foo: {
-            test001: test({
+            test001: bxbTest({
               name: 'bar',
               stack: {},
               expect: () => taskEither.of('result'),
@@ -20,19 +20,19 @@ const tests = [
             }),
           },
         }),
-        readonlyArray.map((test) => test.name)
+        readonlyArray.map((t) => t.name)
       ),
     toResult: ['foo > bar'],
   }),
 
-  simpleTest({
+  test({
     name: 'flattenTests flattens test',
     expect: async () =>
       pipe(
         flattenTests({
           fooModule: {
             tests: [
-              test({
+              bxbTest({
                 name: 'bar',
                 stack: {},
                 expect: () => taskEither.of('result'),
@@ -41,12 +41,12 @@ const tests = [
             ],
           },
         }),
-        readonlyArray.map((test) => test.name)
+        readonlyArray.map((t) => t.name)
       ),
     toResult: ['fooModule > bar'],
   }),
 
-  simpleTest({
+  test({
     name: 'filterStackWithTests includes tests with exact same stack',
     expect: async () =>
       pipe(
@@ -59,19 +59,19 @@ const tests = [
           },
         },
         filterStackWithTests([
-          test({
+          bxbTest({
             name: 'getDoc & upsertDoc',
             stack: { client: { db: { getDoc: true, upsertDoc: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
         ]),
-        readonlyArray.map((test) => test.name)
+        readonlyArray.map((t) => t.name)
       ),
     toResult: ['getDoc & upsertDoc'],
   }),
 
-  simpleTest({
+  test({
     name: 'filterStackWithTests includes tests which stack is subset',
     expect: async () =>
       pipe(
@@ -84,19 +84,19 @@ const tests = [
           },
         },
         filterStackWithTests([
-          test({
+          bxbTest({
             name: 'getDoc',
             stack: { client: { db: { getDoc: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
         ]),
-        readonlyArray.map((test) => test.name)
+        readonlyArray.map((t) => t.name)
       ),
     toResult: ['getDoc'],
   }),
 
-  simpleTest({
+  test({
     name: 'filterStackWithTests does not includes tests which stack is superset',
     expect: async () =>
       pipe(
@@ -109,19 +109,19 @@ const tests = [
           },
         },
         filterStackWithTests([
-          test({
+          bxbTest({
             name: 'getDoc & upsertDoc & getDocWhen',
             stack: { client: { db: { getDoc: true, upsertDoc: true, getDocWhen: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
         ]),
-        readonlyArray.map((test) => test.name)
+        readonlyArray.map((t) => t.name)
       ),
     toResult: [],
   }),
 
-  simpleTest({
+  test({
     name: 'filterStackWithTests filters out tests which stack is not equal nor subset',
     expect: async () =>
       pipe(
@@ -134,26 +134,26 @@ const tests = [
           },
         },
         filterStackWithTests([
-          test({
+          bxbTest({
             name: 'getDoc',
             stack: { client: { db: { getDoc: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-          test({
+          bxbTest({
             name: 'getDoc & upsertDoc',
             stack: { client: { db: { getDoc: true, upsertDoc: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-          test({
+          bxbTest({
             name: 'getDoc & upsertDoc & getDocWhen',
             stack: { client: { db: { getDoc: true, upsertDoc: true, getDocWhen: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
         ]),
-        readonlyArray.map((test) => test.name)
+        readonlyArray.map((t) => t.name)
       ),
     toResult: ['getDoc', 'getDoc & upsertDoc'],
   }),
