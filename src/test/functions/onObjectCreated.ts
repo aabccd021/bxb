@@ -280,7 +280,7 @@ export const test3 = defineTest({
     ci: { deployFunctions: true, deployDb: true },
     server: { db: { upsertDoc: true } },
   },
-  type: 'fail',
+  shouldTimeout: true,
   functionsBuilders: {
     fn1: (server) => ({
       functions: {
@@ -336,7 +336,7 @@ export const test4 = defineTest({
       db: { getDocWhen: true },
     },
   },
-  type: 'fail',
+  shouldTimeout: true,
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
