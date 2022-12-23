@@ -12,14 +12,14 @@ import type { FunctionsBuilder, Stack } from '../type';
 export type Capability = (...p: readonly any[]) => any;
 
 // eslint-disable-next-line no-use-before-define
-export type StackOrCapability = Capability | CapabilitySet;
+export type CapabilitySingleOrSet = Capability | CapabilitySet;
 
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 export type CapabilitySet = {
-  readonly [key: string]: StackOrCapability;
+  readonly [key: string]: CapabilitySingleOrSet;
 };
 
-export type MakeStackOrCapabilityFilter<T extends StackOrCapability> = T extends Capability
+export type MakeCapabilitySingleOrSetFilter<T extends CapabilitySingleOrSet> = T extends Capability
   ? true
   : T extends CapabilitySet
   ? // eslint-disable-next-line no-use-before-define
@@ -27,7 +27,7 @@ export type MakeStackOrCapabilityFilter<T extends StackOrCapability> = T extends
   : never;
 
 export type MakeStackFilter<T extends CapabilitySet> = {
-  readonly [KK in keyof T]?: MakeStackOrCapabilityFilter<T[KK]>;
+  readonly [KK in keyof T]?: MakeCapabilitySingleOrSetFilter<T[KK]>;
 };
 
 export type AnyFilter = {
