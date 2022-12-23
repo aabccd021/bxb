@@ -3,7 +3,7 @@ import { pipe } from 'fp-ts/function';
 
 import { runSimpleTest, simpleTest } from '../../src/simple-test';
 import { filterStackWithTests } from '../../src/test';
-import { defineTest, exportScopeTests, flattenTests } from '../../src/test/util';
+import { test, exportScopeTests, flattenTests } from '../../src/test/util';
 
 const tests = [
   simpleTest({
@@ -12,7 +12,7 @@ const tests = [
       pipe(
         exportScopeTests({
           foo: {
-            test001: defineTest({
+            test001: test({
               name: 'bar',
               stack: {},
               expect: () => taskEither.of('result'),
@@ -32,7 +32,7 @@ const tests = [
         flattenTests({
           fooModule: {
             tests: [
-              defineTest({
+              test({
                 name: 'bar',
                 stack: {},
                 expect: () => taskEither.of('result'),
@@ -59,7 +59,7 @@ const tests = [
           },
         },
         filterStackWithTests([
-          defineTest({
+          test({
             name: 'getDoc & upsertDoc',
             stack: { client: { db: { getDoc: true, upsertDoc: true } } },
             expect: () => taskEither.of('result'),
@@ -84,7 +84,7 @@ const tests = [
           },
         },
         filterStackWithTests([
-          defineTest({
+          test({
             name: 'getDoc',
             stack: { client: { db: { getDoc: true } } },
             expect: () => taskEither.of('result'),
@@ -109,7 +109,7 @@ const tests = [
           },
         },
         filterStackWithTests([
-          defineTest({
+          test({
             name: 'getDoc & upsertDoc & getDocWhen',
             stack: { client: { db: { getDoc: true, upsertDoc: true, getDocWhen: true } } },
             expect: () => taskEither.of('result'),
@@ -134,19 +134,19 @@ const tests = [
           },
         },
         filterStackWithTests([
-          defineTest({
+          test({
             name: 'getDoc',
             stack: { client: { db: { getDoc: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-          defineTest({
+          test({
             name: 'getDoc & upsertDoc',
             stack: { client: { db: { getDoc: true, upsertDoc: true } } },
             expect: () => taskEither.of('result'),
             toResult: either.right('result'),
           }),
-          defineTest({
+          test({
             name: 'getDoc & upsertDoc & getDocWhen',
             stack: { client: { db: { getDoc: true, upsertDoc: true, getDocWhen: true } } },
             expect: () => taskEither.of('result'),

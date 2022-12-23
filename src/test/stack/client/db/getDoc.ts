@@ -1,9 +1,9 @@
 import { either, option, task, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import { defineTest } from '../../../util';
+import { test } from '../../../util';
 
-export const test0001 = defineTest({
+export const test0001 = test({
   name: 'can get doc created with client.db.upsertDoc',
   stack: {
     client: { db: { upsertDoc: true, getDoc: true } },
@@ -31,7 +31,7 @@ export const test0001 = defineTest({
   toResult: either.right(option.some({ name: 'masumoto' })),
 });
 
-export const test0002 = defineTest({
+export const test0002 = test({
   name: 'always returns the latest doc state',
   stack: {
     client: { db: { upsertDoc: true, getDoc: true } },
@@ -69,7 +69,7 @@ export const test0002 = defineTest({
   toResult: either.right(option.some({ name: 'dorokatsu' })),
 });
 
-export const test0003 = defineTest({
+export const test0003 = test({
   name: `does not returns doc made by forbidden create doc request done with client.db.upsertDoc`,
   stack: {
     client: { db: { upsertDoc: true, getDoc: true } },
@@ -97,7 +97,7 @@ export const test0003 = defineTest({
   toResult: either.right(option.none),
 });
 
-export const test0004 = defineTest({
+export const test0004 = test({
   name: `does not returns doc made by forbidden update doc request done with client.db.upsertDoc`,
   stack: {
     client: { db: { upsertDoc: true, getDoc: true } },
@@ -131,7 +131,7 @@ export const test0004 = defineTest({
   toResult: either.right(option.some({ name: 'masumoto' })),
 });
 
-export const test0005 = defineTest({
+export const test0005 = test({
   name: 'returns ForbiddedError if forbidden',
   stack: {
     client: { db: { upsertDoc: true, getDoc: true } },
@@ -159,7 +159,7 @@ export const test0005 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.getDoc' }),
 });
 
-export const test0006 = defineTest({
+export const test0006 = test({
   name: 'returns ForbiddedError if forbidden, even if the doc absent',
   stack: {
     client: { db: { getDoc: true } },
@@ -176,7 +176,7 @@ export const test0006 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.getDoc' }),
 });
 
-export const test0007 = defineTest({
+export const test0007 = test({
   name: 'can get doc created by server.db.upsertDoc',
   stack: {
     server: { db: { upsertDoc: true } },
@@ -205,7 +205,7 @@ export const test0007 = defineTest({
   toResult: either.right(option.some({ name: 'masumoto' })),
 });
 
-export const test0008 = defineTest({
+export const test0008 = test({
   name: 'can get doc updated by server.db.upsertDoc',
   stack: {
     server: { db: { upsertDoc: true } },

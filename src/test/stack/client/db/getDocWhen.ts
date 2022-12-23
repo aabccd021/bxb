@@ -1,9 +1,9 @@
 import { apply, either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
-import { defineTest } from '../../../util';
+import { test } from '../../../util';
 
-export const test0001 = defineTest({
+export const test0001 = test({
   name: 'can return doc after a doc is created with client.db.upsertDoc',
   stack: {
     client: { db: { upsertDoc: true, getDocWhen: true } },
@@ -36,7 +36,7 @@ export const test0001 = defineTest({
   toResult: either.right({ name: 'masumoto' }),
 });
 
-export const test0002 = defineTest({
+export const test0002 = test({
   name: 'can return doc after a doc is updated with client.db.upsertDoc',
   stack: {
     client: { db: { upsertDoc: true, getDocWhen: true } },
@@ -79,7 +79,7 @@ export const test0002 = defineTest({
   toResult: either.right({ name: 'dorokatsu' }),
 });
 
-export const test0003 = defineTest({
+export const test0003 = test({
   name: 'returns ForbiddedError if forbidden',
   stack: {
     client: { db: { upsertDoc: true, getDocWhen: true } },
@@ -109,7 +109,7 @@ export const test0003 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.getDocWhen' }),
 });
 
-export const test0004 = defineTest({
+export const test0004 = test({
   name: 'client.db.getDoc returns Forbidden if forbidden and document absent',
   stack: {
     client: { db: { getDocWhen: true } },
@@ -128,7 +128,7 @@ export const test0004 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.getDocWhen' }),
 });
 
-export const test0005 = defineTest({
+export const test0005 = test({
   name: 'can return doc after a doc is created with server.db.upsertDoc',
   stack: {
     server: { db: { upsertDoc: true } },
@@ -162,7 +162,7 @@ export const test0005 = defineTest({
   toResult: either.right({ name: 'masumoto' }),
 });
 
-export const test0006 = defineTest({
+export const test0006 = test({
   name: 'can return a doc is created with async client.db.upsertDoc',
   stack: {
     client: { db: { upsertDoc: true, getDocWhen: true } },
@@ -198,7 +198,7 @@ export const test0006 = defineTest({
   toResult: either.right({ name: 'masumoto' }),
 });
 
-export const test0007 = defineTest({
+export const test0007 = test({
   name: 'can return a doc updated with async client.db.upsertDoc',
   stack: {
     client: { db: { upsertDoc: true, getDocWhen: true } },
@@ -249,7 +249,7 @@ export const test0007 = defineTest({
   toResult: either.right({ name: 'dorokatsu' }),
 });
 
-export const test0008 = defineTest({
+export const test0008 = test({
   name: 'can return a doc is created with async server.db.upsertDoc',
   stack: {
     server: { db: { upsertDoc: true } },
@@ -286,7 +286,7 @@ export const test0008 = defineTest({
   toResult: either.right({ name: 'masumoto' }),
 });
 
-export const test0009 = defineTest({
+export const test0009 = test({
   name: 'can return a doc updated with async server.db.upsertDoc',
   stack: {
     server: { db: { upsertDoc: true } },

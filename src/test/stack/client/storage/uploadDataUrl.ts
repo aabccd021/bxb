@@ -1,9 +1,9 @@
 import { either, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import { defineTest } from '../../../util';
+import { test } from '../../../util';
 
-export const test0001 = defineTest({
+export const test0001 = test({
   name: 'can upload base64 data url',
   stack: {
     ci: { deployStorage: true },
@@ -23,7 +23,7 @@ export const test0001 = defineTest({
   toResult: either.right('upload success'),
 });
 
-export const test0002 = defineTest({
+export const test0002 = test({
   name: 'can plain text data url',
   stack: {
     ci: { deployStorage: true },
@@ -40,7 +40,7 @@ export const test0002 = defineTest({
   toResult: either.right('upload success'),
 });
 
-export const test0003 = defineTest({
+export const test0003 = test({
   name: 'returns InvalidDataUrlFormat when invalid data url is uploaded',
   stack: {
     ci: { deployStorage: true },
@@ -59,7 +59,7 @@ export const test0003 = defineTest({
   }),
 });
 
-export const test0004 = defineTest({
+export const test0004 = test({
   name: 'returns Forbidden when create security rule not specified',
   stack: {
     ci: { deployStorage: true },
@@ -78,7 +78,7 @@ export const test0004 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
-export const test0005 = defineTest({
+export const test0005 = test({
   name: 'can upload base64 data url less than constraint',
   stack: {
     ci: { deployStorage: true },
@@ -107,7 +107,7 @@ export const test0005 = defineTest({
   toResult: either.right('upload success'),
 });
 
-export const test0006 = defineTest({
+export const test0006 = test({
   name: 'returns Forbidden error if uploaded a base64 data url larger than constraint',
   stack: {
     ci: { deployStorage: true },
@@ -135,7 +135,7 @@ export const test0006 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
-export const test0007 = defineTest({
+export const test0007 = test({
   name: 'can upload plain text data url less than constraint',
   stack: {
     ci: { deployStorage: true },
@@ -161,7 +161,7 @@ export const test0007 = defineTest({
   toResult: either.right('upload success'),
 });
 
-export const test0008 = defineTest({
+export const test0008 = test({
   name: 'returns Forbidden error if uploaded a plain text data url larger than constraint',
   stack: {
     ci: { deployStorage: true },
@@ -186,7 +186,7 @@ export const test0008 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
-export const test0009 = defineTest({
+export const test0009 = test({
   name: 'can upload if auth uid equals to document field which document id equals to object id',
   stack: {
     server: { db: { upsertDoc: true } },
@@ -239,7 +239,7 @@ export const test0009 = defineTest({
   toResult: either.right('upload success'),
 });
 
-export const test0010 = defineTest({
+export const test0010 = test({
   name: 'returns Forbidden error if not signed in but required in rule',
   stack: {
     server: { db: { upsertDoc: true } },
@@ -295,7 +295,7 @@ export const test0010 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
-export const test0011 = defineTest({
+export const test0011 = test({
   name: 'returns Forbidden error if object document does not exists',
   stack: {
     ci: { deployStorage: true },
@@ -340,7 +340,7 @@ export const test0011 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
-export const test0012 = defineTest({
+export const test0012 = test({
   name: 'returns Forbidden error if object document field does not exists',
   stack: {
     server: { db: { upsertDoc: true } },
@@ -389,7 +389,7 @@ export const test0012 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.storage.uploadDataUrl' }),
 });
 
-export const test0013 = defineTest({
+export const test0013 = test({
   name: 'returns Forbidden error if object document field value is not auth uid',
   stack: {
     server: { db: { upsertDoc: true } },

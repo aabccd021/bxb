@@ -1,9 +1,9 @@
 import { either, option, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
-import { defineTest, toFunctionsPath } from '../util';
+import { test, toFunctionsPath } from '../util';
 
-export const test1 = defineTest({
+export const test1 = test({
   name: `onObjectCreated trigger params contains object id with client.storage.uploadDataUrlAwaitFunctions`,
   stack: {
     client: {
@@ -72,7 +72,7 @@ export const test1 = defineTest({
   toResult: either.right({ exists: 'true' }),
 });
 
-export const test14 = defineTest({
+export const test14 = test({
   name: `uploadDataUrl should wait all functions to be finised with client.storage.uploadDataUrlAwaitFunctions`,
   stack: {
     ci: {
@@ -138,7 +138,7 @@ export const test14 = defineTest({
   toResult: either.right(option.some({ exists: 'true' })),
 });
 
-export const test2 = defineTest({
+export const test2 = test({
   name: `onObjectCreated trigger params contains object id`,
   stack: {
     ci: {
@@ -207,7 +207,7 @@ export const test2 = defineTest({
   toResult: either.right({ exists: 'true' }),
 });
 
-export const test24 = defineTest({
+export const test24 = test({
   name: `uploadDataUrl should not wait functions to be finished`,
   stack: {
     client: {
@@ -273,7 +273,7 @@ export const test24 = defineTest({
   toResult: either.right(option.none),
 });
 
-export const test3 = defineTest({
+export const test3 = test({
   name: `onObjectCreated trigger should not be called if not triggered`,
   stack: {
     client: { db: { getDocWhen: true } },
@@ -327,7 +327,7 @@ export const test3 = defineTest({
   toResult: either.right({ exists: 'true' }),
 });
 
-export const test4 = defineTest({
+export const test4 = test({
   name: `document should not be created if trigger not deployed`,
   stack: {
     ci: { deployDb: true },

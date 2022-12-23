@@ -1,9 +1,9 @@
 import { either, option, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import { defineTest } from '../../../util';
+import { test } from '../../../util';
 
-export const test0002 = defineTest({
+export const test0002 = test({
   name: 'can upsert and get doc',
   stack: {
     server: { db: { upsertDoc: true, getDoc: true } },
@@ -31,7 +31,7 @@ export const test0002 = defineTest({
   toResult: either.right(option.some({ name: 'masumoto' })),
 });
 
-export const test0003 = defineTest({
+export const test0003 = test({
   name: 'can get doc even if client.db.getDoc is forbidden by security rule',
   stack: {
     server: { db: { upsertDoc: true, getDoc: true } },
@@ -59,7 +59,7 @@ export const test0003 = defineTest({
   toResult: either.right(option.some({ name: 'masumoto' })),
 });
 
-export const test0004 = defineTest({
+export const test0004 = test({
   name: 'can get doc if forbidden, even if client.db.getDoc is the doc absent',
   stack: {
     server: { db: { getDoc: true } },
@@ -76,7 +76,7 @@ export const test0004 = defineTest({
   toResult: either.right(option.none),
 });
 
-export const test0005 = defineTest({
+export const test0005 = test({
   name: 'can get doc created with client.db.usertDoc',
   stack: {
     server: { db: { getDoc: true } },
@@ -105,7 +105,7 @@ export const test0005 = defineTest({
   toResult: either.right(option.some({ name: 'masumoto' })),
 });
 
-export const test0006 = defineTest({
+export const test0006 = test({
   name: 'can get doc updated with client.db.upsertDoc',
   stack: {
     server: { db: { getDoc: true } },

@@ -1,9 +1,9 @@
 import { either, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import { defineTest } from '../../../util';
+import { test } from '../../../util';
 
-export const test0001 = defineTest({
+export const test0001 = test({
   name: 'returns Forbidden when creating doc if create rule is not specified',
   stack: {
     ci: { deployDb: true },
@@ -25,7 +25,7 @@ export const test0001 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
 });
 
-export const test0002 = defineTest({
+export const test0002 = test({
   name: 'returns Forbidden when updating doc if update rule is not specified',
   stack: {
     ci: { deployDb: true },
@@ -58,7 +58,7 @@ export const test0002 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
 });
 
-export const test0003 = defineTest({
+export const test0003 = test({
   name: 'can create doc',
   stack: {
     ci: { deployDb: true },
@@ -86,7 +86,7 @@ export const test0003 = defineTest({
   toResult: either.right('upload success'),
 });
 
-export const test0004 = defineTest({
+export const test0004 = test({
   name: 'returns Forbidden when creating doc if string given when int field required',
   stack: {
     ci: { deployDb: true },
@@ -113,7 +113,7 @@ export const test0004 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
 });
 
-export const test0005 = defineTest({
+export const test0005 = test({
   name: 'returns Forbidden when creating doc if int given when string field required',
   stack: {
     ci: { deployDb: true },
@@ -137,7 +137,7 @@ export const test0005 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
 });
 
-export const test0006 = defineTest({
+export const test0006 = test({
   name: 'returns Forbidden when creating doc if schema not specified',
   stack: {
     ci: { deployDb: true },
@@ -159,7 +159,7 @@ export const test0006 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
 });
 
-export const test0007 = defineTest({
+export const test0007 = test({
   name: `can create doc if owner field value is owner's auth uid`,
   stack: {
     ci: { deployDb: true },
@@ -201,7 +201,7 @@ export const test0007 = defineTest({
   toResult: either.right('upsert success'),
 });
 
-export const test0008 = defineTest({
+export const test0008 = test({
   name: `returns ForbidenError if owner field value is not owner's auth uid, even if signed in`,
   stack: {
     ci: { deployDb: true },
@@ -242,7 +242,7 @@ export const test0008 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
 });
 
-export const test0009 = defineTest({
+export const test0009 = test({
   name: `returns Forbidden if not signed in`,
   stack: {
     ci: { deployDb: true },
@@ -274,7 +274,7 @@ export const test0009 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.db.upsertDoc' }),
 });
 
-export const test0010 = defineTest({
+export const test0010 = test({
   name: `returns Forbidden if not signed in, swap comparation`,
   stack: {
     ci: { deployDb: true },

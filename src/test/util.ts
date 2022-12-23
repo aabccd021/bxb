@@ -103,7 +103,7 @@ export type DefineSingleTest = <S extends StackFilter, E, T>(t: {
   readonly retry?: number;
 }) => SingleTest;
 
-export const defineTest: DefineSingleTest = (t) => ({ ...t, type: 'single' } as SingleTest);
+export const test: DefineSingleTest = (t) => ({ ...t, type: 'single' } as SingleTest);
 
 export const toFunctionsPath = std.string.replaceAll('bxb/dist/es6')('bxb/dist/cjs');
 
