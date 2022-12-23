@@ -40,23 +40,32 @@ export type StackFromFilter<S extends StackFilter> = DeepPick<Stack.Type, S>;
 
 export type AnyStack = DeepPartial<Stack.Type>;
 
-export type Test<S extends StackFilter = StackFilter, E = unknown, T = unknown> = {
+export type Test = {
+  readonly stack: AnyFilter;
+  readonly name: string;
+  readonly expect: (stack: unknown) => TaskEither<unknown, unknown>;
+  readonly toResult: Either<unknown, unknown>;
+  readonly shouldTimeout?: true;
+  readonly timeOut?: number;
+  readonly functionsBuilders?: ReadonlyRecord<string, unknown>;
+  readonly retry?: number;
+};
+
+export type DefineTest = <S extends StackFilter, E, T>(t: {
   readonly stack: S;
   readonly name: string;
   readonly expect: (stack: StackFromFilter<S>) => TaskEither<E, T>;
   readonly toResult: Either<E, T>;
-  readonly type?: 'fail';
+  readonly shouldTimeout?: true;
   readonly timeOut?: number;
   readonly functionsBuilders?: ReadonlyRecord<
     string,
     FunctionsBuilder<StackFromFilter<S> extends { readonly server: infer SE } ? SE : never>
   >;
   readonly retry?: number;
-};
+}) => Test;
 
-export const defineTest = <S extends StackFilter = StackFilter, E = unknown, T = unknown>(
-  t: Test<S, E, T>
-) => t;
+export const defineTest: DefineTest = (t) => t as Test;
 
 export const toFunctionsPath = std.string.replaceAll('bxb/dist/es6')('bxb/dist/cjs');
 

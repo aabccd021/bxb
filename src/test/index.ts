@@ -10,7 +10,7 @@ import type { AnyFilter, AnyStack, CapabilitySet, StackFilter, Test } from './ut
 import { flattenTests } from './util';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type RunTest = (getStack: TaskEither<unknown, AnyStack>) => (test: Test<{}>) => IO<void>;
+type RunTest = (getStack: TaskEither<unknown, AnyStack>) => (test: Test) => IO<void>;
 
 export const runTest: RunTest = (getStack) => (test) =>
   runSimpleTest({
