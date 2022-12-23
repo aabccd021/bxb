@@ -81,5 +81,5 @@ test(
     const largerStackPageSize = await getPageSize({ production: 'larger', def: 'smaller' });
     expect(smallerStackPageSize).lessThan(largerStackPageSize);
   },
-  { timeout: 60000 }
+  { timeout: 90000 }
 );

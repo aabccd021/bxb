@@ -10,7 +10,8 @@
   "ignorePatterns": [
     "dist/",
     "node_modules",
-    "e2e/framework/nextjs"
+    "test/app-nextjs-treeshaking-capability",
+    "test/app-nextjs-treeshaking-stack"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
