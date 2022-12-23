@@ -12,7 +12,7 @@
     "test-codegen-custom": "echo b",
     "test-app-nextjs-treeshaking-capability": "vitest --run test/app-nextjs-treeshaking-capability",
     "test-app-nextjs-treeshaking-stack": "vitest --run test/app-nextjs-treeshaking-stack",
-    "test-unit": "vitest --run test/unit"
+    "test-unit": "tsc --noEmit && vitest --run test/unit"
   },
   "sideEffects": false,
   "name": "bxb",

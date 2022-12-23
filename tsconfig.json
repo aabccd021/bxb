@@ -33,7 +33,7 @@
   },
   "include": [
     "src",
-    "test",
+    "test/unit",
     "vitest.config.ts"
   ]
 }
