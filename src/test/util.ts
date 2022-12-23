@@ -117,7 +117,7 @@ export const exportScopeTests = (scopeTests: ScopeTests): readonly Test[] =>
     readonlyRecord.mapWithIndex((capabilityName, capabilityTests) =>
       pipe(
         capabilityTests,
-        readonlyRecord.map((test) => ({ ...test, name: `${capabilityName} > ${test.name}` })),
+        readonlyRecord.map((t) => ({ ...t, name: `${capabilityName} > ${t.name}` })),
         readonlyRecord.toReadonlyArray,
         readonlyArray.map(readonlyTuple.snd)
       )
@@ -134,10 +134,7 @@ export const flattenTests = (
     readonlyRecord.mapWithIndex((scopeName, scopeTests) =>
       pipe(
         scopeTests.tests,
-        readonlyArray.map((test) => ({
-          ...test,
-          name: `${scopeName} > ${test.name}`,
-        }))
+        readonlyArray.map((t) => ({ ...t, name: `${scopeName} > ${t.name}` }))
       )
     ),
     readonlyRecord.toReadonlyArray,
