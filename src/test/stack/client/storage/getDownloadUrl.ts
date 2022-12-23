@@ -3,9 +3,9 @@ import { pipe } from 'fp-ts/function';
 
 const fetch = (url: string) => import('node-fetch').then(({ default: _fetch }) => _fetch(url));
 
-import { defineTest } from '../../../util';
+import { test } from '../../../util';
 
-export const test0001 = defineTest({
+export const test0001 = test({
   name: 'can get download url of base64 uploaded with client.storage.getDownloadUrl',
   stack: {
     ci: { deployStorage: true },
@@ -31,7 +31,7 @@ export const test0001 = defineTest({
   toResult: either.right('kira masumoto'),
 });
 
-export const test0002 = defineTest({
+export const test0002 = test({
   name: 'can get download url of plain text uploaded with client.storage.getDownloadUrl',
   stack: {
     ci: { deployStorage: true },
@@ -54,7 +54,7 @@ export const test0002 = defineTest({
   toResult: either.right('kira masumoto'),
 });
 
-export const test0003 = defineTest({
+export const test0003 = test({
   name: 'returns Forbidden if not allowed',
   stack: {
     ci: { deployStorage: true },
@@ -73,7 +73,7 @@ export const test0003 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.storage.getDownloadUrl' }),
 });
 
-export const test0004 = defineTest({
+export const test0004 = test({
   name: 'returns Forbidden if not allowed even if the object is absent',
   stack: {
     ci: { deployStorage: true },
@@ -87,7 +87,7 @@ export const test0004 = defineTest({
   toResult: either.left({ code: 'Forbidden', capability: 'client.storage.getDownloadUrl' }),
 });
 
-export const test0005 = defineTest({
+export const test0005 = test({
   name: 'can get download url of base64 uploaded with async client.storage.getDownloadUrl',
   stack: {
     ci: { deployStorage: true },
@@ -116,7 +116,7 @@ export const test0005 = defineTest({
   toResult: either.right('kira masumoto'),
 });
 
-export const test0006 = defineTest({
+export const test0006 = test({
   name: 'can get download url of plain text uploaded with async client.storage.getDownloadUrl',
   stack: {
     ci: { deployStorage: true },

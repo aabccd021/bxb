@@ -1,16 +1,16 @@
 import { either, option, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import { defineTest } from '../../../util';
+import { test } from '../../../util';
 
-export const test0001 = defineTest({
+export const test0001 = test({
   name: 'returns signed out as default auth state',
   stack: { client: { auth: { getAuthState: true } } },
   expect: ({ client }) => client.auth.getAuthState,
   toResult: either.right(option.none),
 });
 
-export const test0002 = defineTest({
+export const test0002 = test({
   name: 'returns singed in state after client.auth.createUserAndSignInWithEmailAndPassword',
   stack: {
     client: {
@@ -29,7 +29,7 @@ export const test0002 = defineTest({
   toResult: either.right(option.some('some auth state')),
 });
 
-export const test0003 = defineTest({
+export const test0003 = test({
   name: `returns authUser uid same as the one returned from client.auth.createUserAndSignInWithEmailAndPassword`,
   stack: {
     client: { auth: { createUserAndSignInWithEmailAndPassword: true, getAuthState: true } },
@@ -54,7 +54,7 @@ export const test0003 = defineTest({
   toResult: either.right(option.some(true)),
 });
 
-export const test0004 = defineTest({
+export const test0004 = test({
   name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut`,
   stack: {
     client: {

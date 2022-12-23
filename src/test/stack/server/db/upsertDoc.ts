@@ -1,9 +1,9 @@
 import { either, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-import { defineTest } from '../../../util';
+import { test } from '../../../util';
 
-export const test0001 = defineTest({
+export const test0001 = test({
   name: 'can upsert doc',
   stack: {
     server: { db: { upsertDoc: true } },
@@ -31,7 +31,7 @@ export const test0001 = defineTest({
   toResult: either.right('upload success'),
 });
 
-export const test0002 = defineTest({
+export const test0002 = test({
   name: 'can upsert doc even if client.db.upserDoc is forbidden by security rule',
   stack: {
     server: { db: { upsertDoc: true } },
@@ -59,7 +59,7 @@ export const test0002 = defineTest({
   toResult: either.right('upload success'),
 });
 
-export const test0003 = defineTest({
+export const test0003 = test({
   name: `can create doc even if not signed in`,
   stack: {
     server: { db: { upsertDoc: true } },

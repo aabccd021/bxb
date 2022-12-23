@@ -6,9 +6,9 @@ import type { Either } from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 
 import type { DocData } from '../../../../type';
-import { defineTest } from '../../../util';
+import { test } from '../../../util';
 
-export const test0010 = defineTest({
+export const test0010 = test({
   name: 'can return a doc is created with client.db.upsertDoc',
   stack: {
     client: { db: { upsertDoc: true, onSnapshot: true } },
@@ -49,7 +49,7 @@ export const test0010 = defineTest({
   toResult: either.right({ name: 'masumoto' }),
 });
 
-export const test0001 = defineTest({
+export const test0001 = test({
   name: 'can return a doc updated with client.db.upsertDoc',
   stack: {
     client: { db: { upsertDoc: true, onSnapshot: true } },
@@ -100,7 +100,7 @@ export const test0001 = defineTest({
   toResult: either.right({ name: 'dorokatsu' }),
 });
 
-export const test0002 = defineTest({
+export const test0002 = test({
   name: 'returns ForbiddedError if forbidden',
   stack: {
     client: { db: { upsertDoc: true, onSnapshot: true } },
@@ -141,7 +141,7 @@ export const test0002 = defineTest({
   toResult: either.left({ code: 'Forbidden' }),
 });
 
-export const test0003 = defineTest({
+export const test0003 = test({
   name: 'returns Forbidden if forbidden and document absent',
   stack: {
     client: { db: { onSnapshot: true } },
@@ -171,7 +171,7 @@ export const test0003 = defineTest({
   toResult: either.left({ code: 'Forbidden' }),
 });
 
-export const test0004 = defineTest({
+export const test0004 = test({
   name: 'can return a doc created with server.db.upsertDoc',
   stack: {
     client: { db: { onSnapshot: true } },
@@ -213,7 +213,7 @@ export const test0004 = defineTest({
   toResult: either.right({ name: 'masumoto' }),
 });
 
-export const test0005 = defineTest({
+export const test0005 = test({
   name: 'can return a doc updated with server.db.upsertDoc',
   stack: {
     client: { db: { onSnapshot: true } },
@@ -261,7 +261,7 @@ export const test0005 = defineTest({
   toResult: either.right({ name: 'dorokatsu' }),
 });
 
-export const test0006 = defineTest({
+export const test0006 = test({
   name: 'can return a doc is created with async client.db.upsertDoc',
   stack: {
     client: { db: { upsertDoc: true, onSnapshot: true } },
@@ -305,7 +305,7 @@ export const test0006 = defineTest({
   toResult: either.right({ name: 'masumoto' }),
 });
 
-export const test0007 = defineTest({
+export const test0007 = test({
   name: 'can return a doc updated with async client.db.upsertDoc',
   stack: {
     client: { db: { upsertDoc: true, onSnapshot: true } },
@@ -365,7 +365,7 @@ export const test0007 = defineTest({
   toResult: either.right({ name: 'dorokatsu' }),
 });
 
-export const test0008 = defineTest({
+export const test0008 = test({
   name: 'can return a doc is created with async server.db.upsertDoc',
   stack: {
     client: { db: { onSnapshot: true } },
@@ -410,7 +410,7 @@ export const test0008 = defineTest({
   toResult: either.right({ name: 'masumoto' }),
 });
 
-export const test0009 = defineTest({
+export const test0009 = test({
   name: 'can return a doc updated with async server.db.upsertDoc',
   stack: {
     client: { db: { onSnapshot: true } },

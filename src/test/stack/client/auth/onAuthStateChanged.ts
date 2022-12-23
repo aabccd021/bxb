@@ -2,9 +2,9 @@ import { either, ioRef, option, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
 import type { AuthState } from '../../../..';
-import { defineTest } from '../../../util';
+import { test } from '../../../util';
 
-export const test0001 = defineTest({
+export const test0001 = test({
   name: 'returns signed out as default auth state',
   stack: { client: { auth: { onAuthStateChanged: true } } },
   expect: ({ client }) =>
@@ -20,7 +20,7 @@ export const test0001 = defineTest({
   toResult: either.right(option.none),
 });
 
-export const test0002 = defineTest({
+export const test0002 = test({
   name: 'returns singed in state after client.auth.createUserAndSignInWithEmailAndPassword',
   stack: {
     client: {
@@ -50,7 +50,7 @@ export const test0002 = defineTest({
   toResult: either.right(option.some('some auth state')),
 });
 
-export const test0003 = defineTest({
+export const test0003 = test({
   name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut then subscribe`,
   stack: {
     client: {
@@ -81,7 +81,7 @@ export const test0003 = defineTest({
   toResult: either.right(option.none),
 });
 
-export const test0004 = defineTest({
+export const test0004 = test({
   name: `returns singed out state after subscribe and client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut`,
   stack: {
     client: {
@@ -112,7 +112,7 @@ export const test0004 = defineTest({
   toResult: either.right(option.none),
 });
 
-export const test0005 = defineTest({
+export const test0005 = test({
   name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then subscribe then client.auth.signOut`,
   stack: {
     client: {
@@ -143,7 +143,7 @@ export const test0005 = defineTest({
   toResult: either.right(option.none),
 });
 
-export const test0006 = defineTest({
+export const test0006 = test({
   name: 'does not call onAuthStateChanged callback after unsubscribed',
   stack: {
     client: {
