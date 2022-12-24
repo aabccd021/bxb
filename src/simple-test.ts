@@ -60,16 +60,6 @@ export const testsApplicative = taskEither.getApplicativeTaskValidation(
   readonlyArray.getSemigroup<unknown>()
 );
 
-export const withMaxConcurrency =
-  (maxConcurrency: number) =>
-  <A>(tasks: readonly Task<A>[]): Task<readonly A[]> =>
-    pipe(maxConcurrency, pLimit, (limit) =>
-      pipe(
-        tasks,
-        readonlyArray.traverse(task.ApplicativePar)((t) => () => limit(t))
-      )
-    );
-
 const runAssertion = <T>(test: {
   readonly name: string;
   readonly expect: Task<T>;
@@ -89,7 +79,7 @@ const runAssertion = <T>(test: {
     withTimeout(either.left(['timed out'] as readonly unknown[]), test.timeout ?? 5000)
   );
 
-const runTest = (test: Test) => (): TaskEither<readonly unknown[], unknown> =>
+const runTestWithoutRetry = (test: Test) => (): TaskEither<readonly unknown[], unknown> =>
   match(test)
     .with({ type: 'single' }, runAssertion)
     .with({ type: 'sequential' }, (t) =>
@@ -112,16 +102,46 @@ const getRetryPolicy = (test: Test) =>
     .with({ type: 'sequential' }, () => retry.limitRetries(0))
     .exhaustive();
 
-export const runTests = (p: { readonly maxConcurrency: number }) =>
-  flow(
-    readonlyArray.map((test: Test) => retrying(getRetryPolicy(test), runTest(test), either.isLeft)),
-    withMaxConcurrency(p.maxConcurrency),
-    task.map(
-      readonlyArray.sequence(either.getApplicativeValidation(readonlyArray.getSemigroup<unknown>()))
-    )
-  );
+export const maxConcurrency = flow(
+  pLimit,
+  (limiter) =>
+    <A>(t: Task<A>) =>
+    () =>
+      limiter(t)
+);
 
-export type RunTests = typeof runTests;
+export const runParallelWithConcurrency = (concurrency: number) =>
+  readonlyArray.traverse(task.ApplicativePar)(maxConcurrency(concurrency));
+
+export const runParallel = readonlyArray.sequence(task.ApplicativePar);
+
+export const runSequential = readonlyArray.sequence(task.ApplicativeSeq);
+
+// eslint-disable-next-line functional/no-return-void
+export const setExitCode = (code: number) => () => {
+  // eslint-disable-next-line functional/immutable-data, functional/no-expression-statement
+  process.exitCode = code;
+};
+
+export const runTest = (test: Test) =>
+  retrying(getRetryPolicy(test), runTestWithoutRetry(test), either.isLeft);
+
+export const aggregateErrors = task.map(
+  readonlyArray.sequence(either.getApplicativeValidation(readonlyArray.getSemigroup<unknown>()))
+);
+
+export const logAndThrowOnError = flow(
+  taskEither.swap,
+  taskEither.chainIOK(console.error),
+  taskEither.chainIOK(() => setExitCode(1))
+);
+
+export const getTestTasks = readonlyArray.map(runTest);
+
+export const runTests = flow(getTestTasks, runParallel, aggregateErrors, logAndThrowOnError);
+
+export const runTestsWithMaxConcurrency = (concurrency: number) =>
+  flow(getTestTasks, runParallelWithConcurrency(concurrency), aggregateErrors, logAndThrowOnError);
 
 export const simpleTest = <T>(t: Omit<SingleTest<T>, 'type'>): SingleTest<T> => ({
   ...t,
