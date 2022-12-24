@@ -27,7 +27,7 @@ const tests = [
         }),
         readonlyArray.map((t) => t.name)
       ),
-    toResult: ['foo > bar'],
+    toResult: ['fo > bar'],
   }),
 
   test({
@@ -53,52 +53,50 @@ const tests = [
 
   test({
     name: 'filterStackWithTests includes single tests with exact same stack',
-    expect: async () =>
-      pipe(
-        {
-          client: {
-            db: {
-              getDoc: () => taskEither.of(option.none),
-              upsertDoc: () => taskEither.right(undefined),
-            },
+    expect: pipe(
+      taskEither.right({
+        client: {
+          db: {
+            getDoc: () => taskEither.of(option.none),
+            upsertDoc: () => taskEither.right(undefined),
           },
         },
-        filterStackWithTests([
-          singleTest({
-            name: 'getDoc & upsertDoc',
-            stack: { client: { db: { getDoc: true, upsertDoc: true } } },
-            expect: () => taskEither.of('result'),
-            toResult: either.right('result'),
-          }),
-        ]),
-        readonlyArray.map((t) => t.name)
-      ),
-    toResult: ['getDoc & upsertDoc'],
+      }),
+      filterStackWithTests([
+        singleTest({
+          name: 'getDoc & upsertDoc',
+          stack: { client: { db: { getDoc: true, upsertDoc: true } } },
+          expect: () => taskEither.of('result'),
+          toResult: either.right('result'),
+        }),
+      ]),
+      taskEither.map(readonlyArray.map((t) => t.name))
+    ),
+    toResult: either.right(['getDoc & upsertDoc']),
   }),
 
   test({
     name: 'filterStackWithTests includes single tests which stack is subset',
-    expect: async () =>
-      pipe(
-        {
-          client: {
-            db: {
-              getDoc: () => taskEither.of(option.none),
-              upsertDoc: () => taskEither.right(undefined),
-            },
+    expect: pipe(
+      taskEither.right({
+        client: {
+          db: {
+            getDoc: () => taskEither.of(option.none),
+            upsertDoc: () => taskEither.right(undefined),
           },
         },
-        filterStackWithTests([
-          singleTest({
-            name: 'getDoc',
-            stack: { client: { db: { getDoc: true } } },
-            expect: () => taskEither.of('result'),
-            toResult: either.right('result'),
-          }),
-        ]),
-        readonlyArray.map((t) => t.name)
-      ),
-    toResult: ['getDoc'],
+      }),
+      filterStackWithTests([
+        singleTest({
+          name: 'getDoc',
+          stack: { client: { db: { getDoc: true } } },
+          expect: () => taskEither.of('result'),
+          toResult: either.right('result'),
+        }),
+      ]),
+      taskEither.map(readonlyArray.map((t) => t.name))
+    ),
+    toResult: either.right(['getDoc']),
   }),
 
   test({

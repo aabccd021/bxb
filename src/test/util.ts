@@ -7,6 +7,7 @@ import * as std from 'fp-ts-std';
 import type { DeepPartial, DeepPick } from 'ts-essentials';
 
 import type { FunctionsBuilder, Stack } from '../type';
+import { RetryPolicy } from '../simple-test';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Capability = (...p: readonly any[]) => any;
@@ -86,7 +87,7 @@ export type SingleTest = {
   readonly shouldTimeout?: true;
   readonly timeOut?: number;
   readonly functionsBuilders?: ReadonlyRecord<string, unknown>;
-  readonly retry?: number;
+  readonly retry?: RetryPolicy;
 };
 
 export type DefineSingleTest = <S extends StackFilter, E, T>(t: {
@@ -100,7 +101,7 @@ export type DefineSingleTest = <S extends StackFilter, E, T>(t: {
     string,
     FunctionsBuilder<StackFromFilter<S> extends { readonly server: infer SE } ? SE : never>
   >;
-  readonly retry?: number;
+  readonly retry?: RetryPolicy;
 }) => SingleTest;
 
 export const test: DefineSingleTest = (t) => ({ ...t, type: 'single' } as SingleTest);
