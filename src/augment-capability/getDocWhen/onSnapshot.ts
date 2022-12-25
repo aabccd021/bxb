@@ -2,7 +2,6 @@ import { either, io, ioOption, ioRef, option } from 'fp-ts';
 import { flow, pipe } from 'fp-ts/function';
 import type { Option } from 'fp-ts/Option';
 import type { Task } from 'fp-ts/Task';
-import * as std from 'fp-ts-std';
 
 import type { Stack } from '../..';
 import type { Unsubscribe } from '../../type/client/db/OnSnapshot';
@@ -37,7 +36,6 @@ export const fromOnSnapshot =
             }),
             io.chain(flow(option.some, unsubRef.write))
           )
-        ),
-        std.io.execute
-      )
+        )
+      )()
     );

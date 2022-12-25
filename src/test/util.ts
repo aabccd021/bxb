@@ -3,11 +3,10 @@ import type { Either } from 'fp-ts/Either';
 import { pipe } from 'fp-ts/function';
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import type { TaskEither } from 'fp-ts/TaskEither';
-import * as std from 'fp-ts-std';
 import type { DeepPartial, DeepPick } from 'ts-essentials';
 
+import type { RetryPolicy } from '../simple-test';
 import type { FunctionsBuilder, Stack } from '../type';
-import { RetryPolicy } from '../simple-test';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Capability = (...p: readonly any[]) => any;
@@ -105,8 +104,6 @@ export type DefineSingleTest = <S extends StackFilter, E, T>(t: {
 }) => SingleTest;
 
 export const test: DefineSingleTest = (t) => ({ ...t, type: 'single' } as SingleTest);
-
-export const toFunctionsPath = std.string.replaceAll('bxb/dist/es6')('bxb/dist/cjs');
 
 export type Test = SequentialTest | SingleTest;
 

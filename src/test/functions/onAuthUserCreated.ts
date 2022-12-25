@@ -1,7 +1,7 @@
 import { either, option, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
-import { test, toFunctionsPath } from '../util';
+import { test } from '../util';
 
 export const test2 = test({
   name: `onAuthUserCreated trigger can upsert doc`,
@@ -41,7 +41,7 @@ export const test2 = test({
       taskEither.chainW(() =>
         ci.deployFunctions({
           functions: {
-            filePath: toFunctionsPath(__filename),
+            filePath: __filename,
             exportPath: ['test2', 'functionsBuilders', 'fn1'],
           },
           server,
@@ -106,7 +106,7 @@ export const test3 = test({
       taskEither.chainW(() =>
         ci.deployFunctions({
           functions: {
-            filePath: toFunctionsPath(__filename),
+            filePath: __filename,
             exportPath: ['test3', 'functionsBuilders', 'fn1'],
           },
           server,

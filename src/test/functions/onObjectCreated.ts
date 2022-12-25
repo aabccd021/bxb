@@ -1,7 +1,7 @@
 import { either, option, task, taskEither } from 'fp-ts';
 import { identity, pipe } from 'fp-ts/function';
 
-import { test, toFunctionsPath } from '../util';
+import { test } from '../util';
 
 export const test1 = test({
   name: `onObjectCreated trigger params contains object id with client.storage.uploadDataUrlAwaitFunctions`,
@@ -50,7 +50,7 @@ export const test1 = test({
       taskEither.chainW(() =>
         ci.deployFunctions({
           functions: {
-            filePath: toFunctionsPath(__filename),
+            filePath: __filename,
             exportPath: ['test1', 'functionsBuilders', 'fn1'],
           },
           server,
@@ -119,7 +119,7 @@ export const test14 = test({
       taskEither.chainW(() =>
         ci.deployFunctions({
           functions: {
-            filePath: toFunctionsPath(__filename),
+            filePath: __filename,
             exportPath: ['test14', 'functionsBuilders', 'fn1'],
           },
           server,
@@ -185,7 +185,7 @@ export const test2 = test({
       taskEither.chainW(() =>
         ci.deployFunctions({
           functions: {
-            filePath: toFunctionsPath(__filename),
+            filePath: __filename,
             exportPath: ['test2', 'functionsBuilders', 'fn1'],
           },
           server,
@@ -254,7 +254,7 @@ export const test24 = test({
       taskEither.chainW(() =>
         ci.deployFunctions({
           functions: {
-            filePath: toFunctionsPath(__filename),
+            filePath: __filename,
             exportPath: ['test24', 'functionsBuilders', 'fn1'],
           },
           server,
@@ -311,7 +311,7 @@ export const test3 = test({
       taskEither.chainW(() =>
         ci.deployFunctions({
           functions: {
-            filePath: toFunctionsPath(__filename),
+            filePath: __filename,
             exportPath: ['test3', 'functionsBuilders', 'fn1'],
           },
           server,

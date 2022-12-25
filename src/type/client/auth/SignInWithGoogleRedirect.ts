@@ -1,6 +1,6 @@
 import type { TaskEither } from 'fp-ts/TaskEither';
 
-import type { Provider } from '../../..';
+import type { Provider } from '../..';
 
 export type Error = Provider;
 

@@ -1,8 +1,7 @@
 import type { Option } from 'fp-ts/Option';
 import type { TaskEither } from 'fp-ts/TaskEither';
 
-import type { DocKey } from '../..';
-import type { DocData } from '../..';
+import type { DocData, DocKey } from '../..';
 
 export type Param = { readonly key: DocKey };
 
