@@ -1,5 +1,5 @@
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
-import type { DeepPartial } from 'ts-essentials/dist/types';
+import type { DeepPartial } from 'ts-essentials';
 
 import type { StackWithEnv } from '../type';
 

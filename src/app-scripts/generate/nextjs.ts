@@ -11,7 +11,6 @@ import {
 import { flow, identity, pipe } from 'fp-ts/function';
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import { fs, path } from 'fp-ts-node';
-import * as std from 'fp-ts-std';
 import * as realFs from 'fs/promises';
 import type { DeepPartial } from 'ts-essentials';
 
@@ -29,21 +28,23 @@ const getAllStacks = (param: Param) =>
 
 const methodStr = (scope: string, method: string, param: Param) =>
   pipe(
-    {
+    param,
+    getAllStacks,
+    (stacks) => ({
       stackImports: pipe(
-        getAllStacks(param),
+        stacks,
         readonlyNonEmptyArray.map(
           (stack) => `import { stack as ${stack.name}Stack } from 'bxb-stack-${stack.name}';`
         ),
-        std.readonlyArray.join('\n')
+        readonlyArray.intercalate(string.Monoid)('\n')
       ),
       envImports: pipe(
-        getAllStacks(param),
+        stacks,
         readonlyNonEmptyArray.map(
           (stack) =>
             `import { clientEnv as ${stack.name}ClientEnv } from '../../../bxb-stack-${stack.name}.config';`
         ),
-        std.readonlyArray.join('\n')
+        readonlyArray.intercalate(string.Monoid)('\n')
       ),
       methods: pipe(
         option.fromNullable(param.stacks.env),
@@ -54,9 +55,9 @@ const methodStr = (scope: string, method: string, param: Param) =>
             `process.env.NODE_ENV === '${nodeEnv}' ` +
             `? ${stack.name}Stack.client.${scope}.${method}(${stack.name}ClientEnv) :`
         ),
-        std.readonlyArray.join('\n')
+        readonlyArray.intercalate(string.Monoid)('\n')
       ),
-    },
+    }),
     ({ stackImports, envImports, methods }) =>
       `${stackImports}\n${envImports}\nexport const ${method}` +
       ` = ${methods} ${param.stacks.default.name}Stack.client.${scope}.${method}(${param.stacks.default.name}ClientEnv);`
@@ -113,7 +114,7 @@ const getWriteFiles = (param: Param) =>
           scopes,
           readonlyRecord.keys,
           readonlyArray.map((scope) => `export * as ${scope} from './${scope}';`),
-          std.readonlyArray.join('\n')
+          readonlyArray.intercalate(string.Monoid)('\n')
         ),
       },
       ...pipe(
@@ -122,7 +123,7 @@ const getWriteFiles = (param: Param) =>
           pipe(
             methods,
             readonlyArray.map((method) => `export * from './${method}'`),
-            std.readonlyArray.join('\n'),
+            readonlyArray.intercalate(string.Monoid)('\n'),
             (data) => ({ path: `modules/bxb/${scope}/index.ts`, data })
           )
         ),

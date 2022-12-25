@@ -1,6 +1,6 @@
 import type { TaskEither } from 'fp-ts/TaskEither';
 
-import type { AuthUser, Provider } from '../../..';
+import type { AuthUser, Provider } from '../..';
 
 export type Param = { readonly email: string; readonly password: string };
 

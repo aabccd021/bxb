@@ -20,6 +20,7 @@ specifiers:
   next: ^13.0.4
   node-fetch: ^3.3.0
   p-limit: ^4.0.0
+  pattern-matching-ts: ^2.0.0
   pnpm: ^7.17.0
   retry-ts: ^0.1.4
   semantic-release: ^19.0.5
@@ -43,6 +44,7 @@ dependencies:
   next: 13.0.4_biqbaboplfbrettd7655fr4n2y
   node-fetch: 3.3.0
   p-limit: 4.0.0
+  pattern-matching-ts: 2.0.0
   retry-ts: 0.1.4_fp-ts@2.13.1
   ts-essentials: 9.3.0_typescript@4.9.4
   ts-pattern: 4.0.6
@@ -3569,6 +3571,10 @@ packages:
   /pathval/1.1.1:
     resolution: {integrity: sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==}
     dev: true
+
+  /pattern-matching-ts/2.0.0:
+    resolution: {integrity: sha512-XfNA/wZ1A92Ps+jzlmFKXviAI6YQt98GwZoHVAsDEMOKYo+g5aSjvMQ3lnvYQskIYdBj30r7S4rAx/VzuxsRhA==}
+    dev: false
 
   /picocolors/1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}

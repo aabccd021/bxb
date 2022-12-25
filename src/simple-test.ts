@@ -1,11 +1,9 @@
 import { deepStrictEqual } from 'assert';
 import { console, either, readonlyArray, readonlyRecord, task, taskEither } from 'fp-ts';
-import type { Apply1 } from 'fp-ts/Apply';
-import { flow, identity, pipe } from 'fp-ts/function';
+import { apply, flow, pipe } from 'fp-ts/function';
 import type { Task } from 'fp-ts/Task';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import { withTimeout } from 'fp-ts-contrib/lib/Task/withTimeout';
-import pLimit from 'p-limit';
 import * as retry from 'retry-ts';
 import { retrying } from 'retry-ts/lib/Task';
 import { match } from 'ts-pattern';
@@ -46,20 +44,6 @@ export type SequentialTest<T = unknown> = {
 
 export type Test = SequentialTest | SingleTest;
 
-export const ap: <A>(fa: Task<A>) => <B>(fab: Task<(a: A) => B>) => Task<B> = (fa) => (fab) => () =>
-  Promise.all([Promise.resolve().then(fab), Promise.resolve().then(fa)]).then(([f, a]) => f(a));
-
-export const par: Apply1<'Task'> = {
-  URI: 'Task',
-  map: (fa, f) => pipe(fa, task.map(f)),
-  ap: (fab, fa) => pipe(fab, ap(fa)),
-};
-
-export const testsApplicative = taskEither.getApplicativeTaskValidation(
-  par,
-  readonlyArray.getSemigroup<unknown>()
-);
-
 const runAssertion = <T>(test: {
   readonly name: string;
   readonly expect: Task<T>;
@@ -72,7 +56,7 @@ const runAssertion = <T>(test: {
     taskEither.chainTaskK(() => test.expect),
     taskEither.chainEitherK((result) =>
       // eslint-disable-next-line functional/no-return-void
-      either.tryCatch(() => deepStrictEqual(result, test.toResult), identity)
+      either.tryCatch(() => deepStrictEqual(result, test.toResult), either.toError)
     ),
     taskEither.mapLeft(readonlyArray.of),
     taskEither.chainFirstIOK(() => console.log(`Finished ${test.name}`)),
@@ -102,16 +86,19 @@ const getRetryPolicy = (test: Test) =>
     .with({ type: 'sequential' }, () => retry.limitRetries(0))
     .exhaustive();
 
-export const maxConcurrency = flow(
-  pLimit,
-  (limiter) =>
-    <A>(t: Task<A>) =>
-    () =>
-      limiter(t)
-);
-
-export const runParallelWithConcurrency = (concurrency: number) =>
-  readonlyArray.traverse(task.ApplicativePar)(maxConcurrency(concurrency));
+export const runParallelWithConcurrency =
+  (concurrency: number) =>
+  <A>(tasks: readonly Task<A>[]): Task<readonly A[]> =>
+    pipe(
+      () => import('p-limit'),
+      task.map(
+        flow(
+          (pLimit) => pLimit.default(concurrency),
+          (limiter) => readonlyArray.traverse(task.ApplicativePar)((t: Task<A>) => () => limiter(t))
+        )
+      ),
+      task.chain(apply(tasks))
+    );
 
 export const runParallel = readonlyArray.sequence(task.ApplicativePar);
 

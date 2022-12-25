@@ -1,6 +1,6 @@
 import type { TaskEither } from 'fp-ts/TaskEither';
 
-import type { Provider } from '../db/UpsertDoc';
+import type { Provider } from '../..';
 
 export type Param = { readonly key: string };
 
