@@ -4,10 +4,10 @@ import { pipe } from 'fp-ts/function';
 import { runTests, simpleTest as test } from '../../src/simple-test';
 import { filterStackWithTests } from '../../src/test';
 import {
-  defineSequentialTest,
-  exportScopeTests,
-  flattenTests,
-  test as singleTest,
+    defineSequentialTest,
+    exportScopeTests,
+    flattenTests,
+    test as singleTest
 } from '../../src/test/util';
 
 const tests = [
@@ -271,10 +271,10 @@ const tests = [
       taskEither.map(readonlyArray.map((t) => t.name))
     ),
     toResult: either.right([
-      'getDoc',
-      'getDoc & upsertDoc',
-      'seq getDoc',
-      'seq getDoc & upsertDoc',
+      'geetDoc',
+      '+ getDoc & upsertDoc',
+      '+ seq getDoc',
+      '+ seq getDoc & upsertDoc',
     ]),
   }),
 ];

@@ -1,0 +1,36 @@
+{
+  "exportScopeTests adds prefix to test name": {
+    "generatedMessage": true,
+    "code": "ERR_ASSERTION",
+    "actual": [
+      "foo > bar"
+    ],
+    "expected": [
+      "fo > bar"
+    ],
+    "operator": "deepStrictEqual"
+  },
+  "filterStackWithTests filters out tests which stack is not equal nor subset": {
+    "generatedMessage": true,
+    "code": "ERR_ASSERTION",
+    "actual": {
+      "_tag": "Right",
+      "right": [
+        "getDoc",
+        "getDoc & upsertDoc",
+        "seq getDoc",
+        "seq getDoc & upsertDoc"
+      ]
+    },
+    "expected": {
+      "_tag": "Right",
+      "right": [
+        "geetDoc",
+        "+ getDoc & upsertDoc",
+        "+ seq getDoc",
+        "+ seq getDoc & upsertDoc"
+      ]
+    },
+    "operator": "deepStrictEqual"
+  }
+}
