@@ -4,7 +4,7 @@ import { identity, pipe } from 'fp-ts/function';
 import { test } from '../util';
 
 export const test1 = test({
-  name: `onObjectCreated trigger params contains object id with client.storage.uploadDataUrlAwaitFunctions`,
+  name: 'onObjectCreated trigger params contains object id with client.storage.uploadDataUrlAwaitFunctions',
   stack: {
     client: {
       db: { getDocWhen: true },
@@ -73,7 +73,7 @@ export const test1 = test({
 });
 
 export const test14 = test({
-  name: `uploadDataUrl should wait all functions to be finised with client.storage.uploadDataUrlAwaitFunctions`,
+  name: 'uploadDataUrl should wait all functions to be finised with client.storage.uploadDataUrlAwaitFunctions',
   stack: {
     ci: {
       deployStorage: true,
@@ -139,7 +139,7 @@ export const test14 = test({
 });
 
 export const test2 = test({
-  name: `onObjectCreated trigger params contains object id`,
+  name: 'onObjectCreated trigger params contains object id',
   stack: {
     ci: {
       deployStorage: true,
@@ -208,7 +208,7 @@ export const test2 = test({
 });
 
 export const test24 = test({
-  name: `uploadDataUrl should not wait functions to be finished`,
+  name: 'uploadDataUrl should not wait functions to be finished',
   stack: {
     client: {
       storage: { uploadDataUrl: true },
@@ -274,7 +274,7 @@ export const test24 = test({
 });
 
 export const test3 = test({
-  name: `onObjectCreated trigger should not be called if not triggered`,
+  name: 'onObjectCreated trigger should not be called if not triggered',
   stack: {
     client: { db: { getDocWhen: true } },
     ci: { deployFunctions: true, deployDb: true },
@@ -328,7 +328,7 @@ export const test3 = test({
 });
 
 export const test4 = test({
-  name: `document should not be created if trigger not deployed`,
+  name: 'document should not be created if trigger not deployed',
   stack: {
     ci: { deployDb: true },
     client: {

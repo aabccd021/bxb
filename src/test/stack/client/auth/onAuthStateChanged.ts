@@ -51,7 +51,7 @@ export const test0002 = test({
 });
 
 export const test0003 = test({
-  name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut then subscribe`,
+  name: 'returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut then subscribe',
   stack: {
     client: {
       auth: {
@@ -82,7 +82,7 @@ export const test0003 = test({
 });
 
 export const test0004 = test({
-  name: `returns singed out state after subscribe and client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut`,
+  name: 'returns singed out state after subscribe and client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut',
   stack: {
     client: {
       auth: {
@@ -113,7 +113,7 @@ export const test0004 = test({
 });
 
 export const test0005 = test({
-  name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then subscribe then client.auth.signOut`,
+  name: 'returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then subscribe then client.auth.signOut',
   stack: {
     client: {
       auth: {

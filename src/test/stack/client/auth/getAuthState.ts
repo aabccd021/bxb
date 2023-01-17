@@ -30,7 +30,7 @@ export const test0002 = test({
 });
 
 export const test0003 = test({
-  name: `returns authUser uid same as the one returned from client.auth.createUserAndSignInWithEmailAndPassword`,
+  name: 'returns authUser uid same as the one returned from client.auth.createUserAndSignInWithEmailAndPassword',
   stack: {
     client: { auth: { createUserAndSignInWithEmailAndPassword: true, getAuthState: true } },
   },
@@ -55,7 +55,7 @@ export const test0003 = test({
 });
 
 export const test0004 = test({
-  name: `returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut`,
+  name: 'returns singed out state after client.auth.createUserAndSignInWithEmailAndPassword then client.auth.signOut',
   stack: {
     client: {
       auth: { signOut: true, getAuthState: true, createUserAndSignInWithEmailAndPassword: true },

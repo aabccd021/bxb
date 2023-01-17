@@ -4,7 +4,7 @@ import { identity, pipe } from 'fp-ts/function';
 import { test } from '../util';
 
 export const test2 = test({
-  name: `onAuthUserCreated trigger can upsert doc`,
+  name: 'onAuthUserCreated trigger can upsert doc',
   stack: {
     client: {
       auth: { createUserAndSignInWithEmailAndPassword: true },
@@ -71,7 +71,7 @@ export const test2 = test({
 });
 
 export const test3 = test({
-  name: `onAuthUserCreated trigger should not be called if not triggered`,
+  name: 'onAuthUserCreated trigger should not be called if not triggered',
   stack: {
     client: { db: { getDocWhen: true } },
     ci: { deployDb: true, deployFunctions: true },
@@ -123,7 +123,7 @@ export const test3 = test({
 });
 
 export const test4 = test({
-  name: `document should not be created if trigger not deployed`,
+  name: 'document should not be created if trigger not deployed',
   stack: {
     client: {
       auth: { createUserAndSignInWithEmailAndPassword: true },

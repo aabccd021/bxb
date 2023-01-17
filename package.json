@@ -1,14 +1,11 @@
 {
   "scripts": {
-    "build": "tsup",
     "do": "sh -c 'ts-node --compilerOptions \"{\\\"isolatedModules\\\": false}\" --eval \"import(\\\"$0\\\").then(a => a.main());\"'",
     "lint": "eslint --max-warnings=0 . --ignore-path .gitignore",
-    "lint:fix": "eslint --max-warnings=0 . --fix",
-    "lint:fix:compress": "fd --extension .ts --exec sed -i -z 's/{\\n/{/g' {} \\; && pnpm fix",
-    "test": "c8 pnpm do ./test/unit/index.test",
-    "test-codegen-custom": "echo b",
-    "test-app-nextjs-treeshaking-capability": "vitest --run test/app-nextjs-treeshaking-capability",
-    "test-app-nextjs-treeshaking-stack": "vitest --run test/app-nextjs-treeshaking-stack"
+    "lint:fix": "pnpm lint --fix",
+    "lint:fix:compress": "fd --extension .ts --exec sed -i -z 's/{\\n/{/g' {} \\; && pnpm lint:fix",
+    "test-unit": "pnpm do ./test/unit/index.test",
+    "test-app-nextjs-treeshaking-capability": "vitest --run test/app-nextjs-treeshaking-capability"
   },
   "sideEffects": false,
   "name": "bxb",
@@ -64,8 +61,22 @@
     ]
   },
   "eslintConfig": {
-    "ignorePatterns": ["dist", "node_modules"],
-    "extends": "chimeraant"
+    "extends": "chimeraant",
+    "overrides": [
+      {
+        "files": "src/test/**/*.ts",
+        "rules": {
+          "max-len": [
+            "error",
+            {
+              "code": 100,
+              "ignoreUrls": true,
+              "ignorePattern": "(^export|^\\s*readonly|^import|^\\s*name: ')"
+            }
+          ]
+        }
+      }
+    ]
   },
   "dependencies": {
     "fp-ts": "^2.13.1",
@@ -79,10 +90,9 @@
   },
   "devDependencies": {
     "@types/valid-data-url": "^2.0.0",
-    "@vitest/coverage-c8": "^0.26.2",
     "c8": "^7.12.0",
     "eslint": "^8.28.0",
-    "eslint-config-chimeraant": "^1.2.5",
+    "eslint-config-chimeraant": "^1.2.6",
     "pnpm": "^7.17.0",
     "pure-test": "^1.0.4",
     "semantic-release": "^19.0.5",
