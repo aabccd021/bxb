@@ -70,7 +70,7 @@ export const test0002 = test({
 });
 
 export const test0003 = test({
-  name: `does not returns doc made by forbidden create doc request done with client.db.upsertDoc`,
+  name: 'does not returns doc made by forbidden create doc request done with client.db.upsertDoc',
   stack: {
     client: { db: { upsertDoc: true, getDoc: true } },
     ci: { deployDb: true },
@@ -98,7 +98,7 @@ export const test0003 = test({
 });
 
 export const test0004 = test({
-  name: `does not returns doc made by forbidden update doc request done with client.db.upsertDoc`,
+  name: 'does not returns doc made by forbidden update doc request done with client.db.upsertDoc',
   stack: {
     client: { db: { upsertDoc: true, getDoc: true } },
     ci: { deployDb: true },

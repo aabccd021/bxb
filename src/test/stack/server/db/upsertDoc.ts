@@ -60,7 +60,7 @@ export const test0002 = test({
 });
 
 export const test0003 = test({
-  name: `can create doc even if not signed in`,
+  name: 'can create doc even if not signed in',
   stack: {
     server: { db: { upsertDoc: true } },
     ci: { deployDb: true },

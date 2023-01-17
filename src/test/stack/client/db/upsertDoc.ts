@@ -160,7 +160,7 @@ export const test0006 = test({
 });
 
 export const test0007 = test({
-  name: `can create doc if owner field value is owner's auth uid`,
+  name: 'can create doc if owner field value is owners auth uid',
   stack: {
     ci: { deployDb: true },
     client: {
@@ -202,7 +202,7 @@ export const test0007 = test({
 });
 
 export const test0008 = test({
-  name: `returns ForbidenError if owner field value is not owner's auth uid, even if signed in`,
+  name: 'returns ForbidenError if owner field value is not owners auth uid, even if signed in',
   stack: {
     ci: { deployDb: true },
     client: {
@@ -243,7 +243,7 @@ export const test0008 = test({
 });
 
 export const test0009 = test({
-  name: `returns Forbidden if not signed in`,
+  name: 'returns Forbidden if not signed in',
   stack: {
     ci: { deployDb: true },
     client: { db: { upsertDoc: true } },
@@ -275,7 +275,7 @@ export const test0009 = test({
 });
 
 export const test0010 = test({
-  name: `returns Forbidden if not signed in, swap comparation`,
+  name: 'returns Forbidden if not signed in, swap comparation',
   stack: {
     ci: { deployDb: true },
     client: { db: { upsertDoc: true } },
