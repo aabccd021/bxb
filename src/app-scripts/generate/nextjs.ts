@@ -42,7 +42,8 @@ const methodStr = (scope: string, method: string, param: Param) =>
         stacks,
         readonlyNonEmptyArray.map(
           (stack) =>
-            `import { clientEnv as ${stack.name}ClientEnv } from '../../../bxb-stack-${stack.name}.config';`
+            `import { clientEnv as ${stack.name}ClientEnv } ` +
+            `from '../../../bxb-stack-${stack.name}.config';`
         ),
         readonlyArray.intercalate(string.Monoid)('\n')
       ),
@@ -60,7 +61,8 @@ const methodStr = (scope: string, method: string, param: Param) =>
     }),
     ({ stackImports, envImports, methods }) =>
       `${stackImports}\n${envImports}\nexport const ${method}` +
-      ` = ${methods} ${param.stacks.default.name}Stack.client.${scope}.${method}(${param.stacks.default.name}ClientEnv);`
+      ` = ${methods} ${param.stacks.default.name}Stack.client.${scope}.${method}` +
+      `(${param.stacks.default.name}ClientEnv);`
   );
 
 type Scopes = ReadonlyRecord<string, readonly string[]>;
