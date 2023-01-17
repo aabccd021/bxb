@@ -5,7 +5,6 @@ import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
 import type { TaskEither } from 'fp-ts/TaskEither';
 import type { DeepPartial, DeepPick } from 'ts-essentials';
 
-import type { RetryPolicy } from '../simple-test';
 import type { FunctionsBuilder, Stack } from '../type';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -86,7 +85,6 @@ export type SingleTest = {
   readonly shouldTimeout?: true;
   readonly timeOut?: number;
   readonly functionsBuilders?: ReadonlyRecord<string, unknown>;
-  readonly retry?: RetryPolicy;
 };
 
 export type DefineSingleTest = <S extends StackFilter, E, T>(t: {
@@ -100,7 +98,6 @@ export type DefineSingleTest = <S extends StackFilter, E, T>(t: {
     string,
     FunctionsBuilder<StackFromFilter<S> extends { readonly server: infer SE } ? SE : never>
   >;
-  readonly retry?: RetryPolicy;
 }) => SingleTest;
 
 export const test: DefineSingleTest = (t) => ({ ...t, type: 'single' } as SingleTest);

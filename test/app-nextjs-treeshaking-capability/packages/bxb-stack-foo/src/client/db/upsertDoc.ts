@@ -1,3 +1,4 @@
+/* eslint-disable functional/no-expression-statement */
 import { either } from 'fp-ts';
 
 import type { Stack } from '../../env';
