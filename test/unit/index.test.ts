@@ -1,19 +1,20 @@
 import { either, option, readonlyArray, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
+import { logErrors, runTests, test } from 'pure-test';
+import { setExitCode } from 'pure-test/dist/node';
 
-import { runTests, simpleTest as test } from '../../src/simple-test';
 import { filterStackWithTests } from '../../src/test';
 import {
-    defineSequentialTest,
-    exportScopeTests,
-    flattenTests,
-    test as singleTest
+  defineSequentialTest,
+  exportScopeTests,
+  flattenTests,
+  test as singleTest,
 } from '../../src/test/util';
 
 const tests = [
   test({
     name: 'exportScopeTests adds prefix to test name',
-    expect: async () =>
+    act: async () =>
       pipe(
         exportScopeTests({
           foo: {
@@ -27,12 +28,12 @@ const tests = [
         }),
         readonlyArray.map((t) => t.name)
       ),
-    toResult: ['fo > bar'],
+    assert: ['foo > bar'],
   }),
 
   test({
     name: 'flattenTests flattens test',
-    expect: async () =>
+    act: async () =>
       pipe(
         flattenTests({
           fooModule: {
@@ -48,12 +49,12 @@ const tests = [
         }),
         readonlyArray.map((t) => t.name)
       ),
-    toResult: ['fooModule > bar'],
+    assert: ['fooModule > bar'],
   }),
 
   test({
     name: 'filterStackWithTests includes single tests with exact same stack',
-    expect: pipe(
+    act: pipe(
       taskEither.right({
         client: {
           db: {
@@ -72,12 +73,12 @@ const tests = [
       ]),
       taskEither.map(readonlyArray.map((t) => t.name))
     ),
-    toResult: either.right(['getDoc & upsertDoc']),
+    assert: either.right(['getDoc & upsertDoc']),
   }),
 
   test({
     name: 'filterStackWithTests includes single tests which stack is subset',
-    expect: pipe(
+    act: pipe(
       taskEither.right({
         client: {
           db: {
@@ -96,12 +97,12 @@ const tests = [
       ]),
       taskEither.map(readonlyArray.map((t) => t.name))
     ),
-    toResult: either.right(['getDoc']),
+    assert: either.right(['getDoc']),
   }),
 
   test({
     name: 'filterStackWithTests does not includes single tests which stack is superset',
-    expect: pipe(
+    act: pipe(
       taskEither.right({
         client: {
           db: {
@@ -120,12 +121,12 @@ const tests = [
       ]),
       taskEither.map(readonlyArray.map((t) => t.name))
     ),
-    toResult: either.right([]),
+    assert: either.right([]),
   }),
 
   test({
     name: 'filterStackWithTests includes sequential tests with exact same stack',
-    expect: pipe(
+    act: pipe(
       taskEither.right({
         client: {
           db: {
@@ -148,12 +149,12 @@ const tests = [
       ]),
       taskEither.map(readonlyArray.map((t) => t.name))
     ),
-    toResult: either.right(['getDoc & upsertDoc']),
+    assert: either.right(['getDoc & upsertDoc']),
   }),
 
   test({
     name: 'filterStackWithTests includes sequential tests which stack is subset',
-    expect: pipe(
+    act: pipe(
       taskEither.right({
         client: {
           db: {
@@ -176,12 +177,12 @@ const tests = [
       ]),
       taskEither.map(readonlyArray.map((t) => t.name))
     ),
-    toResult: either.right(['getDoc']),
+    assert: either.right(['getDoc']),
   }),
 
   test({
     name: 'filterStackWithTests does not includes sequential tests which stack is superset',
-    expect: pipe(
+    act: pipe(
       taskEither.right({
         client: {
           db: {
@@ -204,12 +205,12 @@ const tests = [
       ]),
       taskEither.map(readonlyArray.map((t) => t.name))
     ),
-    toResult: either.right([]),
+    assert: either.right([]),
   }),
 
   test({
     name: 'filterStackWithTests filters out tests which stack is not equal nor subset',
-    expect: pipe(
+    act: pipe(
       taskEither.right({
         client: {
           db: {
@@ -270,15 +271,8 @@ const tests = [
       ]),
       taskEither.map(readonlyArray.map((t) => t.name))
     ),
-    toResult: either.right([
-      'geetDoc',
-      '+ getDoc & upsertDoc',
-      '+ seq getDoc',
-      '+ seq getDoc & upsertDoc',
-    ]),
+    assert: either.right(['getDoc', 'getDoc & upsertDoc', 'seq getDoc', 'seq getDoc & upsertDoc']),
   }),
 ];
 
-const main = pipe(tests, runTests);
-
-void main();
+export const main = pipe(tests, runTests({}), logErrors, setExitCode);
