@@ -6,6 +6,11 @@
     "lib": [
       "esnext"
     ],
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist/cjs",
     "module": "commonjs",
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
@@ -19,7 +24,6 @@
     "target": "esnext"
   },
   "include": [
-    "src",
-    "test"
+    "src"
   ]
 }
