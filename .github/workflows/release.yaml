@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: chimeraant/dev@v1.3.3
-      - run: tsup
+      - run: pnpm build
       - run: pnpm test-app-nextjs-treeshaking-capability
 
   test-unit:
@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: chimeraant/dev@v1.3.3
-      - run: tsup
+      - run: pnpm build
       - run: semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
