@@ -1,6 +1,7 @@
-import { either, option, readonlyArray, task, taskEither } from 'fp-ts';
+import { either, option, readonlyArray, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
-import { logErrors, runTests, test } from 'pure-test';
+import { logErrorDetails, runTests, test } from 'pure-test';
+import { exit } from 'pure-test/dist/node';
 
 import { filterStackWithTests } from '../../src/test';
 import {
@@ -9,7 +10,6 @@ import {
   flattenTests,
   test as singleTest,
 } from '../../src/test/util';
-
 
 const tests = [
   test({
@@ -275,9 +275,4 @@ const tests = [
   }),
 ];
 
-export const main = pipe(
-  tests,
-  runTests({}),
-  logErrors,
-  task.chainIOK(() => () => process.exit(1))
-);
+export const main = pipe(tests, runTests({}), logErrorDetails, exit);
