@@ -17,11 +17,9 @@ const tests = [
       taskEither.chain(() =>
         exec({ command: 'pnpm build', cwd: `${__dirname}/packages/bxb-stack-foo` })
       ),
+      taskEither.chain(() => exec({ command: 'pnpm install', cwd: `${__dirname}/packages/app` })),
       taskEither.chain(() =>
-        exec({
-          command: 'pnpm ts-node ./scripts/bxb.ts generate nextjs',
-          cwd: `${__dirname}/packages/app`,
-        })
+        exec({ command: 'pnpm exec-main ./scripts/bxb', cwd: `${__dirname}/packages/app` })
       ),
       taskEither.chain(() =>
         exec({ command: 'pnpm next build', cwd: `${__dirname}/packages/app` })
@@ -39,11 +37,13 @@ const tests = [
               option.map(parseFloat)
             )
           ),
-          option.map(
-            (pageSize) =>
+          option.map((pageSize) => {
+            console.log(pageSize);
+            return (
               pageSize['/both'] > pageSize['/upsertDoc'] &&
               pageSize['/upsertDoc'] > pageSize['/getDoc']
-          ),
+            );
+          }),
           either.fromOption(() => 'page not found')
         )
       )
