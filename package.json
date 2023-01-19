@@ -1,9 +1,6 @@
 {
   "scripts": {
-    "build": "rm -rf dist && pnpm build:es6 && pnpm build:cjs && pnpm build:types",
-    "build:cjs": "swc src --out-dir dist/cjs --source-maps --config module.type=commonjs",
-    "build:es6": "swc src --out-dir dist/es6 --source-maps",
-    "build:types": "tsc",
+    "build": "rm -rf dist && swc src --out-dir dist/cjs --source-maps --config module.type=commonjs && swc src --out-dir dist/es6 --source-maps && tsc --declaration --emitDeclarationOnly --declarationMap --sourceMap --skipLibCheck --outDir './dist/cjs'",
     "lint": "eslint . --max-warnings 0 --ignore-path .gitignore",
     "lint:fix": "pnpm lint --fix",
     "test-unit": "exec-main ./test/unit/index.test",
