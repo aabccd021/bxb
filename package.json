@@ -22,19 +22,16 @@
   "types": "./dist/cjs/index.d.ts",
   "exports": {
     "./dist/cjs/test": {
-      "require": "./dist/cjs/test/index.js",
-      "types": "./dist/cjs/test/index.d.ts"
+      "require": "./dist/cjs/test/index.js"
     },
     "./dist/es6/test": {
       "import": "./dist/es6/test/index.js"
     },
     "./dist/cjs/scripts": {
-      "require": "./dist/cjs/scripts/index.js",
-      "types": "./dist/cjs/scripts/index.d.ts"
+      "require": "./dist/cjs/scripts/index.js"
     },
     "./dist/es6/scripts": {
-      "import": "./dist/es6/scripts/index.js",
-      "types": "./dist/cjs/scripts/index.d.ts"
+      "import": "./dist/es6/scripts/index.js"
     },
     "./dist/cjs/next": {
       "require": "./dist/cjs/next.js"
