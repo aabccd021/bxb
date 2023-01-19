@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "rm -rf dist && swc src --out-dir dist/cjs --source-maps --config module.type=commonjs && swc src --out-dir dist/es6 --source-maps && tsc --declaration --emitDeclarationOnly --declarationMap --sourceMap --skipLibCheck --outDir './dist/cjs'",
+    "build": "rm -rf cjs esm && swc src --out-dir cjs --source-maps --config module.type=commonjs && swc src --out-dir esm --source-maps && tsc --declaration --emitDeclarationOnly --declarationMap --sourceMap --skipLibCheck --outDir cjs",
     "lint": "eslint . --max-warnings 0 --ignore-path .gitignore",
     "lint:fix": "pnpm lint --fix",
     "test-unit": "exec-main ./test/unit/index.test",
@@ -12,29 +12,30 @@
   "version": "0.0.0-semantic-release",
   "license": "MIT",
   "files": [
-    "dist"
+    "cjs",
+    "esm"
   ],
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/es6/index.js",
-  "types": "./dist/cjs/index.d.ts",
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "types": "./cjs/index.d.ts",
   "exports": {
-    "./dist/cjs/test": {
-      "require": "./dist/cjs/test/index.js"
+    "./cjs/test": {
+      "require": "./cjs/test/index.js"
     },
-    "./dist/es6/test": {
-      "import": "./dist/es6/test/index.js"
+    "./esm/test": {
+      "import": "./esm/test/index.js"
     },
-    "./dist/cjs/scripts": {
-      "require": "./dist/cjs/scripts/index.js"
+    "./cjs/scripts": {
+      "require": "./cjs/scripts/index.js"
     },
-    "./dist/es6/scripts": {
-      "import": "./dist/es6/scripts/index.js"
+    "./esm/scripts": {
+      "import": "./esm/scripts/index.js"
     },
-    "./dist/cjs/next": {
-      "require": "./dist/cjs/next.js"
+    "./cjs/next": {
+      "require": "./cjs/next.js"
     },
-    "./dist/es6/next": {
-      "import": "./dist/es6/next.js"
+    "./esm/next": {
+      "import": "./esm/next.js"
     }
   },
   "release": {

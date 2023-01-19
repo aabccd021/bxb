@@ -1,5 +1,7 @@
 .direnv
-dist
 node_modules
 playwright-report
 **/coverage/**
+cjs
+esm
+dts
