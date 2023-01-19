@@ -1,16 +1,13 @@
 {
   "name": "bxb-stack-foo",
   "sideEffects": false,
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "build": "rm -rf dist && swc src --out-dir dist/cjs --source-maps --config module.type=commonjs && swc src --out-dir dist/es6 --source-maps && tsc --declaration --emitDeclarationOnly --declarationMap --sourceMap --skipLibCheck --outDir './dist/cjs'",
+    "build": "rm -rf cjs esm && swc src --out-dir cjs --source-maps --config module.type=commonjs && swc src --out-dir esm --source-maps && tsc --declaration --emitDeclarationOnly --declarationMap --sourceMap --skipLibCheck --outDir cjs",
     "test": "tsc --noEmit"
   },
-  "main": "dist/cjs/index.js",
-  "module": "dist/es6/index.js",
-  "types": "./dist/cjs/index.d.ts",
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "types": "./cjs/index.d.ts",
   "dependencies": {
     "bxb": "link:../../../.."
   },
