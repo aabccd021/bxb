@@ -1,6 +1,5 @@
 {
   "name": "bxb-stack-foo",
-  "main": "dist/index.js",
   "sideEffects": false,
   "files": [
     "dist"
@@ -12,6 +11,8 @@
     "build:types": "tsc --project tsconfig.json",
     "test": "tsc --noEmit"
   },
+  "main": "dist/cjs/index.js",
+  "module": "dist/es6/index.js",
   "types": "./dist/cjs/index.d.ts",
   "exports": {
     ".": {
