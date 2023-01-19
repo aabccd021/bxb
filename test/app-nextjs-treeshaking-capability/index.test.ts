@@ -1,56 +1,55 @@
 import cp from 'child_process';
+import { either, option, readonlyArray, readonlyRecord, string, taskEither } from 'fp-ts';
+import { flow, identity, pipe } from 'fp-ts/function';
+import { logErrorDetails, runTests, test } from 'pure-test';
+import { exit } from 'pure-test/dist/node';
 import util from 'util';
-import { expect, test } from 'vitest';
 
-const exec = util.promisify(cp.exec);
+const exec = ({ command, cwd }: { readonly command: string; readonly cwd: string }) =>
+  taskEither.tryCatch(() => util.promisify(cp.exec)(command, { cwd, encoding: 'utf8' }), identity);
 
-test('stack-foo can install packages', async () => {
-  await exec('pnpm install', { cwd: `${__dirname}/packages/bxb-stack-foo`, encoding: 'utf8' });
-});
+const tests = [
+  test({
+    timeout: 60000,
+    name: 'page size is different depends on capabilities used',
+    act: pipe(
+      exec({ command: 'pnpm install', cwd: `${__dirname}/packages/bxb-stack-foo` }),
+      taskEither.chain(() =>
+        exec({ command: 'pnpm build', cwd: `${__dirname}/packages/bxb-stack-foo` })
+      ),
+      taskEither.chain(() =>
+        exec({
+          command: 'pnpm ts-node ./scripts/bxb.ts generate nextjs',
+          cwd: `${__dirname}/packages/app`,
+        })
+      ),
+      taskEither.chain(() =>
+        exec({ command: 'pnpm next build', cwd: `${__dirname}/packages/app` })
+      ),
+      taskEither.chainEitherKW(({ stdout }) =>
+        pipe(
+          { '/getDoc': undefined, '/upsertDoc': undefined, '/both': undefined },
+          readonlyRecord.traverseWithIndex(option.Applicative)((pageName) =>
+            pipe(
+              stdout,
+              string.split('\n'),
+              readonlyArray.filter(string.includes(pageName)),
+              readonlyArray.head,
+              option.chain(flow(string.split(' '), readonlyArray.dropRight(1), readonlyArray.last)),
+              option.map(parseFloat)
+            )
+          ),
+          option.map(
+            (pageSize) =>
+              pageSize['/both'] > pageSize['/upsertDoc'] &&
+              pageSize['/upsertDoc'] > pageSize['/getDoc']
+          ),
+          either.fromOption(() => 'page not found')
+        )
+      )
+    ),
+    assert: either.right(true),
+  }),
+];
 
-test(
-  'stack-foo can build packages',
-  async () => {
-    await exec('pnpm build', { cwd: `${__dirname}/packages/bxb-stack-foo`, encoding: 'utf8' });
-  },
-  { timeout: 20000 }
-);
-
-test(
-  'can generate for nextjs app',
-  async () => {
-    await exec('pnpm ts-node ./scripts/bxb.ts generate nextjs', {
-      cwd: `${__dirname}/packages/app`,
-      encoding: 'utf8',
-    });
-  },
-  { timeout: 20000 }
-);
-
-test(
-  'page size is different depends on capabilities used',
-  async () => {
-    const { stdout } = await exec('pnpm next build', {
-      cwd: `${__dirname}/packages/app`,
-      encoding: 'utf8',
-    });
-    const getSizeOfPage = (page: string) => {
-      const sizeStr = stdout
-        .split('\n')
-        .filter((s) => s.includes(page))
-        .at(0)
-        ?.split(' ')
-        ?.at(-2);
-      // eslint-disable-next-line functional/no-conditional-statement
-      if (sizeStr === undefined) {
-        // eslint-disable-next-line functional/no-throw-statement
-        throw new Error(`page ${page} does not exists`);
-      }
-      return parseFloat(sizeStr);
-    };
-    expect(getSizeOfPage('/getDoc'))
-      .lessThan(getSizeOfPage('/upsertDoc'))
-      .lessThan(getSizeOfPage('/both'));
-  },
-  { timeout: 30000 }
-);
+export const main = pipe(tests, runTests({}), logErrorDetails, exit);

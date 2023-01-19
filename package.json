@@ -1,11 +1,9 @@
 {
   "scripts": {
-    "do": "sh -c 'ts-node --compilerOptions \"{\\\"isolatedModules\\\": false}\" --eval \"import(\\\"$0\\\").then(a => a.main());\"'",
-    "lint": "eslint --max-warnings=0 . --ignore-path .gitignore",
+    "lint": "eslint . --max-warnings 0 --ignore-path .gitignore",
     "lint:fix": "pnpm lint --fix",
-    "lint:fix:compress": "fd --extension .ts --exec sed -i -z 's/{\\n/{/g' {} \\; && pnpm lint:fix",
-    "test-unit": "pnpm do ./test/unit/index.test",
-    "test-app-nextjs-treeshaking-capability": "vitest --run test/app-nextjs-treeshaking-capability"
+    "test-unit": "exec-main ./test/unit/index.test",
+    "test-app-nextjs-treeshaking-capability": "exec-main ./test/app-nextjs-treeshaking-capability/index.test"
   },
   "sideEffects": false,
   "name": "bxb",
@@ -89,12 +87,14 @@
     "valid-data-url": "^4.0.1"
   },
   "devDependencies": {
+    "@types/node": "^18.11.18",
     "@types/valid-data-url": "^2.0.0",
     "c8": "^7.12.0",
     "eslint": "^8.28.0",
     "eslint-config-chimeraant": "^1.2.6",
+    "exec-main": "^1.0.2",
     "pnpm": "^7.17.0",
-    "pure-test": "^1.0.4",
+    "pure-test": "^1.0.6",
     "semantic-release": "^19.0.5",
     "ts-node": "^10.9.1",
     "tsup": "^6.5.0",
