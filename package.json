@@ -17,11 +17,6 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
-    },
     "./dist/test": {
       "require": "./dist/test.js",
       "import": "./dist/test.mjs",
