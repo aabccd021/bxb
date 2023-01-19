@@ -25,12 +25,12 @@
     "./dist/test": {
       "require": "./dist/test.js",
       "import": "./dist/test.mjs",
-      "types": "./dist/test.ts"
+      "types": "./dist/test.d.ts"
     },
     "./dist/scripts": {
       "require": "./dist/scripts.js",
       "import": "./dist/scripts.mjs",
-      "types": "./dist/scripts.ts"
+      "types": "./dist/scripts.d.ts"
     },
     "./dist/next": {
       "require": "./dist/next.js",
