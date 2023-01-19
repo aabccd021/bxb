@@ -37,13 +37,11 @@ const tests = [
               option.map(parseFloat)
             )
           ),
-          option.map((pageSize) => {
-            console.log(pageSize);
-            return (
+          option.map(
+            (pageSize) =>
               pageSize['/both'] > pageSize['/upsertDoc'] &&
               pageSize['/upsertDoc'] > pageSize['/getDoc']
-            );
-          }),
+          ),
           either.fromOption(() => 'page not found')
         )
       )
