@@ -2,7 +2,7 @@
   "name": "bxb-stack-foo",
   "sideEffects": false,
   "scripts": {
-    "build": "rm -rf cjs esm && swc src --out-dir cjs --source-maps --config module.type=commonjs && swc src --out-dir esm --source-maps && tsc --declaration --declarationMap --emitDeclarationOnly --skipLibCheck --module commonjs --outDir cjs",
+    "build": "rm -rf cjs esm && tsc --declaration --declarationMap --skipLibCheck --module commonjs --outDir cjs && tsc --declaration --declarationMap --skipLibCheck --module esnext --outDir esm",
     "test": "tsc --noEmit"
   },
   "main": "./cjs/index.js",
@@ -12,8 +12,6 @@
     "bxb": "link:../../../.."
   },
   "devDependencies": {
-    "@swc/cli": "^0.1.57",
-    "@swc/core": "^1.3.19",
     "typescript": "^4.9.3"
   }
 }
