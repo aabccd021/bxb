@@ -55,7 +55,7 @@
       "@typescript-eslint/no-misused-promises": "off"
     },
     "ignorePatterns": [
-      "test/app-nextjs-treeshaking-capability/packages"
+      "packages"
     ],
     "overrides": [
       {
