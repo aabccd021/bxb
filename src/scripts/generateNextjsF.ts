@@ -7,19 +7,15 @@ import {
   string,
   taskEither,
 } from 'fp-ts';
-import { flow, identity, pipe } from 'fp-ts/function';
+import { flow, pipe } from 'fp-ts/function';
 import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord';
-import { fs, path } from 'fp-ts-node';
-import * as realFs from 'fs/promises';
+import type { TaskEither } from 'fp-ts/TaskEither';
 import type { DeepPartial } from 'ts-essentials';
 
 import type { StackWithEnv } from '../type';
 
 type Param = {
-  readonly stack: {
-    readonly name: string;
-    readonly stack: DeepPartial<StackWithEnv>;
-  };
+  readonly stack: { readonly name: string; readonly stack: DeepPartial<StackWithEnv> };
 };
 
 const methodStr = (scope: string, method: string, { stack }: Param) =>
@@ -29,6 +25,18 @@ const methodStr = (scope: string, method: string, { stack }: Param) =>
   `export const ${method} = ${stack.name}Stack.client.${scope}.${method}(${stack.name}ClientEnv);`;
 
 type Scopes = ReadonlyRecord<string, readonly string[]>;
+
+type Env = {
+  readonly fs: {
+    readonly mkdirRecursive: (p: { readonly path: string }) => TaskEither<unknown, unknown>;
+    readonly writeFile: (p: {
+      readonly path: string;
+      readonly data: string;
+    }) => TaskEither<unknown, unknown>;
+    readonly rmForceRecursive: (p: { readonly path: string }) => TaskEither<unknown, unknown>;
+  };
+  readonly path: { readonly dirname: (path: string) => string };
+};
 
 const getScopes = (stack: DeepPartial<DeepPartial<StackWithEnv>>): Scopes =>
   pipe(
@@ -51,13 +59,13 @@ const getScopes = (stack: DeepPartial<DeepPartial<StackWithEnv>>): Scopes =>
 
 type WriteFile = { readonly path: string; readonly data: string };
 
-const writeFiles = (fws: readonly WriteFile[]) =>
+const writeFiles = (env: Env) => (fws: readonly WriteFile[]) =>
   pipe(
     fws,
     readonlyArray.traverse(taskEither.ApplicativeSeq)((file) =>
       pipe(
-        fs.mkdir({ recursive: true })(path.dirname(file.path)),
-        taskEither.chainW(() => fs.writeFile({})(file.data)(file.path))
+        env.fs.mkdirRecursive({ path: env.path.dirname(file.path) }),
+        taskEither.chainW(() => env.fs.writeFile(file))
       )
     )
   );
@@ -104,10 +112,10 @@ const getWriteFiles = (param: Param) =>
     ),
   ]);
 
-export const generateNextjs = (param: Param) =>
+export const generateNextjsF = (env: Env) => (param: Param) =>
   pipe(
-    taskEither.tryCatch(() => realFs.rm('modules/bxb', { force: true, recursive: true }), identity),
-    taskEither.chainW(() => pipe(param, getWriteFiles, writeFiles)),
+    env.fs.rmForceRecursive({ path: 'modules/bxb' }),
+    taskEither.chainW(() => pipe(param, getWriteFiles, writeFiles(env))),
     taskEither.swap,
     taskEither.chainIOK(console.error),
     taskEither.swap

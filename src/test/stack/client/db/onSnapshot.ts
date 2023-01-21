@@ -10,10 +10,7 @@ import { test } from '../../../util';
 
 export const test0010 = test({
   name: 'can return a doc is created with client.db.upsertDoc',
-  stack: {
-    client: { db: { upsertDoc: true, onSnapshot: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { upsertDoc: true, onSnapshot: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -51,10 +48,7 @@ export const test0010 = test({
 
 export const test0001 = test({
   name: 'can return a doc updated with client.db.upsertDoc',
-  stack: {
-    client: { db: { upsertDoc: true, onSnapshot: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { upsertDoc: true, onSnapshot: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -102,10 +96,7 @@ export const test0001 = test({
 
 export const test0002 = test({
   name: 'returns ForbiddedError if forbidden',
-  stack: {
-    client: { db: { upsertDoc: true, onSnapshot: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { upsertDoc: true, onSnapshot: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -143,10 +134,7 @@ export const test0002 = test({
 
 export const test0003 = test({
   name: 'returns Forbidden if forbidden and document absent',
-  stack: {
-    client: { db: { onSnapshot: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { onSnapshot: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -263,10 +251,7 @@ export const test0005 = test({
 
 export const test0006 = test({
   name: 'can return a doc is created with async client.db.upsertDoc',
-  stack: {
-    client: { db: { upsertDoc: true, onSnapshot: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { upsertDoc: true, onSnapshot: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -307,10 +292,7 @@ export const test0006 = test({
 
 export const test0007 = test({
   name: 'can return a doc updated with async client.db.upsertDoc',
-  stack: {
-    client: { db: { upsertDoc: true, onSnapshot: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { upsertDoc: true, onSnapshot: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({

@@ -1,1 +1,1 @@
-export * from './generateNextjs';
+export { generateNextjsF } from './generateNextjsF';

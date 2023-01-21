@@ -1,10 +1,10 @@
 {
   "scripts": {
-    "build": "rm -rf cjs esm && tsc --declaration --declarationMap --skipLibCheck --module commonjs --outDir cjs && tsc --declaration --declarationMap --skipLibCheck --module esnext --outDir esm",
+    "build": "rm -rf cjs esm && echo '{ \"extends\": \"./tsconfig.json\", \"include\": [\"./src\"] }' > tsconfig.dist.json && tsc --project tsconfig.dist.json --declaration --declarationMap --skipLibCheck --module commonjs --outDir cjs && tsc --project tsconfig.dist.json --declaration --declarationMap --skipLibCheck --moduleResolution node --module esnext --outDir esm && rm tsconfig.dist.json",
     "lint": "eslint . --max-warnings 0 --ignore-path .gitignore",
     "lint:fix": "pnpm lint --fix",
-    "test-unit": "exec-main ./test/unit/index.test",
-    "test-app-nextjs-treeshaking-capability": "exec-main ./test/app-nextjs-treeshaking-capability/index.test"
+    "test-unit": "exec-main ./test/unit/test",
+    "test-app-nextjs-treeshaking-capability": "exec-main ./test/app-nextjs-treeshaking-capability/test.node"
   },
   "sideEffects": false,
   "name": "bxb",
@@ -20,21 +20,19 @@
   "types": "./cjs/index.d.ts",
   "exports": {
     "./cjs/test": {
-      "require": "./cjs/test/index.js"
-    },
-    "./esm/test": {
+      "require": "./cjs/test/index.js",
       "import": "./esm/test/index.js"
     },
     "./cjs/scripts": {
-      "require": "./cjs/scripts/index.js"
-    },
-    "./esm/scripts": {
+      "require": "./cjs/scripts/index.js",
       "import": "./esm/scripts/index.js"
     },
-    "./cjs/next": {
-      "require": "./cjs/next.js"
+    "./cjs/scripts/node": {
+      "require": "./cjs/scripts/node.js",
+      "import": "./esm/scripts/node.js"
     },
-    "./esm/next": {
+    "./cjs/next": {
+      "require": "./cjs/next.js",
       "import": "./esm/next.js"
     }
   },
@@ -70,6 +68,12 @@
             }
           ]
         }
+      },
+      {
+        "files": "**/*node.ts",
+        "rules": {
+          "import/no-nodejs-modules": "off"
+        }
       }
     ]
   },
@@ -88,7 +92,7 @@
     "@types/valid-data-url": "^2.0.0",
     "c8": "^7.12.0",
     "eslint": "^8.28.0",
-    "eslint-config-chimeraant": "^1.2.6",
+    "eslint-config-chimeraant": "^1.2.8",
     "exec-main": "^1.0.2",
     "pnpm": "^7.17.0",
     "pure-test": "^1.0.6",

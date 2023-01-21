@@ -5,10 +5,7 @@ import { test } from '../../../util';
 
 export const test0001 = test({
   name: 'can upload base64 data url',
-  stack: {
-    ci: { deployStorage: true },
-    client: { storage: { uploadDataUrl: true } },
-  },
+  stack: { ci: { deployStorage: true }, client: { storage: { uploadDataUrl: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
@@ -25,10 +22,7 @@ export const test0001 = test({
 
 export const test0002 = test({
   name: 'can plain text data url',
-  stack: {
-    ci: { deployStorage: true },
-    client: { storage: { uploadDataUrl: true } },
-  },
+  stack: { ci: { deployStorage: true }, client: { storage: { uploadDataUrl: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
@@ -42,10 +36,7 @@ export const test0002 = test({
 
 export const test0003 = test({
   name: 'returns InvalidDataUrlFormat when invalid data url is uploaded',
-  stack: {
-    ci: { deployStorage: true },
-    client: { storage: { uploadDataUrl: true } },
-  },
+  stack: { ci: { deployStorage: true }, client: { storage: { uploadDataUrl: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
@@ -61,10 +52,7 @@ export const test0003 = test({
 
 export const test0004 = test({
   name: 'returns Forbidden when create security rule not specified',
-  stack: {
-    ci: { deployStorage: true },
-    client: { storage: { uploadDataUrl: true } },
-  },
+  stack: { ci: { deployStorage: true }, client: { storage: { uploadDataUrl: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({ securityRule: {} }),
@@ -80,10 +68,7 @@ export const test0004 = test({
 
 export const test0005 = test({
   name: 'can upload base64 data url less than constraint',
-  stack: {
-    ci: { deployStorage: true },
-    client: { storage: { uploadDataUrl: true } },
-  },
+  stack: { ci: { deployStorage: true }, client: { storage: { uploadDataUrl: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({
@@ -109,10 +94,7 @@ export const test0005 = test({
 
 export const test0006 = test({
   name: 'returns Forbidden error if uploaded a base64 data url larger than constraint',
-  stack: {
-    ci: { deployStorage: true },
-    client: { storage: { uploadDataUrl: true } },
-  },
+  stack: { ci: { deployStorage: true }, client: { storage: { uploadDataUrl: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({
@@ -137,10 +119,7 @@ export const test0006 = test({
 
 export const test0007 = test({
   name: 'can upload plain text data url less than constraint',
-  stack: {
-    ci: { deployStorage: true },
-    client: { storage: { uploadDataUrl: true } },
-  },
+  stack: { ci: { deployStorage: true }, client: { storage: { uploadDataUrl: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({
@@ -163,10 +142,7 @@ export const test0007 = test({
 
 export const test0008 = test({
   name: 'returns Forbidden error if uploaded a plain text data url larger than constraint',
-  stack: {
-    ci: { deployStorage: true },
-    client: { storage: { uploadDataUrl: true } },
-  },
+  stack: { ci: { deployStorage: true }, client: { storage: { uploadDataUrl: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({
@@ -246,10 +222,7 @@ export const test0010 = test({
     ci: { deployStorage: true },
     client: {
       storage: { uploadDataUrl: true },
-      auth: {
-        createUserAndSignInWithEmailAndPassword: true,
-        signOut: true,
-      },
+      auth: { createUserAndSignInWithEmailAndPassword: true, signOut: true },
     },
   },
   expect: ({ client, ci, server }) =>

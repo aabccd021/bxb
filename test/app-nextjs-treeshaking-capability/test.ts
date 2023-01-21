@@ -1,14 +1,14 @@
-import cp from 'child_process';
 import { either, option, readonlyArray, readonlyRecord, string, taskEither } from 'fp-ts';
-import { flow, identity, pipe } from 'fp-ts/function';
-import { logErrorDetails, runTests, test } from 'pure-test';
-import { exit } from 'pure-test/dist/node';
-import util from 'util';
+import { flow, pipe } from 'fp-ts/function';
+import type { TaskEither } from 'fp-ts/TaskEither';
+import { test } from 'pure-test';
 
-const exec = ({ command, cwd }: { readonly command: string; readonly cwd: string }) =>
-  taskEither.tryCatch(() => util.promisify(cp.exec)(command, { cwd, encoding: 'utf8' }), identity);
+type Exec = (p: {
+  readonly command: string;
+  readonly cwd: string;
+}) => TaskEither<unknown, { readonly stdout: string }>;
 
-const tests = [
+export const makeTest = ({ exec }: { readonly exec: Exec }) =>
   test({
     timeout: 60000,
     name: 'page size is different depends on capabilities used',
@@ -47,7 +47,4 @@ const tests = [
       )
     ),
     assert: either.right(true),
-  }),
-];
-
-export const main = pipe(tests, runTests({}), logErrorDetails, exit);
+  });

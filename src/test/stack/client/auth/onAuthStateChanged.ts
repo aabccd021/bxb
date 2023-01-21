@@ -23,12 +23,7 @@ export const test0001 = test({
 export const test0002 = test({
   name: 'returns singed in state after client.auth.createUserAndSignInWithEmailAndPassword',
   stack: {
-    client: {
-      auth: {
-        createUserAndSignInWithEmailAndPassword: true,
-        onAuthStateChanged: true,
-      },
-    },
+    client: { auth: { createUserAndSignInWithEmailAndPassword: true, onAuthStateChanged: true } },
   },
   expect: ({ client }) =>
     pipe(
@@ -146,12 +141,7 @@ export const test0005 = test({
 export const test0006 = test({
   name: 'does not call onAuthStateChanged callback after unsubscribed',
   stack: {
-    client: {
-      auth: {
-        createUserAndSignInWithEmailAndPassword: true,
-        onAuthStateChanged: true,
-      },
-    },
+    client: { auth: { createUserAndSignInWithEmailAndPassword: true, onAuthStateChanged: true } },
   },
   expect: ({ client }) =>
     pipe(

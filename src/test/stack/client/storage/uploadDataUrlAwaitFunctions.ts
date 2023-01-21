@@ -260,10 +260,7 @@ export const test0009 = test({
     ci: { deployStorage: true },
     client: {
       storage: { uploadDataUrlAwaitFunctions: true },
-      auth: {
-        createUserAndSignInWithEmailAndPassword: true,
-        signOut: true,
-      },
+      auth: { createUserAndSignInWithEmailAndPassword: true, signOut: true },
     },
     server: { db: { upsertDoc: true } },
   },

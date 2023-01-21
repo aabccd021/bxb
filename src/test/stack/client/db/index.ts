@@ -4,9 +4,4 @@ import * as getDocWhen from './getDocWhen';
 import * as onSnapshot from './onSnapshot';
 import * as upsertDoc from './upsertDoc';
 
-export const tests = exportScopeTests({
-  getDoc,
-  getDocWhen,
-  onSnapshot,
-  upsertDoc,
-});
+export const tests = exportScopeTests({ getDoc, getDocWhen, onSnapshot, upsertDoc });

@@ -13,9 +13,7 @@ export const test0001 = test({
 export const test0002 = test({
   name: 'returns singed in state after client.auth.createUserAndSignInWithEmailAndPassword',
   stack: {
-    client: {
-      auth: { getAuthState: true, createUserAndSignInWithEmailAndPassword: true },
-    },
+    client: { auth: { getAuthState: true, createUserAndSignInWithEmailAndPassword: true } },
   },
   expect: ({ client }) =>
     pipe(

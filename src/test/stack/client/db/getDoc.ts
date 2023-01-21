@@ -5,10 +5,7 @@ import { test } from '../../../util';
 
 export const test0001 = test({
   name: 'can get doc created with client.db.upsertDoc',
-  stack: {
-    client: { db: { upsertDoc: true, getDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { upsertDoc: true, getDoc: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -33,10 +30,7 @@ export const test0001 = test({
 
 export const test0002 = test({
   name: 'always returns the latest doc state',
-  stack: {
-    client: { db: { upsertDoc: true, getDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { upsertDoc: true, getDoc: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -71,10 +65,7 @@ export const test0002 = test({
 
 export const test0003 = test({
   name: 'does not returns doc made by forbidden create doc request done with client.db.upsertDoc',
-  stack: {
-    client: { db: { upsertDoc: true, getDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { upsertDoc: true, getDoc: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -99,10 +90,7 @@ export const test0003 = test({
 
 export const test0004 = test({
   name: 'does not returns doc made by forbidden update doc request done with client.db.upsertDoc',
-  stack: {
-    client: { db: { upsertDoc: true, getDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { upsertDoc: true, getDoc: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -133,10 +121,7 @@ export const test0004 = test({
 
 export const test0005 = test({
   name: 'returns ForbiddedError if forbidden',
-  stack: {
-    client: { db: { upsertDoc: true, getDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { upsertDoc: true, getDoc: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -161,10 +146,7 @@ export const test0005 = test({
 
 export const test0006 = test({
   name: 'returns ForbiddedError if forbidden, even if the doc absent',
-  stack: {
-    client: { db: { getDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { client: { db: { getDoc: true } }, ci: { deployDb: true } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
