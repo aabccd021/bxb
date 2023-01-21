@@ -140,10 +140,7 @@ const tests = [
           stack: { client: { db: { getDoc: true, upsertDoc: true } } },
           name: 'getDoc & upsertDoc',
           tests: {
-            first: {
-              expect: () => taskEither.of('result'),
-              toResult: either.right('result'),
-            },
+            first: { expect: () => taskEither.of('result'), toResult: either.right('result') },
           },
         }),
       ]),
@@ -168,10 +165,7 @@ const tests = [
           stack: { client: { db: { getDoc: true } } },
           name: 'getDoc',
           tests: {
-            first: {
-              expect: () => taskEither.of('result'),
-              toResult: either.right('result'),
-            },
+            first: { expect: () => taskEither.of('result'), toResult: either.right('result') },
           },
         }),
       ]),
@@ -196,10 +190,7 @@ const tests = [
           stack: { client: { db: { getDoc: true, upsertDoc: true, getDocWhen: true } } },
           name: 'getDoc & upsertDoc & getDocWhen',
           tests: {
-            first: {
-              expect: () => taskEither.of('result'),
-              toResult: either.right('result'),
-            },
+            first: { expect: () => taskEither.of('result'), toResult: either.right('result') },
           },
         }),
       ]),
@@ -242,30 +233,21 @@ const tests = [
           stack: { client: { db: { getDoc: true } } },
           name: 'seq getDoc',
           tests: {
-            first: {
-              expect: () => taskEither.of('result'),
-              toResult: either.right('result'),
-            },
+            first: { expect: () => taskEither.of('result'), toResult: either.right('result') },
           },
         }),
         defineSequentialTest({
           stack: { client: { db: { getDoc: true, upsertDoc: true } } },
           name: 'seq getDoc & upsertDoc',
           tests: {
-            first: {
-              expect: () => taskEither.of('result'),
-              toResult: either.right('result'),
-            },
+            first: { expect: () => taskEither.of('result'), toResult: either.right('result') },
           },
         }),
         defineSequentialTest({
           stack: { client: { db: { getDoc: true, upsertDoc: true, getDocWhen: true } } },
           name: 'seq getDoc & upsertDoc & getDocWhen',
           tests: {
-            first: {
-              expect: () => taskEither.of('result'),
-              toResult: either.right('result'),
-            },
+            first: { expect: () => taskEither.of('result'), toResult: either.right('result') },
           },
         }),
       ]),

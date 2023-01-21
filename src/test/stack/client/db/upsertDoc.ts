@@ -5,10 +5,7 @@ import { test } from '../../../util';
 
 export const test0001 = test({
   name: 'returns Forbidden when creating doc if create rule is not specified',
-  stack: {
-    ci: { deployDb: true },
-    client: { db: { upsertDoc: true } },
-  },
+  stack: { ci: { deployDb: true }, client: { db: { upsertDoc: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -27,10 +24,7 @@ export const test0001 = test({
 
 export const test0002 = test({
   name: 'returns Forbidden when updating doc if update rule is not specified',
-  stack: {
-    ci: { deployDb: true },
-    client: { db: { upsertDoc: true } },
-  },
+  stack: { ci: { deployDb: true }, client: { db: { upsertDoc: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -60,10 +54,7 @@ export const test0002 = test({
 
 export const test0003 = test({
   name: 'can create doc',
-  stack: {
-    ci: { deployDb: true },
-    client: { db: { upsertDoc: true } },
-  },
+  stack: { ci: { deployDb: true }, client: { db: { upsertDoc: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -88,10 +79,7 @@ export const test0003 = test({
 
 export const test0004 = test({
   name: 'returns Forbidden when creating doc if string given when int field required',
-  stack: {
-    ci: { deployDb: true },
-    client: { db: { upsertDoc: true } },
-  },
+  stack: { ci: { deployDb: true }, client: { db: { upsertDoc: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -115,10 +103,7 @@ export const test0004 = test({
 
 export const test0005 = test({
   name: 'returns Forbidden when creating doc if int given when string field required',
-  stack: {
-    ci: { deployDb: true },
-    client: { db: { upsertDoc: true } },
-  },
+  stack: { ci: { deployDb: true }, client: { db: { upsertDoc: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -139,10 +124,7 @@ export const test0005 = test({
 
 export const test0006 = test({
   name: 'returns Forbidden when creating doc if schema not specified',
-  stack: {
-    ci: { deployDb: true },
-    client: { db: { upsertDoc: true } },
-  },
+  stack: { ci: { deployDb: true }, client: { db: { upsertDoc: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -163,10 +145,7 @@ export const test0007 = test({
   name: 'can create doc if owner field value is owners auth uid',
   stack: {
     ci: { deployDb: true },
-    client: {
-      db: { upsertDoc: true },
-      auth: { createUserAndSignInWithEmailAndPassword: true },
-    },
+    client: { db: { upsertDoc: true }, auth: { createUserAndSignInWithEmailAndPassword: true } },
   },
   expect: ({ client, ci }) =>
     pipe(
@@ -205,10 +184,7 @@ export const test0008 = test({
   name: 'returns ForbidenError if owner field value is not owners auth uid, even if signed in',
   stack: {
     ci: { deployDb: true },
-    client: {
-      db: { upsertDoc: true },
-      auth: { createUserAndSignInWithEmailAndPassword: true },
-    },
+    client: { db: { upsertDoc: true }, auth: { createUserAndSignInWithEmailAndPassword: true } },
   },
   expect: ({ client, ci }) =>
     pipe(
@@ -244,10 +220,7 @@ export const test0008 = test({
 
 export const test0009 = test({
   name: 'returns Forbidden if not signed in',
-  stack: {
-    ci: { deployDb: true },
-    client: { db: { upsertDoc: true } },
-  },
+  stack: { ci: { deployDb: true }, client: { db: { upsertDoc: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({
@@ -276,10 +249,7 @@ export const test0009 = test({
 
 export const test0010 = test({
   name: 'returns Forbidden if not signed in, swap comparation',
-  stack: {
-    ci: { deployDb: true },
-    client: { db: { upsertDoc: true } },
-  },
+  stack: { ci: { deployDb: true }, client: { db: { upsertDoc: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployDb({

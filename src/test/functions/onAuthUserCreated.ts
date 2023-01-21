@@ -6,10 +6,7 @@ import { test } from '../util';
 export const test2 = test({
   name: 'onAuthUserCreated trigger can upsert doc',
   stack: {
-    client: {
-      auth: { createUserAndSignInWithEmailAndPassword: true },
-      db: { getDocWhen: true },
-    },
+    client: { auth: { createUserAndSignInWithEmailAndPassword: true }, db: { getDocWhen: true } },
     ci: { deployDb: true, deployFunctions: true },
     server: { db: { upsertDoc: true } },
   },
@@ -40,10 +37,7 @@ export const test2 = test({
       }),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: {
-            filePath: __filename,
-            exportPath: ['test2', 'functionsBuilders', 'fn1'],
-          },
+          functions: { filePath: __filename, exportPath: ['test2', 'functionsBuilders', 'fn1'] },
           server,
         })
       ),
@@ -105,10 +99,7 @@ export const test3 = test({
       }),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: {
-            filePath: __filename,
-            exportPath: ['test3', 'functionsBuilders', 'fn1'],
-          },
+          functions: { filePath: __filename, exportPath: ['test3', 'functionsBuilders', 'fn1'] },
           server,
         })
       ),
@@ -125,10 +116,7 @@ export const test3 = test({
 export const test4 = test({
   name: 'document should not be created if trigger not deployed',
   stack: {
-    client: {
-      auth: { createUserAndSignInWithEmailAndPassword: true },
-      db: { getDocWhen: true },
-    },
+    client: { auth: { createUserAndSignInWithEmailAndPassword: true }, db: { getDocWhen: true } },
     ci: { deployDb: true },
   },
   shouldTimeout: true,

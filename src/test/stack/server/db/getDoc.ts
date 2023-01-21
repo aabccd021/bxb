@@ -5,10 +5,7 @@ import { test } from '../../../util';
 
 export const test0002 = test({
   name: 'can upsert and get doc',
-  stack: {
-    server: { db: { upsertDoc: true, getDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { server: { db: { upsertDoc: true, getDoc: true } }, ci: { deployDb: true } },
   expect: ({ server, ci }) =>
     pipe(
       ci.deployDb({
@@ -33,10 +30,7 @@ export const test0002 = test({
 
 export const test0003 = test({
   name: 'can get doc even if client.db.getDoc is forbidden by security rule',
-  stack: {
-    server: { db: { upsertDoc: true, getDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { server: { db: { upsertDoc: true, getDoc: true } }, ci: { deployDb: true } },
   expect: ({ server, ci }) =>
     pipe(
       ci.deployDb({
@@ -61,10 +55,7 @@ export const test0003 = test({
 
 export const test0004 = test({
   name: 'can get doc if forbidden, even if client.db.getDoc is the doc absent',
-  stack: {
-    server: { db: { getDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { server: { db: { getDoc: true } }, ci: { deployDb: true } },
   expect: ({ server, ci }) =>
     pipe(
       ci.deployDb({

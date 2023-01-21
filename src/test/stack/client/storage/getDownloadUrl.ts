@@ -1,17 +1,15 @@
 import { either, taskEither } from 'fp-ts';
 import { pipe } from 'fp-ts/function';
 
-const fetch = (url: string) => import('node-fetch').then(({ default: _fetch }) => _fetch(url));
-
 import { test } from '../../../util';
+
+const fetch = (url: string) => import('node-fetch').then(({ default: _fetch }) => _fetch(url));
 
 export const test0001 = test({
   name: 'can get download url of base64 uploaded with client.storage.getDownloadUrl',
   stack: {
     ci: { deployStorage: true },
-    client: {
-      storage: { uploadDataUrl: true, getDownloadUrl: true },
-    },
+    client: { storage: { uploadDataUrl: true, getDownloadUrl: true } },
   },
   expect: ({ client, ci }) =>
     pipe(
@@ -35,9 +33,7 @@ export const test0002 = test({
   name: 'can get download url of plain text uploaded with client.storage.getDownloadUrl',
   stack: {
     ci: { deployStorage: true },
-    client: {
-      storage: { uploadDataUrl: true, getDownloadUrl: true },
-    },
+    client: { storage: { uploadDataUrl: true, getDownloadUrl: true } },
   },
   expect: ({ client, ci }) =>
     pipe(
@@ -58,9 +54,7 @@ export const test0003 = test({
   name: 'returns Forbidden if not allowed',
   stack: {
     ci: { deployStorage: true },
-    client: {
-      storage: { uploadDataUrl: true, getDownloadUrl: true },
-    },
+    client: { storage: { uploadDataUrl: true, getDownloadUrl: true } },
   },
   expect: ({ client, ci }) =>
     pipe(
@@ -75,10 +69,7 @@ export const test0003 = test({
 
 export const test0004 = test({
   name: 'returns Forbidden if not allowed even if the object is absent',
-  stack: {
-    ci: { deployStorage: true },
-    client: { storage: { getDownloadUrl: true } },
-  },
+  stack: { ci: { deployStorage: true }, client: { storage: { getDownloadUrl: true } } },
   expect: ({ client, ci }) =>
     pipe(
       ci.deployStorage({ securityRule: { create: [{ type: 'True' }] } }),
@@ -91,12 +82,7 @@ export const test0005 = test({
   name: 'can get download url of base64 uploaded with async client.storage.getDownloadUrl',
   stack: {
     ci: { deployStorage: true },
-    client: {
-      storage: {
-        uploadDataUrlAwaitFunctions: true,
-        getDownloadUrl: true,
-      },
-    },
+    client: { storage: { uploadDataUrlAwaitFunctions: true, getDownloadUrl: true } },
   },
   expect: ({ client, ci }) =>
     pipe(
@@ -120,12 +106,7 @@ export const test0006 = test({
   name: 'can get download url of plain text uploaded with async client.storage.getDownloadUrl',
   stack: {
     ci: { deployStorage: true },
-    client: {
-      storage: {
-        uploadDataUrlAwaitFunctions: true,
-        getDownloadUrl: true,
-      },
-    },
+    client: { storage: { uploadDataUrlAwaitFunctions: true, getDownloadUrl: true } },
   },
   expect: ({ client, ci }) =>
     pipe(

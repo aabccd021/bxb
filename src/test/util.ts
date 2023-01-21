@@ -14,9 +14,7 @@ export type Capability = (...p: readonly any[]) => any;
 export type CapabilitySingleOrSet = Capability | CapabilitySet;
 
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-export type CapabilitySet = {
-  readonly [key: string]: CapabilitySingleOrSet;
-};
+export type CapabilitySet = { readonly [key: string]: CapabilitySingleOrSet };
 
 export type MakeCapabilitySingleOrSetFilter<T extends CapabilitySingleOrSet> = T extends Capability
   ? true
@@ -29,9 +27,7 @@ export type MakeStackFilter<T extends CapabilitySet> = {
   readonly [KK in keyof T]?: MakeCapabilitySingleOrSetFilter<T[KK]>;
 };
 
-export type AnyFilter = {
-  readonly [key: string]: AnyFilter | true;
-};
+export type AnyFilter = { readonly [key: string]: AnyFilter | true };
 
 export type StackFilter = AnyFilter & MakeStackFilter<Stack.Type>;
 

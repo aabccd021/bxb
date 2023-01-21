@@ -6,15 +6,8 @@ import { test } from '../util';
 export const test1 = test({
   name: 'onObjectCreated trigger params contains object id with client.storage.uploadDataUrlAwaitFunctions',
   stack: {
-    client: {
-      db: { getDocWhen: true },
-      storage: { uploadDataUrlAwaitFunctions: true },
-    },
-    ci: {
-      deployDb: true,
-      deployStorage: true,
-      deployFunctions: true,
-    },
+    client: { db: { getDocWhen: true }, storage: { uploadDataUrlAwaitFunctions: true } },
+    ci: { deployDb: true, deployStorage: true, deployFunctions: true },
     server: { db: { upsertDoc: true } },
   },
   functionsBuilders: {
@@ -49,10 +42,7 @@ export const test1 = test({
       ),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: {
-            filePath: __filename,
-            exportPath: ['test1', 'functionsBuilders', 'fn1'],
-          },
+          functions: { filePath: __filename, exportPath: ['test1', 'functionsBuilders', 'fn1'] },
           server,
         })
       ),
@@ -75,15 +65,8 @@ export const test1 = test({
 export const test14 = test({
   name: 'uploadDataUrl should wait all functions to be finised with client.storage.uploadDataUrlAwaitFunctions',
   stack: {
-    ci: {
-      deployStorage: true,
-      deployDb: true,
-      deployFunctions: true,
-    },
-    client: {
-      storage: { uploadDataUrlAwaitFunctions: true },
-      db: { getDoc: true },
-    },
+    ci: { deployStorage: true, deployDb: true, deployFunctions: true },
+    client: { storage: { uploadDataUrlAwaitFunctions: true }, db: { getDoc: true } },
     server: { db: { upsertDoc: true } },
   },
   functionsBuilders: {
@@ -118,10 +101,7 @@ export const test14 = test({
       ),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: {
-            filePath: __filename,
-            exportPath: ['test14', 'functionsBuilders', 'fn1'],
-          },
+          functions: { filePath: __filename, exportPath: ['test14', 'functionsBuilders', 'fn1'] },
           server,
         })
       ),
@@ -141,16 +121,9 @@ export const test14 = test({
 export const test2 = test({
   name: 'onObjectCreated trigger params contains object id',
   stack: {
-    ci: {
-      deployStorage: true,
-      deployDb: true,
-      deployFunctions: true,
-    },
+    ci: { deployStorage: true, deployDb: true, deployFunctions: true },
     server: { db: { upsertDoc: true } },
-    client: {
-      storage: { uploadDataUrl: true },
-      db: { getDocWhen: true },
-    },
+    client: { storage: { uploadDataUrl: true }, db: { getDocWhen: true } },
   },
   functionsBuilders: {
     fn1: (server) => ({
@@ -184,10 +157,7 @@ export const test2 = test({
       ),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: {
-            filePath: __filename,
-            exportPath: ['test2', 'functionsBuilders', 'fn1'],
-          },
+          functions: { filePath: __filename, exportPath: ['test2', 'functionsBuilders', 'fn1'] },
           server,
         })
       ),
@@ -210,15 +180,8 @@ export const test2 = test({
 export const test24 = test({
   name: 'uploadDataUrl should not wait functions to be finished',
   stack: {
-    client: {
-      storage: { uploadDataUrl: true },
-      db: { getDoc: true },
-    },
-    ci: {
-      deployFunctions: true,
-      deployDb: true,
-      deployStorage: true,
-    },
+    client: { storage: { uploadDataUrl: true }, db: { getDoc: true } },
+    ci: { deployFunctions: true, deployDb: true, deployStorage: true },
     server: { db: { upsertDoc: true } },
   },
   functionsBuilders: {
@@ -253,10 +216,7 @@ export const test24 = test({
       ),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: {
-            filePath: __filename,
-            exportPath: ['test24', 'functionsBuilders', 'fn1'],
-          },
+          functions: { filePath: __filename, exportPath: ['test24', 'functionsBuilders', 'fn1'] },
           server,
         })
       ),
@@ -310,10 +270,7 @@ export const test3 = test({
       }),
       taskEither.chainW(() =>
         ci.deployFunctions({
-          functions: {
-            filePath: __filename,
-            exportPath: ['test3', 'functionsBuilders', 'fn1'],
-          },
+          functions: { filePath: __filename, exportPath: ['test3', 'functionsBuilders', 'fn1'] },
           server,
         })
       ),
@@ -331,10 +288,7 @@ export const test4 = test({
   name: 'document should not be created if trigger not deployed',
   stack: {
     ci: { deployDb: true },
-    client: {
-      storage: { uploadDataUrl: true },
-      db: { getDocWhen: true },
-    },
+    client: { storage: { uploadDataUrl: true }, db: { getDocWhen: true } },
   },
   shouldTimeout: true,
   expect: ({ client, ci }) =>

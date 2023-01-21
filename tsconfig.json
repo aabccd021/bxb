@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "lib": [
       "esnext"
     ],
-    "moduleResolution": "node",
+    "module": "commonjs",
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
@@ -18,6 +19,7 @@
     "target": "esnext"
   },
   "include": [
-    "src"
+    "src",
+    "test"
   ]
 }

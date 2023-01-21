@@ -5,10 +5,7 @@ import { test } from '../../../util';
 
 export const test0001 = test({
   name: 'can upsert doc',
-  stack: {
-    server: { db: { upsertDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { server: { db: { upsertDoc: true } }, ci: { deployDb: true } },
   expect: ({ server, ci }) =>
     pipe(
       ci.deployDb({
@@ -33,10 +30,7 @@ export const test0001 = test({
 
 export const test0002 = test({
   name: 'can upsert doc even if client.db.upserDoc is forbidden by security rule',
-  stack: {
-    server: { db: { upsertDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { server: { db: { upsertDoc: true } }, ci: { deployDb: true } },
   expect: ({ server, ci }) =>
     pipe(
       ci.deployDb({
@@ -61,10 +55,7 @@ export const test0002 = test({
 
 export const test0003 = test({
   name: 'can create doc even if not signed in',
-  stack: {
-    server: { db: { upsertDoc: true } },
-    ci: { deployDb: true },
-  },
+  stack: { server: { db: { upsertDoc: true } }, ci: { deployDb: true } },
   expect: ({ server, ci }) =>
     pipe(
       ci.deployDb({
