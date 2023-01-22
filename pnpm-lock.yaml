@@ -8,10 +8,8 @@ specifiers:
   eslint-config-chimeraant: ^1.2.8
   exec-main: ^1.0.2
   fp-ts: ^2.13.1
-  fp-ts-node: ^6.0.0
   io-ts: ^2.2.19
   next: ^13.0.4
-  node-fetch: ^3.3.0
   pnpm: ^7.17.0
   pure-test: ^1.0.6
   semantic-release: ^19.0.5
@@ -23,10 +21,8 @@ specifiers:
 
 dependencies:
   fp-ts: 2.13.1
-  fp-ts-node: 6.0.0_42cv5d24f3aca3wxphptnpsrgu
   io-ts: 2.2.19_fp-ts@2.13.1
   next: 13.0.4_biqbaboplfbrettd7655fr4n2y
-  node-fetch: 3.3.0
   ts-essentials: 9.3.0_typescript@4.9.4
   ts-pattern: 4.0.6
   valid-data-url: 4.0.1
@@ -559,6 +555,7 @@ packages:
 
   /@types/node/18.11.18:
     resolution: {integrity: sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==}
+    dev: true
 
   /@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
@@ -1180,11 +1177,6 @@ packages:
     resolution: {integrity: sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==}
     engines: {node: '>=8'}
     dev: true
-
-  /data-uri-to-buffer/4.0.0:
-    resolution: {integrity: sha512-Vr3mLBA8qWmcuschSLAOogKgQ/Jwxulv3RNE4FXnYWRGujzrRWQI4m12fQqRkwX06C0KanhLr4hK+GydchZsaA==}
-    engines: {node: '>= 12'}
-    dev: false
 
   /dateformat/3.0.3:
     resolution: {integrity: sha512-jyCETtSl3VMZMWeRo7iY1FL19ges1t55hMo5yaam4Jrsm5EPL89UQkoQRyiI+Yf4k8r2ZpdngkV8hr1lIdjb3Q==}
@@ -1860,14 +1852,6 @@ packages:
       reusify: 1.0.4
     dev: true
 
-  /fetch-blob/3.2.0:
-    resolution: {integrity: sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==}
-    engines: {node: ^12.20 || >= 14.13}
-    dependencies:
-      node-domexception: 1.0.0
-      web-streams-polyfill: 3.2.1
-    dev: false
-
   /figures/2.0.0:
     resolution: {integrity: sha512-Oa2M9atig69ZkfwiApY8F2Yy+tzMbazyvqv21R0NsSC8floSOC09BbT1ITWAdoMGQvJ/aZnR1KMwdx9tvHnTNA==}
     engines: {node: '>=4'}
@@ -1951,26 +1935,6 @@ packages:
       cross-spawn: 7.0.3
       signal-exit: 3.0.7
     dev: true
-
-  /formdata-polyfill/4.0.10:
-    resolution: {integrity: sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==}
-    engines: {node: '>=12.20.0'}
-    dependencies:
-      fetch-blob: 3.2.0
-    dev: false
-
-  /fp-ts-node/6.0.0_42cv5d24f3aca3wxphptnpsrgu:
-    resolution: {integrity: sha512-NQIbGRDvjrrJBrAsD3dSRH6Ieyygk7+PVYgn0mqZNVE4YikGusYXHrAbHfusUcCqpVQRkb1UyTRCpXpCQP/zcQ==}
-    engines: {node: 14 || 16}
-    peerDependencies:
-      '@types/node': ^14.14.31
-      fp-ts: ^2.9.5
-      typescript: ^4.1.5
-    dependencies:
-      '@types/node': 18.11.18
-      fp-ts: 2.13.1
-      typescript: 4.9.4
-    dev: false
 
   /fp-ts-std/0.15.1_sddbbwftoqt3d5g3p7ix53ouca:
     resolution: {integrity: sha512-JvWjUki14fxuse8QAFubdNi4g+o7qWq94n31sxlD8hobl8KbyfguK69yQZBkNQu+q+8b5yYxgyevs003w6sDNA==}
@@ -2921,11 +2885,6 @@ packages:
       - babel-plugin-macros
     dev: false
 
-  /node-domexception/1.0.0:
-    resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
-    engines: {node: '>=10.5.0'}
-    dev: false
-
   /node-emoji/1.11.0:
     resolution: {integrity: sha512-wo2DpQkQp7Sjm2A0cq+sN7EHKO6Sl0ctXeBdFZrL9T9+UywORbufTcTZxom8YqpLQt/FqNMUkOpkZrJVYSKD3A==}
     dependencies:
@@ -2943,15 +2902,6 @@ packages:
     dependencies:
       whatwg-url: 5.0.0
     dev: true
-
-  /node-fetch/3.3.0:
-    resolution: {integrity: sha512-BKwRP/O0UvoMKp7GNdwPlObhYGB5DQqwhEDQlNKuoqwVYSxkSZCSbHjnFFmUEtwSKRPU4kNK8PbDYYitwaE3QA==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-    dependencies:
-      data-uri-to-buffer: 4.0.0
-      fetch-blob: 3.2.0
-      formdata-polyfill: 4.0.10
-    dev: false
 
   /normalize-package-data/2.5.0:
     resolution: {integrity: sha512-/5CMN3T0R4XTj4DcGaexo+roZSdSFW/0AOOTROrjxzCG1wrWXEsGbRKevjlIL+ZDE4sZlJr5ED4YW0yqmkK+eA==}
@@ -4140,11 +4090,6 @@ packages:
       spdx-correct: 3.1.1
       spdx-expression-parse: 3.0.1
     dev: true
-
-  /web-streams-polyfill/3.2.1:
-    resolution: {integrity: sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==}
-    engines: {node: '>= 8'}
-    dev: false
 
   /webidl-conversions/3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
