@@ -1,9 +1,21 @@
+/// <reference lib="dom" />
 import { either, taskEither } from 'fp-ts';
-import { pipe } from 'fp-ts/function';
+import { identity, pipe } from 'fp-ts/function';
+import type { TaskEither } from 'fp-ts/TaskEither';
 
 import { test } from '../../../util';
 
-const fetch = (url: string) => import('node-fetch').then(({ default: _fetch }) => _fetch(url));
+type Env = {
+  readonly fetch: {
+    readonly text: (p: { readonly url: string }) => TaskEither<unknown, string>;
+  };
+};
+
+const node18Env: Env = {
+  fetch: {
+    text: ({ url }) => taskEither.tryCatch(() => fetch(url).then((res) => res.text()), identity),
+  },
+};
 
 export const test0001 = test({
   name: 'can get download url of base64 uploaded with client.storage.getDownloadUrl',
@@ -21,10 +33,7 @@ export const test0001 = test({
         })
       ),
       taskEither.chainW(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
-      taskEither.chainW((url) => taskEither.tryCatch(() => fetch(url), either.toError)),
-      taskEither.chainW((downloadResult) =>
-        taskEither.tryCatch(() => downloadResult.text(), either.toError)
-      )
+      taskEither.chainW((url) => node18Env.fetch.text({ url }))
     ),
   toResult: either.right('kira masumoto'),
 });
@@ -42,10 +51,7 @@ export const test0002 = test({
         client.storage.uploadDataUrl({ key: 'kira_key', dataUrl: `data:,kira masumoto` })
       ),
       taskEither.chainW(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
-      taskEither.chainW((url) => taskEither.tryCatch(() => fetch(url), either.toError)),
-      taskEither.chainW((downloadResult) =>
-        taskEither.tryCatch(() => downloadResult.text(), either.toError)
-      )
+      taskEither.chainW((url) => node18Env.fetch.text({ url }))
     ),
   toResult: either.right('kira masumoto'),
 });
@@ -94,10 +100,7 @@ export const test0005 = test({
         })
       ),
       taskEither.chainW(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
-      taskEither.chainW((url) => taskEither.tryCatch(() => fetch(url), either.toError)),
-      taskEither.chainW((downloadResult) =>
-        taskEither.tryCatch(() => downloadResult.text(), either.toError)
-      )
+      taskEither.chainW((url) => node18Env.fetch.text({ url }))
     ),
   toResult: either.right('kira masumoto'),
 });
@@ -118,10 +121,7 @@ export const test0006 = test({
         })
       ),
       taskEither.chainW(() => client.storage.getDownloadUrl({ key: 'kira_key' })),
-      taskEither.chainW((url) => taskEither.tryCatch(() => fetch(url), either.toError)),
-      taskEither.chainW((downloadResult) =>
-        taskEither.tryCatch(() => downloadResult.text(), either.toError)
-      )
+      taskEither.chainW((url) => node18Env.fetch.text({ url }))
     ),
   toResult: either.right('kira masumoto'),
 });
